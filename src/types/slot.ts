@@ -27,6 +27,12 @@ export interface Slot {
   slug: string
   /** 이벤트명 — 관리 화면에서 슬롯을 고를 때 보인다 */
   name: string
+  /**
+   * 이 슬롯이 쓰는 카드 범위 — 도감·업로드·뽑기·질문 전부의 단일 소스.
+   * 'major' 면 22장, 'full' 이면 78장. 없으면 'full' (getSlotDeck).
+   * 카테고리·질문 덱은 이 범위를 넘을 수 없다 (effectiveDeck 로 캡).
+   */
+  deck?: DeckRange
   theme: Theme
   event: EventConfig
 }

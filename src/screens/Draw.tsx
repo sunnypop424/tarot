@@ -8,9 +8,10 @@ import { getCardById } from '@/data/cards'
 import { verdictOf, VERDICT_LABEL, VERDICT_NOTE } from '@/data/yesno'
 import { savePeriodDraw, loadPeriodDraw } from '@/lib/storage'
 import { useSlot } from '@/slot/SlotProvider'
+import { effectiveDeck } from '@/data/slots'
 import { useSlotPath } from '@/slot/useSlotPath'
 import type { SpreadOptions } from '@/lib/deck'
-import type { CategorySetting } from '@/types/slot'
+import type { CategorySetting, Slot } from '@/types/slot'
 import type { DrawnCard } from '@/types/card'
 import { NotReady } from './NotReady'
 import styles from './Draw.module.css'
@@ -41,10 +42,10 @@ function restorePeriodDraw(category: Category): DrawnCard[] | null {
   return drawn.length === saved.length ? drawn : null
 }
 
-/** 슬롯의 이벤트 설정 → 덱 옵션. 지정 안 한 값은 buildSpread 기본값을 쓴다 */
-function spreadOptionsFrom(setting: CategorySetting | undefined): SpreadOptions {
+/** 슬롯의 이벤트 설정 → 덱 옵션. 덱은 슬롯 범위로 캡한다(22장 슬롯이면 마이너 안 나온다) */
+function spreadOptionsFrom(setting: CategorySetting | undefined, slot: Slot): SpreadOptions {
   return {
-    deck: setting?.deck,
+    deck: effectiveDeck(slot, setting?.deck),
     spreadCount: setting?.spreadCount,
     allowReversed: setting?.allowReversed,
     reversedRate: setting?.reversedRate,
@@ -53,8 +54,8 @@ function spreadOptionsFrom(setting: CategorySetting | undefined): SpreadOptions 
 
 function DrawFlow({ category }: { category: Category }) {
   const { go } = useSlotPath()
-  const { event } = useSlot()
-  const setting = event[category.id]
+  const slot = useSlot()
+  const setting = slot.event[category.id]
   // 기간 카테고리는 이미 뽑았으면 저장된 결과로 바로 들어간다
   const [revealed, setRevealed] = useState<DrawnCard[] | null>(() => restorePeriodDraw(category))
 
@@ -93,7 +94,7 @@ function DrawFlow({ category }: { category: Category }) {
       note={category.renews}
       cardCount={positions.length}
       positions={positions}
-      spread={spreadOptionsFrom(setting)}
+      spread={spreadOptionsFrom(setting, slot)}
       onComplete={handleComplete}
     />
   )

@@ -2,6 +2,7 @@
   {
     "slug": "demo",
     "name": "데모 생일카페",
+    "deck": "full",
     "theme": {
       "colors": {
         "canvas": "#0F1020",
@@ -41,6 +42,7 @@
   {
     "slug": "sample-pink",
     "name": "샘플 생일카페 (핑크)",
+    "deck": "full",
     "theme": {
       "colors": {
         "canvas": "#1A0F16",

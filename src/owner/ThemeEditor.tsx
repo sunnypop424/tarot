@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { Download, Upload, RotateCcw } from 'lucide-react'
 
-import { getSlots, saveSlotsDraft, clearSlotsDraft } from '@/data/slots'
+import { getSlots, saveSlotsDraft, clearSlotsDraft, getSlotDeck } from '@/data/slots'
 import { CATEGORIES } from '@/data/categories'
 import type { DeckRange } from '@/data/cards'
 import type { Slot, CategorySetting } from '@/types/slot'
@@ -87,7 +87,6 @@ const BASE_PRESETS: { id: 'dark' | 'light'; label: string; base: Pick<ThemeColor
 export default function ThemeEditor() {
   const [slots, setSlots] = useState<Slot[]>(() => getSlots())
   const [index, setIndex] = useState(0)
-  const [cardDeck, setCardDeck] = useState<DeckRange>('major')
   const slot = slots[index]
 
   /** 편집분을 localStorage 에 저장 — SlotProvider 가 이걸 우선 읽어 미리보기가 살아난다 */
@@ -415,25 +414,25 @@ export default function ThemeEditor() {
               </div>
               <div className="field" style={{ maxWidth: 240, marginBottom: 'var(--space-base)' }}>
                 <label className="field__label" htmlFor="card-deck">
-                  올릴 카드 범위
+                  사용할 카드 범위
                 </label>
                 <select
                   id="card-deck"
                   className="select"
-                  value={cardDeck}
-                  onChange={(e) => setCardDeck(e.target.value as DeckRange)}
+                  value={getSlotDeck(slot)}
+                  onChange={(e) => patchSlot({ deck: e.target.value as DeckRange })}
                 >
                   <option value="major">메이저 22장</option>
                   <option value="full">전체 78장</option>
                 </select>
                 <span className="field__hint">
-                  이벤트·질문이 전체 덱을 쓰면 78장을 다 올려야 해요. 안 올린 카드는 이름 텍스트로
-                  나옵니다.
+                  이 슬롯 전체의 카드 범위예요 — 도감·뽑기·질문 답변칸이 모두 이 값을 따릅니다.
+                  선택한 범위만큼 앞면을 올리면 되고, 안 올린 카드는 이름 텍스트로 나옵니다.
                 </span>
               </div>
               <CardUploader
                 slug={slot.slug}
-                deck={cardDeck}
+                deck={getSlotDeck(slot)}
                 ext={slot.theme.assets.cardFrontExt}
                 onExtChange={(ext) => patchAsset('cardFrontExt', ext)}
                 onBaseChange={(base) => patchAsset('cardFrontBase', base)}

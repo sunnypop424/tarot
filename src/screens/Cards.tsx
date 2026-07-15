@@ -2,7 +2,9 @@ import { useState } from 'react'
 
 import { CardFace } from '@/components/CardFace'
 import { useSlotPath } from '@/slot/useSlotPath'
-import { CARDS, SUIT_LABELS } from '@/data/cards'
+import { useSlot } from '@/slot/SlotProvider'
+import { getSlotDeck } from '@/data/slots'
+import { CARDS, MAJOR_CARDS, SUIT_LABELS } from '@/data/cards'
 import type { Suit } from '@/types/card'
 import styles from './Cards.module.css'
 
@@ -16,32 +18,40 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'pentacles', label: SUIT_LABELS.pentacles },
 ]
 
-/** 카드 도감 — 78장 전체를 훑어보는 곳 */
+/** 카드 도감 — 이 슬롯이 쓰는 카드만 훑어본다 (메이저 슬롯이면 22장) */
 export function Cards() {
   const { go } = useSlotPath()
+  const majorOnly = getSlotDeck(useSlot()) === 'major'
   const [filter, setFilter] = useState<Filter>('major')
 
-  const list = CARDS.filter((c) => (filter === 'major' ? c.arcana === 'major' : c.suit === filter))
+  // 메이저 슬롯은 22장만 — 수트 필터가 없으니 통째로, 전체 슬롯은 선택 수트로 거른다
+  const list = majorOnly
+    ? MAJOR_CARDS
+    : CARDS.filter((c) => (filter === 'major' ? c.arcana === 'major' : c.suit === filter))
 
   return (
     <div className="screen">
       <h1 className="t-title-l screen__title">카드 도감</h1>
-      <p className="t-text-m screen__lead">78장의 의미를 살펴보세요.</p>
+      <p className="t-text-m screen__lead">
+        {majorOnly ? '메이저 22장' : '78장'}의 의미를 살펴보세요.
+      </p>
 
-      <div className={`segment ${styles.suits}`} role="tablist" aria-label="수트">
-        {FILTERS.map(({ id, label }) => (
-          <button
-            key={id}
-            type="button"
-            role="tab"
-            className="segment__item"
-            aria-selected={filter === id}
-            onClick={() => setFilter(id)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      {!majorOnly && (
+        <div className={`segment ${styles.suits}`} role="tablist" aria-label="수트">
+          {FILTERS.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              className="segment__item"
+              aria-selected={filter === id}
+              onClick={() => setFilter(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <ul className={styles.grid}>
         {list.map((card) => (

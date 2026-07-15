@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom'
 
 import { CardDraw } from '@/components/CardDraw'
 import { useSlotPath } from '@/slot/useSlotPath'
+import { useSlot } from '@/slot/SlotProvider'
+import { effectiveDeck } from '@/data/slots'
 import { FlipCard } from '@/components/FlipCard'
 import { useQuestion, useQuestions } from '@/lib/questions'
 import { answerFor } from '@/lib/answer'
@@ -26,6 +28,7 @@ export function Question() {
 
 function QuestionFlow({ question }: { question: QuestionType }) {
   const { go } = useSlotPath()
+  const slot = useSlot()
   const [revealed, setRevealed] = useState<DrawnCard[] | null>(null)
 
   if (!revealed) {
@@ -35,9 +38,9 @@ function QuestionFlow({ question }: { question: QuestionType }) {
         lead={question.question}
         cardCount={question.cardCount}
         positions={positionsFor(question)}
-        // 질문마다 덱 범위·펼침 수·역방향을 따로 정할 수 있다 (관리자 설정)
+        // 질문마다 덱 범위·펼침 수·역방향을 따로 정할 수 있다 (단, 슬롯 범위로 캡)
         spread={{
-          deck: question.deck,
+          deck: effectiveDeck(slot, question.deck),
           spreadCount: question.spreadCount,
           allowReversed: question.allowReversed,
           reversedRate: question.reversedRate,

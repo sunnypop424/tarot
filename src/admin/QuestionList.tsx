@@ -4,6 +4,7 @@ import { Plus, Trash2, ChevronRight } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import { useSlot } from '@/slot/SlotProvider'
+import { getSlotDeck } from '@/data/slots'
 import type { Question } from '@/types/question'
 
 /** 새 질문의 기본값 — 가장 가벼운 설정(메이저 1장)에서 시작한다 */
@@ -23,7 +24,9 @@ function blankQuestion(): Question {
 }
 
 export function QuestionList() {
-  const { slug } = useSlot()
+  const slot = useSlot()
+  const slug = slot.slug
+  const majorOnly = getSlotDeck(slot) === 'major'
   const navigate = useNavigate()
   const [questions, setQuestions] = useState<Question[] | null>(null)
 
@@ -98,7 +101,7 @@ export function QuestionList() {
                 <span className="t-text-m">{q.question || '(제목 없음)'}</span>
                 <br />
                 <span className="t-text-xs t-muted">
-                  {q.cardCount}장 · {q.deck === 'major' ? '메이저 22장' : '전체 78장'} ·{' '}
+                  {q.cardCount}장 · {majorOnly || q.deck === 'major' ? '메이저 22장' : '전체 78장'} ·{' '}
                   {answeredCount(q)}개 답변 입력됨
                 </span>
               </button>

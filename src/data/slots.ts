@@ -1,5 +1,19 @@
 import slotsJson from './slots.json'
+import type { DeckRange } from './cards'
 import type { Slot } from '@/types/slot'
+
+/** 슬롯이 쓰는 카드 범위 — 없으면 전체(78장) */
+export function getSlotDeck(slot: Slot): DeckRange {
+  return slot.deck ?? 'full'
+}
+
+/**
+ * 카테고리·질문이 원하는 덱을 슬롯 범위로 캡한다.
+ * 슬롯이 메이저 22장이면 무조건 major, 전체 슬롯이면 원하는 값을 그대로(미지정은 그대로 undefined).
+ */
+export function effectiveDeck(slot: Slot, wanted: DeckRange | undefined): DeckRange | undefined {
+  return getSlotDeck(slot) === 'major' ? 'major' : wanted
+}
 
 /**
  * 슬롯 목록 — 소유자가 정해서 배포한다 (주최자는 못 바꾼다).

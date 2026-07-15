@@ -4,6 +4,7 @@ import { ChevronLeft, Sparkles } from 'lucide-react'
 
 import { getDeck, type DeckRange } from '@/data/cards'
 import { repo } from '@/lib/repo'
+import { getSlotDeck } from '@/data/slots'
 import { useSlot } from '@/slot/SlotProvider'
 import type { Aspect, Card, Orientation } from '@/types/card'
 import type { Question } from '@/types/question'
@@ -18,8 +19,8 @@ const ASPECTS: { value: Aspect; label: string }[] = [
 ]
 
 /** 펼침 수 검증 (PLANNING.md §2) — 고를 여지가 없으면 뽑는 의미가 사라진다 */
-function validate(q: Question): string | null {
-  const deckSize = getDeck(q.deck).length
+function validate(q: Question, deck: DeckRange): string | null {
+  const deckSize = getDeck(deck).length
   if (q.spreadCount === null) return null
   if (q.spreadCount > deckSize) return `펼치는 수가 덱 장수(${deckSize})보다 많아요.`
   if (q.spreadCount < q.cardCount + 2)
@@ -28,7 +29,10 @@ function validate(q: Question): string | null {
 }
 
 export function QuestionEditor() {
-  const { slug } = useSlot()
+  const slot = useSlot()
+  const slug = slot.slug
+  // 슬롯이 메이저 22장이면 질문 덱도 22장으로 잠긴다 (전체 78장 못 씀)
+  const slotIsMajor = getSlotDeck(slot) === 'major'
   const { questionId } = useParams<{ questionId: string }>()
   const navigate = useNavigate()
 
@@ -75,13 +79,15 @@ export function QuestionEditor() {
     [slug]
   )
 
-  const cards = useMemo(() => (draft ? getDeck(draft.deck) : []), [draft])
+  // 답변칸이 채워야 할 카드 — 슬롯이 메이저면 draft.deck 과 무관하게 22장
+  const effDeck: DeckRange = slotIsMajor ? 'major' : (draft?.deck ?? 'major')
+  const cards = useMemo(() => (draft ? getDeck(effDeck) : []), [draft, effDeck])
 
   if (draft === null) {
     return <p className="t-body t-muted">질문을 찾을 수 없어요.</p>
   }
 
-  const error = validate(draft)
+  const error = validate(draft, effDeck)
 
   return (
     <>
@@ -154,13 +160,18 @@ export function QuestionEditor() {
             <select
               id="q-deck"
               className="select"
-              value={draft.deck}
+              value={effDeck}
+              disabled={slotIsMajor}
               onChange={(e) => patch({ deck: e.target.value as DeckRange })}
             >
               <option value="major">메이저 22장</option>
               <option value="full">전체 78장</option>
             </select>
-            <span className="field__hint">답변을 채울 카드 수가 달라져요.</span>
+            <span className="field__hint">
+              {slotIsMajor
+                ? '이 슬롯은 메이저 22장으로 설정돼 전체 78장은 쓸 수 없어요.'
+                : '답변을 채울 카드 수가 달라져요.'}
+            </span>
           </div>
 
           <div className="field">
@@ -172,7 +183,7 @@ export function QuestionEditor() {
               className="input"
               type="number"
               min={3}
-              max={78}
+              max={cards.length}
               value={draft.spreadCount ?? ''}
               placeholder="비우면 덱 전체"
               onChange={(e) =>
@@ -278,7 +289,7 @@ function AnswerRow({
   const total = question.allowReversed ? 2 : 1
 
   return (
-    <div className={styles.answerRow}>
+    <div className={styles.answerRow} data-answer-row>
       <button
         type="button"
         className={styles.answerToggle}
