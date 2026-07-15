@@ -1,0 +1,140 @@
+/**
+ * 디자인 토큰 — 단일 소스 오브 트루스
+ * 이 파일 밖에서 hex 리터럴을 쓰지 말 것.
+ *
+ * 여기 값은 "기본 테마"일 뿐이다. 생일카페 이벤트마다 색·패턴·로고가 바뀌므로
+ * 아래 색 토큰은 런타임에 src/lib/theme.ts 의 applyTheme() 이 덮어쓴다.
+ * 색 이름은 역할 기반으로 짓는다 — `gold` 처럼 색을 특정하면 테마가 바뀌는 순간 거짓말이 된다.
+ */
+
+:root {
+  /* ── 색: 인터랙션 (테마 종속) ─────────────────────── */
+  /* CTA, 활성 탭, 선택 글로우 */
+  --color-primary: #816bff;
+  --color-primary-hover: #6e58ff;
+  --color-primary-soft: #b7aaff;
+  --color-on-primary: #ffffff;
+
+  /* ── 색: 포인트/장식 (테마 종속) ──────────────────── */
+  /* 카드 테두리, 장식 아이콘, 별 문양 — 기본 테마에선 골드 */
+  --color-accent: #d4af37;
+  --color-accent-soft: #e8cf7a;
+
+  /* 시스템 에러 전용 — 테마와 무관하게 고정 (운세의 "나쁨"에 쓰지 말 것) */
+  --color-error: #f16361;
+
+  /* ── 색: 표면·텍스트 (테마 종속) ──────────────────── */
+  --color-canvas: #0f1020;
+  --color-surface: #1a1b2e;
+  --color-surface-raised: #242537;
+  --color-wash: #241f45;
+  --color-fg-1: #f2f0fa;
+  --color-fg-2: #c6c3d8;
+  --color-fg-3: #9a97b0;
+  --color-border: #2e2f45;
+  --color-border-hover: #3a3b57;
+  --color-disabled-bg: #2e2f45;
+  --color-disabled-fg: #6b6880;
+  --color-dim: rgba(15, 16, 32, 0.7);
+
+  /* 내장 카드 뒷면 SVG 의 방사형 그라디언트 (테마에 뒷면 이미지가 없을 때만 쓰임) */
+  --card-back-from: #1e1f3e;
+  --card-back-to: #101127;
+
+  /* ── 배경 패턴 (테마 종속) ────────────────────────── */
+  --bg-pattern: none;
+  --bg-pattern-opacity: 0.12;
+  --bg-pattern-size: cover;
+  --bg-pattern-repeat: no-repeat;
+
+  /* ── 타이포그래피 ─────────────────────────────────── */
+  --font-sans: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto,
+    'Noto Sans KR', sans-serif;
+
+  --text-xxs: 0.75rem; /* 12px — 면책 문구 */
+  --text-xs: 0.8125rem; /* 13px — 메타데이터, 키워드 칩 */
+  --text-s: 0.875rem; /* 14px — 탭, 토스트, 작은 라벨 */
+  --text-m: 1rem; /* 16px — 해석 본문 */
+  --text-l: 1.125rem; /* 18px — 버튼 라벨, 강조 본문 */
+  --title-s: 1.25rem; /* 20px — 포지션 라벨, 소제목 */
+  --title-m: 1.5rem; /* 24px — 카드 이름, 블록 타이틀 */
+  --title-l: 1.75rem; /* 28px — 섹션 타이틀 */
+  --title-xl: 2rem; /* 32px — 화면 타이틀 */
+  --title-xxl: 2.5rem; /* 40px — 결과 카드 이름 (대형) */
+
+  /* 웨이트는 두 단계만. 700 초과 금지 (DESIGN.md §3) */
+  --weight-normal: 400;
+  --weight-bold: 700;
+
+  --leading-tight: 1.5; /* 기본 */
+  --leading-body: 1.7; /* 해석 본문 — 호흡이 길어 행간을 넉넉히 */
+
+  /* ── 스페이싱 (8px 리듬) ──────────────────────────── */
+  --space-xs: 0.25rem; /* 4 */
+  --space-sm: 0.5rem; /* 8 */
+  --space-md: 0.75rem; /* 12 */
+  --space-base: 1rem; /* 16 */
+  --space-lg: 1.5rem; /* 24 */
+  --space-xl: 2rem; /* 32 */
+  --space-xxl: 3rem; /* 48 */
+
+  /* ── 형태 ─────────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 8px; /* 버튼, 토스트 */
+  --radius-lg: 16px; /* 카드, 타일 */
+  --radius-full: 9999px; /* 칩, 세그먼트 */
+
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
+  /* 히어로처럼 크게 떠 있는 카드 — 그림자를 깊게 + 보라 기운을 옅게 */
+  --shadow-card-lifted: 0 16px 40px rgba(0, 0, 0, 0.5),
+    0 0 24px rgba(129, 107, 255, 0.12);
+  --shadow-glow: 0 0 24px rgba(129, 107, 255, 0.25);
+  --shadow-hairline: 0 1px 0 0 var(--color-border);
+
+  /* ── 레이아웃 ─────────────────────────────────────── */
+  --layout-max: 480px; /* 콘텐츠 최대 폭 — 그 이상은 여백 */
+  --layout-pad: 1.25rem; /* 20px 좌우 패딩 */
+  --tap-min: 44px; /* 최소 터치 타깃 */
+  --tabbar-h: 64px;
+  --header-h: 56px;
+  --card-ratio: 3 / 5; /* 타로 카드 고정 비율 */
+
+  /* ── 모션 (DESIGN.md §15) ─────────────────────────── */
+  --dur-micro: 200ms; /* 색·상태 전환 */
+  --dur-short: 400ms; /* 오버레이, 토스트 */
+  --dur-flip: 600ms; /* 카드 뒤집기 */
+  --dur-fly: 420ms; /* 고른 카드가 슬롯으로 날아가는 시간 */
+  --dur-shuffle: 1200ms; /* 셔플 연출 */
+  --dur-shimmer: 1500ms; /* 스켈레톤 루프 */
+  --stagger-flip: 150ms; /* 3장 스프레드 순차 플립 간격 */
+  --ease: ease;
+}
+
+/* ── 라이트 테마 (보조) — 색 토큰만 스왑 ───────────── */
+:root[data-theme='light'] {
+  --color-canvas: #faf8ff;
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-wash: #f0edff;
+  --color-fg-1: #1a1b2e;
+  --color-fg-2: #4a4860;
+  --color-fg-3: #7a7791;
+  --color-border: #e8e5f2;
+  --color-border-hover: #d5d0e8;
+  --color-disabled-bg: #eeeeee;
+  --color-disabled-fg: #b0aebd;
+  --color-dim: rgba(15, 16, 32, 0.5);
+
+  --shadow-card: 0 4px 16px rgba(26, 27, 46, 0.12);
+  /* 카드 뒷면은 라이트 모드에서도 딥 네이비 유지 — 카드가 주인공 */
+}
+
+/* 모션 최소화 선호 시 전 구간 즉시 전환 (DESIGN.md §8) */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-flip: 0ms;
+    --dur-fly: 0ms;
+    --dur-shuffle: 0ms;
+    --stagger-flip: 0ms;
+  }
+}

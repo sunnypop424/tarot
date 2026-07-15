@@ -1,0 +1,290 @@
+/**
+ * 관리자 전용 공통 클래스.
+ *
+ * 사용자 앱과 다른 점 (DESIGN.md §5 예외):
+ *  - 최대 폭 제한 없음 — 데스크톱 편집 작업 전제, 데이터 밀도 높은 레이아웃 허용
+ *  - 미스틱 장식(별·글로우) 없음 — 기능 위주
+ *  - **편집 중인 이벤트 테마에 물들지 않는다.** 슬롯 테마가 관리 UI 를 덮으면
+ *    (예: 대비 낮은 색을 저장한 순간) 관리 자체가 불가능해진다 → .admin 에서 색 토큰을 기본값으로 리셋
+ *
+ * 색·크기는 여기서도 토큰으로만 참조한다 (hex 는 tokens.css 밖에 두지 않는다).
+ */
+
+/**
+ * 두 관리 화면 모두 슬롯 테마에 물들면 안 되므로 색 토큰을 자기 값으로 리셋한다.
+ *  .admin — 주최자용. 사용자 앱과 같은 다크 무드
+ *  .owner — 소유자용 테마 편집기. 색을 눈으로 고르는 작업이라 라이트가 낫다
+ */
+.admin,
+.owner {
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+
+  min-height: 100dvh;
+  background: var(--color-canvas);
+  color: var(--color-fg-1);
+}
+
+.admin {
+  color-scheme: dark;
+  --color-canvas: #0f1020;
+  --color-surface: #1a1b2e;
+  --color-surface-raised: #242537;
+  --color-wash: #241f45;
+  --color-primary: #816bff;
+  --color-primary-hover: #6e58ff;
+  --color-primary-soft: #b7aaff;
+  --color-accent: #d4af37;
+  --color-fg-1: #f2f0fa;
+  --color-fg-2: #c6c3d8;
+  --color-fg-3: #9a97b0;
+  --color-border: #2e2f45;
+  --color-border-hover: #3a3b57;
+  --color-on-primary: #ffffff;
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* 편집 중인 이벤트 색(어두울 수도, 밝을 수도)과 섞이지 않게 도구는 늘 라이트로 고정 */
+.owner {
+  color-scheme: light;
+  --color-canvas: #f5f4fa;
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-wash: #efecff;
+  --color-primary: #5b45e8;
+  --color-primary-hover: #4a34d6;
+  --color-primary-soft: #4a34d6;
+  --color-accent: #a1740a;
+  --color-fg-1: #16172a;
+  --color-fg-2: #4a4860;
+  --color-fg-3: #7a7791;
+  --color-border: #e3e0ee;
+  --color-border-hover: #cfcbe0;
+  --color-on-primary: #ffffff;
+  --shadow-card: 0 4px 16px rgba(22, 23, 42, 0.1);
+}
+
+/* ══ 셸 ════════════════════════════════════════════ */
+
+.admin__shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.admin__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  border-right: 1px solid var(--color-border);
+}
+
+.admin__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.admin__navlink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-md);
+  color: var(--color-fg-2);
+  font-size: var(--text-s);
+  font-weight: var(--weight-bold);
+  transition: background-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+.admin__navlink:hover {
+  background: var(--color-surface);
+  color: var(--color-fg-1);
+}
+.admin__navlink[aria-current='page'] {
+  background: var(--color-wash);
+  color: var(--color-primary-soft);
+}
+
+.admin__main {
+  min-width: 0;
+  padding: var(--space-xl);
+}
+
+.admin__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+/* 모바일 — 사이드바를 상단 가로 탭으로 (항목이 적어 햄버거보다 가볍다) */
+@media (max-width: 768px) {
+  .admin__shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin__side {
+    gap: var(--space-md);
+    padding: var(--space-base);
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .admin__nav {
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .admin__nav::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+  .admin__navlink {
+    flex: 0 0 auto;
+  }
+  .admin__main {
+    padding: var(--space-base);
+  }
+}
+
+/* ══ 폼 ════════════════════════════════════════════ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.field__label {
+  color: var(--color-fg-2);
+  font-size: var(--text-s);
+  font-weight: var(--weight-bold);
+}
+
+.field__hint {
+  color: var(--color-fg-3);
+  font-size: var(--text-xs);
+}
+
+.field__error {
+  color: var(--color-error);
+  font-size: var(--text-xs);
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-fg-1);
+  font-size: var(--text-m);
+  transition: border-color var(--dur-micro) var(--ease);
+}
+.input:focus,
+.textarea:focus,
+.select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.textarea {
+  min-height: 96px;
+  line-height: var(--leading-body);
+  resize: vertical;
+}
+
+.select {
+  cursor: pointer;
+}
+
+/* 색 입력 — 피커 + hex 를 나란히 */
+.color-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.color-field input[type='color'] {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+}
+
+/* 스위치 대신 체크박스 행 */
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: var(--tap-min);
+  cursor: pointer;
+}
+.check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* ══ 폼 그리드 ═════════════════════════════════════ */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-base);
+}
+
+.admin-section {
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.admin-section__title {
+  margin-bottom: var(--space-base);
+}
+
+/* ══ 행 목록 ═══════════════════════════════════════ */
+
+.row-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.row-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.row-item__grow {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 저장 상태 */
+.save-state {
+  color: var(--color-fg-3);
+  font-size: var(--text-xs);
+}
+.save-state--dirty {
+  color: var(--color-accent);
+}

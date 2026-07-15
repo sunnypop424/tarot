@@ -1,0 +1,9 @@
+/* 질문 타로 — 주제별 그리드 아래 */
+.questions {
+  margin-top: var(--space-xxl);
+}
+
+/* 목록 행(.list-row)과 같은 높이로 자리를 잡아 로딩 후 밀리지 않게 */
+.questionSkeleton {
+  height: 56px;
+}

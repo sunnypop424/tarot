@@ -1,0 +1,113 @@
+/**
+ * 카드 고르기 — 위쪽 슬롯 + 아래쪽 덱 그리드 + 날아가는 카드.
+ * 덱에서 고른 카드가 슬롯으로 날아가 얹힌다 (FLIP: 원래 위치에서 슬롯 위치로 transform).
+ */
+
+/* ══ 슬롯 ══════════════════════════════════════════ */
+.slots {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+.slot {
+  position: relative;
+  width: 100%;
+  max-width: 68px;
+}
+
+/**
+ * 카드가 놓일 자리. 비어 있든 차 있든 높이가 같아야 한다 —
+ * 안 그러면 카드가 얹히는 순간 아래 버튼이 덜컹 밀린다.
+ */
+.slotBox {
+  position: relative;
+  aspect-ratio: var(--card-ratio);
+}
+
+/* 빈 칸 — 점선으로 "여기에 놓인다"를 보여준다 */
+.slotEmpty {
+  width: 100%;
+  height: 100%;
+  border: 1px dashed var(--color-border-hover);
+  border-radius: var(--radius-lg);
+}
+
+/* 카드가 날아오는 동안 목적지 칸을 은은하게 밝힌다 */
+.slotEmpty--incoming {
+  border-color: var(--color-primary);
+  border-style: solid;
+  box-shadow: var(--shadow-glow);
+}
+
+.slotCard {
+  display: block;
+  height: 100%;
+  animation: slot-land var(--dur-micro) var(--ease);
+}
+
+/* 착지 순간의 짧은 반동 */
+@keyframes slot-land {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* 슬롯 카드 제거 — 다시 고르기 */
+.remove {
+  position: absolute;
+  top: calc(var(--space-sm) * -1);
+  right: calc(var(--space-sm) * -1);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+  color: var(--color-fg-1);
+  transition: background-color var(--dur-micro) var(--ease);
+}
+.remove:hover {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+/* 터치 타깃 44px 확보 — 시각 크기는 28px로 두고 히트 영역만 넓힌다 */
+.remove::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+/* 라벨은 카드 유무와 상관없이 항상 자리를 차지한다 (두 줄까지 대비) */
+.slotLabel {
+  display: block;
+  min-height: calc(var(--text-xxs) * 1.5 * 2);
+  margin-top: var(--space-sm);
+  text-align: center;
+  word-break: keep-all;
+}
+
+/* ══ 날아가는 카드 ═════════════════════════════════ */
+.flying {
+  position: fixed;
+  z-index: 50;
+  transform-origin: 0 0;
+  pointer-events: none;
+  transition: transform var(--dur-fly) var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flying {
+    transition: none;
+  }
+  .slotCard {
+    animation: none;
+  }
+}

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  html,body{margin:0;padding:0;}
+  body{background:#0a0a12;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;}
+  *{box-sizing:border-box;}
+  a{color:#B7AAFF;text-decoration:none;}
+  a:hover{color:#816BFF;}
+  .tp-scroll::-webkit-scrollbar{width:0;height:0;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail" data-bg-color="#0F1020">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#0F1020"/>
+    <rect x="480" y="220" width="240" height="400" rx="24" fill="#151633" stroke="#D4AF37" stroke-width="3"/>
+    <g fill="none" stroke="#D4AF37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" transform="translate(560,380) scale(3.3)">
+      <path d="M18 5h4"/><path d="M20 3v4"/><path d="M21.53 13.11A8.5 8.5 0 1 1 10.89 2.47a1 1 0 0 1 1.13 1.48 6 6 0 0 0 7.99 7.99 1 1 0 0 1 1.52 1.17z"/>
+    </g>
+  </svg>
+</template>
+<div style="min-height:100vh;background:#0a0a12;display:flex;justify-content:center;align-items:center;padding:32px 16px;font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,'Noto Sans KR',sans-serif;">
+  <div style="width:390px;height:844px;background:#0F1020;border-radius:40px;position:relative;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(46,47,69,0.6);color:#F2F0FA;">
+
+    <!-- Scroll content -->
+    <div class="tp-scroll" style="position:absolute;top:0;left:0;right:0;bottom:64px;overflow-y:auto;">
+
+      <!-- ===== HOME ===== -->
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="position:relative;padding:44px 20px 8px;display:flex;flex-direction:column;align-items:center;">
+          <sc-if value="{{ showStars }}" hint-placeholder-val="{{ true }}">
+            <svg width="390" height="380" viewBox="0 0 390 380" style="position:absolute;top:0;left:0;pointer-events:none;opacity:0.3;" fill="#D4AF37"><circle cx="46" cy="60" r="1.2"/><circle cx="120" cy="30" r="1"/><circle cx="300" cy="48" r="1.4"/><circle cx="352" cy="110" r="1"/><circle cx="30" cy="150" r="1"/><circle cx="360" cy="210" r="1.2"/><circle cx="70" cy="250" r="1"/><circle cx="330" cy="300" r="1.3"/><circle cx="200" cy="20" r="0.8"/><circle cx="24" cy="300" r="1"/><path d="M85 110 l1.5 -5 l1.5 5 l5 1.5 l-5 1.5 l-1.5 5 l-1.5 -5 l-5 -1.5 z" opacity="0.9"/><path d="M312 160 l1.2 -4 l1.2 4 l4 1.2 l-4 1.2 l-1.2 4 l-1.2 -4 l-4 -1.2 z" opacity="0.9"/><path d="M52 200 l1 -3.5 l1 3.5 l3.5 1 l-3.5 1 l-1 3.5 l-1 -3.5 l-3.5 -1 z" opacity="0.9"/></svg>
+          </sc-if>
+
+          <div style="position:relative;z-index:2;width:170px;height:283px;border-radius:16px;border:1px solid #D4AF37;box-shadow:0 16px 40px rgba(0,0,0,0.5),0 0 24px rgba(129,107,255,0.12);overflow:hidden;">
+            <svg width="170" height="283" viewBox="0 0 170 283" style="display:block;">
+              <defs>
+                <radialGradient id="tpCardBg" cx="50%" cy="42%" r="72%">
+                  <stop offset="0%" stop-color="#1E1F3E"/>
+                  <stop offset="100%" stop-color="#101127"/>
+                </radialGradient>
+              </defs>
+              <rect width="170" height="283" fill="url(#tpCardBg)"/>
+              <rect x="11" y="11" width="148" height="261" rx="9" fill="none" stroke="#D4AF37" stroke-opacity="0.35"/>
+              <g fill="#D4AF37">
+                <path d="M85 34 l2 -7 l2 7 l7 2 l-7 2 l-2 7 l-2 -7 l-7 -2 z" opacity="0.75"/>
+                <path d="M40 70 l1.4 -5 l1.4 5 l5 1.4 l-5 1.4 l-1.4 5 l-1.4 -5 l-5 -1.4 z" opacity="0.6"/>
+                <path d="M130 70 l1.4 -5 l1.4 5 l5 1.4 l-5 1.4 l-1.4 5 l-1.4 -5 l-5 -1.4 z" opacity="0.6"/>
+                <path d="M36 210 l1.4 -5 l1.4 5 l5 1.4 l-5 1.4 l-1.4 5 l-1.4 -5 l-5 -1.4 z" opacity="0.6"/>
+                <path d="M132 212 l1.4 -5 l1.4 5 l5 1.4 l-5 1.4 l-1.4 5 l-1.4 -5 l-5 -1.4 z" opacity="0.6"/>
+                <path d="M85 250 l2 -7 l2 7 l7 2 l-7 2 l-2 7 l-2 -7 l-7 -2 z" opacity="0.75"/>
+                <circle cx="60" cy="45" r="1"/><circle cx="112" cy="45" r="1"/><circle cx="30" cy="140" r="1"/><circle cx="140" cy="140" r="1"/><circle cx="55" cy="235" r="1"/><circle cx="117" cy="235" r="1"/><circle cx="85" cy="70" r="1"/><circle cx="85" cy="212" r="1"/>
+              </g>
+              <svg x="55" y="112" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5h4"/><path d="M20 3v4"/><path d="M21.53 13.11A8.5 8.5 0 1 1 10.89 2.47a1 1 0 0 1 1.13 1.48 6 6 0 0 0 7.99 7.99 1 1 0 0 1 1.52 1.17z"/></svg>
+            </svg>
+          </div>
+
+          <p style="margin:24px 0 0;font-size:18px;font-weight:700;text-align:center;line-height:1.5;">오늘의 카드가 당신을 기다리고 있어요</p>
+          <p style="margin:8px 0 0;font-size:13px;font-weight:400;color:#9A97B0;">{{ dateLabel }}</p>
+
+          <button style="margin-top:24px;width:100%;height:56px;background:#816BFF;color:#fff;border:none;border-radius:8px;font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 0 24px rgba(129,107,255,0.25);transition:background .2s ease;" style-hover="background:#6E58FF;" style-active="background:#6E58FF;">오늘의 카드 뽑기</button>
+        </div>
+
+        <!-- 바로가기 -->
+        <div style="padding:32px 0 0;">
+          <h2 style="margin:0 20px 16px;font-size:20px;font-weight:700;line-height:1.5;">바로가기</h2>
+          <div class="tp-scroll" style="display:flex;gap:10px;overflow-x:auto;padding:0 20px 4px;">
+            <div onClick="{{ goFortune }}" style="flex:0 0 auto;height:44px;padding:0 16px;display:flex;align-items:center;gap:8px;background:#241F45;border-radius:9999px;cursor:pointer;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+              <span style="font-size:14px;font-weight:700;color:#B7AAFF;">오늘의 타로</span>
+            </div>
+            <div onClick="{{ goFortune }}" style="flex:0 0 auto;height:44px;padding:0 16px;display:flex;align-items:center;gap:8px;background:#241F45;border-radius:9999px;cursor:pointer;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+              <span style="font-size:14px;font-weight:700;color:#B7AAFF;">애정운</span>
+            </div>
+            <div onClick="{{ goFortune }}" style="flex:0 0 auto;height:44px;padding:0 16px;display:flex;align-items:center;gap:8px;background:#241F45;border-radius:9999px;cursor:pointer;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+              <span style="font-size:14px;font-weight:700;color:#B7AAFF;">예 / 아니오</span>
+            </div>
+            <div onClick="{{ goQuestion }}" style="flex:0 0 auto;height:44px;padding:0 16px;display:flex;align-items:center;gap:8px;background:#241F45;border-radius:9999px;cursor:pointer;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+              <span style="font-size:14px;font-weight:700;color:#B7AAFF;">질문 타로</span>
+            </div>
+          </div>
+        </div>
+
+        <p style="text-align:center;font-size:12px;font-weight:400;color:#9A97B0;margin:40px 20px 20px;line-height:1.5;">타로는 재미와 성찰을 위한 것이에요.</p>
+      </div>
+      </sc-if>
+
+      <!-- ===== FORTUNE ===== -->
+      <sc-if value="{{ isFortune }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:44px 20px 0;">
+        <h1 style="margin:0 0 6px;font-size:28px;font-weight:700;line-height:1.5;">운세</h1>
+        <p style="margin:0 0 24px;font-size:16px;font-weight:400;color:#C6C3D8;line-height:1.5;">무엇이 궁금한가요?</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+          <div style="background:#1A1B2E;border-radius:16px;border:1px solid #816BFF;padding:20px 16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;box-shadow:0 0 24px rgba(129,107,255,0.25);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+            <div style="font-size:18px;font-weight:700;line-height:1.5;">오늘의 타로</div>
+            <div style="font-size:13px;font-weight:400;color:#9A97B0;line-height:1.5;">하루 한 장의 메시지</div>
+          </div>
+
+          <div style="background:#1A1B2E;border-radius:16px;border:1px solid #2E2F45;padding:20px 16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:border-color .2s ease;" style-hover="border-color:#3a3b57;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <div style="font-size:18px;font-weight:700;line-height:1.5;">애정운</div>
+            <div style="font-size:13px;font-weight:400;color:#9A97B0;line-height:1.5;">그 사람의 마음이 궁금할 때</div>
+          </div>
+
+          <div style="background:#1A1B2E;border-radius:16px;border:1px solid #2E2F45;padding:20px 16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:border-color .2s ease;" style-hover="border-color:#3a3b57;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>
+            <div style="font-size:18px;font-weight:700;line-height:1.5;">금전운</div>
+            <div style="font-size:13px;font-weight:400;color:#9A97B0;line-height:1.5;">돈의 흐름 살펴보기</div>
+          </div>
+
+          <div style="background:#1A1B2E;border-radius:16px;border:1px solid #2E2F45;padding:20px 16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:border-color .2s ease;" style-hover="border-color:#3a3b57;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+            <div style="font-size:18px;font-weight:700;line-height:1.5;">직업·학업운</div>
+            <div style="font-size:13px;font-weight:400;color:#9A97B0;line-height:1.5;">지금 이 길이 맞을까</div>
+          </div>
+
+          <div style="background:#1A1B2E;border-radius:16px;border:1px solid #2E2F45;padding:20px 16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:border-color .2s ease;" style-hover="border-color:#3a3b57;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+            <div style="font-size:18px;font-weight:700;line-height:1.5;">예 / 아니오</div>
+            <div style="font-size:13px;font-weight:400;color:#9A97B0;line-height:1.5;">가장 단순한 답</div>
+          </div>
+
+          <div style="background:#1A1B2E;border-radius:16px;border:1px solid #2E2F45;padding:20px 16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:border-color .2s ease;" style-hover="border-color:#3a3b57;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4"/><path d="M21 5h-4"/></svg>
+            <div style="font-size:18px;font-weight:700;line-height:1.5;">이달의 조언</div>
+            <div style="font-size:13px;font-weight:400;color:#9A97B0;line-height:1.5;">이번 달의 키워드</div>
+          </div>
+
+        </div>
+        <p style="text-align:center;font-size:12px;font-weight:400;color:#9A97B0;margin:40px 0 20px;line-height:1.5;">타로는 재미와 성찰을 위한 것이에요.</p>
+      </div>
+      </sc-if>
+
+      <!-- ===== QUESTION ===== -->
+      <sc-if value="{{ isQuestion }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:44px 20px 0;">
+        <h1 style="margin:0 0 6px;font-size:28px;font-weight:700;line-height:1.5;">질문 타로</h1>
+        <p style="margin:0 0 24px;font-size:16px;font-weight:400;color:#C6C3D8;line-height:1.5;">마음속 질문을 골라보세요.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="background:#1A1B2E;border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:background .2s ease;" style-hover="background:#242537;">
+            <span style="font-size:16px;font-weight:400;line-height:1.5;">지금 이직해도 괜찮을까요?</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A97B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+          <div style="background:#1A1B2E;border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:background .2s ease;" style-hover="background:#242537;">
+            <span style="font-size:16px;font-weight:400;line-height:1.5;">그 사람과 다시 만날 수 있을까요?</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A97B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+          <div style="background:#1A1B2E;border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:background .2s ease;" style-hover="background:#242537;">
+            <span style="font-size:16px;font-weight:400;line-height:1.5;">올해 안에 목돈을 모을 수 있을까요?</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A97B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+          <div style="background:#1A1B2E;border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:background .2s ease;" style-hover="background:#242537;">
+            <span style="font-size:16px;font-weight:400;line-height:1.5;">이 관계를 계속 이어가도 될까요?</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A97B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+          <div style="background:#1A1B2E;border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:background .2s ease;" style-hover="background:#242537;">
+            <span style="font-size:16px;font-weight:400;line-height:1.5;">새로 시작한 일이 잘 풀릴까요?</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A97B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:12px;font-weight:400;color:#9A97B0;margin:40px 0 20px;line-height:1.5;">타로는 재미와 성찰을 위한 것이에요.</p>
+      </div>
+      </sc-if>
+
+    </div>
+
+    <!-- Tab bar -->
+    <div style="position:absolute;bottom:0;left:0;right:0;height:64px;background:#1A1B2E;box-shadow:0 -1px 0 0 #2E2F45;display:flex;z-index:20;">
+      <div onClick="{{ goHome }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:{{ homeColor }};">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span style="font-size:12px;font-weight:700;">홈</span>
+      </div>
+      <div onClick="{{ goFortune }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:{{ fortuneColor }};">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+        <span style="font-size:12px;font-weight:700;">운세</span>
+      </div>
+      <div onClick="{{ goQuestion }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:{{ questionColor }};">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        <span style="font-size:12px;font-weight:700;">질문</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showStars&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;히어로&quot;}}">
+class Component extends DCLogic {
+  state = { tab: 'home' };
+  renderVals() {
+    const days = ['일','월','화','수','목','금','토'];
+    const d = new Date();
+    const dateLabel = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${days[d.getDay()]}요일`;
+    const tab = this.state.tab;
+    const on = '#816BFF', off = '#9A97B0';
+    return {
+      dateLabel,
+      showStars: this.props.showStars ?? true,
+      isHome: tab === 'home',
+      isFortune: tab === 'fortune',
+      isQuestion: tab === 'question',
+      goHome: () => this.setState({ tab: 'home' }),
+      goFortune: () => this.setState({ tab: 'fortune' }),
+      goQuestion: () => this.setState({ tab: 'question' }),
+      homeColor: tab === 'home' ? on : off,
+      fortuneColor: tab === 'fortune' ? on : off,
+      questionColor: tab === 'question' ? on : off,
+    };
+  }
+}
+</script>
+</body>
+</html>

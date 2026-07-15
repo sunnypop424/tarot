@@ -1,0 +1,45 @@
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 앞면 이미지가 없는 이벤트용 폴백 */
+.fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  height: 100%;
+  padding: var(--space-md);
+  background: radial-gradient(
+    72% 72% at 50% 42%,
+    var(--card-back-from) 0%,
+    var(--card-back-to) 100%
+  );
+  text-align: center;
+}
+
+.number {
+  letter-spacing: 0.08em;
+}
+
+.name {
+  color: var(--color-accent);
+  word-break: keep-all;
+}
+
+.nameEn {
+  opacity: 0.7;
+}
+
+/* 폴백 카드의 역방향 표시 — 이미지를 뒤집는 대신 배지로 */
+.reversed {
+  margin-top: var(--space-xs);
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-wash);
+  color: var(--color-primary-soft);
+}

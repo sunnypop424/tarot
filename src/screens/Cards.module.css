@@ -1,0 +1,81 @@
+/* 카드 도감 */
+
+/* 수트 필터 — 5개라 가로로 흐른다 */
+.suits {
+  margin-bottom: var(--space-lg);
+}
+
+.grid {
+  display: grid;
+  /* minmax(0,1fr) — 카드 이름이 길어도 열 폭이 밀리지 않게 */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-base) var(--space-md);
+}
+
+/**
+ * width:100% 가 없으면 버튼이 라벨 길이에 맞춰 줄어들고, 카드가 그 폭을 따라가
+ * 이름이 긴 카드만 커진다. 모든 카드는 같은 크기여야 한다.
+ */
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+}
+
+.itemCard {
+  display: block;
+  transition: transform var(--dur-micro) var(--ease);
+}
+.item:hover .itemCard {
+  transform: translateY(-4px);
+}
+
+.itemName {
+  word-break: keep-all;
+}
+
+/* ── 상세 ─────────────────────────────────────────── */
+
+.detailCard {
+  width: 170px;
+  margin: 0 auto var(--space-lg);
+}
+
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.section {
+  margin-bottom: var(--space-xl);
+}
+
+.sectionTitle {
+  margin-bottom: var(--space-md);
+}
+
+/* 정방향/역방향 의미 묶음 */
+.meanings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.meaning {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-base);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .itemCard {
+    transition: none;
+  }
+}

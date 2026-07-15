@@ -1,0 +1,107 @@
+/* 홈 — 기간 운세(오늘·주간·월간) */
+
+/**
+ * 화면이 남으면 세로 가운데로 — 큰 기기에서 위쪽에 쏠려 보이지 않게.
+ * safe: 결과가 길어 넘칠 때는 가운데 정렬을 포기하고 위로 붙인다 (안 그러면 윗부분이 잘려 못 본다).
+ */
+.home {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  min-height: 100%;
+}
+
+/* 배경 별 장식 — 카드보다 뒤에 머문다 */
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 380px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.logo {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.segment {
+  position: relative;
+  z-index: 1;
+  margin-bottom: var(--space-base);
+}
+
+.renews {
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.readings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* ── 아직 안 뽑은 상태 ────────────────────────────── */
+.empty {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-base);
+  text-align: center;
+}
+
+.emptyCard {
+  width: 170px;
+  cursor: pointer;
+  transition: transform var(--dur-micro) var(--ease);
+}
+.emptyCard:hover {
+  transform: translateY(-4px);
+}
+
+/* 화면 폭을 꽉 채우면 투박하다 — 카드 폭에 맞춰 놓는다 */
+.emptyCta {
+  min-width: 170px;
+  margin-top: var(--space-sm);
+}
+
+/* ── 관점별 한 줄 요약 ────────────────────────────── */
+.summaries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.summary {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-base);
+}
+
+.summaryIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.summaryText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emptyCard {
+    transition: none;
+  }
+}

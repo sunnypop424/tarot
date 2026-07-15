@@ -1,0 +1,62 @@
+[
+  {
+    "id": "q-001",
+    "question": "지금 이직해도 괜찮을까요?",
+    "published": true,
+    "cardCount": 1,
+    "deck": "major",
+    "spreadCount": null,
+    "allowReversed": true,
+    "reversedRate": 30,
+    "fallbackAspect": "career",
+    "answers": {}
+  },
+  {
+    "id": "q-002",
+    "question": "그 사람과 다시 만날 수 있을까요?",
+    "published": true,
+    "cardCount": 1,
+    "deck": "major",
+    "spreadCount": null,
+    "allowReversed": true,
+    "reversedRate": 30,
+    "fallbackAspect": "love",
+    "answers": {}
+  },
+  {
+    "id": "q-003",
+    "question": "올해 안에 목돈을 모을 수 있을까요?",
+    "published": true,
+    "cardCount": 1,
+    "deck": "major",
+    "spreadCount": null,
+    "allowReversed": true,
+    "reversedRate": 30,
+    "fallbackAspect": "money",
+    "answers": {}
+  },
+  {
+    "id": "q-004",
+    "question": "이 관계를 계속 이어가도 될까요?",
+    "published": true,
+    "cardCount": 1,
+    "deck": "major",
+    "spreadCount": null,
+    "allowReversed": true,
+    "reversedRate": 30,
+    "fallbackAspect": "love",
+    "answers": {}
+  },
+  {
+    "id": "q-005",
+    "question": "새로 시작한 일이 잘 풀릴까요?",
+    "published": true,
+    "cardCount": 1,
+    "deck": "major",
+    "spreadCount": null,
+    "allowReversed": true,
+    "reversedRate": 30,
+    "fallbackAspect": "career",
+    "answers": {}
+  }
+]

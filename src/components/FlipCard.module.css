@@ -1,0 +1,33 @@
+/**
+ * 카드 뒤집기 — CSS rotateY 단일 트랜지션 (DESIGN.md §15).
+ * 3D 라이브러리 금지 원칙에 따라 transform 만 쓴다.
+ */
+
+.scene {
+  perspective: 1000px;
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--card-ratio);
+  transform-style: preserve-3d;
+  transition: transform var(--dur-flip) var(--ease);
+  /* 3장 스프레드는 0.15s 간격 순차 플립 */
+  transition-delay: var(--flip-delay, 0ms);
+}
+
+.inner--flipped {
+  transform: rotateY(180deg);
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.face--back {
+  transform: rotateY(180deg);
+}

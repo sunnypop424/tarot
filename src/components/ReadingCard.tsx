@@ -1,0 +1,76 @@
+import { FlipCard } from './FlipCard'
+import { readingOf } from '@/lib/deck'
+import { useInView } from '@/lib/useInView'
+import type { Aspect, DrawnCard } from '@/types/card'
+import styles from './ReadingCard.module.css'
+
+interface ReadingCardProps {
+  drawn: DrawnCard
+  /** 포지션명 — "나의 마음", "주 초반" 등 */
+  position: string
+  /** 어느 관점 텍스트를 함께 보여줄지. 'general' 이면 종합만 */
+  aspect: Aspect
+  /**
+   * 짧게 — 조언 한 줄만.
+   * 3장 스프레드처럼 여러 장이 나열될 때 쓴다
+   * (한 장짜리 완결 해석을 3번 반복하면 읽히지 않는다).
+   */
+  brief?: boolean
+  /** 해석 맨 앞에 놓을 한 줄 답 — 예/아니오 판정 */
+  verdict?: { label: string; note: string }
+}
+
+/**
+ * 뽑힌 카드 한 장 + 해석. 뽑기 결과와 기간 운세가 같은 모양으로 읽히도록 공유한다.
+ * 스크롤로 화면에 들어올 때 뒤집힌다 — 한 장씩 드러나는 리듬.
+ */
+export function ReadingCard({
+  drawn,
+  position,
+  aspect,
+  brief = false,
+  verdict,
+}: ReadingCardProps) {
+  const [ref, inView] = useInView<HTMLElement>()
+  const reading = readingOf(drawn)
+  const aspectText = reading[aspect]
+
+  return (
+    <section ref={ref} className={styles.reading}>
+      <p className="t-title-s t-primary t-center">{position}</p>
+
+      <FlipCard drawn={drawn} flipped={inView} className={styles.card} />
+
+      <p data-card-name className={`t-title-m ${styles.name}`}>
+        {drawn.card.name}
+        {drawn.orientation === 'reversed' && <span className="t-text-s t-muted"> (역방향)</span>}
+      </p>
+
+      <ul className={styles.keywords}>
+        {drawn.card.keywords.slice(0, 4).map((k) => (
+          <li key={k} className="chip">
+            {k}
+          </li>
+        ))}
+      </ul>
+
+      {/* 간결 모드는 조언 한 줄만 — 종합·관점 텍스트는 접는다 */}
+      <div className={styles.body}>
+        {verdict && (
+          <p className={`t-body ${styles.verdict}`}>
+            <b className={styles.verdictLabel}>{verdict.label}</b>
+            {verdict.note}
+          </p>
+        )}
+        {!brief && (
+          <>
+            <p className="t-body">{reading.general}</p>
+            {/* 카테고리 관점 텍스트 — 종합과 겹치면 생략 */}
+            {aspectText !== reading.general && <p className="t-body">{aspectText}</p>}
+          </>
+        )}
+        <p className={`t-body ${styles.advice}`}>{reading.advice}</p>
+      </div>
+    </section>
+  )
+}

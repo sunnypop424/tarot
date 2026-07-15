@@ -1,0 +1,187 @@
+/* 소유자 전용 테마 편집기 — 개발 모드에서만 존재한다 */
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* ── 대비 검사 ────────────────────────────────────── */
+
+.contrast {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.contrastRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: var(--color-canvas);
+}
+
+.contrastRatio {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.level--pass {
+  color: var(--color-primary-soft);
+}
+.level--large-only {
+  color: var(--color-accent);
+}
+.level--fail {
+  color: var(--color-error);
+}
+
+/* ── 이미지 업로드 ────────────────────────────────── */
+
+/* .input 과 같은 높이·너비 — 폼 그리드에서 필드끼리 줄이 맞아야 한다 */
+.uploadBtn,
+.imageRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.uploadBtn {
+  justify-content: center;
+  background: var(--color-wash);
+  color: var(--color-primary-soft);
+  font-size: var(--text-s);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: border-color var(--dur-micro) var(--ease);
+}
+.uploadBtn:hover {
+  border-color: var(--color-primary);
+}
+
+.imageRow {
+  background: var(--color-surface);
+}
+
+/* 체크무늬로 투명 배경을 드러낸다 — 로고 PNG 의 여백을 확인해야 한다 */
+.thumb {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+  background-color: var(--color-canvas);
+  background-image: linear-gradient(45deg, var(--color-border) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--color-border) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--color-border) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--color-border) 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0;
+}
+
+.imagePath {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-fg-3);
+}
+
+/* ── 카드 앞면 78장 ───────────────────────────────── */
+
+.cardHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-base);
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: var(--space-md) var(--space-sm);
+}
+
+.cardSlot {
+  display: block;
+  aspect-ratio: var(--card-ratio);
+  border: 1px dashed var(--color-border-hover);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--dur-micro) var(--ease);
+}
+.cardSlot:hover {
+  border-color: var(--color-primary);
+}
+
+.cardThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--color-fg-3);
+}
+
+.cardName {
+  display: block;
+  margin-top: var(--space-xs);
+  color: var(--color-fg-3);
+  text-align: center;
+  word-break: keep-all;
+}
+
+/* ── 미리보기 ─────────────────────────────────────── */
+
+.preview {
+  width: 100%;
+  height: 720px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-canvas);
+}
+
+/* 넓은 화면에선 편집 폼과 미리보기를 나란히 */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-lg);
+}
+
+@media (min-width: 1100px) {
+  .split {
+    grid-template-columns: minmax(0, 1fr) 420px;
+    align-items: start;
+  }
+  .previewCol {
+    position: sticky;
+    top: var(--space-lg);
+  }
+}

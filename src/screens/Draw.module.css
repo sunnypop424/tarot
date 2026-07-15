@@ -1,0 +1,15 @@
+/* 결과 — 카드 한 장의 해석 레이아웃은 ReadingCard 가 담당한다 (기간 운세와 공유) */
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding-bottom: var(--space-lg);
+}
+
+.resultActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-base);
+}

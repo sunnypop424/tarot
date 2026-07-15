@@ -1,0 +1,50 @@
+.reading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.card {
+  width: 170px;
+  margin: 0 auto;
+}
+
+.name {
+  text-align: center;
+}
+
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* 조언은 포인트색 세로선으로 구분 — 읽고 나서 가져갈 한 줄 */
+.advice {
+  padding: var(--space-base);
+  border-left: 2px solid var(--color-accent);
+  background: var(--color-surface);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* 예/아니오 답 — 조언과 같은 모양이되 인터랙션 색으로 구분해 맨 앞에 */
+.verdict {
+  padding: var(--space-base);
+  border-left: 2px solid var(--color-primary);
+  background: var(--color-surface);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* 답과 설명 사이에 숨을 준다 — 붙여 쓰면 답이 문장에 묻힌다 */
+.verdictLabel {
+  margin-right: var(--space-sm);
+  color: var(--color-primary-soft);
+  font-weight: var(--weight-bold);
+}

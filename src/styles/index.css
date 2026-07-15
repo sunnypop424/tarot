@@ -1,0 +1,18 @@
+/**
+ * 스타일 엔트리 — 임포트 순서가 캐스케이드 순서다. 바꾸지 말 것.
+ *   tokens     → 모든 값의 단일 소스 (CSS 커스텀 프로퍼티)
+ *   reset      → 브라우저 기본값 제거
+ *   base       → 문서 기본값 + 타이포그래피 스케일 클래스
+ *   layout     → 앱 셸, 화면 골격, 탭바
+ *   components → 공통 컴포넌트 클래스 (.btn, .tile, .chip …)
+ *   admin      → 관리 화면 전용 (.admin, .field, .input …) — 사용자 앱과 격리
+ *
+ * 화면별 스타일은 *.module.css 로 만들고 여기서 임포트하지 않는다.
+ */
+
+@import './tokens.css';
+@import './reset.css';
+@import './base.css';
+@import './layout.css';
+@import './components.css';
+@import './admin.css';

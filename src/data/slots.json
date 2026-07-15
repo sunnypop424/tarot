@@ -1,0 +1,82 @@
+[
+  {
+    "slug": "demo",
+    "name": "데모 생일카페",
+    "theme": {
+      "colors": {
+        "canvas": "#0F1020",
+        "surface": "#1A1B2E",
+        "surfaceRaised": "#242537",
+        "wash": "#241F45",
+        "primary": "#816BFF",
+        "primaryHover": "#6E58FF",
+        "primarySoft": "#B7AAFF",
+        "accent": "#D4AF37",
+        "accentSoft": "#E8CF7A",
+        "fg1": "#F2F0FA",
+        "fg2": "#C6C3D8",
+        "fg3": "#9A97B0",
+        "border": "#2E2F45",
+        "borderHover": "#3A3B57",
+        "onPrimary": "#FFFFFF",
+        "cardBackFrom": "#1E1F3E",
+        "cardBackTo": "#101127"
+      },
+      "shape": { "radiusSm": 4, "radiusMd": 8, "radiusLg": 16 },
+      "assets": {
+        "logo": null,
+        "logoAlt": "데모 생일카페",
+        "logoHeight": 28,
+        "backgroundPattern": null,
+        "backgroundPatternOpacity": 0.12,
+        "backgroundPatternSize": "cover",
+        "backgroundPatternRepeat": "no-repeat",
+        "cardFrontBase": null,
+        "cardFrontExt": "webp",
+        "cardBack": null
+      }
+    },
+    "event": {}
+  },
+  {
+    "slug": "sample-pink",
+    "name": "샘플 생일카페 (핑크)",
+    "theme": {
+      "colors": {
+        "canvas": "#1A0F16",
+        "surface": "#2A1823",
+        "surfaceRaised": "#3A2130",
+        "wash": "#3D1B2E",
+        "primary": "#FF6BA8",
+        "primaryHover": "#FF4F95",
+        "primarySoft": "#FFB3D1",
+        "accent": "#FFD9E8",
+        "accentSoft": "#FFF0F6",
+        "fg1": "#FFF5F9",
+        "fg2": "#E8CDDA",
+        "fg3": "#B08A9C",
+        "border": "#452433",
+        "borderHover": "#5A2F43",
+        "onPrimary": "#FFFFFF",
+        "cardBackFrom": "#3A1F2E",
+        "cardBackTo": "#1F1018"
+      },
+      "shape": { "radiusSm": 4, "radiusMd": 12, "radiusLg": 20 },
+      "assets": {
+        "logo": null,
+        "logoAlt": "샘플 생일카페",
+        "logoHeight": 28,
+        "backgroundPattern": null,
+        "backgroundPatternOpacity": 0.12,
+        "backgroundPatternSize": "cover",
+        "backgroundPatternRepeat": "no-repeat",
+        "cardFrontBase": null,
+        "cardFrontExt": "webp",
+        "cardBack": null
+      }
+    },
+    "event": {
+      "love": { "cardCount": 3 }
+    }
+  }
+]

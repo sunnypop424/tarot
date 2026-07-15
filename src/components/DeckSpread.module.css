@@ -1,0 +1,103 @@
+/**
+ * 덱 펼치기 — 부채꼴로 겹친 카드를 여러 줄로 펼친다 (PLANNING.md §2).
+ *
+ * 한 줄이 하나의 부채꼴이다. 카드를 같은 자리에 겹쳐 두고 **카드 아래 먼 지점(--pivot)**을
+ * 축으로 회전시키면, 회전만으로 좌우 퍼짐과 아래로 처지는 호(arc)가 함께 나온다.
+ * 손에 쥔 카드를 부채처럼 편 모양. 반지름·각도는 DeckSpread.tsx 가 계산해 넘긴다.
+ */
+
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+
+/**
+ * 줄끼리 세로로 겹친다 — 덱 전체와 선택 슬롯이 모바일 한 화면에 들어와야 한다.
+ * 아랫줄이 윗줄 위로 겹치도록 쌓임 순서는 DOM 순서를 따른다.
+ */
+.row {
+  position: relative;
+  height: var(--row-h);
+  /* z-index 를 주어 줄마다 쌓임 맥락을 만든다 —
+     안 그러면 윗줄 오른쪽 카드(z가 큼)가 아랫줄 위로 올라온다 */
+  z-index: var(--row-z);
+}
+
+.row + .row {
+  margin-top: var(--row-overlap);
+}
+
+/* 짚은 카드가 있는 줄은 통째로 앞으로 */
+.row:hover,
+.row:focus-within {
+  z-index: 20;
+}
+
+.card {
+  position: absolute;
+  bottom: 24px; /* 양 끝 카드가 아래로 처지는 만큼 여유 */
+  left: 50%;
+  width: var(--card-w);
+  margin-left: calc(var(--card-w) / -2);
+  border-radius: var(--radius-lg);
+  transform-origin: 50% var(--pivot);
+  transform: rotate(var(--rot)) translateY(var(--lift, 0px));
+  transition: transform var(--dur-micro) var(--ease);
+  cursor: pointer;
+}
+
+/* 짚은 카드는 부채꼴에서 살짝 올라오고 앞으로 나온다 */
+.card:hover:not(:disabled),
+.card:focus-visible {
+  --lift: -14px;
+  z-index: 10;
+}
+
+.card:disabled {
+  cursor: default;
+}
+
+/* 슬롯으로 옮겨간 카드 — 자리는 남기고 비운다 (부채꼴이 재배치되면 어지럽다) */
+.card--taken {
+  visibility: hidden;
+}
+
+/* ══ 셔플 연출 ═════════════════════════════════════ */
+/* 카드가 쓸려 나갔다가(gather) 한 장씩 다시 부채꼴로 놓인다(deal) */
+
+@keyframes card-gather {
+  to {
+    opacity: 0;
+    transform: rotate(var(--rot)) translateY(20px) scale(0.92);
+  }
+}
+
+@keyframes card-deal {
+  from {
+    opacity: 0;
+    transform: rotate(0deg) translateY(-32px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(var(--rot)) translateY(0);
+  }
+}
+
+.card--gathering {
+  animation: card-gather 240ms var(--ease) forwards;
+  animation-delay: var(--gather-delay);
+}
+
+.card--dealing {
+  animation: card-deal 360ms var(--ease) backwards;
+  animation-delay: var(--deal-delay);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card--gathering,
+  .card--dealing {
+    animation: none;
+    transition: none;
+  }
+}

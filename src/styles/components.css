@@ -1,0 +1,263 @@
+/**
+ * 공통 컴포넌트 클래스 — DESIGN.md §4 + 시안(example/타로 포켓 홈.dc.html) 스펙의 구현.
+ * 화면별 CSS 모듈은 이 클래스를 조합해 쓰고, 여기 있는 스타일을 재선언하지 말 것.
+ * 색·크기는 전부 tokens.css 변수로만 참조한다.
+ */
+
+/* ══ 버튼 ═══════════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-base);
+  border-radius: var(--radius-md);
+  font-size: var(--text-l);
+  font-weight: var(--weight-bold);
+  transition: background-color var(--dur-short) var(--ease),
+    color var(--dur-short) var(--ease), box-shadow var(--dur-short) var(--ease);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* 크기 */
+.btn--md {
+  height: 56px;
+  padding: 0 1.125rem; /* 18px */
+  font-size: var(--text-l);
+}
+.btn--sm {
+  height: 48px;
+  padding: 0 var(--space-lg);
+  font-size: var(--text-m);
+}
+
+/* 변형 */
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.btn--slight {
+  background: var(--color-wash);
+  color: var(--color-primary-soft);
+}
+.btn--slight:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-wash) 80%, var(--color-primary));
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-fg-2);
+}
+.btn--ghost:hover:not(:disabled) {
+  color: var(--color-fg-1);
+}
+
+/* 주요 CTA에 인터랙션 글로우 (시안: 오늘의 카드 뽑기) */
+.btn--glow:not(:disabled) {
+  box-shadow: var(--shadow-glow);
+}
+
+.btn:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-fg);
+  box-shadow: none;
+}
+
+/* 아이콘 전용 버튼 */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: var(--radius-md);
+  color: var(--color-fg-1);
+  transition: color var(--dur-short) var(--ease),
+    background-color var(--dur-short) var(--ease);
+}
+.btn-icon:hover {
+  background: var(--color-surface);
+}
+
+/* ══ 타로 카드 프레임 ═══════════════════════════════ */
+/* 비율·테두리·그림자는 카드가 등장하는 모든 곳에서 이 클래스를 쓴다 */
+.tarot-card {
+  position: relative;
+  aspect-ratio: var(--card-ratio);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-accent);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* 부모가 크기를 정하는 경우 (플립 카드의 앞/뒷면처럼 절대배치된 면 안쪽) */
+.tarot-card--fill {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.tarot-card--lifted {
+  box-shadow: var(--shadow-card-lifted);
+}
+
+.tarot-card--selected {
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+}
+
+/* ══ 표면 ══════════════════════════════════════════ */
+.surface {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+.surface--outlined {
+  border: 1px solid var(--color-border);
+}
+
+.surface--active {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-glow);
+}
+
+/* 카테고리 타일 (운세 탭 그리드) */
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-base);
+  text-align: left;
+  transition: border-color var(--dur-micro) var(--ease),
+    box-shadow var(--dur-micro) var(--ease);
+}
+.tile:hover:not(.surface--active) {
+  border-color: var(--color-border-hover);
+}
+
+/* 질문 리스트 행 */
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-base);
+  text-align: left;
+  transition: background-color var(--dur-micro) var(--ease);
+}
+.list-row:hover {
+  background: var(--color-surface-raised);
+}
+/* 행 끝 아이콘(chevron 등)은 텍스트가 길어져도 줄어들지 않는다 */
+.list-row > svg {
+  flex-shrink: 0;
+}
+
+/* ══ 칩 ════════════════════════════════════════════ */
+/* 키워드 칩 — 결과 화면 카드 키워드 */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-full);
+  background: var(--color-wash);
+  color: var(--color-primary-soft);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+/* 액션 칩 — 홈 "바로가기" (터치 타깃 44px) */
+.chip--action {
+  height: var(--tap-min);
+  gap: var(--space-sm);
+  padding: 0 var(--space-base);
+  font-size: var(--text-s);
+  font-weight: var(--weight-bold);
+  transition: background-color var(--dur-micro) var(--ease);
+}
+.chip--action:hover {
+  background: color-mix(in srgb, var(--color-wash) 80%, var(--color-primary));
+}
+
+/* ══ 세그먼트 (오늘/주간/월간) ═════════════════════ */
+.segment {
+  display: flex;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+}
+
+.segment__item {
+  flex: 1;
+  height: var(--tap-min);
+  border-radius: var(--radius-full);
+  color: var(--color-fg-3);
+  font-size: var(--text-s);
+  font-weight: var(--weight-bold);
+  transition: background-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+
+.segment__item[aria-selected='true'] {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+/* ══ 토스트 ════════════════════════════════════════ */
+.toast {
+  min-height: 48px;
+  padding: var(--space-base) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-fg-1);
+  font-size: var(--text-s);
+  box-shadow: var(--shadow-card);
+  transition: opacity var(--dur-micro) var(--ease),
+    transform var(--dur-micro) var(--ease);
+}
+
+/* ══ 스켈레톤 ══════════════════════════════════════ */
+.skeleton {
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    to right,
+    var(--color-surface) 0%,
+    var(--color-surface-raised) 25%,
+    var(--color-surface) 50%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer var(--dur-shimmer) linear infinite;
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* ══ 아이콘 ════════════════════════════════════════ */
+/* 장식·카테고리 아이콘은 포인트색, 기능 아이콘은 텍스트 색 (DESIGN.md §4) */
+.icon-accent {
+  color: var(--color-accent);
+}
+.icon-muted {
+  color: var(--color-fg-3);
+}
