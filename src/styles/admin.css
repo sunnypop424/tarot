@@ -4,49 +4,29 @@
  * 사용자 앱과 다른 점 (DESIGN.md §5 예외):
  *  - 최대 폭 제한 없음 — 데스크톱 편집 작업 전제, 데이터 밀도 높은 레이아웃 허용
  *  - 미스틱 장식(별·글로우) 없음 — 기능 위주
- *  - **편집 중인 이벤트 테마에 물들지 않는다.** 슬롯 테마가 관리 UI 를 덮으면
- *    (예: 대비 낮은 색을 저장한 순간) 관리 자체가 불가능해진다 → .admin 에서 색 토큰을 기본값으로 리셋
+ *  - **주최자 관리(.admin)는 편집 중인 슬롯 테마를 그대로 따른다.** SlotProvider 가
+ *    :root 에 주입한 색·형태·그림자·color-scheme 를 덮지 않고 상속한다 → 관리 화면도 이벤트 브랜드로 물든다.
+ *    (테마는 소유자만 편집하고 테마 편집기에 대비 검사기가 있어 읽히는 색으로 배포된다는 전제)
+ *  - **소유자 테마 편집기(.owner)만 고정 라이트.** 편집 중인 색과 섞이면 색을 못 고른다.
  *
  * 색·크기는 여기서도 토큰으로만 참조한다 (hex 는 tokens.css 밖에 두지 않는다).
  */
 
-/**
- * 두 관리 화면 모두 슬롯 테마에 물들면 안 되므로 색 토큰을 자기 값으로 리셋한다.
- *  .admin — 주최자용. 사용자 앱과 같은 다크 무드
- *  .owner — 소유자용 테마 편집기. 색을 눈으로 고르는 작업이라 라이트가 낫다
- */
+/* 공통 셸 — 색·형태는 각자 다르게 잡는다 (.admin 은 슬롯 테마 상속, .owner 는 고정 라이트) */
 .admin,
 .owner {
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 16px;
-
   min-height: 100dvh;
   background: var(--color-canvas);
   color: var(--color-fg-1);
 }
 
-.admin {
-  color-scheme: dark;
-  --color-canvas: #0f1020;
-  --color-surface: #1a1b2e;
-  --color-surface-raised: #242537;
-  --color-wash: #241f45;
-  --color-primary: #816bff;
-  --color-primary-hover: #6e58ff;
-  --color-primary-soft: #b7aaff;
-  --color-accent: #d4af37;
-  --color-fg-1: #f2f0fa;
-  --color-fg-2: #c6c3d8;
-  --color-fg-3: #9a97b0;
-  --color-border: #2e2f45;
-  --color-border-hover: #3a3b57;
-  --color-on-primary: #ffffff;
-  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
-}
+/* .admin 은 색 토큰을 리셋하지 않는다 — :root 에 주입된 슬롯 테마를 그대로 쓴다 */
 
 /* 편집 중인 이벤트 색(어두울 수도, 밝을 수도)과 섞이지 않게 도구는 늘 라이트로 고정 */
 .owner {
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
   color-scheme: light;
   --color-canvas: #f5f4fa;
   --color-surface: #ffffff;

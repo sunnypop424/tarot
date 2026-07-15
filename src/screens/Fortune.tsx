@@ -50,7 +50,7 @@ export function Fortune() {
                 <li key={id}>
                   <button
                     type="button"
-                    className="surface list-row"
+                    className="surface surface--outlined list-row"
                     onClick={() => go(`question/${id}`)}
                   >
                     <span className="t-text-m">{question}</span>

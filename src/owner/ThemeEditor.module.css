@@ -15,6 +15,16 @@
   gap: var(--space-sm);
 }
 
+/* 바탕 계열 프리셋 — 라이트/다크 우선을 한 줄로 */
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+.presetRow > :global(.btn) {
+  flex: 1 1 0;
+}
+
 /* ── 대비 검사 ────────────────────────────────────── */
 
 .contrast {

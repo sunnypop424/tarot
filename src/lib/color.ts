@@ -22,6 +22,37 @@ function toRgb(hex: string): [number, number, number] | null {
   ]
 }
 
+/** hex 를 흰/검정 쪽으로 t(0~1)만큼 섞은 hex. 못 읽는 색은 그대로 돌려준다 */
+export function mix(hex: string, toward: 'white' | 'black', t: number): string {
+  const rgb = toRgb(hex)
+  if (!rgb) return hex
+  const edge = toward === 'white' ? 255 : 0
+  const [r, g, b] = rgb.map((v) => Math.round(v + (edge - v) * t))
+  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`
+}
+
+/**
+ * bg 위에서 target 대비를 넘는 base 의 명암 조정본.
+ * bg 가 밝으면 base 를 어둡게, 어두우면 밝게 단계적으로 섞는다 — 배경 밝기에 따라
+ * "읽히는 방향"이 반대라, 저장값 하나로는 못 맞추는 토큰(칩·배지 글자)을 런타임에 계산한다.
+ * target 을 못 넘으면 가장 대비가 큰 값을 준다 (best-effort).
+ */
+export function readableShade(base: string, bg: string, target = 4.5): string {
+  const toward = isLight(bg) ? 'black' : 'white'
+  let best = base
+  let bestRatio = contrastRatio(base, bg) ?? 0
+  for (let t = 0.1; t <= 1.0001; t += 0.1) {
+    const shade = mix(base, toward, t)
+    const ratio = contrastRatio(shade, bg) ?? 0
+    if (ratio > bestRatio) {
+      best = shade
+      bestRatio = ratio
+    }
+    if (bestRatio >= target) return best
+  }
+  return best
+}
+
 /** 상대 휘도 (WCAG 2.x). 색을 못 읽으면 null */
 export function luminance(hex: string): number | null {
   const rgb = toRgb(hex)

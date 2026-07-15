@@ -29,7 +29,8 @@ export function AdminLayout() {
 
           <nav className="admin__nav" aria-label="관리 메뉴">
             {NAV.map(({ to, label, icon: Icon }) => (
-              <NavLink key={to} to={to} className="admin__navlink">
+              // 절대 경로로 — 상대 경로는 현재 URL 에 누적돼 /questions/questions… 로 늘어난다
+              <NavLink key={to} to={`/${slot.slug}/admin/${to}`} className="admin__navlink">
                 <Icon size={20} strokeWidth={2} aria-hidden="true" />
                 {label}
               </NavLink>

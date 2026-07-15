@@ -1,4 +1,4 @@
-import { contrastLevel, contrastRatio, type ContrastLevel } from '@/lib/color'
+import { contrastLevel, contrastRatio, readableShade, type ContrastLevel } from '@/lib/color'
 
 /**
  * 테마 대비 검사 — 주최자가 준 색이 가독성을 깨뜨리는 걸 배포 전에 잡는다 (PLANNING.md §5).
@@ -22,7 +22,6 @@ export function checkThemeContrast(colors: {
   primary: string
   onPrimary: string
   wash: string
-  primarySoft: string
 }): ContrastCheck[] {
   const pairs: [string, string, string][] = [
     ['본문 / 배경', colors.fg1, colors.canvas],
@@ -30,7 +29,8 @@ export function checkThemeContrast(colors: {
     ['보조 텍스트 / 표면', colors.fg2, colors.surface],
     ['흐린 텍스트 / 표면', colors.fg3, colors.surface],
     ['버튼 글자 / 버튼', colors.onPrimary, colors.primary],
-    ['칩 글자 / 칩 배경', colors.primarySoft, colors.wash],
+    // 칩 글자는 저장값이 아니라 런타임 파생색을 검사한다 (실제로 화면에 나가는 색)
+    ['칩 글자 / 칩 배경', readableShade(colors.primary, colors.wash), colors.wash],
   ]
 
   return pairs.map(([label, fg, bg]) => {

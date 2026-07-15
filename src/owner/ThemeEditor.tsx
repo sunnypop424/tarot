@@ -6,28 +6,33 @@ import { CATEGORIES } from '@/data/categories'
 import type { DeckRange } from '@/data/cards'
 import type { Slot, CategorySetting } from '@/types/slot'
 import type { ThemeColors, ThemeShape } from '@/types/theme'
+import { isLight } from '@/lib/color'
 import { checkThemeContrast } from './contrast'
 import { ImageField } from './ImageField'
 import { CardUploader } from './CardUploader'
 import styles from './ThemeEditor.module.css'
 
 /** 색을 역할별로 묶어 보여준다 — 17개를 한 줄로 늘어놓으면 뭘 고치는지 모른다 */
-const COLOR_GROUPS: { title: string; keys: (keyof ThemeColors)[] }[] = [
+const COLOR_GROUPS: { title: string; keys: (keyof ThemeColors)[]; hint?: string }[] = [
   { title: '배경 · 표면', keys: ['canvas', 'surface', 'surfaceRaised', 'wash'] },
-  { title: '인터랙션 (CTA · 활성)', keys: ['primary', 'primaryHover', 'primarySoft', 'onPrimary'] },
+  {
+    title: '인터랙션 (CTA · 활성)',
+    keys: ['primary', 'primaryHover', 'onPrimary'],
+    hint: '칩 · 보조버튼 글자색은 배경 밝기에 맞춰 자동 계산돼요.',
+  },
   { title: '포인트 (카드 테두리 · 아이콘)', keys: ['accent', 'accentSoft'] },
   { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'] },
   { title: '카드 뒷면 (내장 SVG용)', keys: ['cardBackFrom', 'cardBackTo'] },
 ]
 
-const COLOR_LABELS: Record<keyof ThemeColors, string> = {
+// primarySoft 는 자동 파생이라 편집기에 노출하지 않는다 → Partial
+const COLOR_LABELS: Partial<Record<keyof ThemeColors, string>> = {
   canvas: '화면 바탕',
   surface: '카드 · 타일',
   surfaceRaised: '떠 있는 표면',
   wash: '보조 버튼 · 칩 배경',
   primary: '주요 CTA',
   primaryHover: 'CTA hover',
-  primarySoft: '칩 · 보조버튼 글자',
   onPrimary: 'CTA 글자',
   accent: '포인트',
   accentSoft: '포인트 (옅게)',
@@ -45,6 +50,34 @@ const SHAPE_LABELS: Record<keyof ThemeShape, string> = {
   radiusMd: '버튼 · 토스트 radius',
   radiusLg: '카드 · 타일 radius',
 }
+
+/**
+ * 바탕 계열 프리셋 — 배경·표면·텍스트 9개만 밝은/어두운 쪽으로 한 번에 스왑한다.
+ * 포인트·인터랙션 색(primary/accent/onPrimary)과 카드 뒷면은 슬롯의 브랜드 색이므로 건드리지 않는다.
+ * 값은 tokens.css 의 다크 `:root` / `[data-theme='light']` 와 동일 — 자동 그림자 전환은 applyTheme() 이 캔버스 휘도로 처리한다.
+ */
+const BASE_KEYS = [
+  'canvas', 'surface', 'surfaceRaised', 'wash', 'fg1', 'fg2', 'fg3', 'border', 'borderHover',
+] as const satisfies readonly (keyof ThemeColors)[]
+
+const BASE_PRESETS: { id: 'dark' | 'light'; label: string; base: Pick<ThemeColors, (typeof BASE_KEYS)[number]> }[] = [
+  {
+    id: 'dark',
+    label: '다크 우선',
+    base: {
+      canvas: '#0F1020', surface: '#1A1B2E', surfaceRaised: '#242537', wash: '#241F45',
+      fg1: '#F2F0FA', fg2: '#C6C3D8', fg3: '#9A97B0', border: '#2E2F45', borderHover: '#3A3B57',
+    },
+  },
+  {
+    id: 'light',
+    label: '라이트 우선',
+    base: {
+      canvas: '#FAF8FF', surface: '#FFFFFF', surfaceRaised: '#FFFFFF', wash: '#F0EDFF',
+      fg1: '#1A1B2E', fg2: '#4A4860', fg3: '#7A7791', border: '#E8E5F2', borderHover: '#D5D0E8',
+    },
+  },
+]
 
 /**
  * 소유자 전용 테마 편집기 — `/theme-editor`, **개발 모드에서만 라우트가 존재한다**.
@@ -72,6 +105,13 @@ export default function ThemeEditor() {
 
   const patchColor = (key: keyof ThemeColors, value: string) =>
     patchSlot({ theme: { ...slot.theme, colors: { ...slot.theme.colors, [key]: value } } })
+
+  /** 바탕 계열만 한 번에 스왑 — 브랜드 색(primary/accent 등)은 유지 */
+  const applyBase = (base: Partial<ThemeColors>) =>
+    patchSlot({ theme: { ...slot.theme, colors: { ...slot.theme.colors, ...base } } })
+
+  /** 현재 캔버스 밝기로 어느 계열인지 표시 (일부만 수정했어도 대략 맞춘다) */
+  const activeBase = isLight(slot.theme.colors.canvas) ? 'light' : 'dark'
 
   const patchShape = (key: keyof ThemeShape, value: number) =>
     patchSlot({ theme: { ...slot.theme, shape: { ...slot.theme.shape, [key]: value } } })
@@ -193,9 +233,35 @@ export default function ThemeEditor() {
               </div>
             </section>
 
-            {COLOR_GROUPS.map(({ title, keys }) => (
+            <section className="admin-section">
+              <h2 className="t-title-s admin-section__title">바탕 계열</h2>
+              <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+                배경 · 표면 · 텍스트를 밝은/어두운 계열로 한 번에 맞춰요. 포인트 · 인터랙션 색은
+                그대로 두니, 계열을 먼저 고르고 브랜드 색을 얹으세요.
+              </p>
+              <div className={styles.presetRow}>
+                {BASE_PRESETS.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`btn btn--sm ${activeBase === p.id ? 'btn--primary' : 'btn--slight'}`}
+                    aria-pressed={activeBase === p.id}
+                    onClick={() => applyBase(p.base)}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {COLOR_GROUPS.map(({ title, keys, hint }) => (
               <section key={title} className="admin-section">
                 <h2 className="t-title-s admin-section__title">{title}</h2>
+                {hint && (
+                  <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+                    {hint}
+                  </p>
+                )}
                 <div className="form-grid">
                   {keys.map((key) => (
                     <div key={key} className="field">

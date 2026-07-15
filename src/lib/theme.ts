@@ -1,4 +1,4 @@
-import { isLight, withAlpha } from './color'
+import { isLight, readableShade, withAlpha } from './color'
 import type { Theme, ThemeColors, ThemeShape } from '@/types/theme'
 
 /**
@@ -6,14 +6,14 @@ import type { Theme, ThemeColors, ThemeShape } from '@/types/theme'
  * tokens.css 에 선언된 기본값을 런타임에 덮어쓴다.
  * 여기 없는 토큰(스페이싱·타이포·모션)은 이벤트별로 바뀌지 않는다.
  */
-const COLOR_VARS: Record<keyof ThemeColors, string> = {
+const COLOR_VARS: Partial<Record<keyof ThemeColors, string>> = {
   canvas: '--color-canvas',
   surface: '--color-surface',
   surfaceRaised: '--color-surface-raised',
   wash: '--color-wash',
   primary: '--color-primary',
   primaryHover: '--color-primary-hover',
-  primarySoft: '--color-primary-soft',
+  // primarySoft 는 저장값을 쓰지 않고 배경 밝기로 파생한다 (아래 applyTheme 참고)
   accent: '--color-accent',
   accentSoft: '--color-accent-soft',
   fg1: '--color-fg-1',
@@ -36,6 +36,12 @@ const SHADOW_LIFTED = {
   light: '0 16px 40px rgba(0, 0, 0, 0.16)',
 }
 
+/** 비활성 색도 배경 밝기를 따라야 한다 — 다크 값을 밝은 캔버스에 쓰면 버튼이 시커멓게 뜬다 */
+const DISABLED = {
+  dark: { bg: '#2e2f45', fg: '#6b6880' },
+  light: { bg: '#eeeeee', fg: '#8a8797' },
+}
+
 /** 형태 키 → CSS 커스텀 프로퍼티 (--radius-full 은 pill 이라 테마 대상이 아니다) */
 const SHAPE_VARS: Record<keyof ThemeShape, string> = {
   radiusSm: '--radius-sm',
@@ -48,7 +54,7 @@ export function applyTheme(theme: Theme): void {
   const root = document.documentElement
 
   for (const [key, cssVar] of Object.entries(COLOR_VARS)) {
-    root.style.setProperty(cssVar, theme.colors[key as keyof ThemeColors])
+    if (cssVar) root.style.setProperty(cssVar, theme.colors[key as keyof ThemeColors])
   }
 
   for (const [key, cssVar] of Object.entries(SHAPE_VARS)) {
@@ -74,6 +80,18 @@ export function applyTheme(theme: Theme): void {
     `${light ? SHADOW_LIFTED.light : SHADOW_LIFTED.dark}, 0 0 24px ${withAlpha(theme.colors.primary, 0.12)}`
   )
   root.style.setProperty('--color-dim', light ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0, 0, 0, 0.7)')
+
+  /**
+   * 칩·배지·보조버튼 글자(--color-primary-soft)는 wash 위에 얹힌다. 읽히는 방향이 배경 밝기에
+   * 따라 반대라(어두운 wash엔 밝은 글자, 밝은 wash엔 어두운 글자) 저장값 하나로 못 맞춘다.
+   * primary 를 wash 대비 4.5:1 넘게 조정해 파생한다 — 소유자가 어떤 브랜드색을 골라도 읽힌다.
+   */
+  root.style.setProperty('--color-primary-soft', readableShade(theme.colors.primary, theme.colors.wash))
+
+  // 비활성 색도 캔버스 밝기로 전환 (그림자·딤과 같은 판정)
+  const disabled = light ? DISABLED.light : DISABLED.dark
+  root.style.setProperty('--color-disabled-bg', disabled.bg)
+  root.style.setProperty('--color-disabled-fg', disabled.fg)
 
   const { backgroundPattern, backgroundPatternOpacity, backgroundPatternSize, backgroundPatternRepeat } =
     theme.assets
