@@ -62,6 +62,20 @@ export function SlotProvider({ children }: { children: ReactNode }) {
     if (state.status === 'ready') applyTheme(state.slot.theme)
   }, [state])
 
+  /**
+   * 브라우저 탭 제목을 **행사명**으로 — 방문자가 홈 화면에 추가하면 이 이름이 앱 이름이 된다.
+   * index.html 의 정적 '타로 포켓' 은 슬롯 밖(배포 루트·편집기)에서만 쓰이고,
+   * 슬롯을 벗어나면 되돌린다 (다른 슬롯의 이름이 남아 있으면 안 된다).
+   */
+  useEffect(() => {
+    if (state.status !== 'ready') return
+    const before = document.title
+    document.title = state.slot.name
+    return () => {
+      document.title = before
+    }
+  }, [state])
+
   return <SlotContext.Provider value={state}>{children}</SlotContext.Provider>
 }
 

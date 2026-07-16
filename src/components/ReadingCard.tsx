@@ -31,7 +31,9 @@ export function ReadingCard({
   brief = false,
   verdict,
 }: ReadingCardProps) {
-  const [ref, inView] = useInView<HTMLElement>()
+  // 뷰포트 하단 35% 를 잘라낸 기준으로 판정 — 카드가 화면 중앙쯤 올라와야 열려서
+  // 뒤집히는 모션이 제대로 보인다 (살짝 걸치자마자 열려버리지 않게)
+  const [ref, inView] = useInView<HTMLElement>(0.35, '0px 0px -35% 0px')
   const reading = readingOf(drawn)
   const aspectText = reading[aspect]
 
