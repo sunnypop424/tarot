@@ -3,21 +3,26 @@ import { useNavigate } from 'react-router-dom'
 import { Plus, Trash2, ChevronRight } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
+import { REVERSED_RATE } from '@/lib/deck'
 import { useSlot } from '@/slot/SlotProvider'
 import { getSlotDeck } from '@/data/slots'
-import type { Question } from '@/types/question'
+import { QUESTION_CARD_COUNT, type Question } from '@/types/question'
 
-/** 새 질문의 기본값 — 가장 가벼운 설정(메이저 1장)에서 시작한다 */
+/**
+ * 새 질문의 기본값.
+ * `cardCount`·`deck`·`reversedRate` 는 화면이 읽지 않는다 — 각각 한 장 고정,
+ * 슬롯 설정, 고정 50% 다. 옛 저장분과 모양을 맞추려고 값만 채워둔다.
+ */
 function blankQuestion(): Question {
   return {
     id: `q-${Date.now().toString(36)}`,
     question: '',
     published: false,
-    cardCount: 1,
+    cardCount: QUESTION_CARD_COUNT,
     deck: 'major',
     spreadCount: null,
     allowReversed: true,
-    reversedRate: 30,
+    reversedRate: REVERSED_RATE,
     fallbackAspect: 'general',
     answers: {},
   }
@@ -100,8 +105,9 @@ export function QuestionList() {
               >
                 <span className="t-text-m">{q.question || '(제목 없음)'}</span>
                 <br />
+                {/* 장수는 안 쓴다 — 질문 타로는 전부 한 장이라 줄마다 "1장"이 붙으면 잡음이다 */}
                 <span className="t-text-xs t-muted">
-                  {q.cardCount}장 · {majorOnly || q.deck === 'major' ? '메이저 22장' : '전체 78장'} ·{' '}
+                  {majorOnly || q.deck === 'major' ? '메이저 22장' : '전체 78장'} ·{' '}
                   {answeredCount(q)}개 답변 입력됨
                 </span>
               </button>

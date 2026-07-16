@@ -73,8 +73,9 @@ body {
 .t-muted {
   color: var(--color-fg-3);
 }
+/* 표면 위 포인트 글자 — 파생색 (raw accent 는 장식용) */
 .t-accent {
-  color: var(--color-accent);
+  color: var(--color-accent-soft);
 }
 .t-primary {
   color: var(--color-primary);

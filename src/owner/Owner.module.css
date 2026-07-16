@@ -1,4 +1,4 @@
-/* 소유자 전용 테마 편집기 — 개발 모드에서만 존재한다 */
+/* 최고관리자 전용 슬롯 편집기 (목록 + 슬롯 편집) — 개발 모드에서만 존재한다 */
 
 .head {
   display: flex;
@@ -7,6 +7,93 @@
   justify-content: space-between;
   gap: var(--space-md);
   margin-bottom: var(--space-lg);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
+  color: var(--color-fg-3);
+}
+.back:hover {
+  color: var(--color-primary);
+}
+
+/* ── 플랜 ─────────────────────────────────────────── */
+
+/* 플랜을 고르면 뭐가 되고 안 되는지 바로 옆에서 답한다 — 값을 외우게 하지 않는다 */
+.planFacts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-base);
+}
+
+.planFacts li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: var(--color-canvas);
+  font-size: var(--text-xs);
+}
+
+.planFacts span {
+  color: var(--color-fg-2);
+}
+
+.planFacts b {
+  color: var(--color-fg-1);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 저장 바 ──────────────────────────────────────── */
+
+/* 편집이 다 끝나는 자리(이벤트 설정 아래)에 둔다. 긴 폼이라 스크롤 끝까지 따라온다 */
+.saveBar {
+  position: sticky;
+  bottom: var(--space-base);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  padding: var(--space-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.saveBarActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* ── 슬롯 목록 ────────────────────────────────────── */
+
+/* 슬롯을 색으로 먼저 알아본다 — 이름보다 빠르다 */
+.swatch {
+  display: flex;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.swatch > span {
+  width: 12px;
+  height: 32px;
+}
+
+.slotMeta {
+  display: block;
+  color: var(--color-fg-3);
 }
 
 .actions {
@@ -90,13 +177,15 @@
   background: var(--color-surface);
 }
 
-/* 체크무늬로 투명 배경을 드러낸다 — 로고 PNG 의 여백을 확인해야 한다 */
+/* 체크무늬로 투명 배경을 드러낸다 — 로고 PNG 의 여백을 확인해야 한다.
+   미리보기 이미지가 background-image 라 체크무늬는 감싸는 쪽이 깔고 이미지는 안쪽에 얹는다 */
 .thumb {
+  display: block;
   flex-shrink: 0;
   width: 28px;
   height: 28px;
   border-radius: var(--radius-sm);
-  object-fit: contain;
+  overflow: hidden;
   background-color: var(--color-canvas);
   background-image: linear-gradient(45deg, var(--color-border) 25%, transparent 25%),
     linear-gradient(-45deg, var(--color-border) 25%, transparent 25%),
@@ -104,6 +193,15 @@
     linear-gradient(-45deg, transparent 75%, var(--color-border) 75%);
   background-size: 10px 10px;
   background-position: 0 0, 0 5px, 5px -5px, -5px 0;
+}
+
+.thumbImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .imagePath {
@@ -136,7 +234,8 @@
   display: block;
   aspect-ratio: var(--card-ratio);
   border: 1px dashed var(--color-border-hover);
-  border-radius: var(--radius-md);
+  /* 작은 썸네일이라 radius-md 로 손수 맞춰뒀던 자리 — 이제 크기에 맞춰 자동으로 준다 */
+  border-radius: var(--card-radius);
   overflow: hidden;
   cursor: pointer;
   transition: border-color var(--dur-micro) var(--ease);
@@ -146,9 +245,12 @@
 }
 
 .cardThumb {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .cardEmpty {
@@ -169,6 +271,14 @@
 }
 
 /* ── 미리보기 ─────────────────────────────────────── */
+
+.previewHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-base);
+}
 
 .preview {
   width: 100%;

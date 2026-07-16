@@ -33,22 +33,30 @@ export function mix(hex: string, toward: 'white' | 'black', t: number): string {
 
 /**
  * bg 위에서 target 대비를 넘는 base 의 명암 조정본.
- * bg 가 밝으면 base 를 어둡게, 어두우면 밝게 단계적으로 섞는다 — 배경 밝기에 따라
- * "읽히는 방향"이 반대라, 저장값 하나로는 못 맞추는 토큰(칩·배지 글자)을 런타임에 계산한다.
- * target 을 못 넘으면 가장 대비가 큰 값을 준다 (best-effort).
+ * 저장값 하나로는 못 맞추는 토큰(칩·배지 글자, 포인트 아이콘)을 런타임에 계산한다.
+ *
+ * **양쪽 방향을 다 시도한다.** 배경 밝기만 보고 방향을 정하면 중간 밝기 배경에서 틀린다 —
+ * 핑크(#FF6BA8)는 휘도 0.35 라 `isLight` 가 "어둡다"고 답하지만, 그 위의 흰 글자는 2.65:1 이고
+ * 검은 글자는 8:1 이다. "어두우니 밝은 글자"는 중간톤에서 성립하지 않는다.
+ *
+ * 조금씩 섞어가며 먼저 target 을 넘는 쪽을 쓴다 — 고른 색에서 **덜 벗어나는 답**을 고르기 위해서다.
+ * 끝내 못 넘으면 가장 대비가 큰 값을 준다 (best-effort).
  */
 export function readableShade(base: string, bg: string, target = 4.5): string {
-  const toward = isLight(bg) ? 'black' : 'white'
   let best = base
   let bestRatio = contrastRatio(base, bg) ?? 0
+  if (bestRatio >= target) return base
+
   for (let t = 0.1; t <= 1.0001; t += 0.1) {
-    const shade = mix(base, toward, t)
-    const ratio = contrastRatio(shade, bg) ?? 0
-    if (ratio > bestRatio) {
-      best = shade
-      bestRatio = ratio
+    for (const toward of ['black', 'white'] as const) {
+      const shade = mix(base, toward, t)
+      const ratio = contrastRatio(shade, bg) ?? 0
+      if (ratio > bestRatio) {
+        best = shade
+        bestRatio = ratio
+      }
+      if (bestRatio >= target) return best
     }
-    if (bestRatio >= target) return best
   }
   return best
 }

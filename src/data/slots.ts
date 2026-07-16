@@ -1,6 +1,13 @@
-import slotsJson from './slots.json'
+import defaultThemeJson from './slot-default.json'
+import { planById, type PlanId } from './plans'
 import type { DeckRange } from './cards'
 import type { Slot } from '@/types/slot'
+import type { Theme } from '@/types/theme'
+
+/**
+ * 슬롯에 관한 **순수 계산**만 여기 둔다.
+ * 어디서 읽고 쓰는지는 `repo.slots` 가 안다 (localStorage 냐 DB 냐는 화면이 알 바 아니다).
+ */
 
 /** 슬롯이 쓰는 카드 범위 — 없으면 전체(78장) */
 export function getSlotDeck(slot: Slot): DeckRange {
@@ -16,44 +23,25 @@ export function effectiveDeck(slot: Slot, wanted: DeckRange | undefined): DeckRa
 }
 
 /**
- * 슬롯 목록 — 소유자가 정해서 배포한다 (주최자는 못 바꾼다).
- * 테마 편집기에서 편집분을 localStorage 에 저장하면 그게 우선한다.
+ * 새 슬롯 — 기본 테마(보라 미스틱)로 시작한다. 색은 편집기에서 이벤트에 맞춰 갈아입힌다.
+ * 기본값이 slots.json 이 아니라 slot-default.json 에 따로 있는 건, 슬롯을 전부 지워도
+ * 새 슬롯을 만들 바탕은 남아 있어야 하기 때문이다.
  */
-/** 테마 편집기 편집분. 미리보기 iframe 이 storage 이벤트로 이 키를 지켜본다 */
-export const SLOTS_DRAFT_KEY = 'tarot-pocket:slots-draft'
-const KEY_DRAFT = SLOTS_DRAFT_KEY
+export function createSlot(slug: string, name: string, plan: PlanId = 'free'): Slot {
+  const theme = structuredClone(defaultThemeJson) as Theme
+  // 로고 이미지를 올리기 전까지는 이벤트명이 로고 자리에 나온다
+  theme.assets.logoAlt = name
 
-const BUNDLED = slotsJson as Slot[]
-
-/** 테마 편집기 편집분 → 번들 순 */
-export function getSlots(): Slot[] {
-  try {
-    const raw = localStorage.getItem(KEY_DRAFT)
-    if (raw) return JSON.parse(raw) as Slot[]
-  } catch {
-    /* 편집분을 못 읽으면 번들된 걸 쓴다 */
-  }
-  return BUNDLED
-}
-
-export function getSlot(slug: string | undefined): Slot | undefined {
-  if (!slug) return undefined
-  return getSlots().find((s) => s.slug === slug)
-}
-
-/** 테마 편집기 전용 — 편집분 저장 */
-export function saveSlotsDraft(slots: Slot[]): void {
-  try {
-    localStorage.setItem(KEY_DRAFT, JSON.stringify(slots))
-  } catch {
-    /* noop */
-  }
-}
-
-export function clearSlotsDraft(): void {
-  try {
-    localStorage.removeItem(KEY_DRAFT)
-  } catch {
-    /* noop */
+  // 한도는 플랜 값으로 시작한다 — 편집기에서 여기서부터 올릴 수 있다
+  const p = planById(plan)
+  return {
+    slug,
+    name,
+    service: 'tarot',
+    plan,
+    limits: { reading: p.readingLimit, answerGen: p.answerGenLimit },
+    deck: 'full',
+    theme,
+    event: {},
   }
 }

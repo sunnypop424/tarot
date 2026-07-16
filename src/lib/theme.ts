@@ -1,3 +1,4 @@
+import { cardRadius } from './card'
 import { isLight, readableShade, withAlpha } from './color'
 import type { Theme, ThemeColors, ThemeShape } from '@/types/theme'
 
@@ -13,9 +14,8 @@ const COLOR_VARS: Partial<Record<keyof ThemeColors, string>> = {
   wash: '--color-wash',
   primary: '--color-primary',
   primaryHover: '--color-primary-hover',
-  // primarySoft 는 저장값을 쓰지 않고 배경 밝기로 파생한다 (아래 applyTheme 참고)
+  // primarySoft·accentSoft 는 저장값을 쓰지 않고 배경 밝기로 파생한다 (아래 applyTheme 참고)
   accent: '--color-accent',
-  accentSoft: '--color-accent-soft',
   fg1: '--color-fg-1',
   fg2: '--color-fg-2',
   fg3: '--color-fg-3',
@@ -25,6 +25,23 @@ const COLOR_VARS: Partial<Record<keyof ThemeColors, string>> = {
   cardBackFrom: '--card-back-from',
   cardBackTo: '--card-back-to',
 }
+
+/**
+ * **배경 밝기로 파생하는 색** — 저장값을 쓰지 않는다.
+ *
+ * 소유자가 고르는 brand 색은 한 가지 배경(보통 어두운 카드·표면)을 보고 고르게 된다.
+ * 그 색을 반대 밝기 배경에 그대로 쓰면 사라진다 — 골드(#D4AF37)는 흰 표면에서 2.1:1 이라
+ * 1.75px 아이콘이 안 보인다. 그래서 배경 대비 4.5:1 을 넘게 조정한 것을 따로 낸다.
+ *
+ * **여기가 단일 소스다.** 소유자 도구의 대비 검사(owner/contrast.ts)도 이걸 불러 쓴다 —
+ * 규칙이 갈라지면 검사는 통과라는데 화면은 안 읽히는 색이 나간다.
+ */
+export const DERIVED_COLORS = {
+  /** 칩·배지·보조버튼 글자 — wash 위에 얹힌다 */
+  primarySoft: (c: Pick<ThemeColors, 'primary' | 'wash'>) => readableShade(c.primary, c.wash),
+  /** 포인트 글자·아이콘 — 표면 위에 얹힌다 (raw accent 는 어두운 카드 위 장식용) */
+  accentSoft: (c: Pick<ThemeColors, 'accent' | 'surface'>) => readableShade(c.accent, c.surface),
+} as const
 
 /** 밝은 배경에선 그림자를 옅게 — 같은 세기를 쓰면 뭉쳐 보인다 */
 const SHADOW_CARD = {
@@ -61,6 +78,13 @@ export function applyTheme(theme: Theme): void {
     root.style.setProperty(cssVar, `${theme.shape[key as keyof ThemeShape]}px`)
   }
 
+  /**
+   * 카드 radius 는 **카드 크기에 비례한다** — 고정 px 을 쓰면 56px 짜리 덱 카드가
+   * 170px 짜리 홈 카드와 같은 16px 을 써서 3배로 뭉툭해진다 (`lib/card.ts`).
+   * 슬롯이 고른 radiusLg 는 홈 카드 기준이고, 나머지 화면은 여기서 나온 퍼센트로 자동으로 줄어든다.
+   */
+  root.style.setProperty('--card-radius', cardRadius(theme.shape.radiusLg))
+
   // 인터랙션 글로우는 primary 에서 파생 — 테마 색이 바뀌면 글로우도 따라간다
   root.style.setProperty(
     '--shadow-glow',
@@ -79,14 +103,10 @@ export function applyTheme(theme: Theme): void {
     '--shadow-card-lifted',
     `${light ? SHADOW_LIFTED.light : SHADOW_LIFTED.dark}, 0 0 24px ${withAlpha(theme.colors.primary, 0.12)}`
   )
-  root.style.setProperty('--color-dim', light ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0, 0, 0, 0.7)')
 
-  /**
-   * 칩·배지·보조버튼 글자(--color-primary-soft)는 wash 위에 얹힌다. 읽히는 방향이 배경 밝기에
-   * 따라 반대라(어두운 wash엔 밝은 글자, 밝은 wash엔 어두운 글자) 저장값 하나로 못 맞춘다.
-   * primary 를 wash 대비 4.5:1 넘게 조정해 파생한다 — 소유자가 어떤 브랜드색을 골라도 읽힌다.
-   */
-  root.style.setProperty('--color-primary-soft', readableShade(theme.colors.primary, theme.colors.wash))
+  // 배경 밝기 종속 색 — 규칙은 DERIVED_COLORS 한 곳에 있다 (대비 검사도 같은 걸 쓴다)
+  root.style.setProperty('--color-primary-soft', DERIVED_COLORS.primarySoft(theme.colors))
+  root.style.setProperty('--color-accent-soft', DERIVED_COLORS.accentSoft(theme.colors))
 
   // 비활성 색도 캔버스 밝기로 전환 (그림자·딤과 같은 판정)
   const disabled = light ? DISABLED.light : DISABLED.dark
@@ -104,8 +124,12 @@ export function applyTheme(theme: Theme): void {
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme.colors.canvas)
 }
 
-/** 카드 앞면 이미지 경로 — 테마에 앞면 이미지가 없으면 null */
+/**
+ * 카드 앞면 이미지 경로 — 테마에 앞면 이미지가 없으면 null.
+ * `?v=` 는 앞면을 다시 올렸을 때 옛 그림이 캐시에서 나오는 걸 막는다 (ThemeAssets 참고).
+ */
 export function cardFrontSrc(theme: Theme, cardId: string): string | null {
-  const { cardFrontBase, cardFrontExt } = theme.assets
-  return cardFrontBase ? `${cardFrontBase}/${cardId}.${cardFrontExt}` : null
+  const { cardFrontBase, cardFrontExt, cardFrontVersion } = theme.assets
+  if (!cardFrontBase) return null
+  return `${cardFrontBase}/${cardId}.${cardFrontExt}${cardFrontVersion ? `?v=${cardFrontVersion}` : ''}`
 }

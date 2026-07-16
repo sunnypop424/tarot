@@ -1,7 +1,6 @@
-import { useState } from 'react'
-
 import { useSlot } from '@/slot/SlotProvider'
 import { cardFrontSrc } from '@/lib/theme'
+import { cssUrl, useImageAsset } from '@/lib/image'
 import type { DrawnCard } from '@/types/card'
 import styles from './CardFace.module.css'
 
@@ -9,23 +8,27 @@ import styles from './CardFace.module.css'
  * 카드 앞면 — 이벤트 테마가 앞면 이미지를 주면 이미지, 없으면 텍스트로 폴백한다.
  * 역방향은 이미지를 180° 뒤집어 보여준다.
  * 프레임(비율·테두리·그림자)은 감싸는 쪽의 .tarot-card 가 담당한다.
+ *
+ * 이미지는 background-image 로만 그린다 (lib/image.ts) — 카페에서 길게 눌러 저장되면 안 된다.
  */
 export function CardFace({ card, orientation }: DrawnCard) {
   const { theme } = useSlot()
   const src = cardFrontSrc(theme, card.id)
-  const [failed, setFailed] = useState(false)
+  const { status } = useImageAsset(src)
 
   const reversed = orientation === 'reversed'
   const label = `${card.name}${reversed ? ' (역방향)' : ''}`
 
-  if (src && !failed) {
+  if (src && status !== 'failed') {
     return (
-      <img
-        src={src}
-        alt={label}
+      <div
+        role="img"
+        aria-label={label}
         className={styles.image}
-        style={reversed ? { transform: 'rotate(180deg)' } : undefined}
-        onError={() => setFailed(true)}
+        style={{
+          backgroundImage: cssUrl(src),
+          transform: reversed ? 'rotate(180deg)' : undefined,
+        }}
       />
     )
   }

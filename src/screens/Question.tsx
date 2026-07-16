@@ -4,13 +4,13 @@ import { useParams } from 'react-router-dom'
 import { CardDraw } from '@/components/CardDraw'
 import { useSlotPath } from '@/slot/useSlotPath'
 import { useSlot } from '@/slot/SlotProvider'
-import { effectiveDeck } from '@/data/slots'
+import { getSlotDeck } from '@/data/slots'
 import { FlipCard } from '@/components/FlipCard'
 import { useQuestion, useQuestions } from '@/lib/questions'
 import { answerFor } from '@/lib/answer'
 import { useInView } from '@/lib/useInView'
 import type { DrawnCard } from '@/types/card'
-import type { Question as QuestionType } from '@/types/question'
+import { QUESTION_CARD_COUNT, type Question as QuestionType } from '@/types/question'
 import { NotReady } from './NotReady'
 import styles from './Question.module.css'
 
@@ -36,14 +36,17 @@ function QuestionFlow({ question }: { question: QuestionType }) {
       <CardDraw
         title="질문 타로"
         lead={question.question}
-        cardCount={question.cardCount}
-        positions={positionsFor(question)}
-        // 질문마다 덱 범위·펼침 수·역방향을 따로 정할 수 있다 (단, 슬롯 범위로 캡)
+        cardCount={QUESTION_CARD_COUNT}
+        positions={POSITIONS}
+        /**
+         * 카드 범위는 **슬롯 설정**이다 — 최고관리자만 정한다.
+         * 주최자가 질문마다 고를 수 있는 건 펼침 수와 역방향 사용 여부뿐이고,
+         * 역방향 확률은 고정이다 (REVERSED_RATE).
+         */
         spread={{
-          deck: effectiveDeck(slot, question.deck),
+          deck: getSlotDeck(slot),
           spreadCount: question.spreadCount,
           allowReversed: question.allowReversed,
-          reversedRate: question.reversedRate,
         }}
         onComplete={setRevealed}
       />
@@ -84,11 +87,8 @@ function QuestionFlow({ question }: { question: QuestionType }) {
   )
 }
 
-/** 한 장이면 포지션 라벨이 굳이 필요 없다 */
-function positionsFor(question: QuestionType): string[] {
-  if (question.cardCount === 1) return ['답']
-  return Array.from({ length: question.cardCount }, (_, i) => `${i + 1}번째`)
-}
+/** 한 장이라 포지션 라벨은 "답" 하나뿐 (QUESTION_CARD_COUNT — src/types/question.ts) */
+const POSITIONS = ['답']
 
 /** 스크롤로 화면에 들어올 때 뒤집힌다 */
 function AnswerCard({ question, drawn }: { question: QuestionType; drawn: DrawnCard }) {

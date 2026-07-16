@@ -1,0 +1,10 @@
+project_id = "tarot-pocket"
+
+[functions.ai]
+# JWT 검증을 Supabase 에 맡기지 않는다 — **경로마다 필요한 권한이 다르기 때문이다.**
+#   /status  누구나 (화면이 AI 를 띄울지 정하는 값이라 로그인 전에도 답해야 한다)
+#   /reading 방문자 (로그인하지 않는다 — 익명 토큰이 있으면 그걸로 레이트리밋을 센다)
+#   /answers 그 슬롯 주최자만
+#   /theme   최고관리자만
+# 전역으로 켜면 /status 가 401 이 되고, 앱은 "AI 없음" 으로 조용히 접힌다.
+verify_jwt = false

@@ -68,6 +68,51 @@
   background: var(--color-wash);
   color: var(--color-primary-soft);
 }
+/* AI 가 만들었지만 아직 저장 전 — 다른 상태라는 걸 색으로 구분한다 */
+.badge--pending {
+  background: var(--color-wash);
+  color: var(--color-accent-soft);
+}
+
+/* ── AI 생성 검수 ─────────────────────────────────── */
+
+/* 저장을 누르기 전까지 방문자에겐 아무것도 안 나간다 — 그 상태를 눈에 띄게 */
+.review {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-base);
+  padding: var(--space-base);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.reviewText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.reviewWarn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--color-accent-soft);
+}
+
+.reviewActions {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-sm);
+}
+
+/* 검수 중인 행 — 목록에서 바로 눈에 띈다 */
+.answerRow[data-pending] {
+  border-color: var(--color-accent);
+}
 
 .answerBody {
   display: flex;

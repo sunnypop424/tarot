@@ -1,0 +1,24 @@
+/* 종합 블록 — 조언(ReadingCard .advice)과 같은 세로선 디자인. 다만 인터랙션 색으로,
+   카드 한 장이 아니라 전체를 묶는 자리라는 걸 구분한다 */
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-base);
+  border-left: 2px solid var(--color-primary);
+  background: var(--color-surface);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-primary-soft);
+}
+
+/* 모델이 문단을 나눠 쓴다 — 줄바꿈을 살려야 읽힌다 */
+.text {
+  white-space: pre-wrap;
+}

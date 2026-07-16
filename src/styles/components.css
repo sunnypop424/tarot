@@ -92,7 +92,8 @@
 .tarot-card {
   position: relative;
   aspect-ratio: var(--card-ratio);
-  border-radius: var(--radius-lg);
+  /* 크기에 비례하는 모서리 — 카드가 작아지면 같이 줄어든다 (tokens.css) */
+  border-radius: var(--card-radius);
   border: 1px solid var(--color-accent);
   background: var(--color-surface);
   box-shadow: var(--shadow-card);
@@ -255,8 +256,10 @@
 
 /* ══ 아이콘 ════════════════════════════════════════ */
 /* 장식·카테고리 아이콘은 포인트색, 기능 아이콘은 텍스트 색 (DESIGN.md §4) */
+/* 표면 위에 얹히는 포인트 아이콘 — 파생색을 쓴다.
+   raw accent 는 어두운 카드 기준이라 밝은 표면에서 사라진다 (lib/theme.ts) */
 .icon-accent {
-  color: var(--color-accent);
+  color: var(--color-accent-soft);
 }
 .icon-muted {
   color: var(--color-fg-3);

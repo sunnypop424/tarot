@@ -35,7 +35,6 @@
   --color-border-hover: #3a3b57;
   --color-disabled-bg: #2e2f45;
   --color-disabled-fg: #6b6880;
-  --color-dim: rgba(15, 16, 32, 0.7);
 
   /* 내장 카드 뒷면 SVG 의 방사형 그라디언트 (테마에 뒷면 이미지가 없을 때만 쓰임) */
   --card-back-from: #1e1f3e;
@@ -89,24 +88,28 @@
   --shadow-card-lifted: 0 16px 40px rgba(0, 0, 0, 0.5),
     0 0 24px rgba(129, 107, 255, 0.12);
   --shadow-glow: 0 0 24px rgba(129, 107, 255, 0.25);
-  --shadow-hairline: 0 1px 0 0 var(--color-border);
 
   /* ── 레이아웃 ─────────────────────────────────────── */
   --layout-max: 480px; /* 콘텐츠 최대 폭 — 그 이상은 여백 */
   --layout-pad: 1.25rem; /* 20px 좌우 패딩 */
   --tap-min: 44px; /* 최소 터치 타깃 */
   --tabbar-h: 64px;
-  --header-h: 56px;
-  --card-ratio: 3 / 5; /* 타로 카드 고정 비율 */
+  /* 타로 카드 고정 비율 — 실물 규격(63×88mm). src/lib/card.ts 와 같은 값이어야 한다 (CSS 는 거길 못 읽는다) */
+  --card-ratio: 63 / 88;
+  /**
+   * 카드 모서리 — **폭 대비 퍼센트**라 카드가 작아지면 같이 줄어든다.
+   * 고정 px 을 쓰면 56px 짜리 덱 카드가 170px 짜리 홈 카드와 같은 radius 를 써서 3배로 뭉툭해진다.
+   * 세로 퍼센트가 다른 건 모서리를 원형으로 유지하기 위해서다 (`lib/card.ts` 의 cardRadius).
+   * 슬롯이 열리면 applyTheme() 이 그 슬롯의 radiusLg 로 덮어쓴다 — 여기 값은 radiusLg 16px 기준.
+   */
+  --card-radius: 9.412% / 6.738%;
 
   /* ── 모션 (DESIGN.md §15) ─────────────────────────── */
   --dur-micro: 200ms; /* 색·상태 전환 */
   --dur-short: 400ms; /* 오버레이, 토스트 */
   --dur-flip: 600ms; /* 카드 뒤집기 */
   --dur-fly: 420ms; /* 고른 카드가 슬롯으로 날아가는 시간 */
-  --dur-shuffle: 1200ms; /* 셔플 연출 */
   --dur-shimmer: 1500ms; /* 스켈레톤 루프 */
-  --stagger-flip: 150ms; /* 3장 스프레드 순차 플립 간격 */
   --ease: ease;
 }
 
@@ -128,7 +131,6 @@
   --color-border-hover: #d5d0e8;
   --color-disabled-bg: #eeeeee;
   --color-disabled-fg: #b0aebd;
-  --color-dim: rgba(15, 16, 32, 0.5);
 
   --shadow-card: 0 4px 16px rgba(26, 27, 46, 0.12);
   /* 카드 뒷면은 라이트 모드에서도 딥 네이비 유지 — 카드가 주인공 */
@@ -139,7 +141,5 @@
   :root {
     --dur-flip: 0ms;
     --dur-fly: 0ms;
-    --dur-shuffle: 0ms;
-    --stagger-flip: 0ms;
   }
 }

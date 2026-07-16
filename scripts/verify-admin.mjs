@@ -6,8 +6,24 @@
  */
 
 import puppeteer from 'puppeteer-core'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+
+/**
+ * 인증이 진짜라 실제 계정으로 들어간다 (supabase/seed.sql 의 씨앗 계정).
+ * Supabase 를 안 붙였으면 local 어댑터가 아무 값이나 통과시키므로 이 값이 그대로 먹는다.
+ */
+const env = {}
+try {
+  for (const line of readFileSync('.env.local', 'utf8').split('\n')) {
+    const m = /^([A-Z_]+)=(.*)$/.exec(line.trim())
+    if (m) env[m[1]] = m[2]
+  }
+} catch {
+  /* .env.local 이 없으면 local 어댑터 — 아무 값이나 통과한다 */
+}
+const ADMIN_EMAIL = 'demo@example.com'
+const ADMIN_PASSWORD = env.SEED_PASSWORD ?? 'tarot1234'
 
 const chrome = [
   'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -89,11 +105,13 @@ console.log(
   page.url().includes('/admin/login') ? '미로그인 → 로그인으로 보냄 (정상)' : '문제 — 가드 없음'
 )
 
-await page.type('#admin-email', 'organizer@demo.kr')
-await page.type('#admin-password', 'pw')
+// 인증이 진짜라 실제 계정으로 들어간다 (supabase/seed.sql · .env.local 의 SEED_PASSWORD).
+// Supabase 를 안 붙인 상태(local 어댑터)면 아무 값이나 통과하므로 이 값이 그대로 먹는다.
+await page.type('#admin-email', ADMIN_EMAIL)
+await page.type('#admin-password', ADMIN_PASSWORD)
 await page.click('button[type="submit"]')
-await wait(800)
-console.log(page.url().includes('/admin/questions') ? '로그인 후 질문 목록 진입 (정상)' : '문제')
+await wait(2500)
+console.log(page.url().includes('/admin/questions') ? '로그인 후 질문 목록 진입 (정상)' : `문제 — ${page.url()}`)
 await page.screenshot({ path: join(outDir, 'admin-questions-desktop.png') })
 
 const rowCount = () => page.$$eval('.row-item', (e) => e.length)
@@ -101,6 +119,9 @@ const before = await rowCount()
 await page.$$eval('button', (bs) => bs.find((b) => b.textContent.includes('질문 추가'))?.click())
 await wait(800)
 console.log(page.url().match(/questions\/q-/) ? '질문 추가 → 편집 화면 진입 (정상)' : '문제')
+
+// 이 질문은 **진짜 DB** 에 들어간다 — 끝나면 반드시 지운다 (localStorage 때는 다음 실행이 덮어썼다)
+const createdId = page.url().split('/').pop()
 
 // 질문 작성 + 공개 + 답변 입력
 await page.type('#q-text', '테스트 질문이 잘 저장되나요?')
@@ -145,6 +166,25 @@ console.log(
     : '문제 — 슬롯 간 질문이 새어 나감'
 )
 
+// ── 뒷정리: 만든 질문을 지운다 (진짜 DB 다) ─────────
+page.on('dialog', (d) => void d.accept())
+await page.goto(`${BASE}/demo/admin/questions`, { waitUntil: 'networkidle0' })
+await wait(600)
+await page.$$eval(
+  '.row-item',
+  (rows, id) => {
+    const row = rows.find((r) => r.textContent.includes('테스트 질문'))
+    row?.querySelector('button[aria-label="삭제"]')?.click()
+    return id
+  },
+  createdId
+)
+await wait(1000)
+const afterDelete = await rowCount()
+console.log(
+  `뒷정리: ${after} → ${afterDelete} ${afterDelete === before ? '(원래대로 — 정상)' : '(문제 — DB 에 쓰레기가 남음)'}`
+)
+
 // ── 관리자 슬롯 격리 ───────────────────────────────
 await page.goto(`${BASE}/sample-pink/admin/questions`, { waitUntil: 'networkidle0' })
 await wait(600)
@@ -152,6 +192,25 @@ console.log(
   page.url().includes('/sample-pink/admin/login')
     ? '데모 계정으로 핑크 관리 진입 차단됨 (정상)'
     : '문제 — 다른 슬롯 관리 화면에 들어가짐'
+)
+
+// ── 로그아웃하면 바로 나가는가 ─────────────────────
+await page.goto(`${BASE}/demo/admin/questions`, { waitUntil: 'networkidle0' })
+await wait(600)
+await page.click('[data-signout]')
+await wait(1200)
+console.log(
+  page.url().includes('/demo/admin/login')
+    ? '로그아웃 → 바로 로그인 화면 (정상)'
+    : `문제 — 로그아웃했는데 ${page.url()}`
+)
+// 정말 나갔나 — 주소를 직접 쳐서 들어가보기
+await page.goto(`${BASE}/demo/admin/questions`, { waitUntil: 'networkidle0' })
+await wait(900)
+console.log(
+  page.url().includes('/demo/admin/login')
+    ? '로그아웃 후엔 다시 못 들어감 (정상)'
+    : '문제 — 세션이 살아 있음'
 )
 
 // ── 모바일 반응형 ──────────────────────────────────
@@ -164,14 +223,13 @@ const overflow = await mobile.evaluate(
 console.log(`모바일 관리자 가로 오버플로: ${overflow}px ${overflow <= 0 ? '(정상)' : '(문제)'}`)
 await mobile.screenshot({ path: join(outDir, 'admin-questions-mobile.png') })
 
-// ── 테마 편집기 (개발 모드) ────────────────────────
+// ── 슬롯 편집기는 주최자 세션으로 열리지 않는다 ────
+// (역할 분리 — 주최자는 자기 질문만 만진다. 편집기 자체 검증은 verify-owner.mjs)
 await page.goto(`${BASE}/theme-editor`, { waitUntil: 'networkidle0' })
-await wait(800)
-const editorTitle = await page.$eval('h1', (h) => h.textContent.trim())
-console.log(`테마 편집기: "${editorTitle}"`)
-const contrastRows = await page.$$eval('[class*="contrastRow"]', (e) => e.length)
-console.log(`대비 검사 항목: ${contrastRows}개 ${contrastRows > 0 ? '(정상)' : '(문제)'}`)
-await page.screenshot({ path: join(outDir, 'theme-editor.png') })
+await wait(600)
+const gated = page.url().endsWith('/theme-editor/login')
+console.log(`주최자 로그인 상태로 /theme-editor: ${page.url()} ${gated ? '(막힘 — 정상)' : '(문제)'}`)
+await page.screenshot({ path: join(outDir, 'owner-login-gate.png') })
 
 await browser.close()
 

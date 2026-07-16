@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Upload, X } from 'lucide-react'
 
-import { uploadAsset, deleteAsset, extOf } from './upload'
-import styles from './ThemeEditor.module.css'
+import { cssUrl } from '@/lib/image'
+import { uploadAsset, deleteAsset, extOf, nameFromUrl } from './upload'
+import styles from './Owner.module.css'
 
 interface ImageFieldProps {
   slug: string
@@ -15,7 +16,7 @@ interface ImageFieldProps {
   hint?: string
 }
 
-/** 로고·배경·뒷면처럼 한 장짜리 이미지 — 업로드하면 public/slots/{slug}/ 에 저장된다 */
+/** 로고·배경·뒷면처럼 한 장짜리 이미지 — 슬롯 이미지 저장소(`owner/upload`)에 올린다 */
 export function ImageField({ slug, label, name, value, onChange, hint }: ImageFieldProps) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -34,7 +35,8 @@ export function ImageField({ slug, label, name, value, onChange, hint }: ImageFi
 
   async function handleClear() {
     if (value) {
-      const file = value.split('/').pop()
+      // 저장된 값은 URL 이라 이름만 떼어낸다 (버전 쿼리 포함 — nameFromUrl 이 벗긴다)
+      const file = nameFromUrl(value)
       if (file) await deleteAsset(slug, file).catch(() => {})
     }
     onChange(null)
@@ -46,7 +48,9 @@ export function ImageField({ slug, label, name, value, onChange, hint }: ImageFi
 
       {value ? (
         <div className={styles.imageRow}>
-          <img src={value} alt="" className={styles.thumb} />
+          <span className={styles.thumb}>
+            <span className={styles.thumbImage} style={{ backgroundImage: cssUrl(value) }} />
+          </span>
           <span className={`t-text-xs ${styles.imagePath}`}>{value}</span>
           <button type="button" className="btn-icon" aria-label={`${label} 지우기`} onClick={() => void handleClear()}>
             <X size={16} strokeWidth={2} aria-hidden="true" />
@@ -60,6 +64,7 @@ export function ImageField({ slug, label, name, value, onChange, hint }: ImageFi
             type="file"
             accept="image/*"
             className="sr-only"
+            data-image-field={name}
             onChange={(e) => e.target.files?.[0] && void handleFile(e.target.files[0])}
           />
         </label>

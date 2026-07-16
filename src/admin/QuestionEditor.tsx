@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, Sparkles } from 'lucide-react'
+import { ChevronLeft, Sparkles, TriangleAlert } from 'lucide-react'
 
 import { getDeck, type DeckRange } from '@/data/cards'
 import { repo } from '@/lib/repo'
+import type { GeneratedAnswer } from '@/lib/repo'
 import { getSlotDeck } from '@/data/slots'
+import { getPlan } from '@/data/plans'
+import { CrystalBall } from '@/components/CrystalBall'
 import { useSlot } from '@/slot/SlotProvider'
 import type { Aspect, Card, Orientation } from '@/types/card'
-import type { Question } from '@/types/question'
+import { QUESTION_CARD_COUNT, type Question, type QuestionAnswers } from '@/types/question'
 import styles from './QuestionEditor.module.css'
 
 const ASPECTS: { value: Aspect; label: string }[] = [
@@ -23,21 +26,30 @@ function validate(q: Question, deck: DeckRange): string | null {
   const deckSize = getDeck(deck).length
   if (q.spreadCount === null) return null
   if (q.spreadCount > deckSize) return `펼치는 수가 덱 장수(${deckSize})보다 많아요.`
-  if (q.spreadCount < q.cardCount + 2)
-    return `펼치는 수는 뽑는 수보다 최소 2장 많아야 해요 (${q.cardCount + 2}장 이상).`
+  // 뽑는 수는 항상 1 (질문 타로는 한 장) — 저장분에 옛 값이 남아 있어도 화면은 1로 돈다
+  if (q.spreadCount < QUESTION_CARD_COUNT + 2)
+    return `펼치는 수는 최소 ${QUESTION_CARD_COUNT + 2}장이어야 해요.`
   return null
 }
 
 export function QuestionEditor() {
   const slot = useSlot()
   const slug = slot.slug
-  // 슬롯이 메이저 22장이면 질문 덱도 22장으로 잠긴다 (전체 78장 못 씀)
-  const slotIsMajor = getSlotDeck(slot) === 'major'
   const { questionId } = useParams<{ questionId: string }>()
   const navigate = useNavigate()
 
   const [draft, setDraft] = useState<Question | null>(null)
   const [saving, setSaving] = useState(false)
+
+  /**
+   * AI 생성분 — **저장 전 검수 자리**.
+   * 생성하자마자 answers 에 넣지 않는다. AI 가 이상한 답을 써도 방문자에게 바로 나가면 안 된다
+   * (PLANNING.md §4-1: 일괄 생성 → 관리자 검수 후 저장).
+   */
+  const [pending, setPending] = useState<QuestionAnswers | null>(null)
+  const [gen, setGen] = useState<{ done: number; total: number } | null>(null)
+  const [genError, setGenError] = useState<string | null>(null)
+  const [aiReady, setAiReady] = useState(false)
 
   useEffect(() => {
     void (async () => {
@@ -45,6 +57,18 @@ export function QuestionEditor() {
       setDraft(all.find((q) => q.id === questionId) ?? null)
     })()
   }, [slug, questionId])
+
+  // AI 가 안 붙어 있으면 버튼은 눌러도 소용없다 — 왜 안 되는지 화면이 말한다
+  useEffect(() => {
+    void repo.ai.ready().then(setAiReady)
+  }, [])
+
+  /**
+   * 이 슬롯이 산 플랜 — 답변 AI 생성이 되는지, 몇 번까지인지가 여기서 나온다.
+   * 주최자는 플랜을 못 바꾼다 (최고관리자가 슬롯 편집기에서 정한다).
+   */
+  const plan = getPlan(slot)
+  const canGenerate = aiReady && plan.answerGenLimit > 0
 
   // 편집 즉시 저장 — 별도 저장 버튼 없이 (주최자가 저장을 잊어 날리는 게 더 나쁘다)
   const patch = useCallback(
@@ -79,15 +103,63 @@ export function QuestionEditor() {
     [slug]
   )
 
-  // 답변칸이 채워야 할 카드 — 슬롯이 메이저면 draft.deck 과 무관하게 22장
-  const effDeck: DeckRange = slotIsMajor ? 'major' : (draft?.deck ?? 'major')
+  /**
+   * 답변칸이 채워야 할 카드 = **슬롯의 카드 범위**.
+   * 질문마다 범위를 고를 수 없다 — 최고관리자가 슬롯에 정해둔 값만 따른다.
+   */
+  const effDeck = getSlotDeck(slot)
   const cards = useMemo(() => (draft ? getDeck(effDeck) : []), [draft, effDeck])
+
+  /** 질문 × 카드 답변 일괄 생성 → pending 에 담아 검수 화면으로 */
+  const generate = useCallback(async () => {
+    if (!draft) return
+    setGenError(null)
+    setPending(null)
+    setGen({ done: 0, total: cards.length })
+    try {
+      const generated = await repo.ai.generateAnswers(
+        slug,
+        {
+          question: draft.question,
+          aspect: draft.fallbackAspect,
+          cardIds: cards.map((c) => c.id),
+          allowReversed: draft.allowReversed,
+        },
+        (done, total) => setGen({ done, total })
+      )
+      setPending(toAnswers(generated, draft.allowReversed))
+    } catch (e) {
+      setGenError(e instanceof Error ? e.message : '생성하지 못했어요')
+    } finally {
+      setGen(null)
+    }
+  }, [draft, cards, slug])
 
   if (draft === null) {
     return <p className="t-body t-muted">질문을 찾을 수 없어요.</p>
   }
 
   const error = validate(draft, effDeck)
+
+  /** 검수 끝 — 여기서 비로소 answers 에 들어간다 (patch 가 곧 저장이다) */
+  const applyPending = () => {
+    if (!pending) return
+    const merged: QuestionAnswers = { ...draft.answers }
+    for (const [cardId, answer] of Object.entries(pending)) {
+      merged[cardId] = { ...merged[cardId], ...answer }
+    }
+    patch({ answers: merged })
+    setPending(null)
+  }
+
+  const pendingCount = pending ? Object.keys(pending).length : 0
+  // 이미 손으로 쓴 답변을 덮어쓰게 되는 카드 — 조용히 지워지면 안 된다
+  const overwrites = pending
+    ? Object.keys(pending).filter((id) => {
+        const written = draft.answers[id]
+        return Boolean(written?.upright?.trim() || written?.reversed?.trim())
+      }).length
+    : 0
 
   return (
     <>
@@ -134,46 +206,14 @@ export function QuestionEditor() {
 
       <section className="admin-section">
         <h2 className="t-title-s admin-section__title">뽑기 설정</h2>
+        {/* 뽑는 수(항상 1장)·카드 범위·역방향 확률(50%)은 주최자가 고르지 않는다.
+            범위는 슬롯 설정이라 최고관리자만 바꾼다 — 여긴 결과만 알려준다 */}
+        <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+          이 슬롯은 <b>{effDeck === 'major' ? '메이저 22장' : '전체 78장'}</b>을 써요. 카드를 한 장
+          뽑고, 역방향은 50% 로 나와요. 카드 범위는 슬롯 설정이라 여기서는 못 바꿔요.
+        </p>
+
         <div className="form-grid">
-          <div className="field">
-            <label className="field__label" htmlFor="q-count">
-              뽑는 카드 수
-            </label>
-            <select
-              id="q-count"
-              className="select"
-              value={draft.cardCount}
-              onChange={(e) => patch({ cardCount: Number(e.target.value) })}
-            >
-              {[1, 2, 3].map((n) => (
-                <option key={n} value={n}>
-                  {n}장
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="field">
-            <label className="field__label" htmlFor="q-deck">
-              카드 범위
-            </label>
-            <select
-              id="q-deck"
-              className="select"
-              value={effDeck}
-              disabled={slotIsMajor}
-              onChange={(e) => patch({ deck: e.target.value as DeckRange })}
-            >
-              <option value="major">메이저 22장</option>
-              <option value="full">전체 78장</option>
-            </select>
-            <span className="field__hint">
-              {slotIsMajor
-                ? '이 슬롯은 메이저 22장으로 설정돼 전체 78장은 쓸 수 없어요.'
-                : '답변을 채울 카드 수가 달라져요.'}
-            </span>
-          </div>
-
           <div className="field">
             <label className="field__label" htmlFor="q-spread">
               펼치는 카드 수
@@ -182,15 +222,18 @@ export function QuestionEditor() {
               id="q-spread"
               className="input"
               type="number"
-              min={3}
+              min={QUESTION_CARD_COUNT + 2}
               max={cards.length}
               value={draft.spreadCount ?? ''}
-              placeholder="비우면 덱 전체"
+              placeholder={`비우면 ${cards.length}장 전부`}
               onChange={(e) =>
                 patch({ spreadCount: e.target.value === '' ? null : Number(e.target.value) })
               }
             />
-            <span className="field__hint">비우면 덱 전체를 펼쳐요.</span>
+            <span className="field__hint">
+              최소 {QUESTION_CARD_COUNT + 2}장 · <b>최대 {cards.length}장</b> (이 슬롯의 카드 범위).
+              비우면 {cards.length}장을 전부 펼쳐요.
+            </span>
           </div>
 
           <div className="field">
@@ -213,31 +256,17 @@ export function QuestionEditor() {
           </div>
         </div>
 
+        {/* 확률은 못 고른다 — 쓸지 말지만 (REVERSED_RATE, src/lib/deck.ts) */}
         <label className="check" style={{ marginTop: 'var(--space-md)' }}>
           <input
             type="checkbox"
             checked={draft.allowReversed}
             onChange={(e) => patch({ allowReversed: e.target.checked })}
           />
-          <span className="t-text-s">역방향 사용</span>
+          <span className="t-text-s">
+            역방향 사용 — 켜면 절반은 역방향으로 나와요 (답변도 두 배로 써야 해요)
+          </span>
         </label>
-
-        {draft.allowReversed && (
-          <div className="field" style={{ marginTop: 'var(--space-md)', maxWidth: 220 }}>
-            <label className="field__label" htmlFor="q-rev">
-              역방향 확률 (%)
-            </label>
-            <input
-              id="q-rev"
-              className="input"
-              type="number"
-              min={0}
-              max={100}
-              value={draft.reversedRate}
-              onChange={(e) => patch({ reversedRate: Number(e.target.value) })}
-            />
-          </div>
-        )}
 
         {error && <p className="field__error" style={{ marginTop: 'var(--space-md)' }}>{error}</p>}
       </section>
@@ -250,12 +279,72 @@ export function QuestionEditor() {
               안 채워도 괜찮아요 — 비운 카드는 카드 본래 의미가 나갑니다.
             </p>
           </div>
-          {/* AI 일괄 생성은 M4 */}
-          <button type="button" className="btn btn--sm btn--slight" disabled>
-            <Sparkles size={18} strokeWidth={2} aria-hidden="true" />
-            AI로 전체 생성 (준비 중)
-          </button>
+          {/* 플랜에 AI 생성이 없으면 버튼 자체를 안 보여준다 — 눌러도 안 되는 버튼은 잡음이다 */}
+          {plan.answerGenLimit > 0 && (
+            <button
+              type="button"
+              className="btn btn--sm btn--slight"
+              disabled={!canGenerate || gen !== null || !draft.question.trim()}
+              onClick={() => void generate()}
+              data-generate
+            >
+              <Sparkles size={18} strokeWidth={2} aria-hidden="true" />
+              AI로 전체 생성
+            </button>
+          )}
         </div>
+
+        {plan.answerGenLimit === 0 ? (
+          <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+            {plan.label} 플랜은 답변을 <b>직접 입력</b>해요. AI 일괄 생성은 라이트 플랜부터예요.
+          </p>
+        ) : (
+          !aiReady && (
+            <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+              AI 가 아직 연결되지 않았어요 — 연결되면 이 버튼으로 {cards.length}장을 한 번에 만들어
+              검수할 수 있어요.
+            </p>
+          )
+        )}
+
+        {gen && (
+          <CrystalBall label={`카드를 읽고 있어요 · ${gen.done} / ${gen.total}장`} />
+        )}
+
+        {genError && (
+          <p className="field__error" style={{ marginBottom: 'var(--space-base)' }}>
+            {genError}
+          </p>
+        )}
+
+        {/* 검수 바 — 저장을 누르기 전까지 방문자에겐 아무것도 안 나간다 */}
+        {pending && (
+          <div className={styles.review} data-review>
+            <div className={styles.reviewText}>
+              <p className="t-text-s">
+                <b>{pendingCount}장 생성됨</b> — 읽어보고 고친 다음 저장하세요.
+              </p>
+              {overwrites > 0 && (
+                <p className={`t-text-xs ${styles.reviewWarn}`}>
+                  <TriangleAlert size={14} strokeWidth={2} aria-hidden="true" />
+                  이미 쓰신 답변 {overwrites}장이 덮어써져요.
+                </p>
+              )}
+            </div>
+            <div className={styles.reviewActions}>
+              <button
+                type="button"
+                className="btn btn--sm btn--slight"
+                onClick={() => setPending(null)}
+              >
+                버리기
+              </button>
+              <button type="button" className="btn btn--sm btn--primary" onClick={applyPending} data-apply>
+                저장
+              </button>
+            </div>
+          </div>
+        )}
 
         <div>
           {cards.map((card) => (
@@ -263,7 +352,15 @@ export function QuestionEditor() {
               key={card.id}
               card={card}
               question={draft}
+              pending={pending?.[card.id]}
               onChange={setAnswer}
+              onChangePending={(orientation, text) =>
+                setPending((prev) =>
+                  prev
+                    ? { ...prev, [card.id]: { ...prev[card.id], [orientation]: text } }
+                    : prev
+                )
+              }
             />
           ))}
         </div>
@@ -275,21 +372,31 @@ export function QuestionEditor() {
 function AnswerRow({
   card,
   question,
+  pending,
   onChange,
+  onChangePending,
 }: {
   card: Card
   question: Question
+  /** AI 가 만들었지만 아직 저장 안 된 답변 — 있으면 이걸 보여준다 */
+  pending?: Partial<Record<Orientation, string>>
   onChange: (cardId: string, orientation: Orientation, text: string) => void
+  onChangePending: (orientation: Orientation, text: string) => void
 }) {
   const [open, setOpen] = useState(false)
   const written = question.answers[card.id]
-  const upright = written?.upright ?? ''
-  const reversed = written?.reversed ?? ''
+  const source = pending ?? written
+  const upright = source?.upright ?? ''
+  const reversed = source?.reversed ?? ''
   const filled = [upright, reversed].filter((t) => t.trim()).length
   const total = question.allowReversed ? 2 : 1
 
+  // 검수 중엔 그 자리에서 바로 고칠 수 있다 — 고친 것도 저장을 눌러야 들어간다
+  const edit = (orientation: Orientation, text: string) =>
+    pending ? onChangePending(orientation, text) : onChange(card.id, orientation, text)
+
   return (
-    <div className={styles.answerRow} data-answer-row>
+    <div className={styles.answerRow} data-answer-row data-pending={pending ? '' : undefined}>
       <button
         type="button"
         className={styles.answerToggle}
@@ -297,11 +404,15 @@ function AnswerRow({
         onClick={() => setOpen((v) => !v)}
       >
         <span className={`t-text-m ${styles.answerName}`}>{card.name}</span>
-        <span
-          className={`${styles.badge} ${filled > 0 ? styles['badge--written'] : styles['badge--fallback']}`}
-        >
-          {filled === 0 ? '폴백 사용 중' : `${filled}/${total} 입력됨`}
-        </span>
+        {pending ? (
+          <span className={`${styles.badge} ${styles['badge--pending']}`}>검수 중</span>
+        ) : (
+          <span
+            className={`${styles.badge} ${filled > 0 ? styles['badge--written'] : styles['badge--fallback']}`}
+          >
+            {filled === 0 ? '폴백 사용 중' : `${filled}/${total} 입력됨`}
+          </span>
+        )}
       </button>
 
       {open && (
@@ -310,20 +421,32 @@ function AnswerRow({
             label="정방향"
             meaning={card.upright[question.fallbackAspect]}
             value={upright}
-            onChange={(t) => onChange(card.id, 'upright', t)}
+            onChange={(t) => edit('upright', t)}
           />
           {question.allowReversed && (
             <AnswerField
               label="역방향"
               meaning={card.reversed[question.fallbackAspect]}
               value={reversed}
-              onChange={(t) => onChange(card.id, 'reversed', t)}
+              onChange={(t) => edit('reversed', t)}
             />
           )}
         </div>
       )}
     </div>
   )
+}
+
+/** 생성 결과 → answers 모델. 빈 문자열은 담지 않는다 (폴백이 나가는 게 낫다) */
+function toAnswers(generated: GeneratedAnswer[], allowReversed: boolean): QuestionAnswers {
+  const out: QuestionAnswers = {}
+  for (const item of generated) {
+    const answer: Partial<Record<Orientation, string>> = {}
+    if (item.upright?.trim()) answer.upright = item.upright.trim()
+    if (allowReversed && item.reversed?.trim()) answer.reversed = item.reversed.trim()
+    if (Object.keys(answer).length) out[item.cardId] = answer
+  }
+  return out
 }
 
 function AnswerField({

@@ -36,6 +36,9 @@
   --color-primary-hover: #4a34d6;
   --color-primary-soft: #4a34d6;
   --color-accent: #a1740a;
+  /* applyTheme 이 파생해주는 값 — .owner 는 슬롯 테마를 안 쓰므로 직접 준다.
+     안 주면 tokens.css 의 다크용 기본값(밝은 골드)이 흰 도구 화면에서 사라진다 */
+  --color-accent-soft: #a1740a;
   --color-fg-1: #16172a;
   --color-fg-2: #4a4860;
   --color-fg-3: #7a7791;
@@ -266,5 +269,5 @@
   font-size: var(--text-xs);
 }
 .save-state--dirty {
-  color: var(--color-accent);
+  color: var(--color-accent-soft);
 }

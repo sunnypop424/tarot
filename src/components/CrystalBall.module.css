@@ -1,0 +1,99 @@
+/* 수정구슬 로더 — 색은 전부 토큰(슬롯 테마를 따라간다), 애니메이션은 transform·opacity 만 */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-base) 0;
+}
+
+.ball {
+  overflow: visible;
+}
+
+/* 슬롯이 올린 구슬 이미지 — <img> 가 아니라 배경으로 (모바일 저장 방지, src/lib/image.ts) */
+.image {
+  display: block;
+  width: 96px;
+  height: 96px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* 구슬만 뜬다 — 받침은 가만히 있어야 떠 있는 것처럼 보인다.
+   올린 이미지(.image)에도 같은 리듬을 준다 */
+.orb {
+  animation: float 3.2s var(--ease) infinite;
+  transform-origin: 32px 29px;
+}
+.image.orb {
+  transform-origin: center;
+}
+
+/* 안개가 구슬 안에서 돈다 */
+.mist {
+  animation: swirl 6s linear infinite;
+  transform-origin: 32px 29px;
+}
+
+.stand {
+  opacity: 0.9;
+}
+
+.star {
+  transform-origin: center;
+  animation: twinkle 2.4s var(--ease) infinite;
+}
+/* 같은 박자로 깜빡이면 신호등처럼 보인다 — 어긋나게 */
+.star--a {
+  animation-delay: 0s;
+}
+.star--b {
+  animation-delay: 0.8s;
+}
+.star--c {
+  animation-delay: 1.6s;
+}
+
+.label {
+  color: var(--color-primary-soft);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes swirl {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+/* 움직임을 원치 않으면 구슬은 가만히, 글자만 남는다 */
+@media (prefers-reduced-motion: reduce) {
+  .orb,
+  .mist,
+  .star {
+    animation: none;
+  }
+}

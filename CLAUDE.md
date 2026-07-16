@@ -4,54 +4,54 @@
 
 아이돌 **생일카페 이벤트 페이지를 슬롯 단위로 파는 플랫폼** (단일 타로 앱이 아니다). 배포 하나에 여러 이벤트가 슬러그(`/seventeen-dino`)로 얹힌다. 배포 루트(`/`)는 아무것도 노출하지 않는다.
 
+타로는 이 플랫폼이 파는 **첫 번째 서비스**일 뿐이다 — 슬롯마다 서비스를 고른다 (`src/data/services.ts`, `slot.service`). 서비스가 늘면 `App.tsx` 의 `SlotLayout` 에서 가른다.
+
 역할 분리가 모든 설계의 근원:
 
-- **소유자(플랫폼 운영자):** 슬러그·색·radius·이미지를 설정해 배포. 도구는 `/theme-editor` (**개발 모드 전용**).
+- **최고관리자(플랫폼 소유자):** 슬롯을 만들고 서비스·슬러그·색·radius·이미지를 설정해 배포. 도구는 슬롯 편집기 `/theme-editor` (로그인 뒤에 있다). **Supabase 가 설정된 빌드에만 존재한다** — 환경변수가 없으면 인증이 가짜라 청크째 빠진다 (App.tsx).
 - **주최자(고객):** `/{slug}/admin` 에서 **질문 타로의 질문·답변만** 관리. 테마는 못 건드린다.
 - **방문자:** 카페에서 모바일로 카드를 뽑는다.
 
-상세: `docs/PLANNING.md`, `docs/ROADMAP.md`, `docs/DESIGN.md`.
+상세: `docs/PLANNING.md`, `docs/ROADMAP.md`, `docs/DESIGN.md`. 백엔드·배포 준비는 `docs/BACKEND.md`.
 
 ## 아키텍처 핵심
 
-- **데이터 경계:** `src/lib/repo/` 는 인터페이스 + localStorage 어댑터. **백엔드 미정**(Supabase/Firebase 추후). 모든 메서드가 slug 스코프(슬롯 격리). 백엔드 결정 시 `repo/index.ts` 어댑터 한 줄만 교체.
+- **데이터 경계:** `src/lib/repo/` 는 인터페이스 + localStorage 어댑터. 모든 메서드가 slug 스코프(슬롯 격리). 백엔드를 붙일 땐 `repo/index.ts` 어댑터 한 줄만 교체. 스택은 **Supabase(DB·인증·이미지·서버함수) · Vercel(배포) · Claude API(AI)** 로 정했고 아직 안 붙었다 (**Cloudflare 는 안 쓴다** — Edge Functions 로 충분) — `docs/BACKEND.md`.
 - **테마:** `src/lib/theme.ts` `applyTheme()` 가 슬롯 색·형태를 `:root` 커스텀 프로퍼티로 주입. **배경 밝기 종속 토큰(그림자·딤·`primary-soft`·`disabled`)은 캔버스 휘도로 파생** (`src/lib/color.ts` `readableShade`). hex 는 `tokens.css` 밖에 두지 않는다. 색 이름은 역할 기반(`primary`/`accent`).
-- **관리 화면:** `.admin`(주최자)은 슬롯 테마를 그대로 상속, `.owner`(테마 편집기)만 고정 라이트.
+- **이미지:** 슬롯 이미지(로고·배경·카드 앞/뒷면)는 **전부 `background-image`** 로 그린다 — `<img>` 는 모바일에서 길게 누르면 저장 메뉴가 뜬다. 로드 실패 폴백과 로고 비율은 `src/lib/image.ts` 의 `useImageAsset` 이 대신한다.
+- **관리 화면:** `.admin`(주최자)은 슬롯 테마를 그대로 상속, `.owner`(슬롯 편집기)만 고정 라이트. 슬롯 편집기는 **저장하기를 눌러야** 반영되고(초안 → 편집분), 주최자 질문 편집은 반대로 즉시 저장이다(저장을 잊어 날리는 게 더 나쁘다).
 - **카드 의미:** 카드 단위 저작 (`docs/cards/*.md` → `npm run cards:build` → `cards.json`). 카드 × 방향(정/역) × 관점(종합·애정·금전·직업·조언). **조합 테이블은 없다.**
 - **검증은 실제로 돌려본다:** 개발 서버 포트 5174 고정, `scripts/verify-*.mjs`(puppeteer 측정), `npm run shot <경로> <출력>`. CSS 모듈 클래스 대신 `data-*` 속성으로 셀렉트.
 
-## 다음 플랜 — M4: 3장 리딩 AI 종합
+## AI 리딩 (M4) — 배포됨
 
-### 문제
-3장 스프레드가 서로 무관한 세 덩어리로 나열돼 "그래서 종합하면?"이 없다. 조합(78×77×76 × 정역 × 관점 ≈ 수억)을 정적으로 채우는 건 불가능하고 **불필요** — 의미는 이미 카드 단위로 저작돼 있다.
+**Claude Haiku 4.5** (`claude-haiku-4-5`) 로 실제로 돈다. **Supabase Edge Function** (`supabase/functions/ai/`) 이 부르고, **개발도 같은 함수를 쓴다** (`VITE_AI_BASE`) — 구현이 둘이면 프롬프트·한도가 어긋난다. 원가는 `docs/PRICING.md`, 배포·운영은 `docs/BACKEND.md`.
 
-### 접근
-뽑을 때 **Claude 로 3장을 하나의 리딩으로 종합 생성**한다. 열거 0, 추가 저작 0.
+### 두 가지 일만 한다
 
-- 입력: 뽑힌 카드들의 `core` + `symbolism`(이미 "AI 프롬프트 컨텍스트용"으로 예약된 필드) + 질문/카테고리 + 포지션 라벨 + 관점.
-- 질문 타로: 관리자 **"AI로 전체 생성"(현재 비활성 버튼) 활성화** — 질문 × 카드 답변을 일괄 생성 → 검수 후 저장(기존 `answers` 모델 그대로).
+1. **3장 리딩 종합** — 애정·금전·직업의 3장 스프레드에서만. 포지션 **순서**(나의 마음 → 상대의 마음 → 관계의 흐름)가 곧 리딩의 흐름이고, AI 는 그 사이를 잇는 일만 한다 (각 장의 개별 해석은 화면이 이미 보여준다). **1장은 AI 를 아예 안 부른다** — 한 장짜리 완결 해석이라 종합할 게 없다.
+2. **질문 × 카드 답변 일괄 생성** — 관리자 "AI로 전체 생성" → 검수 → 저장. 생성 즉시 저장하지 않는다. 방문자에겐 검수를 통과한 답변만 나간다.
 
-### 의존성 (중요)
-API 키를 클라이언트에 둘 수 없으므로 **서버 엔드포인트가 필요**하다. 백엔드가 아직 미정이라(위 `repo` 경계) M4 는 백엔드 선택과 묶여 있다.
+### 구조
 
-### 설계
-1. `repo` 에 `reading` 서비스 추가:
-   `synthesize(slug, { question?, category, drawn: [{cardId, orientation, position}], aspect }) => Promise<string>`.
-   local 어댑터는 스텁(현행 per-card 요약 이어붙이기 또는 "준비 중")으로 두고, 서버 어댑터가 붙으면 교체 — **질문 repo 와 동일 패턴**.
-2. 서버 함수(백엔드 선택 따라 Supabase Edge / Firebase Functions 등)가 Anthropic API 호출. 모델은 비용·품질로 **Haiku 4.5**(대량·짧은 리딩) 또는 **Sonnet 5**. 스트리밍으로 점진 표시. 구현 시 **`claude-api` 스킬** 참고(모델 ID·가격·SDK).
-3. 캐시: `(카테고리 + cardIds + orientations + aspect)` 키로 중복 생성 방지. per-slot 예산·레이트리밋.
-4. 폴백: API 실패 시 현행 per-card 표시 유지(이미 구현됨) — 앱이 멈추지 않는다.
+- **키는 클라이언트에 못 둔다** → Edge Function secret 으로만 산다. 레포·프론트·Vercel 환경변수 어디에도 없다.
+- `repo.reading` (`src/lib/repo/ai.ts`) — 화면은 이 인터페이스만 안다. `ready()` 가 false 면 **AI 관련 UI 가 통째로 사라지고** 앱은 카드별 해석으로 그대로 돈다 (지금 배포하면 그 상태).
+- 프롬프트는 **서버가 조립한다** (`supabase/functions/ai/prompt.ts`). 클라이언트가 보낼 수 있는 건 `cardId`·`orientation`·`position` 뿐 — 의미 텍스트를 클라이언트가 주면 프롬프트를 조작당한다. 카드 의미(`core`+`symbolism`)는 서버가 `cards.json` 에서 직접 읽는다 — 그 사본은 `npm run cards:build` 가 함수 폴더에도 같이 뽑는다(손으로 복사하지 않는다).
+- 모델별 파라미터 차이는 `supabase/functions/ai/claude.ts` 의 `THINKS_BY_DEFAULT` 가 흡수한다 (Sonnet 5·Opus 는 적응형 사고가 기본 ON 이라 꺼야 하고, `temperature` 를 안 받는다).
 
-### UI
-- 결과 화면: per-card 카드들 아래 **"종합" 블록**(조언과 같은 세로선 디자인) 또는 "AI 심층 해석 보기" 버튼(`docs/ROADMAP.md` M4).
-- 질문 화면도 동일.
+### 흐름 (바꾸지 말 것)
 
-### 첫 마일스톤 (백엔드 전에 가능)
-`reading` repo 인터페이스 + local 스텁 + 결과 화면 "종합" 슬롯을 먼저 배선해 **오프라인에서 UI 검증**. 실제 AI 는 어댑터 교체로 뒤에 붙인다.
+카드 3장 선택 → 선택 완료 → **전면 로더**(수정구슬, 탭바까지 덮음) → 뽑은 카드와 리딩이 **함께** 등장.
+기다림이 로딩이 아니라 리추얼이라 전면으로 세운다. 수정구슬은 슬롯이 이미지를 올리면 그걸 쓰고(배경 이미지로), 없으면 내장 SVG.
+
+### 아직 없는 것 (돈이 새는 자리 — `docs/PRICING.md` §5)
+
+**슬롯별 예산 상한 · 레이트리밋 · 답변 생성 권한 검사.** 캐시는 프로세스 메모리라 재시작하면 날아간다. Edge Function 으로 옮길 때 **반드시 같이** 붙인다.
 
 ## 주의 (하지 말 것)
 
 - 배포 루트(`/`)에 슬롯 목록을 노출하지 않는다(남의 이벤트가 다 보인다).
-- 테마 편집기를 주최자 `/admin` 에 넣지 않는다 — 소유자/주최자 역할 분리.
+- 슬롯 편집기를 주최자 `/admin` 에 넣지 않는다 — 최고관리자/주최자 역할 분리.
 - 슬롯 격리(테마·질문·권한이 slug 스코프)를 깨지 않는다.
+- 슬롯 이미지를 `<img>` 로 넣지 않는다 — 전부 `background-image` (모바일 저장 방지). 편집기 미리보기 썸네일도 같다.
 - UI 변경 후엔 관련 `verify-*.mjs` 를 돌리고 스크린샷으로 확인한다(빌드 통과 ≠ 검증).

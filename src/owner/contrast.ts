@@ -1,9 +1,14 @@
-import { contrastLevel, contrastRatio, readableShade, type ContrastLevel } from '@/lib/color'
+import { contrastLevel, contrastRatio, type ContrastLevel } from '@/lib/color'
+import { DERIVED_COLORS } from '@/lib/theme'
+import type { ThemeColors } from '@/types/theme'
 
 /**
- * 테마 대비 검사 — 주최자가 준 색이 가독성을 깨뜨리는 걸 배포 전에 잡는다 (PLANNING.md §5).
+ * 테마 대비 검사 — 최고관리자가 고른 색이 가독성을 깨뜨리는 걸 배포 전에 잡는다 (PLANNING.md §5).
  * 색이 예뻐도 본문이 안 읽히면 이벤트가 망한다.
- * 계산 자체는 lib/color.ts 에 있다 (사용자 앱도 휘도를 쓴다).
+ *
+ * 계산은 lib/color.ts, **파생 규칙은 lib/theme.ts 의 DERIVED_COLORS** 를 그대로 부른다.
+ * 여기서 규칙을 다시 적으면 안 된다 — 갈라지는 순간 검사는 "통과"라는데 화면엔
+ * 안 읽히는 색이 나간다. 검사가 거짓말을 하면 안 하느니만 못하다.
  */
 
 export interface ContrastCheck {
@@ -13,24 +18,16 @@ export interface ContrastCheck {
 }
 
 /** 실제로 겹쳐 놓이는 조합만 검사한다 */
-export function checkThemeContrast(colors: {
-  canvas: string
-  surface: string
-  fg1: string
-  fg2: string
-  fg3: string
-  primary: string
-  onPrimary: string
-  wash: string
-}): ContrastCheck[] {
+export function checkThemeContrast(colors: ThemeColors): ContrastCheck[] {
   const pairs: [string, string, string][] = [
     ['본문 / 배경', colors.fg1, colors.canvas],
     ['본문 / 표면', colors.fg1, colors.surface],
     ['보조 텍스트 / 표면', colors.fg2, colors.surface],
     ['흐린 텍스트 / 표면', colors.fg3, colors.surface],
     ['버튼 글자 / 버튼', colors.onPrimary, colors.primary],
-    // 칩 글자는 저장값이 아니라 런타임 파생색을 검사한다 (실제로 화면에 나가는 색)
-    ['칩 글자 / 칩 배경', readableShade(colors.primary, colors.wash), colors.wash],
+    // 아래 둘은 저장값이 아니라 **런타임 파생색**을 검사한다 (실제로 화면에 나가는 색)
+    ['칩 글자 / 칩 배경', DERIVED_COLORS.primarySoft(colors), colors.wash],
+    ['포인트 아이콘 / 표면', DERIVED_COLORS.accentSoft(colors), colors.surface],
   ]
 
   return pairs.map(([label, fg, bg]) => {

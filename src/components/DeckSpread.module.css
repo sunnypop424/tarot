@@ -39,7 +39,7 @@
   left: 50%;
   width: var(--card-w);
   margin-left: calc(var(--card-w) / -2);
-  border-radius: var(--radius-lg);
+  border-radius: var(--card-radius);
   transform-origin: 50% var(--pivot);
   transform: rotate(var(--rot)) translateY(var(--lift, 0px));
   transition: transform var(--dur-micro) var(--ease);

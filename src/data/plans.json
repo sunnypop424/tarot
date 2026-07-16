@@ -1,0 +1,30 @@
+[
+  {
+    "id": "free",
+    "label": "무료",
+    "allowSpread": false,
+    "readingLimit": 0,
+    "answerGenLimit": 0
+  },
+  {
+    "id": "light",
+    "label": "라이트",
+    "allowSpread": false,
+    "readingLimit": 0,
+    "answerGenLimit": 15
+  },
+  {
+    "id": "standard",
+    "label": "스탠다드",
+    "allowSpread": true,
+    "readingLimit": 1500,
+    "answerGenLimit": 50
+  },
+  {
+    "id": "premium",
+    "label": "프리미엄",
+    "allowSpread": true,
+    "readingLimit": 6000,
+    "answerGenLimit": 150
+  }
+]

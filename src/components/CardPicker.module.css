@@ -30,7 +30,7 @@
   width: 100%;
   height: 100%;
   border: 1px dashed var(--color-border-hover);
-  border-radius: var(--radius-lg);
+  border-radius: var(--card-radius);
 }
 
 /* 카드가 날아오는 동안 목적지 칸을 은은하게 밝힌다 */

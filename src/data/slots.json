@@ -2,6 +2,12 @@
   {
     "slug": "demo",
     "name": "데모 생일카페",
+    "service": "tarot",
+    "plan": "premium",
+    "limits": {
+      "reading": 6000,
+      "answerGen": 150
+    },
     "deck": "full",
     "theme": {
       "colors": {
@@ -23,7 +29,11 @@
         "cardBackFrom": "#1E1F3E",
         "cardBackTo": "#101127"
       },
-      "shape": { "radiusSm": 4, "radiusMd": 8, "radiusLg": 16 },
+      "shape": {
+        "radiusSm": 4,
+        "radiusMd": 8,
+        "radiusLg": 16
+      },
       "assets": {
         "logo": null,
         "logoAlt": "데모 생일카페",
@@ -34,7 +44,8 @@
         "backgroundPatternRepeat": "no-repeat",
         "cardFrontBase": null,
         "cardFrontExt": "webp",
-        "cardBack": null
+        "cardBack": null,
+        "crystalBall": null
       }
     },
     "event": {}
@@ -42,6 +53,12 @@
   {
     "slug": "sample-pink",
     "name": "샘플 생일카페 (핑크)",
+    "service": "tarot",
+    "plan": "standard",
+    "limits": {
+      "reading": 1500,
+      "answerGen": 50
+    },
     "deck": "full",
     "theme": {
       "colors": {
@@ -63,7 +80,11 @@
         "cardBackFrom": "#3A1F2E",
         "cardBackTo": "#1F1018"
       },
-      "shape": { "radiusSm": 4, "radiusMd": 12, "radiusLg": 20 },
+      "shape": {
+        "radiusSm": 4,
+        "radiusMd": 12,
+        "radiusLg": 20
+      },
       "assets": {
         "logo": null,
         "logoAlt": "샘플 생일카페",
@@ -74,11 +95,14 @@
         "backgroundPatternRepeat": "no-repeat",
         "cardFrontBase": null,
         "cardFrontExt": "webp",
-        "cardBack": null
+        "cardBack": null,
+        "crystalBall": null
       }
     },
     "event": {
-      "love": { "cardCount": 3 }
+      "love": {
+        "cardCount": 3
+      }
     }
   }
 ]

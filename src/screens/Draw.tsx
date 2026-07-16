@@ -3,6 +3,9 @@ import { useParams } from 'react-router-dom'
 
 import { CardDraw } from '@/components/CardDraw'
 import { ReadingCard } from '@/components/ReadingCard'
+import { ReadingLoader } from '@/components/ReadingLoader'
+import { Synthesis } from '@/components/Synthesis'
+import { repo } from '@/lib/repo'
 import { getCategory, positionsFor, type Category } from '@/data/categories'
 import { getCardById } from '@/data/cards'
 import { verdictOf, VERDICT_LABEL, VERDICT_NOTE } from '@/data/yesno'
@@ -42,13 +45,15 @@ function restorePeriodDraw(category: Category): DrawnCard[] | null {
   return drawn.length === saved.length ? drawn : null
 }
 
-/** 슬롯의 이벤트 설정 → 덱 옵션. 덱은 슬롯 범위로 캡한다(22장 슬롯이면 마이너 안 나온다) */
+/**
+ * 슬롯의 이벤트 설정 → 덱 옵션. 덱은 슬롯 범위로 캡한다(22장 슬롯이면 마이너 안 나온다).
+ * 역방향 확률은 설정에 없다 — 고정 50% (REVERSED_RATE).
+ */
 function spreadOptionsFrom(setting: CategorySetting | undefined, slot: Slot): SpreadOptions {
   return {
     deck: effectiveDeck(slot, setting?.deck),
     spreadCount: setting?.spreadCount,
     allowReversed: setting?.allowReversed,
-    reversedRate: setting?.reversedRate,
   }
 }
 
@@ -58,10 +63,17 @@ function DrawFlow({ category }: { category: Category }) {
   const setting = slot.event[category.id]
   // 기간 카테고리는 이미 뽑았으면 저장된 결과로 바로 들어간다
   const [revealed, setRevealed] = useState<DrawnCard[] | null>(() => restorePeriodDraw(category))
+  /** 리딩을 만드는 중 — 이 동안 화면을 통째로 덮는다 */
+  const [reading, setReading] = useState(false)
+  const [synthesis, setSynthesis] = useState<string | null>(null)
 
+  /**
+   * 고르기가 끝나면 **결과로 바로 가지 않는다.**
+   * 여러 장이면 리딩을 먼저 다 만들고(전면 로더), 카드와 리딩이 함께 등장한다.
+   * 한 장은 그 자체로 완결된 해석이라 AI 를 아예 부르지 않는다 — 기다릴 이유가 없다.
+   */
   const handleComplete = useCallback(
-    (picked: DrawnCard[]) => {
-      setRevealed(picked)
+    async (picked: DrawnCard[]) => {
       if (category.period) {
         savePeriodDraw(
           category.id,
@@ -69,16 +81,47 @@ function DrawFlow({ category }: { category: Category }) {
           picked.map(({ card, orientation }) => ({ cardId: card.id, orientation }))
         )
       }
+
+      if (picked.length > 1 && (await repo.ai.ready())) {
+        setReading(true)
+        try {
+          const positions = positionsFor(category, picked.length)
+          const text = await repo.ai.synthesize(slot.slug, {
+            category: category.label,
+            aspect: category.aspect,
+            // 고른 순서 = 포지션 순서 = 리딩의 흐름
+            drawn: picked.map(({ card, orientation }, i) => ({
+              cardId: card.id,
+              orientation,
+              position: positions[i],
+            })),
+          })
+          setSynthesis(text)
+        } catch {
+          // 실패해도 결과는 보여준다 — 종합만 빠지고 카드별 해석은 그대로 (앱이 멈추면 안 된다)
+          setSynthesis(null)
+        } finally {
+          setReading(false)
+        }
+      }
+
+      setRevealed(picked)
     },
-    [category]
+    [category, slot.slug]
   )
+
+  if (reading) return <ReadingLoader />
 
   if (revealed) {
     return (
       <Result
         category={category}
         drawn={revealed}
-        onRedraw={() => setRevealed(null)}
+        synthesis={synthesis}
+        onRedraw={() => {
+          setRevealed(null)
+          setSynthesis(null)
+        }}
         onDone={() => go()}
       />
     )
@@ -103,11 +146,13 @@ function DrawFlow({ category }: { category: Category }) {
 interface ResultProps {
   category: Category
   drawn: DrawnCard[]
+  /** 미리 만들어둔 종합 — 없으면(1장이거나 실패) 블록이 통째로 빠진다 */
+  synthesis: string | null
   onRedraw: () => void
   onDone: () => void
 }
 
-function Result({ category, drawn, onRedraw, onDone }: ResultProps) {
+function Result({ category, drawn, synthesis, onRedraw, onDone }: ResultProps) {
   // 기간 카테고리는 그 기간에 한 번뿐 — 다시 뽑을 수 없다
   const canRedraw = !category.period
   const isYesNo = category.id === 'yesno'
@@ -130,6 +175,9 @@ function Result({ category, drawn, onRedraw, onDone }: ResultProps) {
             verdict={isYesNo ? verdictFor(item) : undefined}
           />
         ))}
+
+        {/* 카드 아래 — 각 장을 읽고 나서 "그래서 종합하면?" 이 오는 자리 */}
+        {synthesis && <Synthesis text={synthesis} />}
       </div>
 
       <div className={styles.resultActions}>

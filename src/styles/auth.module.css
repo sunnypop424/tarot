@@ -1,3 +1,5 @@
+/* 로그인 화면 — 주최자(/{slug}/admin)와 최고관리자(/theme-editor)가 같이 쓴다 */
+
 .wrap {
   display: flex;
   align-items: center;
@@ -36,5 +38,5 @@
 .notice svg {
   flex-shrink: 0;
   margin-top: 1px;
-  color: var(--color-accent);
+  color: var(--color-accent-soft);
 }

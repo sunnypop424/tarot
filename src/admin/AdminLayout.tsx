@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { MessageCircleQuestion, ExternalLink, LogOut } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -16,7 +16,18 @@ const NAV: NavItem[] = [{ to: 'questions', label: '질문 타로', icon: Message
 
 export function AdminLayout() {
   const slot = useSlot()
+  const navigate = useNavigate()
   const { user, signOut } = useAdminAuth(slot.slug)
+
+  /**
+   * 로그아웃하면 **바로** 나간다.
+   * `useAdminAuth` 는 부르는 곳마다 상태가 따로라(여기와 RequireAuth 가 각각 부른다),
+   * 세션만 지우면 가드는 그걸 모르고 화면이 그대로 남는다 — 직접 로그인으로 보낸다.
+   */
+  async function handleSignOut() {
+    await signOut()
+    navigate(`/${slot.slug}/admin/login`, { replace: true })
+  }
 
   return (
     <div className="admin">
@@ -51,8 +62,9 @@ export function AdminLayout() {
             <button
               type="button"
               className="admin__navlink"
-              onClick={() => void signOut()}
+              onClick={() => void handleSignOut()}
               style={{ width: '100%' }}
+              data-signout
             >
               <LogOut size={20} strokeWidth={2} aria-hidden="true" />
               로그아웃

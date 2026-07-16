@@ -11,11 +11,22 @@
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { dirname, join, relative } from 'node:path'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const CARDS_DIR = join(ROOT, 'docs', 'cards')
-const OUT_FILE = join(ROOT, 'src', 'data', 'cards.json')
+/**
+ * 카드 데이터는 **두 곳에서 필요하다** — 화면(도감·해석)과 AI 서버(프롬프트).
+ *
+ * Edge Function 은 자기 폴더 밖 파일을 번들에 못 넣어서 함수 안에 사본이 있어야 한다.
+ * 그래서 **손으로 복사하지 않고 여기서 같이 뽑는다** — 저작 소스는 docs/cards/*.md 하나뿐이고,
+ * 사본이 어긋날 길이 없다. (프롬프트에 들어갈 의미 텍스트는 서버가 이 파일에서 직접 읽는다 —
+ * 클라이언트가 보낸 텍스트를 쓰면 프롬프트를 조작당한다)
+ */
+const OUT_FILES = [
+  join(ROOT, 'src', 'data', 'cards.json'),
+  join(ROOT, 'supabase', 'functions', 'ai', 'cards.json'),
+]
 
 /** 파일별 기대 사양 — 장수가 어긋나면 즉시 잡힌다 */
 const SOURCES = [
@@ -140,7 +151,11 @@ const summary = SOURCES.map(
 if (verifyOnly) {
   console.log(`검증 통과 — 78장 (${summary})`)
 } else {
-  await mkdir(dirname(OUT_FILE), { recursive: true })
-  await writeFile(OUT_FILE, JSON.stringify(all, null, 2) + '\n', 'utf8')
-  console.log(`생성 완료 — src/data/cards.json, 78장 (${summary})`)
+  const json = JSON.stringify(all, null, 2) + '\n'
+  for (const out of OUT_FILES) {
+    await mkdir(dirname(out), { recursive: true })
+    await writeFile(out, json, 'utf8')
+  }
+  console.log(`생성 완료 — 78장 (${summary})`)
+  for (const out of OUT_FILES) console.log(`  · ${relative(ROOT, out)}`)
 }

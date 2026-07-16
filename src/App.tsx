@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Outlet, useNavigate } from 'react-router-dom'
 import { BookOpen } from 'lucide-react'
 
-import { SlotProvider, useSlotOrNull } from '@/slot/SlotProvider'
+import { SlotProvider, useSlotState } from '@/slot/SlotProvider'
 import { QuestionsProvider } from '@/lib/questions'
 import { TabBar } from '@/components/TabBar'
 import { Home } from '@/screens/Home'
@@ -17,19 +17,49 @@ import { NotFound } from '@/screens/NotFound'
 const AdminRoutes = lazy(() => import('@/admin/AdminRoutes'))
 
 /**
- * 테마 편집기는 소유자 전용 — 프로덕션 번들에서 **아예 제거**한다.
- * 라우트에만 DEV 가드를 걸면 lazy(import(...)) 는 그대로 평가돼 청크가 빌드에 남는다.
- * 삼항의 조건이 빌드 시 false 로 치환되면서 동적 import 까지 죽은 코드로 걷힌다.
+ * 슬롯 편집기(최고관리자) — **진짜 인증이 있을 때만 존재한다.**
+ *
+ * 예전엔 `import.meta.env.DEV` 로 걸었다. 로그인이 아무 값이나 통과하고 업로드가 개발 서버
+ * 미들웨어에 매여 있어서, 배포하면 **열린 문만 배포되는** 꼴이었기 때문이다 (docs/BACKEND.md §2-3).
+ * 이제 슬롯은 DB 에 있고 이미지는 Storage 로 가고 로그인은 Supabase 가 한다 — 그래서 배포한다.
+ *
+ * 조건이 DEV 가 아니라 "Supabase 가 설정됐나" 인 이유: 환경변수를 빠뜨린 채 배포하면 인증이
+ * local 어댑터로 떨어져 **아무나 슬롯을 만들고 지운다.** 그 경우엔 편집기가 아예 없는 편이 맞다.
+ *
+ * **조건을 쓰는 방식이 까다롭다** — 안 그러면 청크가 빌드에 남는다. 셋 다 이유가 있다:
+ *  - `import.meta.env` 를 여기서 직접 읽는다: Vite 가 빌드 때 문자열 리터럴로 치환하므로
+ *    조건이 상수로 접힌다. `hasSupabase`(다른 모듈의 const)는 Rollup 이 못 접는다.
+ *  - `Boolean(...)` 을 안 쓴다: 전역 함수 호출이라 Rollup 이 상수로 접지 않는다
+ *    (누가 `Boolean` 을 덮어썼을 수도 있으니 — 접으면 틀릴 수 있다).
+ *  - 라우트가 아니라 여기서 가른다: 라우트에만 걸면 `lazy(import(...))` 가 그대로 평가된다.
+ *
+ * 셋 중 하나만 어긋나도 **환경변수 없는 빌드에 편집기 코드가 실려 나간다.** 빌드로 확인했다
+ * (`VITE_SUPABASE_URL= npx vite build` → OwnerRoutes 청크가 없어야 한다).
  */
-const ThemeEditor = import.meta.env.DEV ? lazy(() => import('@/owner/ThemeEditor')) : null
+const OwnerRoutes =
+  (import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY) ||
+  import.meta.env.DEV
+    ? lazy(() => import('@/owner/OwnerRoutes'))
+    : null
 
-/** 슬롯 사용자 앱 셸 */
+/**
+ * 슬롯 사용자 앱 셸.
+ *
+ * 지금은 모든 슬롯이 타로 서비스라 바로 타로 화면을 얹는다. 서비스가 늘면
+ * `getSlotService(slot)` 로 여기서 갈라 서비스별 화면을 얹는다 (`src/data/services.ts`).
+ */
 function SlotLayout() {
   const navigate = useNavigate()
-  const slot = useSlotOrNull()
+  const state = useSlotState()
 
-  // 없는 슬롯이면 테마도 질문도 의미가 없다
-  if (!slot) return <NotFound />
+  /**
+   * **로딩과 "없는 슬롯"을 구분한다.** 둘을 섞으면 슬롯을 읽어오는 동안
+   * "페이지를 찾을 수 없어요" 가 번쩍였다가 사라진다 — QR 을 찍은 사람에게 최악의 첫인상이다.
+   * 아직 테마를 모르니 그릴 것도 없다. 빈 화면으로 기다린다.
+   */
+  if (state.status === 'loading') return <div className="app" aria-busy="true" />
+  if (state.status === 'missing') return <NotFound />
+  const slot = state.slot
 
   return (
     <QuestionsProvider>
@@ -71,7 +101,7 @@ export function App() {
           {/* 배포 루트에는 아무 이벤트도 없다 — 슬러그로만 들어온다 */}
           <Route index element={<NotFound />} />
 
-          {ThemeEditor && <Route path="theme-editor" element={<ThemeEditor />} />}
+          {OwnerRoutes && <Route path="theme-editor/*" element={<OwnerRoutes />} />}
 
           <Route path=":slug" element={<SlotScope />}>
             {/* 주최자 관리 — 자기 슬롯만 */}

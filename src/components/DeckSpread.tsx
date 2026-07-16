@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import type { CSSProperties, MouseEvent } from 'react'
 
+import { CARD_RATIO } from '@/lib/card'
 import { CardBack } from './CardBack'
 import styles from './DeckSpread.module.css'
 
-/** 셔플 연출 타이밍 — 합계가 tokens.css 의 --dur-shuffle(1200ms)에 맞는다 */
+/** 셔플 연출 타이밍 — 합계 1200ms (PLANNING.md §2: 1.2초, 스킵 가능) */
 export const GATHER_MS = 420
 export const DEAL_MS = 780
 
@@ -15,7 +16,12 @@ export type ShufflePhase = 'idle' | 'gather' | 'deal'
  * 만족하도록 잡았다. 이 제약이 깨지면 카드를 더 줄이기보다 줄당 장수를 늘릴 것.
  */
 const CARD_W = 56
-const CARD_H = (CARD_W * 5) / 3
+/**
+ * 비율은 `lib/card.ts` 가 단일 소스다.
+ * 예전엔 여기 `(CARD_W * 5) / 3` 이 박혀 있었는데, 카드 비율을 63×88 로 바꾸자
+ * **CSS 만 따라오고 이 값은 옛 비율로 남아** 줄 높이·피벗이 실제 카드와 어긋났다.
+ */
+const CARD_H = CARD_W / CARD_RATIO
 /** 부채꼴 반쪽이 차지할 수 있는 최대 폭 (모바일 360px 기준, 좌우 패딩 제외) */
 const HALF_SPAN = 140
 /** 한 줄 부채꼴의 최대 벌어짐 각도 */

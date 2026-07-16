@@ -74,8 +74,18 @@ export interface ThemeAssets {
   cardFrontBase: string | null
   /** 카드 앞면 이미지 확장자 */
   cardFrontExt: string
+  /**
+   * 카드 앞면 캐시 버전 — `?v=` 로 붙는다. null 이면 안 붙인다(옛 슬롯).
+   *
+   * 앞면을 다시 올려도 경로가 같아 URL 이 그대로다 → 브라우저·CDN 이 옛 그림을 계속 쓴다.
+   * 올릴 때 이 값을 바꿔 **URL 자체를 다르게** 만든다. 캐시를 지우는 게 아니라 비껴가는 방식이라
+   * 저장소(Storage / 개발 서버)나 요금제와 무관하게 성립한다.
+   */
+  cardFrontVersion?: string | null
   /** 카드 뒷면 이미지 URL — null 이면 내장 SVG 뒷면을 쓴다 */
   cardBack: string | null
+  /** AI 리딩 로더의 수정구슬 이미지 URL — null 이면 내장 SVG 수정구슬을 쓴다 */
+  crystalBall: string | null
 }
 
 export interface Theme {
