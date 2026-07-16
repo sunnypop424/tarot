@@ -5,7 +5,25 @@ import { useParams } from 'react-router-dom'
 import { repo } from '@/lib/repo'
 import { onSlotChange } from '@/lib/repo/changed'
 import { applyTheme } from '@/lib/theme'
+import { isLight } from '@/lib/color'
 import type { Slot } from '@/types/slot'
+
+/**
+ * 다음 방문 때 **첫 페인트 전에** 깔 배경색을 슬러그별로 캐시한다 (index.html 의 인라인 스크립트가 읽는다).
+ * 방문자가 QR 로 들어오는 첫 순간엔 색을 모르지만, 홈 화면에 추가해 다시 열거나 새로고침하면
+ * 어두운 기본색이 번쩍이지 않고 처음부터 이 슬롯의 배경으로 뜬다. 키·모양은 그 스크립트와 맞춘다.
+ */
+const THEME_CACHE_PREFIX = 'tarot-pocket:theme:'
+function cacheThemeHint(slug: string, slot: Slot) {
+  try {
+    localStorage.setItem(
+      THEME_CACHE_PREFIX + slug,
+      JSON.stringify({ canvas: slot.theme.colors.canvas, light: isLight(slot.theme.colors.canvas) })
+    )
+  } catch {
+    /* 저장 실패는 무시 — 캐시는 최적화지 필수가 아니다 */
+  }
+}
 
 type State =
   /** 아직 못 읽었다 — "없는 슬롯"과 구분해야 한다 (섞으면 로딩 중에 404 가 번쩍인다) */
@@ -59,8 +77,11 @@ export function SlotProvider({ children }: { children: ReactNode }) {
   }, [slug])
 
   useEffect(() => {
-    if (state.status === 'ready') applyTheme(state.slot.theme)
-  }, [state])
+    if (state.status !== 'ready') return
+    applyTheme(state.slot.theme)
+    // 다음 방문의 첫 페인트를 위해 배경색을 남겨둔다
+    if (slug) cacheThemeHint(slug, state.slot)
+  }, [state, slug])
 
   /**
    * 브라우저 탭 제목을 **행사명**으로 — 방문자가 홈 화면에 추가하면 이 이름이 앱 이름이 된다.
