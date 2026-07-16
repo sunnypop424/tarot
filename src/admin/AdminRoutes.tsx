@@ -1,7 +1,9 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 
+import { hasSupabase } from '@/lib/repo/client'
 import { useSlotOrNull } from '@/slot/SlotProvider'
 import { NotFound } from '@/screens/NotFound'
+import { Account } from './Account'
 import { AdminLayout } from './AdminLayout'
 import { Login } from './Login'
 import { QuestionList } from './QuestionList'
@@ -27,6 +29,8 @@ export default function AdminRoutes() {
         <Route element={<AdminLayout />}>
           <Route path="questions" element={<QuestionList />} />
           <Route path="questions/:questionId" element={<QuestionEditor />} />
+          {/* local 어댑터엔 바꿀 비밀번호가 없다 (아무 값이나 통과한다) — 메뉴도 화면도 안 만든다 */}
+          {hasSupabase && <Route path="account" element={<Account />} />}
         </Route>
         <Route path="*" element={<Navigate to="questions" replace />} />
       </Route>

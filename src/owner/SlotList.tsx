@@ -3,15 +3,17 @@ import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Download, ExternalLink, LogOut, Plus, Trash2, Upload } from 'lucide-react'
 
-import { createSlot, getSlotDeck } from '@/data/slots'
+import { createSlot, getSlotDeck, isSlotExpired, isSlotOpen } from '@/data/slots'
 import { getSlotService, serviceLabel } from '@/data/services'
 import { PLANS, getPlan, type PlanId } from '@/data/plans'
 import { repo } from '@/lib/repo'
 import { hasSupabase } from '@/lib/repo/client'
-import type { Slot } from '@/types/slot'
+import type { Slot, SlotPeriod } from '@/types/slot'
 import { useOwnerAuth } from './useOwnerAuth'
 import { validateSlug } from './slug'
 import { exportSlots, importSlots } from './slotsFile'
+import { PeriodFields } from './PeriodFields'
+import { periodLabel } from './period'
 import styles from './Owner.module.css'
 
 /**
@@ -28,6 +30,7 @@ export function SlotList() {
   const [slug, setSlug] = useState('')
   const [name, setName] = useState('')
   const [plan, setPlan] = useState<PlanId>('free')
+  const [period, setPeriod] = useState<SlotPeriod>({})
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -58,7 +61,7 @@ export function SlotList() {
 
     setBusy(true)
     try {
-      await repo.slots.save(createSlot(slug, name.trim(), plan))
+      await repo.slots.save(createSlot(slug, name.trim(), plan, period))
       // 만들자마자 편집으로 — 슬롯은 색을 입혀야 슬롯이 된다
       navigate(`/theme-editor/${slug}`)
     } catch (e) {
@@ -69,18 +72,24 @@ export function SlotList() {
   }
 
   async function handleRemove(target: Slot) {
+    /**
+     * 슬롯을 지우면 **그 슬롯과 관련된 모든 것**이 지워진다.
+     * Supabase 면 주최자 계정·이미지까지 (`repo.organizers.purgeSlot`) — cascade 만으로는
+     * 주최자 로그인 계정이 유령으로 남는다. local 이면 그 브라우저의 슬롯·질문만.
+     */
+    const deep = repo.organizers.ready()
     if (
       !confirm(
         `${target.name} (/${target.slug}) 슬롯을 지울까요?\n` +
-          `질문·답변도 함께 지워지고, 방문자는 이 주소로 못 들어옵니다.\n` +
-          (hasSupabase
-            ? `올린 이미지는 저장소에 그대로 남습니다.`
-            : `올린 이미지 파일은 public/slots/${target.slug}/ 에 그대로 남습니다.`)
+          (deep
+            ? `질문·답변, 주최자 계정, 올린 이미지까지 전부 지워집니다.\n되돌릴 수 없어요.`
+            : `질문·답변도 함께 지워집니다.\n올린 이미지 파일은 public/slots/${target.slug}/ 에 그대로 남습니다.`)
       )
     )
       return
     try {
-      await repo.slots.remove(target.slug)
+      if (deep) await repo.organizers.purgeSlot(target.slug)
+      else await repo.slots.remove(target.slug)
       await load()
     } catch (e) {
       setError(e instanceof Error ? e.message : '슬롯을 못 지웠어요')
@@ -119,7 +128,7 @@ export function SlotList() {
             <h1 className="t-title-l">슬롯</h1>
             {/* 저장이 곧 배포인지 아닌지는 저장소가 정한다 — 화면이 거짓말하면 안 된다 */}
             <p className="t-text-xs t-muted">
-              최고관리자 전용 · 개발 모드에서만 열려요.{' '}
+              최고관리자 전용.{' '}
               {hasSupabase
                 ? '만들거나 고치면 바로 반영돼요 — 방문자가 그 주소로 들어올 수 있습니다.'
                 : '지금은 이 브라우저에만 저장돼요 (Supabase 미설정). 내보낸 slots.json 을 레포에 넣어야 배포됩니다.'}
@@ -136,9 +145,11 @@ export function SlotList() {
                 onChange={(e) => e.target.files?.[0] && void handleImport(e.target.files[0])}
               />
             </label>
+            {/* 보조 동작이다 — 이 화면의 주인공은 슬롯 만들기다.
+                SlotEditor 의 같은 버튼과도 변형을 맞춘다 (거긴 처음부터 slight 였다) */}
             <button
               type="button"
-              className="btn btn--sm btn--primary"
+              className="btn btn--sm btn--slight"
               disabled={!slots?.length}
               onClick={() => slots && exportSlots(slots)}
             >
@@ -210,19 +221,23 @@ export function SlotList() {
                 </select>
                 <span className="field__hint">나중에 편집기에서 바꿀 수 있어요.</span>
               </div>
-
-              <div className="field">
-                {/* 라벨 자리를 비워 옆 입력칸과 높이를 맞춘다 */}
-                <span className="field__label" aria-hidden="true">
-                  &nbsp;
-                </span>
-                {/* 크기 수식자를 안 쓴다 — .btn 기본 높이(--tap-min)가 .input 과 같다 */}
-                <button type="submit" className="btn btn--primary" disabled={busy || !slots}>
-                  <Plus size={18} strokeWidth={2} aria-hidden="true" />
-                  슬롯 만들기
-                </button>
-              </div>
             </div>
+
+            {/* 슬롯은 팔면서 만든다 — 만들 때 이미 언제부터 언제까진지 안다.
+                비워두면 기간 제한 없이 열린다 (편집기에서 나중에 정할 수 있다) */}
+            <div style={{ marginTop: 'var(--space-base)' }}>
+              <PeriodFields period={period} onChange={setPeriod} disabled={busy} />
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn--primary"
+              style={{ marginTop: 'var(--space-lg)' }}
+              disabled={busy || !slots}
+            >
+              <Plus size={18} strokeWidth={2} aria-hidden="true" />
+              슬롯 만들기
+            </button>
             {error && <p className="field__error" style={{ marginTop: 'var(--space-sm)' }}>{error}</p>}
           </form>
         </section>
@@ -241,8 +256,19 @@ export function SlotList() {
             <p className="t-text-s t-muted">아직 슬롯이 없어요. 위에서 만들어 주세요.</p>
           ) : (
             <ul className="row-list" data-slot-list>
-              {slots.map((s) => (
-                <li key={s.slug} className="row-item" data-slot={s.slug}>
+              {slots.map((s) => {
+                /**
+                 * 대여가 끝난 슬롯 — 방문자에겐 이미 닫혔지만(RLS) 목록엔 남는다.
+                 * 최고관리자만 볼 수 있고, 지우는 것도 최고관리자다 — 그래서 여기서 재촉한다.
+                 */
+                const expired = isSlotExpired(s)
+                return (
+                <li
+                  key={s.slug}
+                  className={`row-item ${expired ? styles.expired : ''}`}
+                  data-slot={s.slug}
+                  data-expired={expired || undefined}
+                >
                   {/* 슬롯을 색으로 먼저 알아본다 — 이름보다 빠르다 */}
                   <span className={styles.swatch} aria-hidden="true">
                     {[s.theme.colors.canvas, s.theme.colors.primary, s.theme.colors.accent].map(
@@ -256,8 +282,19 @@ export function SlotList() {
                     <span className="t-text-m">{s.name}</span>
                     <span className={`t-text-xs ${styles.slotMeta}`}>
                       /{s.slug} · {getPlan(s).label} · {serviceLabel(getSlotService(s))} ·{' '}
-                      {getSlotDeck(s) === 'major' ? '메이저 22장' : '전체 78장'}
+                      {getSlotDeck(s) === 'major' ? '메이저 22장' : '전체 78장'} · {periodLabel(s)}
                     </span>
+                    {expired && (
+                      <span className={`t-text-xs ${styles.expiredNote}`}>
+                        대여가 끝났어요 — <b>삭제해야 하는 슬롯입니다.</b> 방문자와 주최자는 이미 못
+                        들어옵니다.
+                      </span>
+                    )}
+                    {!expired && !isSlotOpen(s) && (
+                      <span className={`t-text-xs ${styles.slotMeta}`}>
+                        아직 시작 전이에요 — 방문자는 못 들어옵니다.
+                      </span>
+                    )}
                   </span>
 
                   <a
@@ -281,7 +318,8 @@ export function SlotList() {
                     <Trash2 size={18} strokeWidth={2} aria-hidden="true" />
                   </button>
                 </li>
-              ))}
+                )
+              })}
             </ul>
           )}
         </section>

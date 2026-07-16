@@ -1,4 +1,5 @@
-import { aiAuthHeader } from './client'
+import { authHeader } from './client'
+import { fail } from './http'
 import type {
   AnswerGenInput,
   GeneratedAnswer,
@@ -20,7 +21,7 @@ import type {
  *
  * **인증은 붙인다.** 배포된 함수는 경로마다 권한이 다르다 — 답변 생성은 그 슬롯 주최자만,
  * 색 만들기는 최고관리자만, 리딩은 (익명이라도) 토큰이 있어야 레이트리밋을 셀 수 있다.
- * Supabase 를 안 붙였으면 `aiAuthHeader` 가 빈 헤더를 주고, 개발 서버 미들웨어는 그걸 무시한다.
+ * Supabase 를 안 붙였으면 `authHeader` 가 빈 헤더를 주고, 함수는 그걸 권한 없음으로 본다.
  */
 
 /** 없으면 AI 는 꺼진 채로 돈다 — `ready()` 가 false 를 주고 화면이 조용히 접힌다 */
@@ -28,17 +29,6 @@ const BASE = import.meta.env.VITE_AI_BASE ?? ''
 
 /** 한 번에 보낼 카드 수 — 서버의 MAX_CARDS_PER_BATCH 와 맞춘다 */
 const BATCH = 12
-
-async function fail(res: Response): Promise<never> {
-  let message = `요청이 실패했어요 (${res.status})`
-  try {
-    const body = (await res.json()) as { error?: string }
-    if (body.error) message = body.error
-  } catch {
-    /* 본문이 JSON 이 아니면 상태코드로 만족한다 */
-  }
-  throw new Error(message)
-}
 
 export const httpAi: AiRepo = {
   async ready() {
@@ -55,7 +45,7 @@ export const httpAi: AiRepo = {
 
   async synthesize(slug, input: SynthesisInput, onText) {
     // 방문자는 로그인하지 않는다 — 여기서 익명 토큰을 받는다 (repo/client.ts)
-    const auth = await aiAuthHeader({ anonymous: true })
+    const auth = await authHeader({ anonymous: true })
     const res = await fetch(`${BASE}/reading`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', ...auth },
@@ -99,7 +89,7 @@ export const httpAi: AiRepo = {
     // 최고관리자만 — 이미 로그인해 있다
     const res = await fetch(`${BASE}/theme`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json', ...(await aiAuthHeader()) },
+      headers: { 'content-type': 'application/json', ...(await authHeader()) },
       body: JSON.stringify(input),
     })
     if (!res.ok) return fail(res)
@@ -112,7 +102,7 @@ export const httpAi: AiRepo = {
   async generateAnswers(slug, input: AnswerGenInput, onProgress) {
     const out: GeneratedAnswer[] = []
     // 그 슬롯 주최자만 — 이미 로그인해 있다
-    const auth = await aiAuthHeader()
+    const auth = await authHeader()
 
     // 78장을 한 번에 요청하면 응답이 잘린다 — 묶음으로 나눠 보내고 진행률을 알린다.
     // `batchIndex` 는 서버가 한도를 세는 단위다 — 7묶음이 와도 "전체 생성 1회"로 센다

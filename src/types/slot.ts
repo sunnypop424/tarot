@@ -22,6 +22,38 @@ export interface CategorySetting {
 export type EventConfig = Record<string, CategorySetting>
 
 /**
+ * 날짜 구간 — `'YYYY-MM-DD'` (**KST 기준**).
+ *
+ * 문자열인 이유: 이 값은 시각이 아니라 **날짜**다. Date 로 들고 다니면 타임존이 붙어
+ * "6월 1일" 이 브라우저에 따라 5월 31일이 된다. 이 형식은 사전순 비교가 곧 시간순이라
+ * 비교도 문자열로 그냥 된다.
+ *
+ * null = 그쪽 끝이 열려 있다 (시작이 null 이면 언제부터든, 끝이 null 이면 언제까지든).
+ */
+export interface DateRange {
+  start: string | null
+  end: string | null
+}
+
+/**
+ * 슬롯이 열려 있는 기간 — **접근을 정한다.**
+ *
+ * 두 기간 중 **하나라도** 오늘을 품으면 슬롯이 열린다:
+ *  - `test` — 주최자가 미리 열어보고 질문·답변을 채우는 기간
+ *  - `rent` — 실제로 파는 기간. 이게 끝나면 방문자도 주최자도 못 들어온다
+ *
+ * **판정은 DB(RLS)가 한다** (`0005_slot_period.sql` 의 `slot_open`).
+ * 여기 있는 계산은 화면이 미리 알려주기 위한 것이지 방어가 아니다 —
+ * 프론트만 막으면 anon 키로 슬롯을 그대로 읽어 종료된 이벤트가 열린다.
+ *
+ * 비었으면(둘 다 미설정) **제한이 없다** — 기간이 생기기 전에 만든 슬롯이 죽으면 안 된다.
+ */
+export interface SlotPeriod {
+  test?: DateRange
+  rent?: DateRange
+}
+
+/**
  * 슬롯 — 배포 하나에 여러 이벤트가 얹힌다.
  *
  * `/seventeen-dino` 가 그 슬롯의 루트가 되고, `/seventeen-dino/admin` 은
@@ -59,6 +91,11 @@ export interface Slot {
    * 카테고리·질문 덱은 이 범위를 넘을 수 없다 (effectiveDeck 로 캡).
    */
   deck?: DeckRange
+  /**
+   * 이 슬롯이 열려 있는 기간 — 없으면 **제한 없음** (기간이 생기기 전 슬롯들).
+   * 최고관리자만 정한다. 대여 기간이 끝나면 주최자도 못 들어온다.
+   */
+  period?: SlotPeriod
   theme: Theme
   event: EventConfig
 }

@@ -25,8 +25,15 @@ export interface SlotRepo {
   list(): Promise<Slot[]>
   /** 없는 슬러그면 null */
   get(slug: string): Promise<Slot | null>
-  /** 새 슬롯이면 추가, 있으면 덮어쓴다 */
-  save(slot: Slot): Promise<void>
+  /**
+   * 새 슬롯이면 추가, 있으면 덮어쓴다.
+   *
+   * `prevSlug` 를 주면 **그 슬롯의 슬러그를 옮긴다** — 새로 만들고 옛것을 지우는 게 아니다.
+   * 지우면 questions·slot_admins 가 `on delete cascade` 로 **같이 사라진다**:
+   * 주최자가 78장씩 검수해 채운 답변이 슬러그 오타 고치다 날아간다.
+   * 옮기기는 FK 의 `on update cascade` 가 따라온다 (`0004_slug_rename.sql`).
+   */
+  save(slot: Slot, prevSlug?: string): Promise<void>
   remove(slug: string): Promise<void>
 }
 
@@ -52,6 +59,14 @@ export interface AuthRepo {
   signOut(): Promise<void>
   /** 로그인 상태가 아니면 null */
   currentUser(): Promise<AdminUser | null>
+  /**
+   * **자기** 비밀번호를 바꾼다 — 최고관리자에게 임시 비번을 받아 들어온 뒤 쓰는 자리다.
+   *
+   * 계정 생성(`OrganizersRepo`)과 달리 서버 함수를 안 거친다: 남의 계정을 만질 때만
+   * service_role 이 필요하고, 자기 세션으로 자기 비번을 바꾸는 건 anon 키로 된다.
+   * 그래서 이건 주최자 화면에 있고 저건 최고관리자 화면에 있다.
+   */
+  changePassword(password: string): Promise<void>
 }
 
 /**
@@ -137,10 +152,61 @@ export interface AiRepo {
   generateTheme(input: ThemeGenInput): Promise<Record<string, string>>
 }
 
+/** 주최자 계정 한 개. 이메일은 `auth.users` 에 있어 **서버만 읽을 수 있다** */
+export interface Organizer {
+  userId: string
+  email: string
+  createdAt: string
+}
+
+/**
+ * 주최자 계정 — **최고관리자 도구** (슬롯 편집기에서만 쓴다).
+ *
+ * 이 인터페이스가 따로 있는 이유는 `AuthRepo` 와 하는 일이 반대이기 때문이다:
+ * `AuthRepo` 는 주최자가 **자기 계정으로 들어오는** 문이고, 여기는 최고관리자가
+ * **그 계정을 만들어 주는** 자리다. 섞으면 주최자 화면이 계정 생성 코드를 들고 다니게 된다.
+ *
+ * **어댑터가 local 이면 할 수 있는 게 없다.** 계정은 Supabase 가 갖고 있고,
+ * 만들려면 service_role 키가 필요해 브라우저가 직접 못 부른다 → Edge Function 을 거친다
+ * (`supabase/functions/admin`). 그래서 `ready()` 가 false 면 화면은 패널을 통째로 접는다 —
+ * localStorage 에 계정을 흉내 내면 "만들었다" 고 말해놓고 아무도 로그인하지 못한다.
+ */
+export interface OrganizersRepo {
+  /**
+   * 계정을 만들 수 있는 어댑터인가 — false 면 화면이 패널을 아예 안 띄운다.
+   * `AiRepo.ready()` 와 달리 동기다: 저쪽은 서버에 키가 있는지 물어야 알지만,
+   * 여기는 "Supabase 를 붙였나" 뿐이라 왕복할 게 없다.
+   */
+  ready(): boolean
+  list(slug: string): Promise<Organizer[]>
+  /**
+   * 계정 생성 + 슬롯 지정을 **한 번에**. 둘로 나누면 사이에서 실패했을 때
+   * 로그인은 되는데 아무 슬롯도 못 보는 유령 계정이 남는다 (그 이메일은 이미 쓰여서 재사용도 안 된다).
+   */
+  create(slug: string, email: string, password: string): Promise<Organizer>
+  /**
+   * **임시 비밀번호를 발급받는다** — 최고관리자가 정하는 게 아니라 서버가 만들어 돌려준다.
+   * 돌아온 값은 **이때 한 번만** 볼 수 있다 (해시로만 저장되므로 다시 못 꺼낸다).
+   * 주최자는 그걸로 들어와 `AuthRepo.changePassword` 로 자기 것으로 바꾼다.
+   */
+  resetPassword(userId: string): Promise<string>
+  /** 매핑만이 아니라 **계정째** 지운다 */
+  remove(userId: string): Promise<void>
+  /**
+   * 슬롯과 관련된 **모든 것**을 지운다 — 주최자 계정·이미지·질문·사용량까지.
+   *
+   * `repo.slots.remove` 로는 부족하다: cascade 가 매핑은 지워도 주최자의 로그인 계정은
+   * 남긴다 (`auth.users`, service_role 이라야 지운다). 그래서 슬롯 삭제는 이 경로를 탄다.
+   * 돌려주는 수는 실제로 지운 계정 수.
+   */
+  purgeSlot(slug: string): Promise<{ deletedAccounts: number }>
+}
+
 export interface Repo {
   slots: SlotRepo
   questions: QuestionRepo
   auth: AuthRepo
   ownerAuth: OwnerAuthRepo
+  organizers: OrganizersRepo
   ai: AiRepo
 }

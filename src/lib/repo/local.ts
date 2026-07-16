@@ -4,6 +4,7 @@ import type { Question } from '@/types/question'
 import type { Slot } from '@/types/slot'
 import { httpAi } from './ai'
 import { publishSlotChange } from './changed'
+import { localOrganizers } from './organizers'
 import type {
   AdminUser,
   AuthRepo,
@@ -60,12 +61,31 @@ const slots: SlotRepo = {
   async get(slug) {
     return allSlots().find((s) => s.slug === slug) ?? null
   },
-  async save(slot) {
+  async save(slot, prevSlug) {
     const all = allSlots()
-    const i = all.findIndex((s) => s.slug === slot.slug)
+    // 슬러그를 옮기는 중이면 **옛 행을 찾아 갈아끼운다** — 새로 push 하면 옛 슬롯이 목록에 남는다
+    const i = all.findIndex((s) => s.slug === (prevSlug ?? slot.slug))
     if (i === -1) all.push(slot)
     else all[i] = slot
     write(SLOTS_DRAFT_KEY, all)
+
+    /**
+     * 질문은 슬러그별 키에 산다 — 슬롯을 옮겼으면 질문도 따라가야 한다.
+     * Supabase 어댑터에선 FK 의 `on update cascade` 가 하는 일을 여기선 손으로 한다
+     * (`0004_slug_rename.sql`). 안 하면 옛 키에 갇혀 새 슬롯에선 질문이 사라진 것처럼 보인다.
+     */
+    if (prevSlug && prevSlug !== slot.slug) {
+      const moved = read<Question[]>(questionsKey(prevSlug))
+      if (moved) {
+        write(questionsKey(slot.slug), moved)
+        try {
+          localStorage.removeItem(questionsKey(prevSlug))
+        } catch {
+          /* 지우기 실패는 넘긴다 — 새 키에 이미 옮겨 놨다 */
+        }
+      }
+      publishSlotChange(prevSlug)
+    }
     publishSlotChange(slot.slug)
   },
   async remove(slug) {
@@ -119,14 +139,19 @@ const auth: AuthRepo = {
       /* noop */
     }
   },
+  // 비밀번호랄 게 없는 어댑터다 — 아무 값이나 통과시키므로 바꿀 것도 없다.
+  // 화면은 이 사실을 hasSupabase 로 알고 변경 UI 를 아예 띄우지 않는다.
+  async changePassword() {
+    throw new Error('Supabase 를 붙여야 비밀번호를 바꿀 수 있어요')
+  },
   async currentUser() {
     return read<AdminUser>(KEY_USER)
   },
 }
 
 const ownerAuth: OwnerAuthRepo = {
-  // 주최자 로그인과 같은 한계 — 아직 아무나 통과한다. 로그인 화면이 그 사실을 밝힌다.
-  // 슬롯 편집기는 개발 모드에서만 열리므로 지금은 이 문이 로컬에만 있다.
+  // 주최자 로그인과 같은 한계 — 아무나 통과한다. 로그인 화면이 그 사실을 밝힌다.
+  // 이 문은 Supabase 를 안 붙인 빌드에만 있다 (붙이면 supabaseRepo 가 대신한다).
   async signIn(email) {
     const user: OwnerUser = { email }
     write(KEY_OWNER, user)
@@ -148,4 +173,11 @@ const ownerAuth: OwnerAuthRepo = {
  * reading 만 localStorage 가 아니다 — AI 는 키 때문에 반드시 서버를 거친다.
  * 저장소가 Supabase 로 바뀌어도 이 줄은 그대로다 (엔드포인트 주소만 VITE_AI_BASE 로 바뀐다).
  */
-export const localRepo: Repo = { slots, questions, auth, ownerAuth, ai: httpAi }
+export const localRepo: Repo = {
+  slots,
+  questions,
+  auth,
+  ownerAuth,
+  organizers: localOrganizers,
+  ai: httpAi,
+}

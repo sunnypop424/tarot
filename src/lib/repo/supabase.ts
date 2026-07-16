@@ -4,6 +4,7 @@ import type { Slot } from '@/types/slot'
 import { httpAi } from './ai'
 import { publishSlotChange } from './changed'
 import { db } from './client'
+import { httpOrganizers } from './organizers'
 import type {
   AdminUser,
   AuthRepo,
@@ -26,7 +27,7 @@ import type {
 /** slots 테이블 행 ↔ Slot. 컬럼 이름이 곧 필드 이름이라 매핑이 얇다 */
 type SlotRow = Slot
 
-const SLOT_COLUMNS = 'slug, name, service, plan, limits, deck, theme, event'
+const SLOT_COLUMNS = 'slug, name, service, plan, limits, deck, period, theme, event'
 
 /**
  * 번들된 씨앗 — **네트워크가 죽었을 때의 마지막 방어선**.
@@ -63,17 +64,38 @@ const slots: SlotRepo = {
     }
   },
 
-  async save(slot) {
-    const { error } = await (await db()).from('slots').upsert({
+  async save(slot, prevSlug) {
+    const row = {
       slug: slot.slug,
       name: slot.name,
       service: slot.service ?? 'tarot',
       plan: slot.plan ?? 'free',
       limits: slot.limits ?? {},
       deck: slot.deck ?? 'full',
+      // 컬럼이 not null 이라 빈 기간은 {} 로 — "안 정했다" = 제한 없음 (slot_open 이 그렇게 읽는다)
+      period: slot.period ?? {},
       theme: slot.theme,
       event: slot.event,
-    })
+    }
+
+    /**
+     * 슬러그를 옮기는 중이면 **update 한 문장**이다 — 새로 만들고 옛것을 지우는 게 아니다.
+     *
+     * 지우면 questions·slot_admins 가 `on delete cascade` 로 같이 사라진다:
+     * 주최자가 검수해 채운 답변과 그 슬롯 계정이 슬러그 오타 고치다 날아간다.
+     * 한 문장이라 옛 행이 잠깐이라도 없어지는 순간이 없고, FK 의 `on update cascade` 가
+     * 질문·계정·사용량을 새 슬러그로 따라오게 한다 (`0004_slug_rename.sql`).
+     */
+    if (prevSlug && prevSlug !== slot.slug) {
+      const { error } = await (await db()).from('slots').update(row).eq('slug', prevSlug)
+      if (error) throw new Error(error.message)
+      // 옛 주소로 열어둔 화면(편집기 미리보기)도 다시 읽어야 한다
+      publishSlotChange(prevSlug)
+      publishSlotChange(slot.slug)
+      return
+    }
+
+    const { error } = await (await db()).from('slots').upsert(row)
     if (error) throw new Error(error.message)
     // 저장이 됐다는 걸 이 브라우저의 다른 화면(편집기 미리보기)에 알린다
     publishSlotChange(slot.slug)
@@ -166,6 +188,15 @@ const auth: AuthRepo = {
     await (await db()).auth.signOut()
   },
 
+  /**
+   * 자기 비밀번호 — **자기 세션으로 바꾼다.** service_role 도 Edge Function 도 필요 없다.
+   * 최고관리자가 발급한 임시 비번으로 들어온 주최자가 여기서 자기 것으로 바꾼다.
+   */
+  async changePassword(password) {
+    const { error } = await (await db()).auth.updateUser({ password })
+    if (error) throw new Error(error.message)
+  },
+
   async currentUser(): Promise<AdminUser | null> {
     const { data } = await (await db()).auth.getUser()
     if (!data.user) return null
@@ -207,7 +238,14 @@ const ownerAuth: OwnerAuthRepo = {
 }
 
 /**
- * AI 는 저장소와 무관하다 — 키 때문에 어차피 서버 엔드포인트를 거친다.
- * 질문이 localStorage 에 있든 DB 에 있든 AI 를 부르는 쪽은 같다.
+ * AI 와 계정은 저장소와 무관하다 — 둘 다 **키 때문에** 서버 엔드포인트를 거친다.
+ * AI 는 ANTHROPIC_API_KEY, 계정은 service_role 키. 어느 쪽도 브라우저에 둘 수 없다.
  */
-export const supabaseRepo: Repo = { slots, questions, auth, ownerAuth, ai: httpAi }
+export const supabaseRepo: Repo = {
+  slots,
+  questions,
+  auth,
+  ownerAuth,
+  organizers: httpOrganizers,
+  ai: httpAi,
+}

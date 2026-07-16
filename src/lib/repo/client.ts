@@ -30,7 +30,7 @@ export const supabaseUrl: string = url ?? ''
 let pending: Promise<SupabaseClient> | null = null
 
 /**
- * AI 함수에 보낼 Authorization 헤더.
+ * Edge Function 에 보낼 Authorization 헤더 (ai · admin 둘 다 이걸 쓴다).
  *
  * **방문자는 로그인하지 않는다** — 카페에서 회원가입 없이 뽑는 게 이 앱의 전제다.
  * 그런데 함수를 아무나 부르면 남이 우리 Claude 예산을 쓴다. 그래서 리딩을 부르기 직전에만
@@ -44,7 +44,7 @@ let pending: Promise<SupabaseClient> | null = null
 /** 익명 로그인이 꺼져 있으면 매번 실패하는 왕복을 하지 않는다 — 한 번 겪으면 기억한다 */
 let anonBlocked = false
 
-export async function aiAuthHeader({ anonymous = false } = {}): Promise<Record<string, string>> {
+export async function authHeader({ anonymous = false } = {}): Promise<Record<string, string>> {
   if (!hasSupabase) return {}
   try {
     const client = await db()

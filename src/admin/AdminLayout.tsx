@@ -1,7 +1,8 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { MessageCircleQuestion, ExternalLink, LogOut } from 'lucide-react'
+import { MessageCircleQuestion, ExternalLink, LogOut, UserCog } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
+import { hasSupabase } from '@/lib/repo/client'
 import { useSlot } from '@/slot/SlotProvider'
 import { useAdminAuth } from './useAdminAuth'
 
@@ -11,8 +12,17 @@ interface NavItem {
   icon: LucideIcon
 }
 
-/** 주최자가 만질 수 있는 건 질문/답변뿐 — 테마·이미지는 소유자가 배포한다 */
-const NAV: NavItem[] = [{ to: 'questions', label: '질문 타로', icon: MessageCircleQuestion }]
+/**
+ * 주최자가 만질 수 있는 건 질문/답변 **과 자기 계정**뿐 — 테마·이미지는 소유자가 배포한다.
+ *
+ * 계정이 여기 있는 이유: 주최자는 최고관리자가 만들어 준 계정으로 들어온다.
+ * 처음엔 남이 아는 비밀번호라 자기 것으로 바꿀 자리가 필요하다 (`Account`).
+ * local 어댑터엔 바꿀 비번이 없으므로(아무 값이나 통과한다) 그 빌드에선 메뉴를 안 만든다.
+ */
+const NAV: NavItem[] = [
+  { to: 'questions', label: '질문 타로', icon: MessageCircleQuestion },
+  ...(hasSupabase ? [{ to: 'account', label: '내 계정', icon: UserCog }] : []),
+]
 
 export function AdminLayout() {
   const slot = useSlot()

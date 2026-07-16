@@ -17,6 +17,9 @@ import { checkThemeContrast } from './contrast'
 import { repairContrast, type GeneratedTheme } from './aiTheme'
 import { ImageField } from './ImageField'
 import { CardUploader } from './CardUploader'
+import { OrganizerPanel } from './OrganizerPanel'
+import { PeriodFields } from './PeriodFields'
+import { periodLabel, rangeInvalid } from './period'
 import { validateSlug } from './slug'
 import { exportSlots } from './slotsFile'
 import styles from './Owner.module.css'
@@ -101,7 +104,8 @@ const BASE_PRESETS: { id: 'dark' | 'light'; label: string; base: Pick<ThemeColor
 ]
 
 /**
- * 슬롯 하나의 색·형태·이미지·이벤트 설정 — `/theme-editor/:slug`, **개발 모드에서만 열린다**.
+ * 슬롯 하나의 색·형태·이미지·이벤트 설정 — `/theme-editor/:slug`, **최고관리자 전용**
+ * (Supabase 가 설정된 빌드에만 존재한다 — App.tsx).
  * 슬롯을 만들고 지우는 건 목록(SlotList)이 맡는다.
  * 주최자에겐 노출되지 않는다 (주최자는 질문/답변만 만진다).
  *
@@ -109,6 +113,9 @@ const BASE_PRESETS: { id: 'dark' | 'light'; label: string; base: Pick<ThemeColor
  * 저장할 때 비로소 저장소에 쓰여 미리보기·목록·내보내기에 나타난다.
  * 저장소가 DB 면 **저장이 곧 배포다** — 방문자 화면이 그 순간 바뀐다.
  * (주최자 질문 편집은 반대로 즉시 저장이다 — 거긴 저장을 잊어 날리는 게 더 나쁘다.)
+ *
+ * **주최자 계정 패널만 초안이 아니다** (`OrganizerPanel`) — 계정 생성은 되돌릴 수 없는
+ * 서버 작업이라 초안에 담을 수가 없다. 그 패널이 스스로 그 사실을 말한다.
  */
 export function SlotEditor() {
   const { slug } = useParams<{ slug: string }>()
@@ -285,10 +292,19 @@ export function SlotEditor() {
     setSlugError(null)
     setSaveError(null)
 
+    // 거꾸로 된 기간을 저장하면 slot_open 이 영영 false 라 아무도 못 들어오는 슬롯이 된다
+    if (rangeInvalid(draft!)) {
+      setSaveError('기간의 종료일이 시작일보다 앞서요.')
+      return
+    }
+
     try {
-      await repo.slots.save(draft!)
-      // 슬러그를 바꿨으면 옛 행이 남는다 — 지워야 /옛슬러그 가 계속 열리지 않는다
-      if (draft!.slug !== saved!.slug) await repo.slots.remove(saved!.slug)
+      /**
+       * 슬러그가 바뀌었으면 **옮긴다** — 새로 만들고 옛것을 지우는 게 아니다.
+       * 지우면 그 슬롯의 질문·주최자 계정이 `on delete cascade` 로 같이 사라졌다
+       * (`0004_slug_rename.sql`). 옛 행은 옮겨졌으므로 `/옛슬러그` 도 알아서 닫힌다.
+       */
+      await repo.slots.save(draft!, saved!.slug)
 
       setSlots(await repo.slots.list())
       // 슬러그를 바꿔 저장했으면 주소도 따라가야 한다 — 안 그러면 편집 중인 슬롯을 잃는다
@@ -790,6 +806,33 @@ export function SlotEditor() {
                 </li>
               </ul>
             </section>
+
+            <section className="admin-section">
+              <h2 className="t-title-s admin-section__title">기간</h2>
+              <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+                {/* 지금 상태를 먼저 말한다 — 날짜만 보고 오늘이 그 안인지 세게 하지 않는다 */}
+                지금 이 슬롯은 <b>{periodLabel(draft)}</b> 상태예요. 두 기간 중 하나라도 오늘을 품으면
+                열려요. 대여가 끝나면 <b>주최자도</b> 못 들어옵니다 (최고관리자만 볼 수 있어요).
+              </p>
+              <PeriodFields
+                period={draft.period}
+                onChange={(period) => patchSlot(() => ({ period }))}
+              />
+              {rangeInvalid(draft) && (
+                <p className="field__error" style={{ marginTop: 'var(--space-sm)' }}>
+                  종료일이 시작일보다 앞서요.
+                </p>
+              )}
+            </section>
+
+            {/**
+             * 계정은 **저장된 슬러그**에 매인다 (slot_admins.slug 가 FK 다) — 초안 슬러그가 아니다.
+             * ready() 가 false 인 어댑터(local)에선 만들 계정이 없으므로 패널을 아예 안 띄운다:
+             * localStorage 로 흉내 내면 "만들었다" 고 해놓고 아무도 로그인하지 못한다.
+             */}
+            {repo.organizers.ready() && (
+              <OrganizerPanel slot={saved} slugPending={draft.slug !== saved.slug} />
+            )}
 
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">이벤트 설정</h2>

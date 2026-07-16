@@ -1,4 +1,4 @@
-/* 최고관리자 전용 슬롯 편집기 (목록 + 슬롯 편집) — 개발 모드에서만 존재한다 */
+/* 최고관리자 전용 슬롯 편집기 (목록 + 슬롯 편집) — Supabase 가 설정된 빌드에만 존재한다 */
 
 .head {
   display: flex;
@@ -96,6 +96,18 @@
   color: var(--color-fg-3);
 }
 
+/* 대여가 끝난 슬롯 — 지워야 할 것이라 목록에서 눈에 걸려야 한다.
+   테두리만 물들이고 배경은 두는 이유: 이 행의 다른 정보(색 견본·슬러그)도 읽혀야 한다 */
+.expired {
+  border-color: var(--color-error);
+  box-shadow: inset 3px 0 0 var(--color-error);
+}
+
+.expiredNote {
+  display: block;
+  color: var(--color-error);
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -110,6 +122,73 @@
 }
 .presetRow > :global(.btn) {
   flex: 1 1 0;
+}
+
+/* ── 기간 ─────────────────────────────────────────── */
+
+/* 날짜 입력 둘 + '~' 가 들어갈 만큼 칸을 넓게 (form-grid 220px 로는 잘린다) */
+.periodGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-base);
+}
+
+.rangeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* 날짜 입력은 내용 폭이 제각각이라(브라우저마다 달력 아이콘이 다르다) 균등하게 나눈다 */
+.rangeRow :global(.input) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.rangeSep {
+  flex-shrink: 0;
+  color: var(--color-fg-3);
+}
+
+/* ── 주최자 계정 ──────────────────────────────────── */
+
+/* 방금 만든 계정의 안내문 — 다시 못 만드는 값이라 눈에 띄어야 한다 (wash 로 구분) */
+.issued {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-base);
+  padding: var(--space-base);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-wash);
+}
+
+.issuedHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.issuedActions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* 비밀번호는 옮겨 적을 값이라 글자 폭이 고르게 — 비슷한 글자를 눈으로 가려야 한다 */
+.issuedValue {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.05em;
+  color: var(--color-fg-1);
+  user-select: all;
+}
+
+/* 안내문 미리보기는 손대는 값이 아니라 읽고 복사하는 값 — 폭 넓게, 코드처럼 */
+.issued :global(.textarea) {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+  background: var(--color-surface);
 }
 
 /* ── 대비 검사 ────────────────────────────────────── */

@@ -5,23 +5,27 @@
 
 ## 지금 어디까지 됐나
 
-**데이터는 이미 브라우저 밖으로 나갔다.** 남은 건 AI 와 배포다.
+**다 나갔다.** https://tarot-btjp.vercel.app — 슬러그로 직접 들어오면 열리고, AI 도 배포에서 돈다.
+
+`node scripts/verify-prod.mjs <주소> <스크린샷>` 이 배포된 주소를 실제로 때려 확인한다 (리딩 1회 ≈5원).
 
 | 기능 | 상태 |
 |---|---|
 | 슬롯 (생성·테마·플랜) | ✅ **DB** — 저장이 곧 배포. 다른 브라우저에서 열리는 걸 `verify-owner` 가 확인한다 |
 | 주최자 답변이 방문자에게 감 | ✅ **DB + RLS** (`verify-supabase` 29종) |
 | 로그인 (최고관리자 · 주최자) | ✅ **Supabase 인증** — 역할은 `owners`/`slot_admins` 가 정한다 |
+| 주최자 계정 발급 (편집기에서 자동) | ✅ **Edge Function `admin`** — 생성·매핑·비번재발급·삭제를 최고관리자가 편집기에서 (§5) |
+| 슬롯 기간 (테스트·대여) | ✅ **DB + RLS** — 대여가 끝나면 최고관리자 말고는 슬롯을 못 읽는다 (`slot_open`, 0005) |
 | 슬롯 이미지 | ✅ **Storage** (버킷 `slots`, 쓰기는 최고관리자만) |
-| 슬롯 편집기 | ✅ 동작 · **배포됨** (Supabase 설정된 빌드에만 — §2-3) |
+| 슬롯 편집기 | ✅ **배포됨** (Supabase 설정된 빌드에만 — §2-3) |
 | 3장 리딩 AI 종합 | ✅ **Edge Function** (`supabase/functions/ai`) — 개발도 같은 함수를 쓴다 |
 | 질문 × 카드 답변 AI 생성 → 검수 → 저장 | ✅ 위와 같음 · 그 슬롯 주최자만 부를 수 있다 |
 
-| 남은 것 | 왜 문제인가 |
+| 남은 것 | 메모 |
 |---|---|
-| AI 엔드포인트가 개발 서버 미들웨어 | 배포하면 AI 가 조용히 꺼진다(폴백으로 돈다 — 앱은 안 멈춘다) |
-| 예산 상한 · 레이트리밋 없음 | 한도는 서버가 읽지만 프로세스 메모리라 재시작하면 0 이 된다 (§4-3) |
-| Vercel 배포 · SPA 리라이트 | 슬러그로 직접 들어오면 404 (§2-2) |
+| 익명 로그인 (선택) | 안 켜도 함수가 IP 로 레이트리밋을 센다. 켜면 세션 단위로 더 촘촘해진다 (§4-4) |
+| 커스텀 도메인 | 붙이면 `AI_ALLOWED_ORIGINS` 에 **그 도메인도** 넣어야 한다 |
+| 사용량을 보는 화면 | `ai_usage` 는 RLS 로 아무도 못 읽는다(service_role 만). 정산·모니터링이 필요해지면 최고관리자 정책을 연다 |
 
 **경계 덕을 봤다.** 화면은 `src/lib/repo/types.ts` 인터페이스만 알고, 어댑터가 뭔지는 `repo/index.ts` 한 줄만 안다. 이미지도 같은 구조다 (`owner/upload/index.ts`). 여기까지 온 작업의 대부분은 그 어댑터를 새로 쓴 일이다.
 
@@ -107,8 +111,18 @@ create policy "owner manages slots" on slots for all
 ### 1-3. 인증
 
 - Authentication → 이메일/비밀번호 켜기. 자동 가입은 **끈다** (슬롯은 파는 것이지 아무나 만드는 게 아니다).
-- 최고관리자 계정을 하나 만들고 `owners` 에 그 `user_id` 를 넣는다.
-- 주최자 계정은 슬롯을 팔 때 만들어 `slot_admins` 에 매핑한다.
+- **최고관리자는 SQL 로만 만든다** (부트스트랩). 편집기에 그 기능은 없다 — 최고관리자는
+  모든 슬롯을 만들고 지우는 권한이라 자주 늘 일이 아니고, UI 로 열었다가 계정 하나가 뚫리면
+  피해가 플랫폼 전체다. 방법:
+  1. 대시보드 Authentication → Users → **Add user** (Auto Confirm User 켜기)
+  2. SQL Editor 에서 `insert into public.owners (user_id) select id from auth.users where email = '그 이메일';`
+  - `supabase/seed.sql` 하단에 예시가 있다.
+- **주최자 계정은 편집기가 자동으로 만든다** — `/theme-editor/{slug}` 하단 ‘주최자 계정’ 패널에서
+  이메일·비밀번호를 넣으면 **계정 생성 + `slot_admins` 매핑을 한 번에** 한다. 대시보드를 열 일이 없다.
+  이건 Edge Function `admin` 이 한다 (§5) — 계정 생성은 service_role 키를 요구하는데 그 키는
+  브라우저에 못 두기 때문이다. 비밀번호 재발급·계정 삭제도 같은 패널에서 한다.
+  - 주최자가 **자기** 비밀번호를 바꾸는 건 함수를 안 거친다 (`/{slug}/admin` → 내 계정) —
+    자기 세션으로 자기 비번을 바꾸는 건 anon 키로 되고, service_role 은 남의 계정을 만질 때만 필요하다.
 
 ### 1-4. Storage — 슬롯 이미지 ✅
 
@@ -141,21 +155,25 @@ create policy "owner manages slots" on slots for all
 
 ## 2. Vercel — 배포
 
-### 2-1. 프로젝트
+### 2-1. 프로젝트 ✅
 
 - GitHub 레포 연결. Framework: **Vite**. 빌드 `npm run build`, 출력 `dist`.
-- 환경변수에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_AI_BASE`(Edge Function 주소) 추가. **`ANTHROPIC_API_KEY` 는 여기 넣지 않는다** — Supabase secret 으로만 산다.
+- 환경변수 3개: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_AI_BASE`. **`ANTHROPIC_API_KEY` 는 여기 넣지 않는다** — Supabase secret 으로만 산다.
+- **배포 도메인을 `AI_ALLOWED_ORIGINS` 에 넣어야 한다.** 안 넣으면 함수가 CORS 로 막아 AI 가 통째로 죽는다(앱은 안 멈추고 종합만 빠진다 — 그래서 조용히 지나칠 수 있다):
+  `npx supabase secrets set AI_ALLOWED_ORIGINS="https://내도메인,http://localhost:5174"`
 
 ### 2-2. SPA 라우팅 — 빠뜨리면 슬러그가 죽는다
 
 `/seventeen-dino` 로 **직접 들어오면**(QR 이 바로 그 주소다) Vercel 은 그런 파일이 없다고 404 를 준다. 리라이트를 걸어야 한다:
 
 ```json
-// vercel.json
+// vercel.json — 파일이 있으면 그게 먼저고, 없을 때만 index.html 로 간다
 {
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
 ```
+
+**같이 필요한 것: `base: '/'`** (vite.config.ts). 상대 경로(`'./'`)면 자산이 `./assets/…` 로 나가고, `/seventeen-dino` 로 **직접** 들어온 브라우저는 `/seventeen-dino/assets/…` 를 찾아 404 — **빈 화면**이 된다. 리라이트만 걸고 이걸 빠뜨리면 정확히 QR 경로만 죽는다.
 ### 2-3. 슬롯 편집기를 프로덕션에 열려면
 
 **✅ 열렸다.** 막고 있던 세 가지가 다 풀렸다:
@@ -242,6 +260,65 @@ Deno 에선 `npm:@anthropic-ai/sdk` 로 같은 SDK 를 쓴다. `cards.json` 은 
 
 - **3장 리딩**은 실시간 생성이라 미리 만들어둘 수 없다 → Supabase **익명 로그인**을 켜서 방문자에게도 JWT 를 준다. 그래야 레이트리밋·예산을 걸 주체가 생긴다.
 - **질문 타로는 그럴 필요가 없다** — 답변은 주최자가 미리 생성·검수해 DB 에 저장하고, 방문자는 읽기만 한다. 이미 그렇게 구현돼 있다.
+
+---
+
+## 5. Supabase Edge Function — 계정 함수 (`admin`)
+
+**주최자 계정을 만드는 유일한 자리** — `supabase/functions/admin/`. AI 함수와 같은 이유로 존재한다:
+계정 생성(`auth.admin.createUser`)은 **service_role 키를 요구하는데 그 키는 브라우저에 못 둔다**.
+anon 키로 되는 `signUp()` 은 대시보드에서 자동 가입을 켜야 하고, 그 순간 공개된 anon 키로
+누구나 계정을 만들 수 있게 된다 (§1-3 이 끈 걸 도로 켜는 셈). 그래서 키는 함수에만 산다.
+
+### 5-1. 배포
+
+```
+supabase functions deploy admin
+# secret 은 이미 있다 — SUPABASE_URL·SERVICE_ROLE_KEY·ANON_KEY 는 런타임이 자동 주입,
+# AI_ALLOWED_ORIGINS 는 ai 함수와 공유한다 (따로 두면 도메인 하나만 고치고 다른 쪽이 죽는다).
+```
+
+`config.toml` 에 `[functions.admin] verify_jwt = false` 를 둔다 — ai 와 같은 이유다.
+**필요한 건 "로그인했나"가 아니라 "최고관리자인가"** 이고, 그 판정은 함수 안의 `is_owner()`(RPC)가 한다.
+verify_jwt 를 켜면 게이트웨이가 CORS 헤더 없이 401 을 줘 브라우저엔 CORS 오류로 보인다.
+
+### 5-2. 엔드포인트 (전부 최고관리자만)
+
+| 경로 | 하는 일 |
+|---|---|
+| `GET  /admin/organizers?slug=` | 그 슬롯 주최자 목록 (이메일은 `auth.users` 라 service_role 로만 읽힌다) |
+| `POST /admin/organizers` | 계정 생성 + `slot_admins` 매핑 **한 번에** (매핑 실패 시 계정 롤백) |
+| `POST /admin/password` | 임시 비밀번호 **발급** (서버가 만들어 한 번만 보여준다 — 주최자가 받아서 바꾼다) |
+| `POST /admin/revoke` | 계정 삭제 (매핑만이 아니라 계정째 — 유령 계정을 안 남긴다) |
+
+비번 재발급·삭제는 대상이 **주최자인지(`slot_admins` 에 있는지) 먼저 본다** — 안 그러면 최고관리자가
+다른 최고관리자의 비번을 바꾸거나 계정을 지울 수 있다. 최고관리자 계정은 SQL 로만 다룬다.
+
+화면은 `repo.organizers` (`src/lib/repo/organizers.ts`) 만 안다. `ready()` 가 false 면
+(=Supabase 미설정) 편집기가 계정 패널을 **통째로 안 띄운다** — localStorage 로 계정을 흉내 내면
+"만들었다" 고 해놓고 아무도 로그인하지 못한다.
+
+---
+
+## 6. 슬롯 기간 — 대여가 끝나면 닫힌다 (`0005_slot_period.sql`)
+
+슬롯은 파는 물건이다. 이벤트가 끝났는데 링크가 열려 있으면 안 판 것과 같다. 그래서:
+
+- `slots.period` (jsonb) 에 **테스트·대여** 두 기간을 둔다. 둘 중 하나라도 오늘을 품으면 열린다.
+- **판정은 RLS 가 한다** — `anyone reads slots` 정책을 `is_owner() or slot_open(period)` 로 바꿨다.
+  프론트에서만 막으면 anon 키로 `/rest/v1/slots?slug=eq.종료슬롯` 을 그대로 부를 수 있다.
+- 대여가 끝나면 **주최자도 못 들어온다** (요구사항). 주최자가 미리 준비할 자리는 **테스트 기간**이다.
+- 날짜는 **KST 기준** (`today_kst()`) — UTC current_date 는 한국 자정~오전 9시에 어제를 가리켜
+  오픈런 방문자가 "아직 시작 안 함"을 본다. 화면도 같은 기준을 쓴다 (`data/slots.ts` 의 `todayKst`).
+- `slot_open`·`today_kst` 는 **anon·authenticated 에 EXECUTE 를 준다** — 정책이 호출자 롤로
+  평가되므로 뺏으면 슬롯이 아무에게도 안 열린다. AI 함수들과 반대다 (저건 service_role 전용).
+- 최고관리자 목록은 지난 슬롯을 **빨간 테두리 + "삭제해야 하는 슬롯" 안내**로 보여준다 (`SlotList`).
+
+**슬러그 변경 버그도 같이 고쳤다 (`0004_slug_rename.sql`):** 편집기가 슬러그를 바꿀 때
+새 행을 만들고 옛 행을 지웠는데, `questions`·`slot_admins` 가 `on delete cascade` 라
+**질문·계정이 통째로 날아갔다.** FK 에 `on update cascade` 를 더하고, 편집기·어댑터를
+"지우고 새로 만들기"에서 **"slug 를 update"** 로 바꿨다 (`repo.slots.save(slot, prevSlug)`).
+
 ---
 
 ## 순서
@@ -259,8 +336,13 @@ AI·화면·편집기는 **이미 다 됐다.** 남은 건 전부 "이 브라우
 3. ~~**Edge Function** + `VITE_AI_BASE`~~ **✅ 끝** — AI 가 배포에서도 산다. 개발 미들웨어는 지웠다 (구현은 하나).
    → 예산 상한·레이트리밋·권한을 **같이** 붙였다 (§4-3). `verify-ai` 47종이 전부 배포된 함수를 때린다.
    → 남은 건 `AI_ALLOWED_ORIGINS` 에 배포 도메인 추가 (지금은 localhost:5174 만).
-4. **Vercel** 배포 + `vercel.json` 리라이트 → 슬러그가 실제로 열린다
+4. ~~**Vercel** 배포 + `vercel.json` 리라이트~~ **✅ 끝** — https://tarot-btjp.vercel.app
+   → `node scripts/verify-prod.mjs <주소> <스크린샷>` 이 배포된 주소를 실제로 때린다 (리딩 1회 ≈5원).
 5. ~~`App.tsx` 의 슬롯 편집기 **DEV 가드 해제**~~ **✅ 끝** — 이제 "Supabase 가 설정된 빌드" 조건이다 (§2-3)
+6. **주최자 계정 자동화 + 슬롯 기간** — 편집기에서 계정을 발급하고, 대여가 끝나면 슬롯이 닫힌다.
+   → 마이그레이션 `0004_slug_rename.sql`·`0005_slot_period.sql` 을 SQL Editor 에서 돌린다.
+   → `supabase functions deploy admin` (§5-1). `AI_ALLOWED_ORIGINS` 에 배포 도메인이 있어야 한다.
+   → `verify-owner` 가 슬러그를 바꿔도 질문이 안 날아가는지, 종료된 슬롯이 익명 컨텍스트에서 막히는지 확인한다.
 
 1~3 이 끝나면 **localStorage 를 쓰는 데이터는 하나도 안 남는다.** 남는 건 기간 잠금(오늘의 카드를 그 기기에 고정하는 `src/lib/storage.ts`)뿐인데, 그건 방문자가 로그인을 안 하니 localStorage 가 맞는 자리다.
 
