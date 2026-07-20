@@ -28,6 +28,10 @@ for (const line of readFileSync('.env.local', 'utf8').split('\n')) {
   if (m) env[m[1]] = m[2]
 }
 const OWNER_PASSWORD = env.SEED_PASSWORD ?? 'tarot1234'
+const URL_ = env.VITE_SUPABASE_URL
+const ANON = env.VITE_SUPABASE_ANON_KEY
+/** 빈 테마로 슬롯을 만들면 applyTheme 이 죽어 화면이 하얗게 뜬다 — 씨앗에서 통째로 가져온다 */
+const SEED_THEME = JSON.parse(readFileSync('src/data/slots.json', 'utf8'))[0].theme
 const BASE = 'http://localhost:5174'
 const outDir = process.argv[2] ?? '.'
 
@@ -135,6 +139,76 @@ try {
   await wait(3500)
   const restored = await canvasOf()
   check('저장 안 했으므로 원래 색으로 돌아온다', restored === before, `${restored}`)
+
+  // ══ 럭키드로우 슬롯의 편집기 ═══════════════════
+  //
+  // **타로 전용 설정이 안 보여야 한다.** 남겨두면 최고관리자가 78장 앞면을 올리거나
+  // AI 플랜을 고르고 있게 되고, 안 쓰이는 값이 저장돼 나중에 "이 슬롯은 타로도 되나" 로 헷갈린다.
+  const auth = await fetch(`${URL_}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { apikey: ANON, 'content-type': 'application/json' },
+    body: JSON.stringify({ email: 'owner@example.com', password: OWNER_PASSWORD }),
+  })
+  const { access_token } = await auth.json()
+  const OWNER = {
+    apikey: ANON,
+    authorization: `Bearer ${access_token}`,
+    'content-type': 'application/json',
+  }
+  const LD = 'preview-ld-verify'
+  const dropLd = () =>
+    fetch(`${URL_}/rest/v1/slots?slug=eq.${LD}`, { method: 'DELETE', headers: OWNER })
+
+  await dropLd()
+  await fetch(`${URL_}/rest/v1/slots`, {
+    method: 'POST',
+    headers: { ...OWNER, prefer: 'return=minimal' },
+    body: JSON.stringify({
+      slug: LD,
+      name: '럭키드로우 편집기 검증',
+      service: 'luckydraw',
+      period: {},
+      theme: SEED_THEME,
+      event: {},
+    }),
+  })
+
+  try {
+    await page.goto(`${BASE}/theme-editor/${LD}`, { waitUntil: 'domcontentloaded' })
+    await wait(3500)
+
+    const body = await page.evaluate(() => document.body.innerText)
+    check('럭키드로우: 카드 앞면 설정이 없다', !body.includes('카드 앞면'))
+    check('럭키드로우: 카드 뒷면 설정이 없다', !body.includes('카드 뒷면'))
+    check('럭키드로우: 수정구슬 설정이 없다', !body.includes('수정구슬'))
+    check('럭키드로우: 플랜이 없다', !body.includes('플랜'))
+    check('럭키드로우: 이벤트 설정이 없다', !body.includes('이벤트 설정'))
+    check('럭키드로우: 전용 화면 설정이 있다', body.includes('럭키드로우 화면'))
+    check('럭키드로우: 미리보기가 아이패드 가로다', body.includes('아이패드 가로'))
+    check('럭키드로우: 상태 토글이 있다', body.includes('뽑기') && body.includes('전체 결과'))
+
+    // 공통 설정은 그대로 있어야 한다 (다 지워버리면 그것도 틀린 것이다)
+    check('럭키드로우: 색·기간 설정은 남아 있다', body.includes('배경 · 표면') && body.includes('기간'))
+
+    await page.screenshot({ path: join(outDir, 'preview-luckydraw-editor.png'), fullPage: true })
+
+    /** 당첨 탭 — 미리보기에서 진짜로 뽑을 순 없으니 가짜 결과가 떠야 한다 */
+    const clicked = await page.evaluate(() => {
+      const b = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === '당첨')
+      if (!b) return false
+      b.click()
+      return true
+    })
+    check('럭키드로우: 당첨 탭을 눌렀다', clicked)
+    await wait(2000)
+
+    const ldFrame = page.frames().find((f) => f !== page.mainFrame() && f.url().includes(`/${LD}`))
+    const shown = ldFrame ? await ldFrame.evaluate(() => document.body.innerText) : ''
+    check('럭키드로우: 미리보기에 당첨 결과가 뜬다', shown.includes('당첨 결과'), shown.slice(0, 60))
+    await page.screenshot({ path: join(outDir, 'preview-luckydraw-result.png') })
+  } finally {
+    await dropLd()
+  }
 } finally {
   await browser.close()
 }

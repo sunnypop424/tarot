@@ -27,7 +27,13 @@ import { exportSlots } from './slotsFile'
 import styles from './Owner.module.css'
 
 /** 색을 역할별로 묶어 보여준다 — 17개를 한 줄로 늘어놓으면 뭘 고치는지 모른다 */
-const COLOR_GROUPS: { title: string; keys: (keyof ThemeColors)[]; hint?: string }[] = [
+const COLOR_GROUPS: {
+  title: string
+  keys: (keyof ThemeColors)[]
+  hint?: string
+  /** 타로에서만 쓰이는 색 — 럭키드로우 슬롯에선 안 보인다 */
+  tarotOnly?: boolean
+}[] = [
   { title: '배경 · 표면', keys: ['canvas', 'surface', 'surfaceRaised', 'wash'] },
   {
     title: '인터랙션 (CTA · 활성)',
@@ -40,7 +46,8 @@ const COLOR_GROUPS: { title: string; keys: (keyof ThemeColors)[]; hint?: string 
     hint: '어두운 카드 위 장식 기준으로 고르세요. 표면 위 아이콘·글자에 쓰일 색은 표면 밝기에 맞춰 자동 계산돼요.',
   },
   { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'] },
-  { title: '카드 뒷면 (내장 SVG용)', keys: ['cardBackFrom', 'cardBackTo'] },
+  // 럭키드로우엔 카드가 없다 — 그 슬롯에선 이 그룹을 통째로 감춘다
+  { title: '카드 뒷면 (내장 SVG용)', keys: ['cardBackFrom', 'cardBackTo'], tarotOnly: true },
 ]
 
 // primarySoft·accentSoft 는 자동 파생이라 편집기에 노출하지 않는다 → Partial
@@ -252,6 +259,16 @@ export function SlotEditor() {
    */
   if (!draft) return <div className="owner" aria-busy="true" />
 
+  /**
+   * **타로 전용 설정은 럭키드로우 슬롯에서 아예 안 보인다.**
+   *
+   * 카드 앞면·뒷면·수정구슬·플랜(AI 한도)·카테고리별 뽑기 설정은 럭키드로우에 쓰이는 데가
+   * 하나도 없다. 남겨두면 최고관리자가 78장 앞면을 올리거나 AI 플랜을 고르고 있게 되고,
+   * 그건 시간 낭비로 끝나지 않는다 — **안 쓰이는 값이 저장돼 있으면 나중에 누가 그걸 보고
+   * "이 슬롯은 타로도 되나" 하고 헷갈린다.** 서비스가 정하는 건 화면만이 아니라 설정의 범위다.
+   */
+  const luckydraw = getSlotService(draft) === 'luckydraw'
+
   const patchColor = (key: keyof ThemeColors, value: string) =>
     patchSlot((prev) => ({
       theme: { ...prev.theme, colors: { ...prev.theme.colors, [key]: value } },
@@ -400,7 +417,8 @@ export function SlotEditor() {
           </div>
         </div>
 
-        <div className={styles.split}>
+        {/* 가로 미리보기는 좁은 칸에 넣으면 글자가 안 읽힌다 — 넓은 화면에선 칸을 키운다 */}
+        <div className={styles.split} data-wide-preview={luckydraw || undefined}>
           <div>
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">슬롯</h2>
@@ -451,8 +469,12 @@ export function SlotEditor() {
                       </option>
                     ))}
                   </select>
+                  {/* 서비스를 바꾸면 아래 설정 목록 자체가 갈린다 — 그 사실을 여기서 말해준다 */}
                   <span className="field__hint">
-                    이 슬롯이 파는 것. 아래 카드 · 이벤트 설정은 타로 서비스의 설정이에요.
+                    이 슬롯이 파는 것.{' '}
+                    {luckydraw
+                      ? '아래 설정은 럭키드로우용이에요 (카드·AI 관련 항목은 안 나와요).'
+                      : '아래 카드 · 뽑기 관련 항목은 타로 서비스의 설정이에요.'}
                   </span>
                 </div>
               </div>
@@ -557,7 +579,7 @@ export function SlotEditor() {
               </div>
             </section>
 
-            {COLOR_GROUPS.map(({ title, keys, hint }) => (
+            {COLOR_GROUPS.filter((g) => !(luckydraw && g.tarotOnly)).map(({ title, keys, hint }) => (
               <section key={title} className="admin-section">
                 <h2 className="t-title-s admin-section__title">{title}</h2>
                 {hint && (
@@ -711,25 +733,31 @@ export function SlotEditor() {
                     onChange={(e) => patchAsset('backgroundPatternRepeat', e.target.value)}
                   />
                 </div>
-                <ImageField
-                  slug={saved.slug}
-                  label="카드 뒷면"
-                  name="card-back"
-                  value={draft.theme.assets.cardBack}
-                  onChange={(v) => patchAsset('cardBack', v)}
-                  hint="없으면 내장 SVG 뒷면을 써요."
-                />
-                <ImageField
-                  slug={saved.slug}
-                  label="수정구슬 (AI 리딩 로더)"
-                  name="crystal-ball"
-                  value={draft.theme.assets.crystalBall}
-                  onChange={(v) => patchAsset('crystalBall', v)}
-                  hint="3장 리딩을 만드는 동안 뜨는 구슬이에요. 없으면 내장 SVG 구슬을 써요."
-                />
+                {/* 카드도 AI 리딩도 럭키드로우엔 없다 — 로고·배경 패턴만 남긴다 */}
+                {!luckydraw && (
+                  <>
+                    <ImageField
+                      slug={saved.slug}
+                      label="카드 뒷면"
+                      name="card-back"
+                      value={draft.theme.assets.cardBack}
+                      onChange={(v) => patchAsset('cardBack', v)}
+                      hint="없으면 내장 SVG 뒷면을 써요."
+                    />
+                    <ImageField
+                      slug={saved.slug}
+                      label="수정구슬 (AI 리딩 로더)"
+                      name="crystal-ball"
+                      value={draft.theme.assets.crystalBall}
+                      onChange={(v) => patchAsset('crystalBall', v)}
+                      hint="3장 리딩을 만드는 동안 뜨는 구슬이에요. 없으면 내장 SVG 구슬을 써요."
+                    />
+                  </>
+                )}
               </div>
             </section>
 
+            {!luckydraw && (
             <section className="admin-section">
               <div className="admin-section__title">
                 <h2 className="t-title-s">카드 앞면</h2>
@@ -762,7 +790,10 @@ export function SlotEditor() {
                 onVersionChange={(v) => patchAsset('cardFrontVersion', v)}
               />
             </section>
+            )}
 
+            {/* 플랜은 AI 한도다 — 럭키드로우는 AI 를 안 쓴다 */}
+            {!luckydraw && (
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">플랜</h2>
               <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
@@ -860,13 +891,14 @@ export function SlotEditor() {
                 </li>
               </ul>
             </section>
+            )}
 
             {/**
              * 럭키드로우 겉모습 — **주최자는 못 건드린다** (테마의 일부다).
              * 옮겨온 원본은 이 값들이 코드에 박혀 있어 행사마다 고칠 수가 없었다:
              * 1·2등만 스크래치, 커버는 ♥, 배지는 50개 이하. 상품 구성은 행사마다 다르다.
              */}
-            {getSlotService(draft) === 'luckydraw' && (
+            {luckydraw && (
               <section className="admin-section">
                 <h2 className="t-title-s admin-section__title">럭키드로우 화면</h2>
                 <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
@@ -1002,6 +1034,8 @@ export function SlotEditor() {
               <OrganizerPanel slot={saved} slugPending={draft.slug !== saved.slug} />
             )}
 
+            {/* 카테고리별 뽑기 설정 — 럭키드로우엔 카테고리도 카드도 없다 */}
+            {!luckydraw && (
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">이벤트 설정</h2>
               <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
@@ -1041,6 +1075,7 @@ export function SlotEditor() {
                 })}
               </div>
             </section>
+            )}
 
             {/* 저장은 편집이 다 끝나는 자리에 — 위에 있으면 뭘 저장하는지 안 보인다 */}
             <div className={styles.saveBar} data-save-bar>

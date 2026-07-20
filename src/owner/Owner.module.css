@@ -412,3 +412,13 @@
     top: var(--space-lg);
   }
 }
+
+/**
+ * 럭키드로우는 미리보기가 **가로 1180px** 라 420px 칸에 넣으면 0.35배로 줄어 글자가 안 읽힌다.
+ * 화면이 넓을 때만 미리보기 칸을 키운다 — 설정 칸도 아직 충분히 넓다.
+ */
+@media (min-width: 1500px) {
+  .split[data-wide-preview] {
+    grid-template-columns: minmax(0, 1fr) 680px;
+  }
+}
