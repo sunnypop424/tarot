@@ -209,7 +209,7 @@ try {
       check(`럭키드로우: '${gone}' 입력이 없다`, !body.includes(gone))
     }
     // 카드 안에 색·크기·문구가 **같이** 들어 있어야 묶은 의미가 있다
-    for (const kept of ['본문 폰트', '배경 이미지', '상단 여백', '커버 문자', '남은 수량 배지']) {
+    for (const kept of ['본문 폰트', '배경 이미지', '상단 여백', '커버 문자', '남은 수량 배지', '둥글기']) {
       check(`럭키드로우: '${kept}' 칸이 있다`, body.includes(kept))
     }
     check('럭키드로우: 미리보기가 아이패드 가로다', body.includes('아이패드 가로'))
@@ -265,6 +265,25 @@ try {
     const ldFrame = page.frames().find((f) => f !== page.mainFrame() && f.url().includes(`/${LD}`))
     const shown = ldFrame ? await ldFrame.evaluate(() => document.body.innerText) : ''
     check('럭키드로우: 미리보기에 당첨 결과가 뜬다', shown.includes('당첨 결과'), shown.slice(0, 60))
+
+    /**
+     * **폰트가 미리보기에 실제로 먹는가.**
+     * `--ld-font` 를 자식(.stage)에 정의하고 font-family 는 부모(.app)에서 읽고 있었다 —
+     * CSS 변수는 아래로만 상속되므로 폰트가 영영 안 먹었는데, 설정이 저장은 되니 아무도 몰랐다.
+     */
+    const look = ldFrame
+      ? await ldFrame.evaluate(() => {
+          const box = document.querySelector('[data-part="box"]')
+          const link = document.querySelector('[data-part="adminLink"]')
+          return {
+            font: box ? getComputedStyle(box).fontFamily : '',
+            adminLink: link ? getComputedStyle(link).color : '(없음)',
+          }
+        })
+      : { font: '', adminLink: '' }
+    check('럭키드로우: 미리보기에 슬롯 폰트가 먹는다', /Paperlogy|Pretendard|Noto/.test(look.font), look.font)
+    // 색을 고르는 칸이 편집기에 있는데 화면에 안 보이면 무슨 색인지 확인할 수가 없다
+    check('럭키드로우: 미리보기에 관리자 링크가 보인다', look.adminLink.startsWith('rgb'), look.adminLink)
     await page.screenshot({ path: join(outDir, 'preview-luckydraw-result.png') })
   } finally {
     await dropLd()

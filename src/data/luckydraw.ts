@@ -73,9 +73,16 @@ export const WEBFONTS = {
     href: 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css',
   },
   paperlogy: {
-    label: 'Paperlogy (또렷함)',
+    label: 'Paperlogy (또렷함 · 기본)',
     stack: "'Paperlogy', 'Pretendard', sans-serif",
-    href: 'https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-4Regular.woff2',
+    /**
+     * **굵기별로 파일이 따로다.** 하나만 받으면 버튼·제목이 브라우저가 만든 가짜 볼드로
+     * 나와 획이 뭉갠다 — 부스 태블릿은 멀리서 보는 화면이라 그게 그대로 티가 난다.
+     */
+    faces: [
+      { href: 'https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-4Regular.woff2', weight: 400 },
+      { href: 'https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-8ExtraBold.woff2', weight: 800 },
+    ],
   },
   noto: {
     label: 'Noto Sans KR (무난함)',
@@ -198,8 +205,14 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   // 원본 빌더의 기본값 그대로 (160px / 2rem)
   boxTopMargin: 160,
   boxPadding: 32,
-  adminLinkColor: 'rgba(255, 255, 255, 0.3)',
-  fontFamily: 'pretendard',
+  /**
+   * 원본은 흰색 30% 였다. 그건 **배경이 어두운 사진**일 때 맞는 값이고, 럭키드로우 기본이
+   * 라이트라 그대로 두면 밝은 바탕에 흰 글자가 되어 **아무것도 안 보인다** — 색을 고르라고
+   * 만든 칸인데 무슨 색인지 확인할 수가 없다. 어두운 사진을 깔면 흰색으로 바꾸면 된다.
+   */
+  adminLinkColor: 'rgba(0, 0, 0, 0.45)',
+  // 원본 빌더의 기본이자 추천값이었다 — 획이 또렷해 부스 태블릿에서 멀리서도 읽힌다
+  fontFamily: 'paperlogy',
 }
 
 /**

@@ -146,7 +146,13 @@ export function ResultReveal({
               className={styles.resultItem}
               style={{ ['--i' as string]: i }}
               data-high={high || undefined}
-              data-open={open || undefined}
+              /**
+               * **긁는 동안에도 열린 색이다.** `open` 만 보면 커버가 다 벗겨진 뒤에야 색이
+               * 바뀌어서, 긁는 0.7초 동안 기본 타일 색이 드러났다가 뒤늦게 당첨 색으로
+               * 튄다 — 긁어서 드러나는 게 아니라 나중에 칠해지는 것처럼 보인다.
+               * 커버가 움직이기 시작할 때 **이미 그 색이어야** 드러나는 연출이 된다.
+               */
+              data-open={open || busy || undefined}
             >
               <span className={styles.resultLabel}>{label(p)}</span>
 

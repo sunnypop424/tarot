@@ -8,11 +8,17 @@
 .app {
   display: flex;
   flex-direction: column;
-  /* 슬롯이 고른 폰트 — 안 고르면 앱 기본 */
-  font-family: var(--ld-font, inherit);
 }
 
 .stage {
+  /**
+   * 슬롯이 고른 폰트.
+   *
+   * **`--ld-font` 를 정의한 바로 그 요소에서 읽어야 한다.** 전에는 변수를 여기(.stage)에
+   * 넣고 font-family 는 부모(.app)에서 읽었는데, CSS 변수는 아래로만 상속되므로
+   * 부모에겐 보이지 않아 폰트가 영영 안 먹었다.
+   */
+  font-family: var(--ld-font, inherit);
   flex: 1;
   display: flex;
   flex-direction: column;

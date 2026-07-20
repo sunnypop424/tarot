@@ -72,12 +72,19 @@ export default function LuckydrawApp() {
     const id = `ld-font-${display.fontFamily}`
     if (document.getElementById(id)) return
 
-    const el = font.href.endsWith('.woff2')
-      ? Object.assign(document.createElement('style'), {
-          id,
-          textContent: `@font-face{font-family:'Paperlogy';src:url('${font.href}') format('woff2');font-display:swap}`,
-        })
-      : Object.assign(document.createElement('link'), { id, rel: 'stylesheet', href: font.href })
+    // woff2 를 직접 주는 폰트는 @font-face 를 굵기별로 만든다 (CSS 를 주는 폰트는 link 하나)
+    const el =
+      'faces' in font
+        ? Object.assign(document.createElement('style'), {
+            id,
+            textContent: font.faces
+              .map(
+                (f) =>
+                  `@font-face{font-family:'Paperlogy';src:url('${f.href}') format('woff2');font-weight:${f.weight};font-display:swap}`
+              )
+              .join(''),
+          })
+        : Object.assign(document.createElement('link'), { id, rel: 'stylesheet', href: font.href })
 
     document.head.appendChild(el)
   }, [display.fontFamily])
@@ -281,10 +288,21 @@ export default function LuckydrawApp() {
          * 손님 눈엔 안 띄고 스태프는 어디 있는지 안다 — 박스 안에 크게 두면
          * 추첨 화면의 주인공이 로그인 버튼이 돼 버린다.
          */}
-        {authStatus !== 'in' && !previewing && (
-          <Link to={`/${slot.slug}/admin`} className={styles.adminLink}>
-            {authStatus === 'checking' ? '확인 중…' : '스태프 로그인'}
-          </Link>
+        {/**
+         * 미리보기에서도 **보여야 한다** — 이 링크의 색을 고르는 칸이 편집기에 있는데
+         * 정작 화면에 안 나오면 무슨 색인지 확인할 수가 없다.
+         * 다만 링크로 두면 미리보기 iframe 이 관리자 화면으로 넘어가 버리므로 글자만 그린다.
+         */}
+        {previewing ? (
+          <span className={styles.adminLink} data-part="adminLink">
+            스태프 로그인
+          </span>
+        ) : (
+          authStatus !== 'in' && (
+            <Link to={`/${slot.slug}/admin`} className={styles.adminLink}>
+              {authStatus === 'checking' ? '확인 중…' : '스태프 로그인'}
+            </Link>
+          )
         )}
       </main>
     </div>

@@ -82,6 +82,58 @@ function AlphaColor({
 }
 
 /**
+ * "1, 2" 처럼 **여러 값을 한 칸에** 적는 입력.
+ *
+ * 값을 곧바로 파싱해 되돌리면 **쉼표를 칠 수가 없다**: "1," 을 치는 순간 파싱이 `[1]` 로
+ * 만들고 화면이 "1" 로 되돌아가 방금 친 쉼표가 지워진다. 그래서 **치는 동안은 적은 그대로**
+ * 두고(로컬 문자열), 부모에는 파싱한 값을 함께 보낸다.
+ *
+ * 밖에서 값이 바뀌면(다른 슬롯으로 이동) 그때만 문자열을 다시 맞춘다 —
+ * 매번 맞추면 결국 같은 문제로 돌아온다.
+ */
+function RankListField({
+  label,
+  value,
+  hint,
+  onChange,
+}: {
+  label: string
+  value: number[]
+  hint?: string
+  onChange: (v: number[]) => void
+}) {
+  const joined = value.join(', ')
+  const [text, setText] = useState(joined)
+  const [lastSynced, setLastSynced] = useState(joined)
+
+  if (joined !== lastSynced) {
+    setLastSynced(joined)
+    setText(joined)
+  }
+
+  return (
+    <div className="field">
+      <span className="field__label">{label}</span>
+      <input
+        className="input"
+        value={text}
+        inputMode="numeric"
+        onChange={(e) => {
+          setText(e.target.value)
+          onChange(
+            e.target.value
+              .split(',')
+              .map((s) => Number(s.trim()))
+              .filter((n) => Number.isFinite(n) && n > 0)
+          )
+        }}
+      />
+      {hint && <span className="field__hint">{hint}</span>}
+    </div>
+  )
+}
+
+/**
  * 카드 안에 색과 **같이 오는** 칸들 — 형태·여백·문구.
  *
  * 색만 카드로 묶고 나머지를 딴 데 두면 묶은 의미가 없다: "박스를 손본다" 는 배경색과
@@ -148,18 +200,12 @@ function LuckydrawExtra({
       return (
         <>
           {text('커버 문자', d.coverMark, (v) => patchLd({ coverMark: v }), '긁기 전 덮인 자리에 찍혀요')}
-          {text(
-            '긁는 등수',
-            d.highlightRanks.join(', '),
-            (v) =>
-              patchLd({
-                highlightRanks: v
-                  .split(',')
-                  .map((s) => Number(s.trim()))
-                  .filter((n) => Number.isFinite(n) && n > 0),
-              }),
-            '예: 1, 2 — 비우면 전부 바로 보여요'
-          )}
+          <RankListField
+            label="긁는 등수"
+            value={d.highlightRanks}
+            hint="예: 1, 2 — 비우면 전부 바로 보여요"
+            onChange={(v) => patchLd({ highlightRanks: v })}
+          />
         </>
       )
     case 'font':
