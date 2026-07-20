@@ -194,6 +194,8 @@ export function SlotEditor() {
    */
   const previewBox = useRef<HTMLDivElement>(null)
   const [previewScale, setPreviewScale] = useState(1)
+  /** '크게' — 미리보기를 위로 올리고 전체 폭을 준다 (아이패드 가로는 좁은 칸에선 못 읽는다) */
+  const [previewBig, setPreviewBig] = useState(false)
 
   useEffect(() => {
     const el = previewBox.current
@@ -418,7 +420,11 @@ export function SlotEditor() {
         </div>
 
         {/* 가로 미리보기는 좁은 칸에 넣으면 글자가 안 읽힌다 — 넓은 화면에선 칸을 키운다 */}
-        <div className={styles.split} data-wide-preview={luckydraw || undefined}>
+        <div
+          className={styles.split}
+          data-wide-preview={luckydraw || undefined}
+          data-preview-big={previewBig || undefined}
+        >
           <div>
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">슬롯</h2>
@@ -1140,10 +1146,20 @@ export function SlotEditor() {
             <section className="admin-section">
               <div className={styles.previewHead}>
                 <h2 className="t-title-s">미리보기</h2>
-                <span className="t-text-xs t-muted">
-                  {previewDevice.label}
-                  {dirty && ' · 저장 전 초안이에요'}
-                </span>
+                <div className={styles.previewMeta}>
+                  <span className="t-text-xs t-muted">
+                    {previewDevice.label}
+                    {previewScale < 0.95 && ` · ${Math.round(previewScale * 100)}%`}
+                    {dirty && ' · 저장 전 초안'}
+                  </span>
+                  <button
+                    type="button"
+                    className="btn btn--sm btn--ghost"
+                    onClick={() => setPreviewBig((v) => !v)}
+                  >
+                    {previewBig ? '작게' : '크게'}
+                  </button>
+                </div>
               </div>
 
               {/**

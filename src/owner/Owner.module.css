@@ -353,10 +353,17 @@
 
 .previewHead {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
   margin-bottom: var(--space-base);
+  flex-wrap: wrap;
+}
+
+.previewMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
 /* 럭키드로우는 화면이 하나뿐이라 상태를 골라 본다 (미리보기에선 진짜로 못 뽑는다) */
@@ -415,10 +422,41 @@
 
 /**
  * 럭키드로우는 미리보기가 **가로 1180px** 라 420px 칸에 넣으면 0.35배로 줄어 글자가 안 읽힌다.
- * 화면이 넓을 때만 미리보기 칸을 키운다 — 설정 칸도 아직 충분히 넓다.
+ * 화면이 넓을 때 칸을 키우고, 그래도 작으면 아래 '크게' 로 전체 폭을 쓴다.
  */
-@media (min-width: 1500px) {
+@media (min-width: 1400px) {
   .split[data-wide-preview] {
-    grid-template-columns: minmax(0, 1fr) 680px;
+    grid-template-columns: minmax(0, 1fr) 620px;
   }
+}
+
+@media (min-width: 1700px) {
+  .split[data-wide-preview] {
+    grid-template-columns: minmax(0, 1fr) 820px;
+  }
+}
+
+/**
+ * '크게' — 미리보기를 **위로 올리고 전체 폭**을 준다. 그래야 축소 없이(1배) 보인다.
+ * 아래로 내리지 않는 이유: 색을 바꾸면서 봐야 하는데 화면 밖에 있으면 볼 수가 없다.
+ */
+.split[data-preview-big] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.split[data-preview-big] .previewCol {
+  order: -1;
+  position: static;
+  /* 대비 검사가 위에 있으면 미리보기가 화면 밖으로 밀린다 — 크게 볼 땐 미리보기가 먼저다 */
+  display: flex;
+  flex-direction: column;
+}
+
+.split[data-preview-big] .previewCol > :last-child {
+  order: -1;
+}
+
+/* 전체 폭보다 기기가 좁으면 가운데로 — 왼쪽에 붙어 있으면 잘린 것처럼 보인다 */
+.split[data-preview-big] .previewStage {
+  justify-content: center;
 }

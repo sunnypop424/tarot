@@ -78,10 +78,9 @@ export default function LuckydrawApp() {
     void load()
   }, [load])
 
-  const remaining = (prizes ?? []).reduce((sum, p) => sum + p.remaining, 0)
-  const soldOut = prizes !== null && remaining === 0
+  const realRemaining = (prizes ?? []).reduce((sum, p) => sum + p.remaining, 0)
+  const soldOut = prizes !== null && realRemaining === 0
   const closed = settings?.closed === true
-  const unavailable = soldOut || closed
 
   async function draw() {
     if (drawing) return
@@ -115,6 +114,17 @@ export default function LuckydrawApp() {
     preview && preview.state !== 'draw'
       ? { result: sampleResult(display), summary: preview.state === 'summary' }
       : null
+
+  /**
+   * 미리보기에선 **재고·마감 상태를 무시하고 뽑기 화면을 보여준다.**
+   *
+   * 상품을 아직 안 넣은 새 슬롯은 재고가 0 이라 "마감되었습니다" 가 뜬다. 색을 고르려고
+   * 편집기를 연 최고관리자에게 그 화면은 아무 쓸모가 없고, 마감 문구를 보려면 토글로
+   * 볼 수 있어야 할 것을 상태 때문에 강제로 보게 된다.
+   * 재고 배지도 그럴듯한 수를 써서 실제 화면과 같은 배치를 보여준다.
+   */
+  const unavailable = previewing ? false : soldOut || closed
+  const remaining = previewing && realRemaining === 0 ? 120 : realRemaining
 
   if (prizes === null && !previewing) return <div className="app" aria-busy="true" />
 
