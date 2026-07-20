@@ -1,13 +1,15 @@
 /**
  * 럭키드로우 — 화면이 하나뿐이라 탭바도 헤더도 없다.
  *
- * 배치는 옮겨온 원본을 그대로 따른다. **가운데 정렬이 아니라 위에서 내려 앉힌다**:
- * 배경이 보통 아이돌 사진이고 얼굴이 화면 위쪽에 오는 경우가 많아서, 가운데 두면 얼굴을 덮는다.
- * 얼마나 내릴지는 사진마다 다르므로 슬롯 설정(`boxTopMargin`)이 정한다.
+ * 배치는 옮겨온 원본을 그대로 따른다: **세로 가운데 정렬을 하고, 그 위에 상단 여백을 더한다.**
+ * 가운데에서 얼마나 더 내릴지를 `boxTopMargin` 이 정하는 것이지 상단 정렬이 아니다 —
+ * 배경 사진마다 얼굴이 오는 높이가 달라서 그만큼 밀어내야 한다.
  */
 .app {
   display: flex;
   flex-direction: column;
+  /* 슬롯이 고른 폰트 — 안 고르면 앱 기본 */
+  font-family: var(--ld-font, inherit);
 }
 
 .stage {
@@ -15,6 +17,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* 원본과 같이 **세로 가운데** — 여기에 박스의 margin-top 이 더해진다 */
+  justify-content: center;
   gap: var(--space-base);
   padding: var(--space-lg) var(--space-base);
   /* 사진 배경이 화면을 다 덮어야 한다 — 박스는 그 위에 뜬다 */
@@ -51,12 +55,12 @@
   font-size: var(--text-xs);
   font-weight: 500;
   text-decoration: none;
-  color: var(--color-fg3);
-  opacity: 0.6;
+  /* 슬롯이 정한다 — 사진 배경마다 눈에 띄는 정도가 다르다 (기본은 흐린 본문색) */
+  color: var(--ld-admin-link, var(--color-fg-3));
 }
 
 .adminLink:hover {
-  opacity: 1;
+  opacity: 0.8;
 }
 
 .rehearsal,
@@ -183,13 +187,11 @@
   animation-delay: calc(var(--i) * 0.5s);
 }
 
-/* 비싼 등수는 열리고 나면 색이 바뀐다.
-   테두리에 accent(장식용 포인트 색)를 얹고, 채움은 primary 를 쓴다 —
-   primary 만 글자색 짝(--color-on-primary)이 보장돼 있어 대비가 깨지지 않는다 */
+/* 비싼 등수는 열리고 나면 색이 바뀐다 — 최고관리자가 고른 당첨 색 한 쌍 */
 .resultItem[data-high][data-open] {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  border-color: var(--color-accent);
+  background: var(--color-high);
+  color: var(--color-on-high);
+  border-color: var(--color-high);
   box-shadow: var(--shadow-glow);
 }
 

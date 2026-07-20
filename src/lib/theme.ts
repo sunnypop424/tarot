@@ -22,6 +22,9 @@ const COLOR_VARS: Partial<Record<keyof ThemeColors, string>> = {
   border: '--color-border',
   borderHover: '--color-border-hover',
   onPrimary: '--color-on-primary',
+  // 럭키드로우 당첨 강조 — 넓은 면을 채우고 글자를 얹으므로 짝으로 간다
+  high: '--color-high',
+  onHigh: '--color-on-high',
   cardBackFrom: '--card-back-from',
   cardBackTo: '--card-back-to',
 }

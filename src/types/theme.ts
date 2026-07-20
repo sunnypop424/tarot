@@ -24,6 +24,16 @@ export interface ThemeColors {
   accent: string
   accentSoft: string
 
+  /**
+   * 당첨 강조 — 럭키드로우에서 **비싼 등수를 긁었을 때** 채워지는 색과 그 위 글자색.
+   *
+   * `accent` 로 대신하지 않는 이유: accent 는 테두리·아이콘용이라 글자색 짝이 없다.
+   * 여기는 넓은 면을 채우고 그 위에 상품명을 얹으므로 짝이 있어야 대비가 보장된다.
+   * (옮겨온 원본의 `highBgColor` / `highTextColor` 자리다.)
+   */
+  high: string
+  onHigh: string
+
   fg1: string
   fg2: string
   fg3: string

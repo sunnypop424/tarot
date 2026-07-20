@@ -22,7 +22,8 @@ import { PeriodFields } from './PeriodFields'
 import { periodLabel, rangeInvalid } from './period'
 import { validateSlug } from './slug'
 import { onPreviewReady, postPreview, type PreviewState } from '@/slot/preview'
-import { DEFAULT_DISPLAY, luckydrawDisplay } from '@/data/luckydraw'
+import { DEFAULT_DISPLAY, WEBFONTS, luckydrawDisplay, type FontId } from '@/data/luckydraw'
+import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 import { exportSlots } from './slotsFile'
 import styles from './Owner.module.css'
 
@@ -33,6 +34,8 @@ const COLOR_GROUPS: {
   hint?: string
   /** 타로에서만 쓰이는 색 — 럭키드로우 슬롯에선 안 보인다 */
   tarotOnly?: boolean
+  /** 럭키드로우에서만 쓰이는 색 — 타로 슬롯에선 안 보인다 */
+  luckydrawOnly?: boolean
 }[] = [
   { title: '배경 · 표면', keys: ['canvas', 'surface', 'surfaceRaised', 'wash'] },
   {
@@ -48,6 +51,12 @@ const COLOR_GROUPS: {
   { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'] },
   // 럭키드로우엔 카드가 없다 — 그 슬롯에선 이 그룹을 통째로 감춘다
   { title: '카드 뒷면 (내장 SVG용)', keys: ['cardBackFrom', 'cardBackTo'], tarotOnly: true },
+  {
+    title: '당첨 강조',
+    keys: ['high', 'onHigh'],
+    hint: '비싼 등수를 긁었을 때 채워지는 색이에요.',
+    luckydrawOnly: true,
+  },
 ]
 
 // primarySoft·accentSoft 는 자동 파생이라 편집기에 노출하지 않는다 → Partial
@@ -59,6 +68,8 @@ const COLOR_LABELS: Partial<Record<keyof ThemeColors, string>> = {
   primary: '주요 CTA',
   primaryHover: 'CTA hover',
   onPrimary: 'CTA 글자',
+  high: '당첨 배경',
+  onHigh: '당첨 글자',
   accent: '포인트',
   fg1: '기본 텍스트',
   fg2: '보조 텍스트',
@@ -611,7 +622,9 @@ export function SlotEditor() {
               </div>
             </section>
 
-            {COLOR_GROUPS.filter((g) => !(luckydraw && g.tarotOnly)).map(({ title, keys, hint }) => (
+            {COLOR_GROUPS.filter((g) =>
+              luckydraw ? !g.tarotOnly : !g.luckydrawOnly
+            ).map(({ title, keys, hint }) => (
               <section key={title} className="admin-section">
                 <h2 className="t-title-s admin-section__title">{title}</h2>
                 {hint && (
@@ -969,8 +982,81 @@ export function SlotEditor() {
                   const patchLd = (change: Partial<typeof d>) =>
                     patchSlot((prev) => ({ luckydraw: { ...luckydrawDisplay(prev), ...change } }))
 
+                  /** hex 고르개 + 투명도 슬라이더 → rgba 한 값 (원본 빌더와 같은 짝) */
+                  const AlphaColor = ({
+                    label,
+                    value,
+                    hint,
+                    onChange,
+                  }: {
+                    label: string
+                    value: string
+                    hint?: string
+                    onChange: (v: string) => void
+                  }) => (
+                    <div className="field">
+                      <span className="field__label">{label}</span>
+                      <div className="color-field">
+                        <input
+                          type="color"
+                          value={hexOf(value)}
+                          aria-label={`${label} 고르기`}
+                          onChange={(e) => onChange(withAlphaValue(e.target.value, alphaOf(value)))}
+                        />
+                        <input
+                          type="range"
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          value={alphaOf(value)}
+                          aria-label={`${label} 투명도`}
+                          onChange={(e) =>
+                            onChange(withAlphaValue(hexOf(value), Number(e.target.value)))
+                          }
+                        />
+                      </div>
+                      <span className="field__hint">
+                        {hint ? `${hint} · ` : ''}
+                        불투명도 {Math.round(alphaOf(value) * 100)}%
+                      </span>
+                    </div>
+                  )
+
                   return (
                     <div className={styles.fieldGrid}>
+                      <div className="field">
+                        <span className="field__label">본문 폰트</span>
+                        <select
+                          className="select"
+                          value={d.fontFamily}
+                          onChange={(e) => patchLd({ fontFamily: e.target.value as FontId })}
+                        >
+                          {Object.entries(WEBFONTS).map(([id, f]) => (
+                            <option key={id} value={id}>
+                              {f.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/**
+                       * 박스 배경은 **투명도가 핵심**이다 — 사진이 비쳐야 원본의 인상이 난다.
+                       * 그래서 테마 색(hex)이 아니라 여기서 rgba 로 덮어쓴다.
+                       */}
+                      <AlphaColor
+                        label="박스 배경색"
+                        value={draft.theme.colors.surface}
+                        hint="사진이 비칠수록 낮게"
+                        onChange={(v) => patchColor('surface', v)}
+                      />
+
+                      <AlphaColor
+                        label="관리자 링크 색"
+                        value={d.adminLinkColor}
+                        hint="손님 눈엔 안 띄고 스태프는 찾을 정도로"
+                        onChange={(v) => patchLd({ adminLinkColor: v })}
+                      />
+
                       <label className="field">
                         <span className="field__label">긁어서 여는 등수</span>
                         <input

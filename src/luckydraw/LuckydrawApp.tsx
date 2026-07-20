@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Minus, Plus } from 'lucide-react'
 
-import { luckydrawDisplay, type LuckydrawDisplay } from '@/data/luckydraw'
+import { luckydrawDisplay, WEBFONTS, type LuckydrawDisplay } from '@/data/luckydraw'
 import { repo } from '@/lib/repo'
 import type { DrawResult, LuckydrawSettings, Prize } from '@/lib/repo'
 import { useAdminAuth } from '@/admin/useAdminAuth'
@@ -58,6 +58,29 @@ export default function LuckydrawApp() {
   const [drawing, setDrawing] = useState(false)
   const [result, setResult] = useState<DrawResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  /**
+   * 고른 웹폰트를 **그때 받는다.**
+   *
+   * index.html 에 세 개를 다 넣어두면 안 쓰는 폰트까지 모든 방문자가 받는다 —
+   * 카페 대기줄에서 그만큼 더 기다린다. 슬롯이 고른 하나만 붙인다.
+   * Paperlogy 는 CSS 가 아니라 woff2 라 @font-face 를 직접 만든다.
+   */
+  useEffect(() => {
+    const font = WEBFONTS[display.fontFamily]
+    if (!font) return
+    const id = `ld-font-${display.fontFamily}`
+    if (document.getElementById(id)) return
+
+    const el = font.href.endsWith('.woff2')
+      ? Object.assign(document.createElement('style'), {
+          id,
+          textContent: `@font-face{font-family:'Paperlogy';src:url('${font.href}') format('woff2');font-display:swap}`,
+        })
+      : Object.assign(document.createElement('link'), { id, rel: 'stylesheet', href: font.href })
+
+    document.head.appendChild(el)
+  }, [display.fontFamily])
 
   const load = useCallback(async () => {
     try {
@@ -137,6 +160,8 @@ export default function LuckydrawApp() {
           {
             '--ld-box-top': `${display.boxTopMargin}px`,
             '--ld-box-padding': `${display.boxPadding}px`,
+            '--ld-admin-link': display.adminLinkColor,
+            '--ld-font': WEBFONTS[display.fontFamily]?.stack,
           } as React.CSSProperties
         }
       >

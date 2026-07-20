@@ -16,9 +16,15 @@
     "borderHover": "#3A3B57",
     "onPrimary": "#FFFFFF",
     "cardBackFrom": "#1E1F3E",
-    "cardBackTo": "#101127"
+    "cardBackTo": "#101127",
+    "high": "#D4AF37",
+    "onHigh": "#FFFFFF"
   },
-  "shape": { "radiusSm": 4, "radiusMd": 8, "radiusLg": 16 },
+  "shape": {
+    "radiusSm": 4,
+    "radiusMd": 8,
+    "radiusLg": 16
+  },
   "assets": {
     "logo": null,
     "logoAlt": "",

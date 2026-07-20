@@ -43,7 +43,48 @@ export interface LuckydrawDisplay {
   boxTopMargin: number
   /** 박스 안쪽 여백 (px) — 원본의 `boxPadding` */
   boxPadding: number
+
+  /**
+   * 박스 아래 '스태프 로그인' 링크 색 — 투명도가 붙은 rgba 를 그대로 받는다.
+   *
+   * 색 하나를 따로 두는 이유: 이 링크는 **손님 눈에 안 띄어야 하고 스태프는 찾을 수 있어야**
+   * 한다. 그 균형이 배경 사진마다 다르다 — 밝은 사진 위 흰 글자는 사라지고,
+   * 어두운 사진 위 검은 글자도 사라진다.
+   */
+  adminLinkColor: string
+
+  /**
+   * 본문 폰트 — 옮겨온 원본이 고르게 하던 세 가지 (`WEBFONTS`).
+   * 값은 `font-family` 스택 그대로 들어간다.
+   */
+  fontFamily: FontId
 }
+
+/**
+ * 고를 수 있는 폰트 — 원본 빌더와 같은 세 가지.
+ *
+ * **웹폰트 주소를 여기 한 곳에만 둔다.** 화면과 편집기가 각자 들고 있으면 하나만 바꿨을 때
+ * 미리보기와 실제가 다른 폰트로 뜬다.
+ */
+export const WEBFONTS = {
+  pretendard: {
+    label: 'Pretendard (깔끔함)',
+    stack: "'Pretendard', system-ui, sans-serif",
+    href: 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css',
+  },
+  paperlogy: {
+    label: 'Paperlogy (또렷함)',
+    stack: "'Paperlogy', 'Pretendard', sans-serif",
+    href: 'https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-4Regular.woff2',
+  },
+  noto: {
+    label: 'Noto Sans KR (무난함)',
+    stack: "'Noto Sans KR', sans-serif",
+    href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap',
+  },
+} as const
+
+export type FontId = keyof typeof WEBFONTS
 
 export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   highlightRanks: [1, 2],
@@ -54,6 +95,8 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   // 원본 빌더의 기본값 그대로 (160px / 2rem)
   boxTopMargin: 160,
   boxPadding: 32,
+  adminLinkColor: 'rgba(255, 255, 255, 0.3)',
+  fontFamily: 'pretendard',
 }
 
 /**
@@ -77,5 +120,8 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
     // 0 은 유효한 값이다 (박스를 맨 위에 붙임) — ?? 로 기본값에 먹히면 안 된다
     boxTopMargin: saved.boxTopMargin ?? DEFAULT_DISPLAY.boxTopMargin,
     boxPadding: saved.boxPadding ?? DEFAULT_DISPLAY.boxPadding,
+    adminLinkColor: saved.adminLinkColor || DEFAULT_DISPLAY.adminLinkColor,
+    // 없는 폰트 id 가 저장돼 있으면 기본으로 (옛 저장분·손으로 고친 JSON)
+    fontFamily: saved.fontFamily && saved.fontFamily in WEBFONTS ? saved.fontFamily : DEFAULT_DISPLAY.fontFamily,
   }
 }

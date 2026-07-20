@@ -27,7 +27,9 @@
         "borderHover": "#3A3B57",
         "onPrimary": "#FFFFFF",
         "cardBackFrom": "#1E1F3E",
-        "cardBackTo": "#101127"
+        "cardBackTo": "#101127",
+        "high": "#D4AF37",
+        "onHigh": "#FFFFFF"
       },
       "shape": {
         "radiusSm": 4,
@@ -78,7 +80,9 @@
         "borderHover": "#5A2F43",
         "onPrimary": "#FFFFFF",
         "cardBackFrom": "#3A1F2E",
-        "cardBackTo": "#1F1018"
+        "cardBackTo": "#1F1018",
+        "high": "#FFD9E8",
+        "onHigh": "#FFFFFF"
       },
       "shape": {
         "radiusSm": 4,

@@ -20,6 +20,10 @@
   --color-accent: #d4af37;
   --color-accent-soft: #e8cf7a;
 
+  /* 럭키드로우 당첨 강조 — 슬롯 테마가 덮어쓴다 (applyTheme) */
+  --color-high: #d4af37;
+  --color-on-high: #ffffff;
+
   /* 시스템 에러 전용 — 테마와 무관하게 고정 (운세의 "나쁨"에 쓰지 말 것) */
   --color-error: #f16361;
 

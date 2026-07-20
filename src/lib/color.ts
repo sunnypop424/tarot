@@ -4,7 +4,46 @@
  * (lib 이 owner 를 import 하면 소유자 코드가 프로덕션 번들에 딸려 들어온다).
  */
 
+/**
+ * `rgba(r, g, b, a)` 의 알파 — 없으면 1.
+ * 박스 배경처럼 **사진이 비쳐야 하는 색**은 hex 로 표현할 수 없어 rgba 로 저장된다.
+ */
+export function alphaOf(color: string): number {
+  const m = /^rgba?\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*(?:,\s*([\d.]+)\s*)?\)$/i.exec(
+    color.trim()
+  )
+  return m ? Math.min(1, Math.max(0, Number(m[1] ?? 1))) : 1
+}
+
+/** 색에서 hex 부분만 — rgba 든 hex 든 `#rrggbb` 로 (색 고르개에 넣을 값) */
+export function hexOf(color: string): string {
+  const rgb = toRgb(color)
+  if (!rgb) return '#000000'
+  return `#${rgb.map((v) => v.toString(16).padStart(2, '0')).join('')}`
+}
+
+/** hex + 알파 → 저장할 색 문자열. 알파가 1 이면 hex 그대로 둔다 (읽기 좋다) */
+export function withAlphaValue(hex: string, alpha: number): string {
+  const rgb = toRgb(hex)
+  if (!rgb || alpha >= 1) return hex
+  return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${Math.round(alpha * 100) / 100})`
+}
+
+/**
+ * **rgb()·rgba() 도 받는다** — 알파는 버린다.
+ *
+ * 대비 계산에서 알파를 무시하는 게 맞는 이유: 반투명 박스 뒤에 오는 건 대개 **사진**이라
+ * 무엇과 섞일지 알 수 없다. 최고관리자가 고른 불투명 색으로 재는 편이 예측 가능하고,
+ * 실제로 사진 위에서 어떻게 보이는지는 미리보기가 답한다.
+ */
 function toRgb(hex: string): [number, number, number] | null {
+  const rgba = /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/i.exec(hex.trim())
+  if (rgba) {
+    return [Number(rgba[1]), Number(rgba[2]), Number(rgba[3])].map((v) =>
+      Math.min(255, Math.max(0, Math.round(v)))
+    ) as [number, number, number]
+  }
+
   const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim())
   if (!m) return null
   const body = m[1]

@@ -94,7 +94,8 @@ await rest('slots', {
     name: '럭키드로우 화면검증',
     service: 'luckydraw',
     period: {},
-    theme: SEED_THEME,
+    // 반투명 박스 — 원본 인상의 핵심이라 검증도 그 상태로 한다
+    theme: { ...SEED_THEME, colors: { ...SEED_THEME.colors, surface: 'rgba(255, 255, 255, 0.85)' } },
     event: {},
   }),
 })
@@ -164,6 +165,28 @@ try {
   check('로그인 전에는 DRAW 가 비활성이다', shell.drawDisabled)
   check('스태프 로그인으로 유도한다', shell.text.includes('스태프 로그인'), shell.text.slice(0, 60))
   check('리허설 안내가 뜬다', shell.rehearsal)
+
+  /**
+   * 원본 인상의 핵심 셋 — **화면에 실제로 먹혔는지**를 계산된 스타일로 잰다.
+   * 설정값이 저장되는 것과 화면이 그걸 쓰는 것은 다른 문제다.
+   */
+  const look = await page.evaluate(() => {
+    const box = document.querySelector('[data-draw]')?.closest('.surface')
+    const link = document.querySelector('a[href*="/admin"]')
+    const s = box ? getComputedStyle(box) : null
+    return {
+      boxBg: s?.backgroundColor ?? '',
+      boxMarginTop: s?.marginTop ?? '',
+      font: s?.fontFamily ?? '',
+      linkColor: link ? getComputedStyle(link).color : '',
+      centered: getComputedStyle(box?.parentElement).justifyContent,
+    }
+  })
+  check('박스가 반투명하다 (사진이 비친다)', /rgba\([^)]+,\s*0?\.\d+\)/.test(look.boxBg), look.boxBg)
+  check('박스가 세로 가운데 정렬이다', look.centered === 'center', look.centered)
+  check('그 위에 상단 여백이 얹힌다', look.boxMarginTop === '160px', look.boxMarginTop)
+  check('슬롯이 고른 폰트가 먹었다', /Pretendard|Paperlogy|Noto/.test(look.font), look.font)
+  check('관리자 링크 색이 슬롯 값이다', look.linkColor.startsWith('rgba('), look.linkColor)
   await page.screenshot({ path: join(outDir, 'luckydraw-1-visitor.png') })
 
   // ── 2. 주최자 로그인 ────────────────────────────
