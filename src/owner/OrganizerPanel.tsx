@@ -168,8 +168,19 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
     <section className="admin-section">
       <h2 className="t-title-s admin-section__title">주최자 계정</h2>
       <p className="t-text-xs t-muted">
-        이 슬롯의 <b>/{slug}/admin</b> 에 들어갈 계정이에요. 주최자는 질문·답변만 만지고 테마는 못
+        이 슬롯의 <b>/{slug}/admin</b> 에 들어갈 계정이에요. 주최자는 운영 데이터만 만지고 테마는 못
         건드립니다. <b>만들면 그 자리에서 반영돼요</b> — 저장하기를 누르지 않아도 바로 씁니다.
+      </p>
+
+      {/**
+       * 겸업 주최자를 만드는 방법이 화면 어디에도 안 적혀 있으면 아무도 모른다 —
+       * "이미 있는 이메일" 은 보통 **에러**지 기능이 아니기 때문이다.
+       * 여기서 말해두지 않으면 같은 사람에게 계정을 두 개 만들어 주게 된다.
+       */}
+      <p className="t-text-xs t-muted" style={{ marginTop: 'var(--space-xs)' }}>
+        타로와 럭키드로우를 함께 하시는 주최자라면, 다른 슬롯에서 쓰던 <b>같은 이메일</b>을 넣어
+        주세요. 새로 만들지 않고 그 계정에 이 슬롯을 더해 드려요 (이때 비밀번호 칸은 무시되고
+        쓰던 비밀번호가 그대로 유지됩니다).
       </p>
 
       {slugPending && (
