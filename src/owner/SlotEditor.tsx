@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Download, Save, Sparkles } from 'lucide-react'
 
@@ -21,6 +21,8 @@ import { OrganizerPanel } from './OrganizerPanel'
 import { PeriodFields } from './PeriodFields'
 import { periodLabel, rangeInvalid } from './period'
 import { validateSlug } from './slug'
+import { onPreviewReady, postPreview, type PreviewState } from '@/slot/preview'
+import { DEFAULT_DISPLAY, luckydrawDisplay } from '@/data/luckydraw'
 import { exportSlots } from './slotsFile'
 import styles from './Owner.module.css'
 
@@ -158,6 +160,58 @@ export function SlotEditor() {
     () => Boolean(draft && saved) && JSON.stringify(draft) !== JSON.stringify(saved),
     [draft, saved]
   )
+
+  /**
+   * 실시간 미리보기 — 초안이 바뀔 때마다 iframe 으로 건너보낸다.
+   *
+   * 예전엔 저장된 슬롯을 띄우고 "저장하면 반영돼요" 라고 말했다. 색을 고를 때마다 저장을
+   * 눌러야 보이니, 마음에 안 들면 되돌릴 방법이 없는 채로 저장이 쌓였다.
+   */
+  const previewFrame = useRef<HTMLIFrameElement>(null)
+  const [previewState, setPreviewState] = useState<PreviewState>('draw')
+
+  /**
+   * 미리보기 기기 — **서비스마다 실제로 쓰는 기기가 다르다.**
+   * 타로는 방문자가 자기 폰으로 보고, 럭키드로우는 부스에 세워둔 아이패드를 **가로로** 쓴다.
+   * 폰 세로로 보여주면 아이패드에서 어떻게 보일지 알 수 없어 미리보기가 제 일을 못 한다.
+   */
+  const previewDevice =
+    draft && getSlotService(draft) === 'luckydraw'
+      ? { w: 1180, h: 820, label: '아이패드 가로' }
+      : { w: 390, h: 844, label: '폰 세로' }
+
+  /**
+   * 편집기 오른쪽 칸은 아이패드보다 좁다 — 줄여서 통째로 보여준다.
+   * **iframe 을 좁게 만들지 않는다**: 그러면 앱이 그 폭을 진짜 기기 폭으로 알고 모바일 배치로
+   * 그려서, 아이패드에서 볼 화면과 다른 걸 보게 된다. 기기 크기로 그린 뒤 축소한다.
+   */
+  const previewBox = useRef<HTMLDivElement>(null)
+  const [previewScale, setPreviewScale] = useState(1)
+
+  useEffect(() => {
+    const el = previewBox.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      setPreviewScale(Math.min(1, entry.contentRect.width / previewDevice.w))
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [previewDevice.w])
+
+  useEffect(() => {
+    if (draft) postPreview(previewFrame.current, { slot: draft, state: previewState })
+  }, [draft, previewState])
+
+  /**
+   * iframe 이 "리스너 붙였다" 고 알려오면 그때 첫 초안을 보낸다.
+   * `load` 이벤트에 맞춰 보내면 React 가 아직 안 붙어 있어 첫 장이 사라진다 —
+   * 처음엔 저장본이 보이다가 뭔가 건드려야 초안으로 바뀌는 이상한 동작이 된다.
+   */
+  useEffect(() => {
+    return onPreviewReady(() => {
+      if (draft) postPreview(previewFrame.current, { slot: draft, state: previewState })
+    })
+  }, [draft, previewState])
 
   /**
    * 초안 고치기 — 이전 값을 딛고 고칠 땐(색·이미지처럼 theme 을 통째로 다시 만드는 경우)
@@ -807,6 +861,104 @@ export function SlotEditor() {
               </ul>
             </section>
 
+            {/**
+             * 럭키드로우 겉모습 — **주최자는 못 건드린다** (테마의 일부다).
+             * 옮겨온 원본은 이 값들이 코드에 박혀 있어 행사마다 고칠 수가 없었다:
+             * 1·2등만 스크래치, 커버는 ♥, 배지는 50개 이하. 상품 구성은 행사마다 다르다.
+             */}
+            {getSlotService(draft) === 'luckydraw' && (
+              <section className="admin-section">
+                <h2 className="t-title-s admin-section__title">럭키드로우 화면</h2>
+                <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+                  오른쪽 미리보기의 <b>당첨</b> 탭에서 바로 확인할 수 있어요.
+                </p>
+
+                {(() => {
+                  const d = luckydrawDisplay(draft)
+                  const patchLd = (change: Partial<typeof d>) =>
+                    patchSlot((prev) => ({ luckydraw: { ...luckydrawDisplay(prev), ...change } }))
+
+                  return (
+                    <div className={styles.fieldGrid}>
+                      <label className="field">
+                        <span className="field__label">긁어서 여는 등수</span>
+                        <input
+                          className="input"
+                          value={d.highlightRanks.join(', ')}
+                          placeholder="1, 2"
+                          onChange={(e) =>
+                            patchLd({
+                              // "1, 2" → [1,2]. 숫자가 아닌 건 버린다 (빈 칸 = 전부 바로 보임)
+                              highlightRanks: e.target.value
+                                .split(',')
+                                .map((s) => Number(s.trim()))
+                                .filter((n) => Number.isFinite(n) && n > 0),
+                            })
+                          }
+                        />
+                        <span className="field__hint">
+                          비싼 등수만 긁게 해요. 전부 긁게 하면 10개 뽑을 때 10번 긁어야 해요.
+                        </span>
+                      </label>
+
+                      <label className="field">
+                        <span className="field__label">커버 문자</span>
+                        <input
+                          className="input"
+                          value={d.coverMark}
+                          maxLength={4}
+                          placeholder={DEFAULT_DISPLAY.coverMark}
+                          onChange={(e) => patchLd({ coverMark: e.target.value })}
+                        />
+                        <span className="field__hint">긁기 전에 덮여 있는 자리에 찍혀요.</span>
+                      </label>
+
+                      <label className="field">
+                        <span className="field__label">추첨 버튼 문구</span>
+                        <input
+                          className="input"
+                          value={d.drawLabel}
+                          placeholder={DEFAULT_DISPLAY.drawLabel}
+                          onChange={(e) => patchLd({ drawLabel: e.target.value })}
+                        />
+                      </label>
+
+                      <label className="field">
+                        <span className="field__label">마감 문구</span>
+                        <input
+                          className="input"
+                          value={d.closedText}
+                          placeholder={DEFAULT_DISPLAY.closedText}
+                          onChange={(e) => patchLd({ closedText: e.target.value })}
+                        />
+                      </label>
+
+                      <label className="field">
+                        <span className="field__label">남은 수량 배지</span>
+                        <input
+                          className="input"
+                          type="number"
+                          min={0}
+                          value={d.lowStockThreshold ?? ''}
+                          placeholder="안 띄움"
+                          onChange={(e) =>
+                            patchLd({
+                              // 빈 칸 = 안 띄운다. 0 과 다르다 (0 은 "0개 남았을 때만")
+                              lowStockThreshold:
+                                e.target.value === '' ? null : Math.max(0, Number(e.target.value)),
+                            })
+                          }
+                        />
+                        <span className="field__hint">
+                          재고가 이 수 이하로 내려가면 “N개 남았어요”가 떠요. 비우면 안 띄워요.
+                        </span>
+                      </label>
+                    </div>
+                  )
+                })()}
+              </section>
+            )}
+
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">기간</h2>
               <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
@@ -953,15 +1105,65 @@ export function SlotEditor() {
             <section className="admin-section">
               <div className={styles.previewHead}>
                 <h2 className="t-title-s">미리보기</h2>
-                {dirty && <span className="t-text-xs t-muted">저장하면 반영돼요</span>}
+                <span className="t-text-xs t-muted">
+                  {previewDevice.label}
+                  {dirty && ' · 저장 전 초안이에요'}
+                </span>
               </div>
-              {/* 실제 앱을 그대로 띄운다 — SlotProvider 가 저장된 편집분을 읽는다 */}
-              <iframe
-                key={saved.slug}
-                className={styles.preview}
-                src={`/${saved.slug}`}
-                title="미리보기"
-              />
+
+              {/**
+               * 럭키드로우는 화면이 하나뿐이라 **상태를 골라 봐야** 한다 —
+               * 커버 색·커버 문자·하이라이트는 당첨 화면에서만 보이는데, 미리보기에서
+               * 진짜로 뽑을 수는 없다(재고를 태운다). 가짜 결과로 그 순간을 보여준다.
+               */}
+              {getSlotService(draft) === 'luckydraw' && (
+                <div className={styles.previewTabs}>
+                  {(
+                    [
+                      ['draw', '뽑기'],
+                      ['result', '당첨'],
+                      ['summary', '전체 결과'],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      className={`btn btn--sm ${previewState === value ? 'btn--slight' : 'btn--ghost'}`}
+                      onClick={() => setPreviewState(value)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/**
+               * 실제 앱을 그대로 띄운다 — **미리보기를 따로 구현하지 않는다.**
+               * 원본 빌더는 순수 JS 로 화면을 재현했는데, 그러면 화면을 고칠 때마다 미리보기도
+               * 따로 고쳐야 하고 언젠가 어긋난다. 초안은 postMessage 로 건너간다 (`slot/preview.ts`).
+               */}
+              <div className={styles.previewStage} ref={previewBox}>
+                <div
+                  className={styles.previewViewport}
+                  style={{
+                    width: previewDevice.w * previewScale,
+                    height: previewDevice.h * previewScale,
+                  }}
+                >
+                  <iframe
+                    key={saved.slug}
+                    ref={previewFrame}
+                    className={styles.preview}
+                    src={`/${saved.slug}`}
+                    title="미리보기"
+                    style={{
+                      width: previewDevice.w,
+                      height: previewDevice.h,
+                      transform: `scale(${previewScale})`,
+                    }}
+                  />
+                </div>
+              </div>
             </section>
           </div>
         </div>

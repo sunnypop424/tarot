@@ -6,6 +6,7 @@ import { repo } from '@/lib/repo'
 import { onSlotChange } from '@/lib/repo/changed'
 import { applyTheme } from '@/lib/theme'
 import { isLight } from '@/lib/color'
+import { useLivePreview } from './preview'
 import type { Slot } from '@/types/slot'
 
 /**
@@ -43,7 +44,15 @@ const SlotContext = createContext<State>({ status: 'loading' })
  */
 export function SlotProvider({ children }: { children: ReactNode }) {
   const { slug } = useParams<{ slug: string }>()
-  const [state, setState] = useState<State>({ status: 'loading' })
+  const [loaded, setLoaded] = useState<State>({ status: 'loading' })
+
+  /**
+   * 편집기 미리보기가 보낸 **초안** — 있으면 저장본 대신 이걸 그린다.
+   * 저장 없이 색·형태를 바꿔보라고 있는 자리다 (`slot/preview.ts`).
+   */
+  const preview = useLivePreview()
+  const state: State = preview ? { status: 'ready', slot: preview.slot } : loaded
+  const setState = setLoaded
 
   useEffect(() => {
     if (!slug) {
@@ -79,9 +88,13 @@ export function SlotProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (state.status !== 'ready') return
     applyTheme(state.slot.theme)
-    // 다음 방문의 첫 페인트를 위해 배경색을 남겨둔다
-    if (slug) cacheThemeHint(slug, state.slot)
-  }, [state, slug])
+    /**
+     * 다음 방문의 첫 페인트를 위해 배경색을 남겨둔다.
+     * **초안일 땐 남기지 않는다** — 저장하지도 않은 색이 방문자의 첫 페인트 캐시에 박히면,
+     * 편집기에서 이것저것 해본 흔적이 실제 방문자 화면의 첫 순간에 나타난다.
+     */
+    if (slug && !preview) cacheThemeHint(slug, state.slot)
+  }, [state, slug, preview])
 
   /**
    * 브라우저 탭 제목을 **행사명**으로 — 방문자가 홈 화면에 추가하면 이 이름이 앱 이름이 된다.

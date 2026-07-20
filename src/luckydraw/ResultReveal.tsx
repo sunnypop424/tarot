@@ -15,6 +15,8 @@ interface Props {
   displayMode: LuckydrawSettings['displayMode']
   slug: string
   onFinish: () => void
+  /** 편집기 미리보기 전용 — 전체 결과 화면을 바로 보여준다 (거기까지 눌러 갈 수 없다) */
+  startAtSummary?: boolean
 }
 
 /**
@@ -24,11 +26,18 @@ interface Props {
  * 전부 긁게 하면 10개 뽑을 때 10번 긁어야 해서 리추얼이 노동이 되고, 전부 그냥 보여주면
  * 1등이 나온 순간이 밋밋해진다. 원본(Firebase)의 이 감각이 좋아서 그대로 가져왔다.
  */
-export function ResultReveal({ result, display, displayMode, slug, onFinish }: Props) {
+export function ResultReveal({
+  result,
+  display,
+  displayMode,
+  slug,
+  onFinish,
+  startAtSummary = false,
+}: Props) {
   const { results } = result
   const [revealed, setRevealed] = useState<number[]>([])
   const [scratching, setScratching] = useState<number | null>(null)
-  const [summary, setSummary] = useState(false)
+  const [summary, setSummary] = useState(startAtSummary)
   const [shipping, setShipping] = useState(false)
   const [celebrate, setCelebrate] = useState(false)
 

@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Minus, Plus } from 'lucide-react'
 
-import { luckydrawDisplay } from '@/data/luckydraw'
+import { luckydrawDisplay, type LuckydrawDisplay } from '@/data/luckydraw'
 import { repo } from '@/lib/repo'
 import type { DrawResult, LuckydrawSettings, Prize } from '@/lib/repo'
 import { useAdminAuth } from '@/admin/useAdminAuth'
 import { useSlot } from '@/slot/SlotProvider'
+import { useLivePreview } from '@/slot/preview'
 import { ResultReveal } from './ResultReveal'
 import styles from './Luckydraw.module.css'
 
@@ -23,10 +24,33 @@ const QUICK = [1, 5, 10]
  *
  * 타로와 정반대라 셸도 다르다: 탭바도 카드 도감도 없다. 이 슬롯엔 화면이 하나뿐이다.
  */
+/**
+ * 미리보기용 가짜 결과 — **편집기에서 진짜로 뽑을 수는 없다** (재고를 태우게 된다).
+ *
+ * 하이라이트 등수를 반드시 섞는다: 커버 색·커버 문자·긁는 연출이 이 화면의 핵심인데
+ * 샘플에 비싼 등수가 없으면 최고관리자가 그걸 못 보고 색을 고르게 된다.
+ */
+function sampleResult(display: LuckydrawDisplay): DrawResult {
+  const high = display.highlightRanks[0] ?? 1
+  const ranks = [high, high, 3, 3, 4]
+  return {
+    batchId: 'preview',
+    rehearsal: true,
+    results: ranks.map((rank, i) => ({
+      prizeId: `preview-${i}`,
+      rank,
+      name: `${rank}등 상품`,
+      requiresShipping: rank === high,
+    })),
+    prizes: [],
+  }
+}
+
 export default function LuckydrawApp() {
   const slot = useSlot()
   const display = luckydrawDisplay(slot)
   const { status: authStatus } = useAdminAuth(slot.slug)
+  const preview = useLivePreview()
 
   const [prizes, setPrizes] = useState<Prize[] | null>(null)
   const [settings, setSettings] = useState<LuckydrawSettings | null>(null)
@@ -82,19 +106,43 @@ export default function LuckydrawApp() {
     void load()
   }
 
-  if (prizes === null) return <div className="app" aria-busy="true" />
+  /**
+   * 편집기 미리보기 — 저장된 상품이 없어도(새 슬롯) 화면이 나와야 하고,
+   * 당첨 연출은 가짜 결과로 보여준다. 진짜 추첨은 재고를 태우므로 여기서 못 한다.
+   */
+  const previewing = preview !== null
+  const previewView =
+    preview && preview.state !== 'draw'
+      ? { result: sampleResult(display), summary: preview.state === 'summary' }
+      : null
+
+  if (prizes === null && !previewing) return <div className="app" aria-busy="true" />
 
   return (
     <div className={`app ${styles.app}`}>
       <main className={styles.stage}>
         <div className={`surface ${styles.panel}`}>
-          {settings?.rehearsal && !unavailable && (
-            <p className={styles.rehearsal} data-rehearsal>
-              지금은 리허설이에요. 뽑아도 실제 재고는 줄지 않아요.
-            </p>
-          )}
+          {previewView ? (
+            <ResultReveal
+              /** 토글을 옮기면 연출을 처음부터 다시 — 긁은 상태가 남아 있으면 안 본 것처럼 안 보인다 */
+              key={previewView.summary ? 'summary' : 'result'}
+              result={previewView.result}
+              display={display}
+              displayMode={settings?.displayMode ?? 'both'}
+              slug={slot.slug}
+              /** 미리보기에선 되돌아갈 데가 없다 — 상태는 편집기의 토글이 정한다 */
+              onFinish={() => {}}
+              startAtSummary={previewView.summary}
+            />
+          ) : (
+            <>
+              {settings?.rehearsal && !unavailable && (
+                <p className={styles.rehearsal} data-rehearsal>
+                  지금은 리허설이에요. 뽑아도 실제 재고는 줄지 않아요.
+                </p>
+              )}
 
-          {result ? (
+              {result ? (
             <ResultReveal
               result={result}
               display={display}
@@ -179,7 +227,9 @@ export default function LuckydrawApp() {
                   추첨은 스태프만 할 수 있어요. 로그인하면 버튼이 열려요.
                 </p>
               )}
-            </div>
+                </div>
+              )}
+            </>
           )}
 
           {error && (
