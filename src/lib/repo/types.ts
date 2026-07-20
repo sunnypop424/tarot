@@ -317,6 +317,16 @@ export interface LuckydrawRepo {
   submitShipping(slug: string, entry: Omit<ShippingEntry, 'id' | 'createdAt'>): Promise<void>
   listShipping(slug: string): Promise<ShippingEntry[]>
   clearShipping(slug: string): Promise<void>
+  /**
+   * 다른 기기의 변화를 **가만히 있어도** 받는다 — 되돌리는 함수를 준다.
+   *
+   * 부스에 태블릿을 두 대 놓는 행사가 있다. 옆 기기에서 마지막 하나가 나가도 이쪽 화면이
+   * "1개 남음" 을 띄우고 있으면, 손님 앞에서 눌렀다가 에러를 보게 된다 —
+   * 서버가 막아 주는 것과 **애초에 안 보이게 하는 것**은 다르다.
+   *
+   * 못 붙는 어댑터(local)에선 아무것도 안 하고 빈 함수를 준다. 화면은 그걸 몰라도 된다.
+   */
+  watch(slug: string, onChange: () => void): () => void
 }
 
 export interface Repo {

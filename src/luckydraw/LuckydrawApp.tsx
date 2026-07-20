@@ -108,6 +108,18 @@ export default function LuckydrawApp() {
     void load()
   }, [load])
 
+  /**
+   * 다른 기기가 뽑거나 주최자가 마감하면 **가만히 있어도** 따라온다.
+   *
+   * **결과를 보고 있을 땐 안 읽는다** — 당첨 화면 한가운데서 재고가 갱신되면 화면이
+   * 흔들리고, 어차피 '처음으로' 를 누르면 다시 읽는다. 재고가 중요한 건 뽑기 화면이다.
+   * 미리보기에서도 안 붙인다 (편집기가 보내는 초안이 진짜 데이터를 덮어쓰는 화면이다).
+   */
+  useEffect(() => {
+    if (result || preview) return
+    return repo.luckydraw.watch(slot.slug, () => void load())
+  }, [slot.slug, load, result, preview])
+
   const realRemaining = (prizes ?? []).reduce((sum, p) => sum + p.remaining, 0)
   const soldOut = prizes !== null && realRemaining === 0
   const closed = settings?.closed === true

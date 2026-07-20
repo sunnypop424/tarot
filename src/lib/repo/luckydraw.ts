@@ -175,6 +175,46 @@ export const supabaseLuckydraw: LuckydrawRepo = {
     }))
   },
 
+  /**
+   * 재고·설정 구독 — 다른 기기가 뽑거나 주최자가 마감하면 그 자리에서 알려준다.
+   *
+   * **무엇이 바뀌었는지는 안 본다.** 바뀌었다는 사실만 받고 화면이 다시 읽는다:
+   * 이벤트 페이로드로 상태를 조립하면 놓친 이벤트 하나에 화면과 DB 가 갈라진다
+   * (재연결 중에 일어난 변화는 아예 안 온다). 다시 읽으면 늘 서버가 맞다.
+   */
+  watch(slug, onChange) {
+    let channel: { unsubscribe: () => void } | null = null
+    let cancelled = false
+
+    void db().then((client) => {
+      if (cancelled) return
+      const ch = client
+        .channel(`luckydraw:${slug}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'prizes', filter: `slug=eq.${slug}` },
+          onChange
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'luckydraw_settings',
+            filter: `slug=eq.${slug}`,
+          },
+          onChange
+        )
+        .subscribe()
+      channel = ch
+    })
+
+    return () => {
+      cancelled = true
+      channel?.unsubscribe()
+    }
+  },
+
   /** 배송이 끝나면 **지우는 게 맞다** — 남겨둘 이유가 없는 개인정보다 */
   async clearShipping(slug) {
     const { error } = await (await db()).from('shipping_entries').delete().eq('slug', slug)
@@ -219,5 +259,9 @@ export const localLuckydraw: LuckydrawRepo = {
   },
   async clearShipping() {
     unavailable()
+  },
+  // 구독할 저장소가 없다 — 되돌리는 함수만 모양 맞춰 돌려준다
+  watch() {
+    return () => {}
   },
 }
