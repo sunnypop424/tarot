@@ -285,6 +285,42 @@
   white-space: nowrap;
 }
 
+/**
+ * ── 색 자리 비추기 ──────────────────────────
+ *
+ * 편집기에서 색 칸을 누르면 그 색이 **화면 어디에 쓰이는지** 깜빡여 보여준다.
+ * "커버 배경" 이라는 이름만으로는 어디인지 모른다 — 특히 긁기 전에만 보이는 자리가 그렇다.
+ * 미리보기에서만 도는 장치라 방문자 화면엔 영향이 없다 (data-hl 은 편집기가 붙인다).
+ */
+.stage[data-hl] .panel [data-part],
+.stage[data-hl='box'] .panel {
+  position: relative;
+}
+
+.stage[data-hl='box'] .panel,
+.stage[data-hl='title'] [data-part='title'],
+.stage[data-hl='tile'] .resultItem:not([data-high]),
+.stage[data-hl='cover'] .cover,
+.stage[data-hl='high'] .resultItem[data-high],
+.stage[data-hl='note'] .rehearsal,
+.stage[data-hl='note'] .lowStock,
+.stage[data-hl='button'] .controls :global(.btn--primary),
+.stage[data-hl='button'] .reveal :global(.btn--primary) {
+  animation: hlPulse 1.1s ease-in-out infinite;
+}
+
+@keyframes hlPulse {
+  0%,
+  100% {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+  50% {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+}
+
 /* ── 컨페티 ────────────────────────────────── */
 .confetti {
   position: fixed;

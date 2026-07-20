@@ -86,6 +86,109 @@ export const WEBFONTS = {
 
 export type FontId = keyof typeof WEBFONTS
 
+/**
+ * 럭키드로우 화면에 **들어가는 색 전부** — 편집기가 이 목록대로 낸다.
+ *
+ * 테마 색 키를 그대로 쓰되 **이름을 화면 기준으로 바꿔 부른다.** 최고관리자가 보는 건
+ * 'surfaceRaised' 가 아니라 "상품 타일 배경" 이다 — 역할 이름은 타로 화면을 전제로 붙은 것이라
+ * 럭키드로우에선 뭘 가리키는지 알 수 없다.
+ *
+ * `part` 는 미리보기에서 **어느 자리인지 비춰줄 때** 쓰는 이름이다 (`data-part`).
+ */
+export interface LuckydrawColorField {
+  key: string
+  label: string
+  part: string
+  alpha?: boolean
+  hint?: string
+}
+
+/**
+ * 편집기의 **카드 묶음** — 한 화면 요소에 딸린 것들을 한 카드에 모은다.
+ *
+ * 색은 색끼리, 크기는 크기끼리 늘어놓으면 "박스를 손보려면 색 목록에서 하나, 형태 목록에서
+ * 하나, 여백 목록에서 하나" 를 오가게 된다. 최고관리자가 실제로 하는 일은 **"박스를 손본다"**
+ * 이지 "색을 손본다" 가 아니다.
+ */
+export const LUCKYDRAW_GROUPS: {
+  title: string
+  hint?: string
+  colors?: LuckydrawColorField[]
+  /** 이 카드에 같이 오는 형태·여백·문구 칸 (편집기가 이름으로 알아본다) */
+  extras?: ('boxRadius' | 'boxPadding' | 'boxTopMargin' | 'buttonRadius' | 'font' | 'background' | 'texts' | 'cover' | 'badge')[]
+}[] = [
+  {
+    title: '박스',
+    hint: '사진 위에 뜨는 흰 상자예요.',
+    colors: [
+      { key: 'surface', label: '배경색', part: 'box', alpha: true, hint: '사진이 비칠수록 낮게' },
+    ],
+    extras: ['boxRadius', 'boxPadding', 'boxTopMargin'],
+  },
+  {
+    title: '버튼',
+    colors: [
+      { key: 'primary', label: '배경색', part: 'button' },
+      { key: 'onPrimary', label: '글자색', part: 'button' },
+    ],
+    extras: ['buttonRadius', 'texts'],
+  },
+  {
+    title: '상품 타일',
+    hint: '뽑은 결과가 놓이는 칸이에요.',
+    colors: [
+      { key: 'surfaceRaised', label: '배경색', part: 'tile' },
+      { key: 'fg2', label: '글자색', part: 'tile' },
+      { key: 'border', label: '테두리', part: 'tile' },
+    ],
+  },
+  {
+    title: '당첨 (긁는 등수)',
+    hint: '비싼 등수만 덮어두고 직접 긁게 해요.',
+    colors: [
+      { key: 'wash', label: '커버 배경', part: 'cover' },
+      { key: 'accent', label: '커버 문자색', part: 'cover' },
+      { key: 'high', label: '열린 뒤 배경', part: 'high' },
+      { key: 'onHigh', label: '열린 뒤 글자', part: 'high' },
+    ],
+    extras: ['cover'],
+  },
+  {
+    title: '글자 · 폰트',
+    colors: [
+      { key: 'fg1', label: '제목', part: 'title' },
+      { key: 'fg3', label: '안내 문구', part: 'note' },
+    ],
+    extras: ['font', 'badge'],
+  },
+  {
+    title: '배경',
+    colors: [],
+    extras: ['background'],
+  },
+]
+
+/**
+ * 럭키드로우로 바꿀 때 깔아주는 **시작 색** — 옮겨온 base-template 의 값이다.
+ *
+ * 붙박이가 아니라 출발점이다: 전부 편집기에서 고칠 수 있다. 다만 다크 테마 값이 그대로
+ * 남아 있으면 밝은 박스 안에서 글자가 안 보이므로, 서비스를 바꾸는 순간 한 번 맞춰준다.
+ *
+ */
+export const LUCKYDRAW_NEUTRALS = {
+  // 박스 배경 — 기본은 원본과 같은 **반투명 흰색**. 이건 편집기에서 고칠 수 있다
+  surface: 'rgba(255, 255, 255, 0.85)',
+  canvas: '#f3f4f6', // 사진이 없을 때의 바탕 (base-template body)
+  surfaceRaised: '#ffffff', // 수량 입력칸·결과 타일
+  wash: '#f3f4f6', // 덮인 타일
+  fg1: '#1f2937', // gray-800
+  fg2: '#374151', // gray-700
+  fg3: '#6b7280', // gray-500
+  border: '#e5e7eb', // gray-200
+  borderHover: '#d1d5db', // gray-300
+  accent: '#d4af37', // 커버의 하트
+} as const
+
 export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   highlightRanks: [1, 2],
   coverMark: '♥',

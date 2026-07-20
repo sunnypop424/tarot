@@ -123,7 +123,7 @@ try {
    */
   check('저장하지 않아도 미리보기가 따라온다', after !== before, `${before} → ${after}`)
 
-  const dirtyNote = await page.evaluate(() => document.body.innerText.includes('저장 전 초안이에요'))
+  const dirtyNote = await page.evaluate(() => document.body.innerText.includes('저장 전 초안'))
   check('저장 전 초안임을 화면이 말한다', dirtyNote)
 
   await page.screenshot({ path: join(outDir, 'preview-live.png') })
@@ -183,12 +183,62 @@ try {
     check('럭키드로우: 수정구슬 설정이 없다', !body.includes('수정구슬'))
     check('럭키드로우: 플랜이 없다', !body.includes('플랜'))
     check('럭키드로우: 이벤트 설정이 없다', !body.includes('이벤트 설정'))
-    check('럭키드로우: 전용 화면 설정이 있다', body.includes('럭키드로우 화면'))
+    /** 설정이 **화면 요소별 카드**로 묶여 있는가 — 색·형태·문구가 흩어져 있으면 못 쓴다 */
+    for (const card of ['박스', '버튼', '상품 타일', '당첨 (긁는 등수)', '글자 · 폰트', '배경']) {
+      check(`럭키드로우: '${card}' 카드가 있다`, body.includes(card))
+    }
+
+    /**
+     * **원본 index.html 에 없던 입력은 하나도 남지 않아야 한다.**
+     * 중립색(글자·테두리·입력칸)은 base-template 에서 고정이었고, 그게 이 디자인이
+     * 성립하는 이유다 — 사진 위 반투명 흰 박스 안은 늘 밝은 회색이라 어떤 사진에서도 읽힌다.
+     * 열어두면 어두운 글자색을 고르는 순간 사라진다.
+     */
+    // '포인트' 만으로 찾으면 대비 검사 패널의 '포인트 아이콘 / 표면' 행에 걸린다 — 그건 입력이 아니다
+    for (const gone of ['색 만들기', '배경 · 표면', '텍스트 · 보더', '포인트 (카드', '로고']) {
+      check(`럭키드로우: '${gone}' 입력이 없다`, !body.includes(gone))
+    }
+    // 카드 안에 색·크기·문구가 **같이** 들어 있어야 묶은 의미가 있다
+    for (const kept of ['본문 폰트', '배경 이미지', '상단 여백', '커버 문자', '남은 수량 배지']) {
+      check(`럭키드로우: '${kept}' 칸이 있다`, body.includes(kept))
+    }
     check('럭키드로우: 미리보기가 아이패드 가로다', body.includes('아이패드 가로'))
     check('럭키드로우: 상태 토글이 있다', body.includes('뽑기') && body.includes('전체 결과'))
 
-    // 공통 설정은 그대로 있어야 한다 (다 지워버리면 그것도 틀린 것이다)
-    check('럭키드로우: 색·기간 설정은 남아 있다', body.includes('배경 · 표면') && body.includes('기간'))
+    // 다 지워버리는 것도 틀린 것이다 — 슬롯·기간·형태는 서비스와 무관하게 필요하다
+    // 다 지워버리는 것도 틀린 것이다 — 슬롯·기간은 서비스와 무관하게 필요하다
+    check(
+      '럭키드로우: 슬롯·기간 설정은 남아 있다',
+      body.includes('기간') && body.includes('슬러그')
+    )
+    // 둥글기는 '형태' 섹션이 아니라 박스·버튼 카드 안으로 갔다 (같은 값이 두 군데 뜨면 안 된다)
+    check('럭키드로우: 별도 형태 섹션이 없다', !body.includes('형태 (radius)'))
+
+    /**
+     * **색 고르개가 리렌더에 살아남는가.**
+     *
+     * 처음엔 AlphaColor 를 SlotEditor 안에서 정의했는데, 그러면 렌더마다 새 컴포넌트 타입이
+     * 만들어져 React 가 input 을 버리고 다시 만든다 — 색을 고르려고 누르는 순간 브라우저
+     * 색 고르개가 닫혀서 **드래그로 색을 못 고른다.** DOM 노드가 유지되는지로 잰다
+     * (네이티브 고르개는 자동화로 못 여니 원인을 직접 본다).
+     */
+    const survives = await page.evaluate(() => {
+      const color = document.querySelector('.color-field input[type="color"]')
+      const range = document.querySelector('.color-field input[type="range"]')
+      if (!color || !range) return 'not-found'
+      color.dataset.probe = 'same-node'
+
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set
+      setter.call(range, '0.5')
+      range.dispatchEvent(new Event('input', { bubbles: true }))
+      return 'ok'
+    })
+    check('색 고르개 조작이 반영된다', survives === 'ok', survives)
+    await wait(600)
+    const sameNode = await page.evaluate(
+      () => document.querySelector('.color-field input[type="color"]')?.dataset.probe === 'same-node'
+    )
+    check('색 고르개가 리렌더에 다시 만들어지지 않는다 (드래그로 고를 수 있다)', sameNode)
 
     await page.screenshot({ path: join(outDir, 'preview-luckydraw-editor.png'), fullPage: true })
 

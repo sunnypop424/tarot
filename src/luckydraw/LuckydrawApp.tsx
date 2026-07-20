@@ -155,6 +155,8 @@ export default function LuckydrawApp() {
     <div className={`app ${styles.app}`}>
       <main
         className={styles.stage}
+        /* 편집기가 누른 색이 어느 자리인지 — 그 부분만 깜빡인다 */
+        data-hl={preview?.highlight ?? undefined}
         /* 박스 위치·여백은 슬롯이 정한다 — 배경 사진마다 얼굴이 오는 높이가 다르다 */
         style={
           {
@@ -165,7 +167,7 @@ export default function LuckydrawApp() {
           } as React.CSSProperties
         }
       >
-        <div className={`surface ${styles.panel}`}>
+        <div className={`surface ${styles.panel}`} data-part="box">
           {previewView ? (
             <ResultReveal
               /** 토글을 옮기면 연출을 처음부터 다시 — 긁은 상태가 남아 있으면 안 본 것처럼 안 보인다 */

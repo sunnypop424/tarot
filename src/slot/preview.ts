@@ -25,6 +25,12 @@ export type PreviewState = 'draw' | 'result' | 'summary'
 export interface PreviewPayload {
   slot: Slot
   state: PreviewState
+  /**
+   * 지금 만지는 색이 화면의 **어느 자리**인지 (`data-part` 이름).
+   * 색 이름만으로는 "커버 배경" 이 어디인지 알 수 없어서, 편집기가 누르는 칸을 알려주면
+   * 미리보기가 그 부분을 깜빡인다.
+   */
+  highlight?: string | null
 }
 
 /** 편집기 → iframe. 초안이 바뀔 때마다 부른다 */
@@ -64,7 +70,11 @@ export function useLivePreview(): PreviewPayload | null {
     const listener = (e: MessageEvent) => {
       if (e.origin !== window.location.origin) return
       if (e.data?.channel !== CHANNEL || !e.data?.slot) return
-      setPayload({ slot: e.data.slot as Slot, state: (e.data.state as PreviewState) ?? 'draw' })
+      setPayload({
+        slot: e.data.slot as Slot,
+        state: (e.data.state as PreviewState) ?? 'draw',
+        highlight: (e.data.highlight as string | null) ?? null,
+      })
     }
 
     window.addEventListener('message', listener)

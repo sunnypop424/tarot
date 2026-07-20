@@ -22,10 +22,205 @@ import { PeriodFields } from './PeriodFields'
 import { periodLabel, rangeInvalid } from './period'
 import { validateSlug } from './slug'
 import { onPreviewReady, postPreview, type PreviewState } from '@/slot/preview'
-import { DEFAULT_DISPLAY, WEBFONTS, luckydrawDisplay, type FontId } from '@/data/luckydraw'
+import {
+  LUCKYDRAW_GROUPS,
+  LUCKYDRAW_NEUTRALS,
+  WEBFONTS,
+  luckydrawDisplay,
+  type FontId,
+} from '@/data/luckydraw'
 import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 import { exportSlots } from './slotsFile'
 import styles from './Owner.module.css'
+
+/**
+ * hex 고르개 + 투명도 슬라이더 → rgba 한 값 (원본 빌더와 같은 짝).
+ *
+ * **모듈 바깥에 둔다.** 처음엔 SlotEditor 안에서 정의했는데, 그러면 렌더마다 **새 컴포넌트
+ * 타입**이 만들어져 React 가 input 을 버리고 다시 만든다 — 색을 고르려고 누르는 순간
+ * 브라우저 색 고르개가 닫혀서 **드래그로 색을 못 고른다.** 안에서 정의된 컴포넌트는
+ * 눈에 잘 안 띄는 이런 방식으로 깨진다.
+ */
+function AlphaColor({
+  label,
+  value,
+  hint,
+  onChange,
+}: {
+  label: string
+  value: string
+  hint?: string
+  onChange: (v: string) => void
+}) {
+  return (
+    <div className="field">
+      <span className="field__label">{label}</span>
+      <div className="color-field">
+        <input
+          type="color"
+          value={hexOf(value)}
+          aria-label={`${label} 고르기`}
+          onChange={(e) => onChange(withAlphaValue(e.target.value, alphaOf(value)))}
+        />
+        <input
+          type="range"
+          min={0}
+          max={1}
+          step={0.05}
+          value={alphaOf(value)}
+          aria-label={`${label} 투명도`}
+          onChange={(e) => onChange(withAlphaValue(hexOf(value), Number(e.target.value)))}
+        />
+      </div>
+      <span className="field__hint">
+        {hint ? `${hint} · ` : ''}
+        불투명도 {Math.round(alphaOf(value) * 100)}%
+      </span>
+    </div>
+  )
+}
+
+/**
+ * 카드 안에 색과 **같이 오는** 칸들 — 형태·여백·문구.
+ *
+ * 색만 카드로 묶고 나머지를 딴 데 두면 묶은 의미가 없다: "박스를 손본다" 는 배경색과
+ * 둥글기와 여백을 함께 만지는 일이다.
+ */
+function LuckydrawExtra({
+  kind,
+  draft,
+  slug,
+  patchSlot,
+  patchShape,
+  patchAsset,
+}: {
+  kind: string
+  draft: Slot
+  slug: string
+  patchSlot: (c: Partial<Slot> | ((p: Slot) => Partial<Slot>)) => void
+  patchShape: (k: keyof ThemeShape, v: number) => void
+  patchAsset: (k: 'backgroundPattern', v: string | null) => void
+}) {
+  const d = luckydrawDisplay(draft)
+  const patchLd = (change: Partial<typeof d>) =>
+    patchSlot((prev) => ({ luckydraw: { ...luckydrawDisplay(prev), ...change } }))
+
+  const num = (label: string, value: number, onChange: (n: number) => void, hint?: string) => (
+    <div className="field">
+      <span className="field__label">{label}</span>
+      <input
+        className="input"
+        type="number"
+        min={0}
+        value={value}
+        onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
+      />
+      {hint && <span className="field__hint">{hint}</span>}
+    </div>
+  )
+
+  const text = (label: string, value: string, onChange: (v: string) => void, hint?: string) => (
+    <div className="field">
+      <span className="field__label">{label}</span>
+      <input className="input" value={value} onChange={(e) => onChange(e.target.value)} />
+      {hint && <span className="field__hint">{hint}</span>}
+    </div>
+  )
+
+  switch (kind) {
+    case 'boxRadius':
+      return num('둥글기 (px)', draft.theme.shape.radiusLg, (n) => patchShape('radiusLg', n))
+    case 'boxPadding':
+      return num('안쪽 여백 (px)', d.boxPadding, (n) => patchLd({ boxPadding: n }))
+    case 'boxTopMargin':
+      return num('상단 여백 (px)', d.boxTopMargin, (n) => patchLd({ boxTopMargin: n }), '가운데에서 얼마나 내릴지 — 사진 얼굴을 안 가리게')
+    case 'buttonRadius':
+      return num('둥글기 (px)', draft.theme.shape.radiusMd, (n) => patchShape('radiusMd', n))
+    case 'texts':
+      return (
+        <>
+          {text('추첨 버튼 문구', d.drawLabel, (v) => patchLd({ drawLabel: v }))}
+          {text('마감 문구', d.closedText, (v) => patchLd({ closedText: v }))}
+        </>
+      )
+    case 'cover':
+      return (
+        <>
+          {text('커버 문자', d.coverMark, (v) => patchLd({ coverMark: v }), '긁기 전 덮인 자리에 찍혀요')}
+          {text(
+            '긁는 등수',
+            d.highlightRanks.join(', '),
+            (v) =>
+              patchLd({
+                highlightRanks: v
+                  .split(',')
+                  .map((s) => Number(s.trim()))
+                  .filter((n) => Number.isFinite(n) && n > 0),
+              }),
+            '예: 1, 2 — 비우면 전부 바로 보여요'
+          )}
+        </>
+      )
+    case 'font':
+      return (
+        <div className="field">
+          <span className="field__label">본문 폰트</span>
+          <select
+            className="select"
+            value={d.fontFamily}
+            onChange={(e) => patchLd({ fontFamily: e.target.value as FontId })}
+          >
+            {Object.entries(WEBFONTS).map(([id, f]) => (
+              <option key={id} value={id}>
+                {f.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )
+    case 'badge':
+      return (
+        <div className="field">
+          <span className="field__label">남은 수량 배지</span>
+          <input
+            className="input"
+            type="number"
+            min={0}
+            value={d.lowStockThreshold ?? ''}
+            placeholder="안 띄움"
+            onChange={(e) =>
+              // 빈 칸 = 안 띄운다. 0 과 다르다 (0 은 "0개 남았을 때만")
+              patchLd({
+                lowStockThreshold: e.target.value === '' ? null : Math.max(0, Number(e.target.value)),
+              })
+            }
+          />
+          <span className="field__hint">이 수 이하로 내려가면 “N개 남았어요”. 비우면 안 띄워요</span>
+        </div>
+      )
+    case 'background':
+      return (
+        <>
+          <ImageField
+            slug={slug}
+            label="배경 이미지"
+            name="background"
+            value={draft.theme.assets.backgroundPattern}
+            onChange={(v) => patchAsset('backgroundPattern', v)}
+            hint="화면을 꽉 채워요. 박스가 얹힐 자리를 비워둔 사진이 좋아요."
+          />
+          <AlphaColor
+            label="관리자 링크 색"
+            value={d.adminLinkColor}
+            hint="손님 눈엔 안 띄고 스태프는 찾을 정도로"
+            onChange={(v) => patchLd({ adminLinkColor: v })}
+          />
+        </>
+      )
+    default:
+      return null
+  }
+}
 
 /** 색을 역할별로 묶어 보여준다 — 17개를 한 줄로 늘어놓으면 뭘 고치는지 모른다 */
 const COLOR_GROUPS: {
@@ -37,26 +232,23 @@ const COLOR_GROUPS: {
   /** 럭키드로우에서만 쓰이는 색 — 타로 슬롯에선 안 보인다 */
   luckydrawOnly?: boolean
 }[] = [
-  { title: '배경 · 표면', keys: ['canvas', 'surface', 'surfaceRaised', 'wash'] },
+  // 럭키드로우는 중립색이 붙박이라(LUCKYDRAW_NEUTRALS) 이 그룹이 통째로 없다
+  { title: '배경 · 표면', keys: ['canvas', 'surface', 'surfaceRaised', 'wash'], tarotOnly: true },
   {
     title: '인터랙션 (CTA · 활성)',
     keys: ['primary', 'primaryHover', 'onPrimary'],
     hint: '칩 · 보조버튼 글자색은 배경 밝기에 맞춰 자동 계산돼요.',
+    tarotOnly: true,
   },
   {
     title: '포인트 (카드 테두리 · 별 문양)',
     keys: ['accent'],
     hint: '어두운 카드 위 장식 기준으로 고르세요. 표면 위 아이콘·글자에 쓰일 색은 표면 밝기에 맞춰 자동 계산돼요.',
+    tarotOnly: true,
   },
-  { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'] },
+  { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'], tarotOnly: true },
   // 럭키드로우엔 카드가 없다 — 그 슬롯에선 이 그룹을 통째로 감춘다
   { title: '카드 뒷면 (내장 SVG용)', keys: ['cardBackFrom', 'cardBackTo'], tarotOnly: true },
-  {
-    title: '당첨 강조',
-    keys: ['high', 'onHigh'],
-    hint: '비싼 등수를 긁었을 때 채워지는 색이에요.',
-    luckydrawOnly: true,
-  },
 ]
 
 // primarySoft·accentSoft 는 자동 파생이라 편집기에 노출하지 않는다 → Partial
@@ -103,9 +295,6 @@ const SHAPE_HINTS: Partial<Record<keyof ThemeShape, string>> = {
 const BASE_KEYS = [
   'canvas', 'surface', 'surfaceRaised', 'wash', 'fg1', 'fg2', 'fg3', 'border', 'borderHover',
 ] as const satisfies readonly (keyof ThemeColors)[]
-
-/** 기본 다크 바탕 — "아직 색을 안 골랐다" 를 이 값으로 판정한다 */
-const DARK_CANVAS = '#0F1020'
 
 const BASE_PRESETS: { id: 'dark' | 'light'; label: string; base: Pick<ThemeColors, (typeof BASE_KEYS)[number]> }[] = [
   {
@@ -210,6 +399,8 @@ export function SlotEditor() {
   const [previewScale, setPreviewScale] = useState(1)
   /** '크게' — 미리보기를 위로 올리고 전체 폭을 준다 (아이패드 가로는 좁은 칸에선 못 읽는다) */
   const [previewBig, setPreviewBig] = useState(false)
+  /** 지금 만지는 색이 화면의 **어느 자리**인지 — 미리보기가 그 부분을 깜빡인다 */
+  const [highlight, setHighlight] = useState<string | null>(null)
 
   useEffect(() => {
     const el = previewBox.current
@@ -222,8 +413,8 @@ export function SlotEditor() {
   }, [previewDevice.w])
 
   useEffect(() => {
-    if (draft) postPreview(previewFrame.current, { slot: draft, state: previewState })
-  }, [draft, previewState])
+    if (draft) postPreview(previewFrame.current, { slot: draft, state: previewState, highlight })
+  }, [draft, previewState, highlight])
 
   /**
    * iframe 이 "리스너 붙였다" 고 알려오면 그때 첫 초안을 보낸다.
@@ -232,9 +423,9 @@ export function SlotEditor() {
    */
   useEffect(() => {
     return onPreviewReady(() => {
-      if (draft) postPreview(previewFrame.current, { slot: draft, state: previewState })
+      if (draft) postPreview(previewFrame.current, { slot: draft, state: previewState, highlight })
     })
-  }, [draft, previewState])
+  }, [draft, previewState, highlight])
 
   /**
    * 초안 고치기 — 이전 값을 딛고 고칠 땐(색·이미지처럼 theme 을 통째로 다시 만드는 경우)
@@ -485,16 +676,11 @@ export function SlotEditor() {
                       const next = e.target.value as ServiceId
                       patchSlot({ service: next })
                       /**
-                       * 럭키드로우는 **라이트가 기본**이다 — 배경이 보통 밝은 아이돌 사진이라
-                       * 그 위에 뜨는 박스가 어두우면 어울리지 않는다.
-                       *
-                       * 다만 **손대지 않은 슬롯일 때만** 바꾼다. 이미 색을 고른 슬롯에서
-                       * 서비스를 바꿨다고 그 선택을 지워버리면, 되돌릴 방법이 없다.
+                       * 럭키드로우로 바꾸면 **중립색을 base-template 값으로 못박는다.**
+                       * 이 색들은 편집기에 없으므로(고를 수 없으므로) 여기서 맞춰두지 않으면
+                       * 다크 테마의 글자색이 밝은 박스 안에 남아 아무것도 안 보인다.
                        */
-                      const untouched = draft.theme.colors.canvas === DARK_CANVAS
-                      if (next === 'luckydraw' && untouched) {
-                        applyBase(BASE_PRESETS.find((p) => p.id === 'light')!.base)
-                      }
+                      if (next === 'luckydraw') applyBase(LUCKYDRAW_NEUTRALS)
                     }}
                   >
                     {SERVICES.map((s) => (
@@ -514,6 +700,12 @@ export function SlotEditor() {
               </div>
             </section>
 
+            {/**
+             * 색 만들기(AI 생성 + 밝기 프리셋) — **럭키드로우엔 통째로 없다.**
+             * 고를 수 있는 색이 넷뿐이라(버튼 2 · 당첨 2) 대표 색에서 한 벌을 만들 것도,
+             * 바탕을 밝기 계열로 스왑할 것도 없다. 중립색은 base-template 값으로 붙박이다.
+             */}
+            {!luckydraw && (
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">색 만들기</h2>
               {/**
@@ -521,8 +713,6 @@ export function SlotEditor() {
                * 얹는 색이 몇 개뿐이라, 대표 색에서 한 벌을 만들 이유가 없다.
                * 밝기 프리셋(다크·라이트)은 남긴다 — 바탕을 한 번에 맞추는 건 여기서도 쓸모 있다.
                */}
-              {!luckydraw && (
-              <>
               <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
                 대표 색 하나와 밝기만 정하면 나머지 색을 다 만들어요. 마음에 안 드는 색은 아래에서
                 손으로 고치면 됩니다. <b>읽히는지는 자동으로 맞춰요</b> — 안 읽히는 색은 대비를
@@ -601,8 +791,6 @@ export function SlotEditor() {
                   안 읽히던 {repaired.join(' · ')} 색은 대비를 맞춰 조정했어요.
                 </p>
               )}
-              </>
-              )}
 
               <p className="t-text-xs t-muted" style={{ margin: 'var(--space-base) 0 var(--space-sm)' }}>
                 바탕만 밝기 계열로 바꾸기 (브랜드 색은 그대로)
@@ -621,6 +809,80 @@ export function SlotEditor() {
                 ))}
               </div>
             </section>
+            )}
+
+            {/**
+             * 럭키드로우 설정은 **화면 요소별 카드**로 묶는다.
+             *
+             * 색은 색끼리, 크기는 크기끼리 늘어놓으면 "박스를 손보려면 색 목록에서 하나,
+             * 형태 목록에서 하나, 여백 목록에서 하나" 를 오가게 된다. 최고관리자가 실제로
+             * 하는 일은 "박스를 손본다" 이지 "색을 손본다" 가 아니다.
+             *
+             * 색 칸에 손을 올리면 미리보기에서 **그 자리가 깜빡인다** — "커버 배경" 이라는
+             * 이름만으로는 어디인지 모른다 (긁기 전에만 보이는 자리라 더 그렇다).
+             */}
+            {luckydraw &&
+              LUCKYDRAW_GROUPS.map((g) => (
+                <section key={g.title} className="admin-section">
+                  <h2 className="t-title-s admin-section__title">{g.title}</h2>
+                  {g.hint && (
+                    <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+                      {g.hint}
+                    </p>
+                  )}
+                  <div className={styles.fieldGrid}>
+                    {(g.colors ?? []).map((f) => {
+                      const key = f.key as keyof ThemeColors
+                      return (
+                        <div
+                          key={f.key}
+                          onMouseEnter={() => setHighlight(f.part)}
+                          onFocusCapture={() => setHighlight(f.part)}
+                          onMouseLeave={() => setHighlight(null)}
+                        >
+                          {f.alpha ? (
+                            <AlphaColor
+                              label={f.label}
+                              value={draft.theme.colors[key]}
+                              hint={f.hint}
+                              onChange={(v) => patchColor(key, v)}
+                            />
+                          ) : (
+                            <div className="field">
+                              <span className="field__label">{f.label}</span>
+                              <div className="color-field">
+                                <input
+                                  type="color"
+                                  value={hexOf(draft.theme.colors[key])}
+                                  aria-label={`${f.label} 고르기`}
+                                  onChange={(e) => patchColor(key, e.target.value)}
+                                />
+                                <input
+                                  className="input"
+                                  value={draft.theme.colors[key]}
+                                  onChange={(e) => patchColor(key, e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                    {(g.extras ?? []).map((x) => (
+                      <LuckydrawExtra
+                        key={x}
+                        kind={x}
+                        draft={draft}
+                        slug={saved.slug}
+                        patchSlot={patchSlot}
+                        patchShape={patchShape}
+                        patchAsset={patchAsset}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))}
+
 
             {COLOR_GROUPS.filter((g) =>
               luckydraw ? !g.tarotOnly : !g.luckydrawOnly
@@ -658,6 +920,8 @@ export function SlotEditor() {
               </section>
             ))}
 
+            {/* 럭키드로우는 박스·버튼 카드 안에서 각각 고친다 — 여기 두면 같은 값이 두 군데 뜬다 */}
+            {!luckydraw && (
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">형태 (radius)</h2>
               <div className="form-grid">
@@ -680,7 +944,10 @@ export function SlotEditor() {
                 ))}
               </div>
             </section>
+            )}
 
+            {/* 럭키드로우는 '배경' 카드가 이미지를 받는다 (로고·카드 이미지는 애초에 없다) */}
+            {!luckydraw && (
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">이미지</h2>
               {/* 이미지가 어디로 가는지는 저장소가 정한다 — 화면이 거짓말하면 안 된다 */}
@@ -697,6 +964,11 @@ export function SlotEditor() {
                 이미지로 깔립니다 — 모바일에서 길게 눌러 저장되지 않게.
               </p>
               <div className="form-grid">
+                {/**
+                 * 로고는 **타로 전용**이다 — 럭키드로우 화면엔 로고 자리가 없다
+                 * (원본 base-template 도 배경 이미지 하나만 받았다).
+                 */}
+                {!luckydraw && (
                 <ImageField
                   slug={saved.slug}
                   label="로고"
@@ -705,6 +977,9 @@ export function SlotEditor() {
                   onChange={(v) => patchAsset('logo', v)}
                   hint="없으면 이벤트명 텍스트가 나와요."
                 />
+                )}
+                {!luckydraw && (
+                <>
                 <div className="field">
                   <label className="field__label" htmlFor="a-logoalt">
                     로고 대체 텍스트
@@ -730,6 +1005,8 @@ export function SlotEditor() {
                     onChange={(e) => patchAsset('logoHeight', Number(e.target.value))}
                   />
                 </div>
+                </>
+                )}
                 <ImageField
                   slug={saved.slug}
                   label={luckydraw ? '배경 이미지' : '배경 패턴'}
@@ -828,6 +1105,7 @@ export function SlotEditor() {
                 )}
               </div>
             </section>
+            )}
 
             {!luckydraw && (
             <section className="admin-section">
@@ -965,205 +1243,6 @@ export function SlotEditor() {
             </section>
             )}
 
-            {/**
-             * 럭키드로우 겉모습 — **주최자는 못 건드린다** (테마의 일부다).
-             * 옮겨온 원본은 이 값들이 코드에 박혀 있어 행사마다 고칠 수가 없었다:
-             * 1·2등만 스크래치, 커버는 ♥, 배지는 50개 이하. 상품 구성은 행사마다 다르다.
-             */}
-            {luckydraw && (
-              <section className="admin-section">
-                <h2 className="t-title-s admin-section__title">럭키드로우 화면</h2>
-                <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                  오른쪽 미리보기의 <b>당첨</b> 탭에서 바로 확인할 수 있어요.
-                </p>
-
-                {(() => {
-                  const d = luckydrawDisplay(draft)
-                  const patchLd = (change: Partial<typeof d>) =>
-                    patchSlot((prev) => ({ luckydraw: { ...luckydrawDisplay(prev), ...change } }))
-
-                  /** hex 고르개 + 투명도 슬라이더 → rgba 한 값 (원본 빌더와 같은 짝) */
-                  const AlphaColor = ({
-                    label,
-                    value,
-                    hint,
-                    onChange,
-                  }: {
-                    label: string
-                    value: string
-                    hint?: string
-                    onChange: (v: string) => void
-                  }) => (
-                    <div className="field">
-                      <span className="field__label">{label}</span>
-                      <div className="color-field">
-                        <input
-                          type="color"
-                          value={hexOf(value)}
-                          aria-label={`${label} 고르기`}
-                          onChange={(e) => onChange(withAlphaValue(e.target.value, alphaOf(value)))}
-                        />
-                        <input
-                          type="range"
-                          min={0}
-                          max={1}
-                          step={0.05}
-                          value={alphaOf(value)}
-                          aria-label={`${label} 투명도`}
-                          onChange={(e) =>
-                            onChange(withAlphaValue(hexOf(value), Number(e.target.value)))
-                          }
-                        />
-                      </div>
-                      <span className="field__hint">
-                        {hint ? `${hint} · ` : ''}
-                        불투명도 {Math.round(alphaOf(value) * 100)}%
-                      </span>
-                    </div>
-                  )
-
-                  return (
-                    <div className={styles.fieldGrid}>
-                      <div className="field">
-                        <span className="field__label">본문 폰트</span>
-                        <select
-                          className="select"
-                          value={d.fontFamily}
-                          onChange={(e) => patchLd({ fontFamily: e.target.value as FontId })}
-                        >
-                          {Object.entries(WEBFONTS).map(([id, f]) => (
-                            <option key={id} value={id}>
-                              {f.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/**
-                       * 박스 배경은 **투명도가 핵심**이다 — 사진이 비쳐야 원본의 인상이 난다.
-                       * 그래서 테마 색(hex)이 아니라 여기서 rgba 로 덮어쓴다.
-                       */}
-                      <AlphaColor
-                        label="박스 배경색"
-                        value={draft.theme.colors.surface}
-                        hint="사진이 비칠수록 낮게"
-                        onChange={(v) => patchColor('surface', v)}
-                      />
-
-                      <AlphaColor
-                        label="관리자 링크 색"
-                        value={d.adminLinkColor}
-                        hint="손님 눈엔 안 띄고 스태프는 찾을 정도로"
-                        onChange={(v) => patchLd({ adminLinkColor: v })}
-                      />
-
-                      <label className="field">
-                        <span className="field__label">긁어서 여는 등수</span>
-                        <input
-                          className="input"
-                          value={d.highlightRanks.join(', ')}
-                          placeholder="1, 2"
-                          onChange={(e) =>
-                            patchLd({
-                              // "1, 2" → [1,2]. 숫자가 아닌 건 버린다 (빈 칸 = 전부 바로 보임)
-                              highlightRanks: e.target.value
-                                .split(',')
-                                .map((s) => Number(s.trim()))
-                                .filter((n) => Number.isFinite(n) && n > 0),
-                            })
-                          }
-                        />
-                        <span className="field__hint">
-                          비싼 등수만 긁게 해요. 전부 긁게 하면 10개 뽑을 때 10번 긁어야 해요.
-                        </span>
-                      </label>
-
-                      <label className="field">
-                        <span className="field__label">커버 문자</span>
-                        <input
-                          className="input"
-                          value={d.coverMark}
-                          maxLength={4}
-                          placeholder={DEFAULT_DISPLAY.coverMark}
-                          onChange={(e) => patchLd({ coverMark: e.target.value })}
-                        />
-                        <span className="field__hint">긁기 전에 덮여 있는 자리에 찍혀요.</span>
-                      </label>
-
-                      <label className="field">
-                        <span className="field__label">추첨 버튼 문구</span>
-                        <input
-                          className="input"
-                          value={d.drawLabel}
-                          placeholder={DEFAULT_DISPLAY.drawLabel}
-                          onChange={(e) => patchLd({ drawLabel: e.target.value })}
-                        />
-                      </label>
-
-                      <label className="field">
-                        <span className="field__label">마감 문구</span>
-                        <input
-                          className="input"
-                          value={d.closedText}
-                          placeholder={DEFAULT_DISPLAY.closedText}
-                          onChange={(e) => patchLd({ closedText: e.target.value })}
-                        />
-                      </label>
-
-                      <label className="field">
-                        <span className="field__label">박스 상단 여백 (px)</span>
-                        <input
-                          className="input"
-                          type="number"
-                          min={0}
-                          value={d.boxTopMargin}
-                          onChange={(e) =>
-                            patchLd({ boxTopMargin: Math.max(0, Number(e.target.value) || 0) })
-                          }
-                        />
-                        <span className="field__hint">
-                          박스를 화면 위에서 얼마나 내릴지. 배경 사진의 얼굴을 안 가리게 맞춰요.
-                        </span>
-                      </label>
-
-                      <label className="field">
-                        <span className="field__label">박스 안쪽 여백 (px)</span>
-                        <input
-                          className="input"
-                          type="number"
-                          min={0}
-                          value={d.boxPadding}
-                          onChange={(e) =>
-                            patchLd({ boxPadding: Math.max(0, Number(e.target.value) || 0) })
-                          }
-                        />
-                      </label>
-
-                      <label className="field">
-                        <span className="field__label">남은 수량 배지</span>
-                        <input
-                          className="input"
-                          type="number"
-                          min={0}
-                          value={d.lowStockThreshold ?? ''}
-                          placeholder="안 띄움"
-                          onChange={(e) =>
-                            patchLd({
-                              // 빈 칸 = 안 띄운다. 0 과 다르다 (0 은 "0개 남았을 때만")
-                              lowStockThreshold:
-                                e.target.value === '' ? null : Math.max(0, Number(e.target.value)),
-                            })
-                          }
-                        />
-                        <span className="field__hint">
-                          재고가 이 수 이하로 내려가면 “N개 남았어요”가 떠요. 비우면 안 띄워요.
-                        </span>
-                      </label>
-                    </div>
-                  )
-                })()}
-              </section>
-            )}
 
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">기간</h2>

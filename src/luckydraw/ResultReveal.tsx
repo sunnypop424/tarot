@@ -88,7 +88,7 @@ export function ResultReveal({
   if (summary) {
     return (
       <div className={styles.reveal}>
-        <h2 className="t-title-s">전체 결과</h2>
+        <h2 className="t-title-s" data-part="title">전체 결과</h2>
 
         <ul className={`stack ${styles.summary}`}>
           {grouped.map((p) => (
@@ -133,7 +133,7 @@ export function ResultReveal({
   return (
     <div className={styles.reveal}>
       {celebrate && <Confetti />}
-      <h2 className="t-title-s">당첨 결과</h2>
+      <h2 className="t-title-s" data-part="title">당첨 결과</h2>
 
       <ul className={styles.results} data-results>
         {results.map((p, i) => {
