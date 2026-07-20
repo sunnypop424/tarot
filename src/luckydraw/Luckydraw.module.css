@@ -484,15 +484,26 @@
   border-radius: 2px;
   background: var(--color-primary);
   /* 시간·회전은 조각마다 다르다 (Confetti.tsx 가 인라인으로 준다) — 뭉치면 한 번 번쩍이고 만다 */
-  animation: fall 2.6s cubic-bezier(0.2, 0.6, 0.5, 1) forwards;
+  animation: fall 4s cubic-bezier(0.2, 0.6, 0.5, 1) forwards;
 }
 
+/**
+ * **최고관리자가 고른 색으로만 만든다.**
+ *
+ * 전에는 primary · accent · accent-soft 를 섞었는데, 럭키드로우에서 accent 는 "커버 문자색"
+ * 이라 축하와 무관하고 accent-soft 는 대비 계산으로 **자동 파생되는 값**이라 아무도 고른 적 없는
+ * 색이 끼어들었다. 당첨 배경 · 버튼 배경 · 당첨 글자 — 이 화면이 이미 쓰는 색으로 맞춘다.
+ */
 .confettiPiece[data-tone='1'] {
-  background: var(--color-accent);
+  background: var(--color-high);
 }
 
+/**
+ * 세 번째 색은 **두 색을 섞어** 만든다. 당첨 글자색을 쓰려다 말았다 — 보통 흰색이라
+ * 밝은 배경 위에선 조각이 안 보인다. 섞은 색은 어떤 조합에서도 실제 색이 나온다.
+ */
 .confettiPiece[data-tone='2'] {
-  background: var(--color-accent-soft);
+  background: color-mix(in srgb, var(--color-primary) 50%, var(--color-high));
 }
 
 @keyframes fall {
