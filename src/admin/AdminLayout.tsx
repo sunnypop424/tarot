@@ -91,6 +91,16 @@ export function AdminLayout() {
           </nav>
 
           <div style={{ marginTop: 'auto' }}>
+            {/**
+             * **최고관리자로 들어와 있으면 그렇다고 말한다.**
+             * 남의 이벤트 데이터를 자기 것인 줄 알고 고치면 안 된다 — 여기 뜨는 상품·질문은
+             * 고객의 것이고, 고치면 그 고객 화면이 그 자리에서 바뀐다.
+             */}
+            {user?.owner && !user.slugs.includes(slot.slug) && (
+              <p className="t-text-xs" style={{ color: 'var(--color-accent)' }} data-owner-view>
+                최고관리자로 보는 중이에요 — 고치면 고객 화면에 바로 반영돼요.
+              </p>
+            )}
             {user && <p className="t-text-xs t-muted">{user.email}</p>}
             <button
               type="button"

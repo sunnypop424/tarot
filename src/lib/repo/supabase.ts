@@ -175,6 +175,12 @@ async function myAdminSlugs(): Promise<string[]> {
   return (data ?? []).map((row) => row.slug as string)
 }
 
+/** 최고관리자인가 — `owners` 는 자기 행만 읽힌다 (0001 의 정책) */
+async function amOwner(): Promise<boolean> {
+  const { data } = await (await db()).from('owners').select('user_id').maybeSingle()
+  return Boolean(data)
+}
+
 const auth: AuthRepo = {
   /**
    * 주최자 로그인 — 비밀번호가 맞아도 **그 슬롯 관리자가 아니면 못 들어온다.**
@@ -184,13 +190,17 @@ const auth: AuthRepo = {
     const { data, error } = await (await db()).auth.signInWithPassword({ email, password })
     if (error) throw new Error(error.message)
 
-    const mine = await myAdminSlugs()
-    if (!mine.includes(slug)) {
+    const [mine, owner] = await Promise.all([myAdminSlugs(), amOwner()])
+    /**
+     * **최고관리자는 어느 슬롯이든 들어온다.** RLS 가 이미 그렇게 돼 있는데 화면만 막고 있었다 —
+     * 고객이 "질문이 안 보여요" 하고 물어와도 대신 들어가 볼 수가 없었다.
+     */
+    if (!owner && !mine.includes(slug)) {
       // 남의 슬롯 로그인 화면에서 맞는 비번을 넣은 경우 — 세션을 남기지 않는다
       await (await db()).auth.signOut()
       throw new Error('이 슬롯의 관리자 계정이 아니에요')
     }
-    return { email: data.user.email ?? email, slugs: mine }
+    return { email: data.user.email ?? email, slugs: mine, owner }
   },
 
   async signOut() {
@@ -209,9 +219,10 @@ const auth: AuthRepo = {
   async currentUser(): Promise<AdminUser | null> {
     const { data } = await (await db()).auth.getUser()
     if (!data.user) return null
-    const slugs = await myAdminSlugs()
-    if (slugs.length === 0) return null
-    return { email: data.user.email ?? '', slugs }
+    const [slugs, owner] = await Promise.all([myAdminSlugs(), amOwner()])
+    // 맡은 슬롯도 없고 최고관리자도 아니면 관리 화면과 무관한 계정이다
+    if (slugs.length === 0 && !owner) return null
+    return { email: data.user.email ?? '', slugs, owner }
   },
 }
 

@@ -22,7 +22,8 @@ export function useAdminAuth(slug: string) {
     const current = await repo.auth.currentUser()
     // 이 슬롯을 안 맡은 계정이면 여기선 로그아웃 상태로 본다
     // (겸업 주최자라면 다른 슬롯에선 그대로 로그인 상태다 — 슬롯마다 훅이 따로 돈다)
-    const valid = current?.slugs.includes(slug) ? current : null
+    // 최고관리자는 어느 슬롯이든 (RLS 도 그렇게 돼 있다 — 화면만 막고 있었다)
+    const valid = current && (current.owner || current.slugs.includes(slug)) ? current : null
     setUser(valid)
     setStatus(valid ? 'in' : 'out')
   }, [slug])

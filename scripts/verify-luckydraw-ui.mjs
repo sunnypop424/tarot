@@ -203,6 +203,28 @@ try {
   check('배송 정보 메뉴가 있다', nav.includes('배송 정보'), seen)
   await page.screenshot({ path: join(outDir, 'luckydraw-2-admin.png'), fullPage: true })
 
+  // ── 2-b. 최고관리자도 들어갈 수 있어야 한다 ─────
+  //
+  // RLS 는 이미 최고관리자에게 전부 열려 있었는데(owner manages all …) 화면 게이트가
+  // slot_admins 만 봐서 **DB 는 허락하는데 화면이 막는** 상태였다.
+  // 고객이 "질문이 안 보여요" 하고 물어와도 대신 들어가 볼 수가 없었다.
+  {
+    const solo = await browser.newPage()
+    try {
+      await solo.goto(`${BASE}/${SLUG}/admin/login`, { waitUntil: 'networkidle0' })
+      await solo.type('#admin-email', 'owner@example.com')
+      await solo.type('#admin-password', OWNER_PASSWORD)
+      await Promise.all([solo.click('button[type="submit"]'), wait(2500)])
+
+      const body = await solo.evaluate(() => document.body.innerText)
+      check('최고관리자도 주최자 화면에 들어간다', body.includes('상품과 수량'), body.slice(0, 60))
+      // 남의 데이터를 자기 것인 줄 알고 고치면 안 된다
+      check('최고관리자로 보는 중임을 알린다', Boolean(await solo.$('[data-owner-view]')))
+    } finally {
+      await solo.close()
+    }
+  }
+
   // ── 3. 로그인 상태로 실제 추첨 ──────────────────
   await page.goto(`${BASE}/${SLUG}`, { waitUntil: 'networkidle0' })
   await wait(800)
