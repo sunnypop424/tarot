@@ -223,6 +223,8 @@ export default function LuckydrawApp() {
                 <p className={styles.lowStock}>{remaining}개 남았어요</p>
               )}
 
+              {/* 카운터 + 빠른선택은 "수량 고르기" 한 덩어리 — 붙여야 그렇게 읽힌다 */}
+              <div className={styles.countGroup}>
               <div className={styles.counter}>
                 <button
                   type="button"
@@ -259,12 +261,14 @@ export default function LuckydrawApp() {
                   <button
                     key={n}
                     type="button"
-                    className={`btn btn--ghost ${count === n ? styles.quickOn : ''}`}
+                    className={styles.quickBtn}
+                    data-on={count === n || undefined}
                     onClick={() => setCount(n)}
                   >
                     {n}개
                   </button>
                 ))}
+              </div>
               </div>
 
               {/**
@@ -275,7 +279,7 @@ export default function LuckydrawApp() {
                */}
               <button
                 type="button"
-                className="btn btn--primary btn--block"
+                className={`btn btn--primary btn--block ${styles.drawBtn}`}
                 disabled={(authStatus !== 'in' && !previewing) || drawing}
                 onClick={draw}
                 data-draw

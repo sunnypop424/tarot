@@ -25,7 +25,8 @@
   align-items: center;
   /* 원본과 같이 **세로 가운데** — 여기에 박스의 margin-top 이 더해진다 */
   justify-content: center;
-  gap: var(--space-base);
+  /* 박스와 관리자 링크 사이 — 16px 이면 박스 그림자에 거의 닿는다 */
+  gap: 28px;
   padding: var(--space-lg) var(--space-base);
   /* 사진 배경이 화면을 다 덮어야 한다 — 박스는 그 위에 뜬다 */
   position: relative;
@@ -41,7 +42,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-lg);
+  /**
+   * 배너 · 컨트롤 · 결과 사이 간격. 20px 인 이유는 아래 `.controls` 가 자기 안에서
+   * 다시 묶기 때문이다 — 전부 24px 로 균등하게 벌리면 무엇이 한 덩어리인지 안 보인다.
+   */
+  gap: 20px;
+
+  /**
+   * **사진 위에 뜬 카드로 보이게 한다.** 반투명이기만 하면 그냥 색이 옅은 판이고,
+   * 뒤가 흐려져야 비로소 "위에 떠 있다" 가 된다. 사진 배경을 쓰는 디자인에서
+   * 이게 있고 없고의 차이가 제일 크다.
+   */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card-lifted, 0 16px 40px rgb(0 0 0 / 0.18));
 }
 
 /**
@@ -53,7 +67,15 @@
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  /* 수량 덩어리와 DRAW 사이 — 안쪽(8px)보다 넓어야 두 덩어리로 읽힌다 */
+  gap: 20px;
+}
+
+/** 카운터 + 빠른선택은 "수량 고르기" 한 덩어리다 — 붙여야 그렇게 읽힌다 */
+.countGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /** 박스 아래 흐릿하게 — 손님 눈에 띄지 않고 스태프만 찾는다 (원본과 같은 자리) */
@@ -69,19 +91,22 @@
   opacity: 0.8;
 }
 
-/* 원본과 같은 12px·16/12px 패딩·테두리 있는 배너 */
+/**
+ * 리허설 안내 — **스태프에게 주는 경고지 손님이 볼 정보가 아니다.**
+ * 채운 블록으로 두면 박스에서 제일 큰 덩어리가 되어 이 화면의 주인공처럼 앉는다.
+ * 알약으로 줄여 "켜져 있다" 만 알린다.
+ */
 .rehearsal {
-  width: 100%;
   margin: 0;
-  padding: 12px 16px;
+  padding: 5px 12px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: 9999px;
   text-align: center;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.5;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
   background: var(--color-wash);
-  color: var(--color-fg-2);
+  color: var(--color-fg-3);
 }
 
 /* 재고 경고는 알약 모양 14px — 원본의 rounded-full */
@@ -154,12 +179,34 @@
 .quick {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-sm);
+  gap: 8px;
 }
 
-.quickOn {
+/**
+ * **누를 수 있는 것처럼 보여야 한다.** ghost 버튼으로 뒀더니 테두리도 배경도 없어
+ * 라벨인지 버튼인지 알 수 없었다 (원본은 흰 배경 + 회색 테두리였다).
+ */
+.quickBtn {
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-fg-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--dur-micro, 0.12s) ease, background var(--dur-micro, 0.12s) ease;
+}
+
+.quickBtn:hover {
+  border-color: var(--color-border-hover);
+}
+
+/* 고른 것은 **채워서** 구분한다 — 글자색만 바꾸면 뭘 골랐는지 잘 안 보인다 */
+.quickBtn[data-on] {
   border-color: var(--color-primary);
-  color: var(--color-primary-soft);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
 }
 
 /**
@@ -173,6 +220,22 @@
   padding: 0 16px;
   font-size: 14px;
   letter-spacing: 0.025em;
+}
+
+/**
+ * **이 화면은 이 버튼을 누르는 화면이다.** 수량 입력칸과 같은 크기로 세 번째 줄에 두면
+ * 주인공이 아니라 그냥 항목 하나가 된다. 높이·글자를 키우고 살짝 띄워 눌러야 할 곳을 못박는다.
+ */
+.drawBtn {
+  min-height: 52px;
+  height: 52px;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+.drawBtn:disabled {
+  box-shadow: none;
 }
 
 /* ── 결과 ──────────────────────────────────── */

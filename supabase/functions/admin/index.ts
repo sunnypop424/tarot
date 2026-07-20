@@ -247,7 +247,19 @@ async function createOrganizer(body: Record<string, unknown>, origin: string | n
        * 비번을 새로 줘야 하면 목록의 "비밀번호 재발급" 을 쓴다.
        */
       const existing = await findOrganizerByEmail(email)
-      if (!existing) return bad(409, '이미 있는 이메일이에요', origin)
+      /**
+       * 이메일은 쓰이고 있는데 **주최자는 아니다** — 최고관리자 계정이거나, 슬롯이 지워져
+       * 매핑만 사라진 계정이다. 여기서 그냥 붙여주면 최고관리자 계정이 슬롯 주최자가 되어
+       * 역할 분리가 깨지므로 거절한다. 다만 **왜 거절인지는 말해준다**:
+       * "이미 있는 이메일이에요" 만 보면 겸업 연결이 되는지 안 되는지조차 알 수 없다.
+       */
+      if (!existing) {
+        return bad(
+          409,
+          '이 이메일은 이미 다른 용도로 쓰이고 있어요 (최고관리자 계정이거나, 슬롯이 지워진 계정). 다른 슬롯의 주최자 계정이면 그 슬롯에서 먼저 확인해 주세요.',
+          origin
+        )
+      }
 
       const { error: linkError } = await admin
         .from('slot_admins')
