@@ -8,9 +8,9 @@
  * `rgba(r, g, b, a)` 의 알파 — 없으면 1.
  * 박스 배경처럼 **사진이 비쳐야 하는 색**은 hex 로 표현할 수 없어 rgba 로 저장된다.
  */
-export function alphaOf(color: string): number {
+export function alphaOf(color: string | null | undefined): number {
   const m = /^rgba?\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*(?:,\s*([\d.]+)\s*)?\)$/i.exec(
-    color.trim()
+    String(color ?? '').trim()
   )
   return m ? Math.min(1, Math.max(0, Number(m[1] ?? 1))) : 1
 }
@@ -36,15 +36,22 @@ export function withAlphaValue(hex: string, alpha: number): string {
  * 무엇과 섞일지 알 수 없다. 최고관리자가 고른 불투명 색으로 재는 편이 예측 가능하고,
  * 실제로 사진 위에서 어떻게 보이는지는 미리보기가 답한다.
  */
-function toRgb(hex: string): [number, number, number] | null {
-  const rgba = /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/i.exec(hex.trim())
+function toRgb(hex: string | null | undefined): [number, number, number] | null {
+  /**
+   * **없는 값도 받는다.** 테마에 색 키를 새로 더하면 그 전에 저장된 슬롯엔 그 키가 없다
+   * (`high`·`onHigh` 를 추가했을 때 실제로 편집기가 하얗게 죽었다).
+   * 색 하나가 비었다고 화면이 통째로 죽으면 안 된다 — 못 읽는 색은 null 로 답하고,
+   * 부르는 쪽이 기본값으로 그린다.
+   */
+  const value = String(hex ?? '').trim()
+  const rgba = /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/i.exec(value)
   if (rgba) {
     return [Number(rgba[1]), Number(rgba[2]), Number(rgba[3])].map((v) =>
       Math.min(255, Math.max(0, Math.round(v)))
     ) as [number, number, number]
   }
 
-  const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim())
+  const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(value)
   if (!m) return null
   const body = m[1]
   const full =

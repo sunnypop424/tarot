@@ -168,7 +168,17 @@ try {
       name: '럭키드로우 편집기 검증',
       service: 'luckydraw',
       period: {},
-      theme: SEED_THEME,
+      /**
+       * **새로 더한 색 키를 일부러 뺀다** — 실제 DB 의 옛 슬롯이 그 상태다.
+       * high·onHigh 를 추가했을 때 옛 슬롯을 열자 편집기가 통째로 하얗게 죽었는데,
+       * 검증이 늘 최신 테마로 슬롯을 만들어서 못 잡았다.
+       */
+      theme: (() => {
+        const t = structuredClone(SEED_THEME)
+        delete t.colors.high
+        delete t.colors.onHigh
+        return t
+      })(),
       event: {},
     }),
   })

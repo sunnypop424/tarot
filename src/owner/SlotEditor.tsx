@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Download, Save, Sparkles } from 'lucide-react'
 
+import defaultThemeJson from '@/data/slot-default.json'
 import { getSlotDeck } from '@/data/slots'
 import { SERVICES, getSlotService, type ServiceId } from '@/data/services'
 import { PLANS, getPlan, planById, effectiveLimits, type PlanId } from '@/data/plans'
@@ -361,7 +362,23 @@ export function SlotEditor() {
   // 다 읽었거나 다른 슬롯으로 옮겨가면 그 슬롯의 저장된 값으로 초안을 새로 뜬다
   useEffect(() => {
     if (!slots) return
-    setDraft(slots.find((s) => s.slug === slug))
+    const found = slots.find((s) => s.slug === slug)
+    /**
+     * **없는 색 키를 기본값으로 채운다.**
+     *
+     * 테마에 색을 새로 더하면 그 전에 저장된 슬롯엔 그 키가 없다 — `high`·`onHigh` 를
+     * 추가했을 때 옛 슬롯을 열자 편집기가 통째로 하얗게 죽었다 (undefined 를 색으로 읽으려다).
+     * 저장할 때 채우면 늦다: 화면이 먼저 그려지기 때문이다. 읽어오는 이 자리가 맞다.
+     */
+    setDraft(
+      found && {
+        ...found,
+        theme: {
+          ...found.theme,
+          colors: { ...defaultThemeJson.colors, ...found.theme.colors },
+        },
+      }
+    )
     setSlugError(null)
     // slots 는 저장할 때만 바뀐다 — 저장 직후 초안을 되짚는 건 같은 값이라 무해하다
   }, [slug, slots])

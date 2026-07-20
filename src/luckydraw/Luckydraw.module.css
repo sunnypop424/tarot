@@ -332,12 +332,13 @@
 
 .confettiPiece {
   position: absolute;
-  top: -20px;
-  width: 8px;
-  height: 12px;
+  top: -24px;
+  width: 9px;
+  height: 14px;
   border-radius: 2px;
   background: var(--color-primary);
-  animation: fall 1.6s ease-out forwards;
+  /* 시간·회전은 조각마다 다르다 (Confetti.tsx 가 인라인으로 준다) — 뭉치면 한 번 번쩍이고 만다 */
+  animation: fall 2.6s cubic-bezier(0.2, 0.6, 0.5, 1) forwards;
 }
 
 .confettiPiece[data-tone='1'] {
@@ -349,12 +350,20 @@
 }
 
 @keyframes fall {
-  from {
+  0% {
     transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  /* 나타나는 건 빨리 — 위에서 스르륵 켜지면 "터진" 느낌이 안 난다 */
+  6% {
     opacity: 1;
   }
-  to {
-    transform: translate3d(var(--drift), 110vh, 0) rotate(540deg);
+  /* 거의 끝까지 보이다가 바닥 근처에서 사라진다 (중간에 꺼지면 "터지다 마는" 그 느낌이다) */
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--drift), 110vh, 0) rotate(var(--spin, 540deg));
     opacity: 0;
   }
 }
