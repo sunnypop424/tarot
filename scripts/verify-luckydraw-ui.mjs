@@ -243,6 +243,31 @@ try {
       () => document.querySelectorAll('[data-results] li[data-open]').length
     )
     check('긁으면 열린다', opened > 0, `${opened}개 열림`)
+
+    /**
+     * **폭죽이 박스 밖에서 터지는가.**
+     * 박스에 `backdrop-filter` 를 넣는 순간 그 요소가 자손 `position: fixed` 의 기준이 되어
+     * 화면을 덮어야 할 폭죽이 박스 안에 갇혔다. body 로 포털해 푼 것을 여기서 잰다 —
+     * transform·filter 를 조상에 추가할 때마다 다시 걸릴 수 있는 함정이다.
+     */
+    const confetti = await page.evaluate(() => {
+      const piece = document.querySelector('[aria-hidden="true"] > span')
+      const layer = piece?.parentElement
+      if (!layer) return { found: false }
+      const box = document.querySelector('[data-part="box"]')
+      return {
+        found: true,
+        inBox: box?.contains(layer) ?? false,
+        width: Math.round(layer.getBoundingClientRect().width),
+        viewport: window.innerWidth,
+      }
+    })
+    check('폭죽이 박스 안에 갇히지 않는다', confetti.found && !confetti.inBox, JSON.stringify(confetti))
+    check(
+      '폭죽이 화면 전체를 덮는다',
+      confetti.found && confetti.width >= confetti.viewport - 1,
+      `${confetti.width} / ${confetti.viewport}`
+    )
     await page.screenshot({ path: join(outDir, 'luckydraw-4-revealed.png') })
   }
 

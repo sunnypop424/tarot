@@ -182,6 +182,7 @@ export default function LuckydrawApp() {
             '--ld-box-top': `${display.boxTopMargin}px`,
             '--ld-box-padding': `${display.boxPadding}px`,
             '--ld-admin-link': display.adminLinkColor,
+            '--ld-shadow': display.boxShadowColor,
             '--ld-font': WEBFONTS[display.fontFamily]?.stack,
           } as React.CSSProperties
         }

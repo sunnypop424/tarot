@@ -60,6 +60,14 @@ export interface LuckydrawDisplay {
   adminLinkColor: string
 
   /**
+   * 박스 그림자 색 — 투명도가 붙은 rgba.
+   *
+   * 배경 사진에 따라 어울리는 값이 다르다: 밝은 사진 위에선 짙은 그림자가 박스를 띄우고,
+   * 어두운 사진 위에선 같은 값이 그냥 검은 얼룩이 된다. 투명도를 0 으로 두면 그림자가 없다.
+   */
+  boxShadowColor: string
+
+  /**
    * 본문 폰트 — 옮겨온 원본이 고르게 하던 세 가지 (`WEBFONTS`).
    * 값은 `font-family` 스택 그대로 들어간다.
    */
@@ -130,7 +138,7 @@ export const LUCKYDRAW_GROUPS: {
   /** 이 카드에 같이 오는 형태·여백·문구 칸 (편집기가 이름으로 알아본다) */
   extras?: (
     | 'boxRadius' | 'boxPadding' | 'boxTopMargin' | 'buttonRadius'
-    | 'font' | 'background' | 'texts' | 'cover' | 'badge' | 'footer'
+    | 'font' | 'background' | 'texts' | 'cover' | 'badge' | 'footer' | 'shadow'
   )[]
 }[] = [
   {
@@ -139,7 +147,7 @@ export const LUCKYDRAW_GROUPS: {
     colors: [
       { key: 'surface', label: '배경색', part: 'box', alpha: true, hint: '사진이 비칠수록 낮게' },
     ],
-    extras: ['boxRadius', 'boxPadding', 'boxTopMargin'],
+    extras: ['boxRadius', 'boxPadding', 'boxTopMargin', 'shadow'],
   },
   {
     title: '버튼',
@@ -221,6 +229,7 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
    * 만든 칸인데 무슨 색인지 확인할 수가 없다. 어두운 사진을 깔면 흰색으로 바꾸면 된다.
    */
   adminLinkColor: 'rgba(0, 0, 0, 0.45)',
+  boxShadowColor: 'rgba(0, 0, 0, 0.12)',
   // 원본 빌더의 기본이자 추천값이었다 — 획이 또렷해 부스 태블릿에서 멀리서도 읽힌다
   fontFamily: 'paperlogy',
 }
@@ -249,6 +258,7 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
     boxTopMargin: saved.boxTopMargin ?? DEFAULT_DISPLAY.boxTopMargin,
     boxPadding: saved.boxPadding ?? DEFAULT_DISPLAY.boxPadding,
     adminLinkColor: saved.adminLinkColor || DEFAULT_DISPLAY.adminLinkColor,
+    boxShadowColor: saved.boxShadowColor || DEFAULT_DISPLAY.boxShadowColor,
     // 없는 폰트 id 가 저장돼 있으면 기본으로 (옛 저장분·손으로 고친 JSON)
     fontFamily: saved.fontFamily && saved.fontFamily in WEBFONTS ? saved.fontFamily : DEFAULT_DISPLAY.fontFamily,
   }

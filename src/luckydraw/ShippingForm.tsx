@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 
 import { repo } from '@/lib/repo'
 import styles from './Luckydraw.module.css'
@@ -47,7 +48,11 @@ export function ShippingForm({ slug, prizes, onClose }: Props) {
     }
   }
 
-  return (
+  /**
+   * 폭죽과 같은 이유로 **body 로 뺀다** — 박스의 `backdrop-filter` 가 `position: fixed` 의
+   * 기준이 되어, 화면을 덮어야 할 시트가 박스 안에 갇힌다.
+   */
+  return createPortal(
     <div className={styles.sheet} role="dialog" aria-modal="true" aria-label="배송 정보 입력">
       <div className={`surface ${styles.sheetBody}`}>
         {done ? (
@@ -124,6 +129,7 @@ export function ShippingForm({ slug, prizes, onClose }: Props) {
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

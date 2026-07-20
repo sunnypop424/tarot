@@ -225,6 +225,15 @@ function LuckydrawExtra({
           </select>
         </div>
       )
+    case 'shadow':
+      return (
+        <AlphaColor
+          label="그림자 색"
+          value={d.boxShadowColor}
+          hint="밝은 사진 위엔 짙게, 어두운 사진 위엔 옅게. 0% 면 그림자 없음"
+          onChange={(v) => patchLd({ boxShadowColor: v })}
+        />
+      )
     case 'footer':
       return text(
         '오른쪽 아래 표기',

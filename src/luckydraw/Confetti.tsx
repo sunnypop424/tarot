@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { createPortal } from 'react-dom'
 
 import styles from './Luckydraw.module.css'
 
@@ -40,7 +41,14 @@ export function Confetti() {
     []
   )
 
-  return (
+  /**
+   * **body 로 빼서 그린다.**
+   *
+   * 박스(`.panel`)에 `backdrop-filter` 를 넣는 순간 그 요소가 자손 `position: fixed` 의
+   * 새 기준(containing block)이 된다 — 화면 전체를 덮어야 할 폭죽이 **박스 안에 갇혔다.**
+   * transform·filter·perspective 도 같은 일을 한다. 조상이 뭘 하든 안 흔들리게 포털로 뺀다.
+   */
+  return createPortal(
     <div className={styles.confetti} aria-hidden="true">
       {pieces.map((p, i) => (
         <span
@@ -56,6 +64,7 @@ export function Confetti() {
           }}
         />
       ))}
-    </div>
+    </div>,
+    document.body
   )
 }

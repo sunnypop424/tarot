@@ -55,7 +55,12 @@
    */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: var(--shadow-card-lifted, 0 16px 40px rgb(0 0 0 / 0.18));
+  /**
+   * 그림자는 **은은해야 한다** — 앱 기본(shadow-card-lifted)은 어두운 카드 위를 전제로 한
+   * 값이라 밝은 사진 위 박스에 쓰면 박스가 무겁게 떠 보인다.
+   * 색은 슬롯이 정한다: 사진이 밝으면 짙은 그림자가, 어두우면 옅은 그림자가 어울린다.
+   */
+  box-shadow: 0 8px 24px var(--ld-shadow, rgb(0 0 0 / 0.12));
 }
 
 /**
@@ -293,11 +298,12 @@
 }
 
 /* 비싼 등수는 열리고 나면 색이 바뀐다 — 최고관리자가 고른 당첨 색 한 쌍 */
+/* 그림자는 안 얹는다 — 40px 짜리 작은 칸에 글로우까지 붙이면 지저분해진다.
+   당첨은 색이 바뀌는 것만으로 충분히 눈에 띈다 */
 .resultItem[data-high][data-open] {
   background: var(--color-high);
   color: var(--color-on-high);
   border-color: var(--color-high);
-  box-shadow: var(--shadow-glow);
 }
 
 .resultLabel {
