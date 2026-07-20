@@ -142,6 +142,7 @@ try {
   const shell = await page.evaluate(() => ({
     tabbar: !!document.querySelector('.tabbar'),
     draw: !!document.querySelector('[data-draw]'),
+    drawDisabled: document.querySelector('[data-draw]')?.disabled === true,
     rehearsal: !!document.querySelector('[data-rehearsal]'),
     text: document.body.innerText,
   }))
@@ -155,7 +156,12 @@ try {
   check('자바스크립트 오류가 없다', pageErrors.length === 0, pageErrors[0]?.slice(0, 120) ?? '')
 
   check('럭키드로우 셸에 탭바가 없다 (타로 셸이 안 샌다)', !shell.tabbar)
-  check('로그인 전에는 DRAW 버튼이 없다', !shell.draw)
+  /**
+   * 버튼은 **있고 비활성**이다 (원본과 같다). 로그인 링크로 바꿔치우면 손님이 보는 화면의
+   * 주인공이 로그인 버튼이 되고, 로그인 뒤엔 버튼 위치가 달라져 스태프가 한 번 더 헤맨다.
+   */
+  check('로그인 전에도 DRAW 버튼은 자리에 있다', shell.draw)
+  check('로그인 전에는 DRAW 가 비활성이다', shell.drawDisabled)
   check('스태프 로그인으로 유도한다', shell.text.includes('스태프 로그인'), shell.text.slice(0, 60))
   check('리허설 안내가 뜬다', shell.rehearsal)
   await page.screenshot({ path: join(outDir, 'luckydraw-1-visitor.png') })

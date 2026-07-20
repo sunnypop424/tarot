@@ -1,4 +1,10 @@
-/* 럭키드로우 — 화면이 하나뿐이라 탭바도 헤더도 없다. 가운데 패널 하나가 전부다 */
+/**
+ * 럭키드로우 — 화면이 하나뿐이라 탭바도 헤더도 없다.
+ *
+ * 배치는 옮겨온 원본을 그대로 따른다. **가운데 정렬이 아니라 위에서 내려 앉힌다**:
+ * 배경이 보통 아이돌 사진이고 얼굴이 화면 위쪽에 오는 경우가 많아서, 가운데 두면 얼굴을 덮는다.
+ * 얼마나 내릴지는 사진마다 다르므로 슬롯 설정(`boxTopMargin`)이 정한다.
+ */
 .app {
   display: flex;
   flex-direction: column;
@@ -7,24 +13,50 @@
 .stage {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: var(--space-lg);
+  gap: var(--space-base);
+  padding: var(--space-lg) var(--space-base);
+  /* 사진 배경이 화면을 다 덮어야 한다 — 박스는 그 위에 뜬다 */
+  position: relative;
+  z-index: 1;
 }
 
 .panel {
   width: 100%;
-  max-width: 420px;
-  padding: var(--space-xl);
+  /* 원본과 같은 480px — 아이패드 가로에서도 이 폭을 넘기지 않는다 */
+  max-width: 480px;
+  margin-top: var(--ld-box-top, 160px);
+  padding: var(--ld-box-padding, 32px);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-lg);
 }
 
+/**
+ * 컨트롤은 박스보다 **좁다** (원본 260px). 박스를 꽉 채우면 버튼이 과하게 넓어져
+ * "누르는 곳" 이라는 느낌이 흐려진다 — 원본의 인상이 여기서 나온다.
+ */
 .controls {
+  width: 260px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-sm);
+}
+
+/** 박스 아래 흐릿하게 — 손님 눈에 띄지 않고 스태프만 찾는다 (원본과 같은 자리) */
+.adminLink {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--color-fg3);
+  opacity: 0.6;
+}
+
+.adminLink:hover {
+  opacity: 1;
 }
 
 .rehearsal,
@@ -100,30 +132,40 @@
 
 /* ── 결과 ──────────────────────────────────── */
 .reveal {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
-  align-items: stretch;
+  gap: var(--space-base);
+  align-items: center;
   text-align: center;
 }
 
+/**
+ * 결과 타일 — 원본과 같이 **한 줄에 3개**, 넘치면 안에서 스크롤된다.
+ * 박스가 늘어나면 화면 밖으로 밀려 "전체 결과 보기" 버튼이 안 보이게 된다.
+ */
 .results {
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--space-sm);
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
-  max-height: 46vh;
+  max-height: 190px;
   overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.results::-webkit-scrollbar {
+  display: none;
 }
 
 .resultItem {
   position: relative;
-  flex: 1 1 calc(33.333% - var(--space-sm));
-  min-width: 96px;
-  min-height: 44px;
+  width: calc((100% - 20px) / 3);
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,8 +178,9 @@
 
   opacity: 0;
   /* 순서대로 나타난다 — 이 시차가 "하나씩 열린다" 는 느낌을 만든다 */
-  animation: rise 0.5s ease-out forwards;
-  animation-delay: calc(var(--i) * 0.12s);
+  /* 원본과 같은 0.5초 간격 — 한 장씩 넘어가는 리듬이 이 연출의 전부다 */
+  animation: rise 0.8s ease-out forwards;
+  animation-delay: calc(var(--i) * 0.5s);
 }
 
 /* 비싼 등수는 열리고 나면 색이 바뀐다.

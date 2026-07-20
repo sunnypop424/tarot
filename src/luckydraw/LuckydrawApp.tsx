@@ -130,7 +130,16 @@ export default function LuckydrawApp() {
 
   return (
     <div className={`app ${styles.app}`}>
-      <main className={styles.stage}>
+      <main
+        className={styles.stage}
+        /* 박스 위치·여백은 슬롯이 정한다 — 배경 사진마다 얼굴이 오는 높이가 다르다 */
+        style={
+          {
+            '--ld-box-top': `${display.boxTopMargin}px`,
+            '--ld-box-padding': `${display.boxPadding}px`,
+          } as React.CSSProperties
+        }
+      >
         <div className={`surface ${styles.panel}`}>
           {previewView ? (
             <ResultReveal
@@ -213,30 +222,21 @@ export default function LuckydrawApp() {
               </div>
 
               {/**
-               * 로그인 전에는 버튼 대신 **왜 못 누르는지**를 보여준다.
-               * 비활성 버튼만 두면 스태프가 "고장났나" 하고 행사 중에 헤맨다.
+               * 버튼은 **늘 이 자리에 있고 로그인 전엔 비활성**이다 (원본과 같다).
+               * 로그인 링크로 바꿔치우면 손님이 보는 화면의 주인공이 로그인 버튼이 되고,
+               * 로그인한 뒤엔 버튼 위치가 달라져 스태프가 한 번 더 헤맨다.
+               * 어디로 가야 하는지는 박스 아래 흐린 링크가 말해준다 (원본과 같은 자리).
                */}
-              {authStatus === 'in' ? (
-                <button
-                  type="button"
-                  className="btn btn--primary btn--block"
-                  disabled={drawing}
-                  onClick={draw}
-                  data-draw
-                >
-                  {drawing ? '뽑는 중…' : display.drawLabel}
-                </button>
-              ) : (
-                <Link to={`/${slot.slug}/admin`} className="btn btn--primary btn--block">
-                  {authStatus === 'checking' ? '확인 중…' : '스태프 로그인'}
-                </Link>
-              )}
+              <button
+                type="button"
+                className="btn btn--primary btn--block"
+                disabled={(authStatus !== 'in' && !previewing) || drawing}
+                onClick={draw}
+                data-draw
+              >
+                {drawing ? '뽑는 중…' : display.drawLabel}
+              </button>
 
-              {authStatus === 'out' && (
-                <p className="t-text-xs t-muted">
-                  추첨은 스태프만 할 수 있어요. 로그인하면 버튼이 열려요.
-                </p>
-              )}
                 </div>
               )}
             </>
@@ -248,6 +248,17 @@ export default function LuckydrawApp() {
             </p>
           )}
         </div>
+
+        {/**
+         * 관리자 진입은 **박스 밖 아래**에 흐릿하게 (원본과 같은 자리).
+         * 손님 눈엔 안 띄고 스태프는 어디 있는지 안다 — 박스 안에 크게 두면
+         * 추첨 화면의 주인공이 로그인 버튼이 돼 버린다.
+         */}
+        {authStatus !== 'in' && !previewing && (
+          <Link to={`/${slot.slug}/admin`} className={styles.adminLink}>
+            {authStatus === 'checking' ? '확인 중…' : '스태프 로그인'}
+          </Link>
+        )}
       </main>
     </div>
   )

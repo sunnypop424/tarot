@@ -32,6 +32,17 @@ export interface LuckydrawDisplay {
   drawLabel: string
   /** 마감됐을 때 방문자에게 보이는 문구 */
   closedText: string
+
+  /**
+   * 박스를 화면 위에서 얼마나 내릴지 (px).
+   *
+   * 옮겨온 원본의 `boxMarginTop` 이다. 가운데 정렬이 아니라 **위에서 내려 앉히는** 이유는
+   * 배경이 보통 사진이기 때문이다 — 아이돌 얼굴이 화면 위쪽에 오는 사진이 많아서,
+   * 박스를 가운데 두면 얼굴을 덮는다. 얼마나 내릴지는 사진마다 다르다.
+   */
+  boxTopMargin: number
+  /** 박스 안쪽 여백 (px) — 원본의 `boxPadding` */
+  boxPadding: number
 }
 
 export const DEFAULT_DISPLAY: LuckydrawDisplay = {
@@ -40,6 +51,9 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   lowStockThreshold: 50,
   drawLabel: 'DRAW!',
   closedText: '럭키드로우가 마감되었습니다',
+  // 원본 빌더의 기본값 그대로 (160px / 2rem)
+  boxTopMargin: 160,
+  boxPadding: 32,
 }
 
 /**
@@ -60,5 +74,8 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
         : saved.lowStockThreshold,
     drawLabel: saved.drawLabel || DEFAULT_DISPLAY.drawLabel,
     closedText: saved.closedText || DEFAULT_DISPLAY.closedText,
+    // 0 은 유효한 값이다 (박스를 맨 위에 붙임) — ?? 로 기본값에 먹히면 안 된다
+    boxTopMargin: saved.boxTopMargin ?? DEFAULT_DISPLAY.boxTopMargin,
+    boxPadding: saved.boxPadding ?? DEFAULT_DISPLAY.boxPadding,
   }
 }

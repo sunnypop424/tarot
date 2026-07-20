@@ -93,6 +93,9 @@ const BASE_KEYS = [
   'canvas', 'surface', 'surfaceRaised', 'wash', 'fg1', 'fg2', 'fg3', 'border', 'borderHover',
 ] as const satisfies readonly (keyof ThemeColors)[]
 
+/** 기본 다크 바탕 — "아직 색을 안 골랐다" 를 이 값으로 판정한다 */
+const DARK_CANVAS = '#0F1020'
+
 const BASE_PRESETS: { id: 'dark' | 'light'; label: string; base: Pick<ThemeColors, (typeof BASE_KEYS)[number]> }[] = [
   {
     id: 'dark',
@@ -467,7 +470,21 @@ export function SlotEditor() {
                     id="slot-service"
                     className="select"
                     value={getSlotService(draft)}
-                    onChange={(e) => patchSlot({ service: e.target.value as ServiceId })}
+                    onChange={(e) => {
+                      const next = e.target.value as ServiceId
+                      patchSlot({ service: next })
+                      /**
+                       * 럭키드로우는 **라이트가 기본**이다 — 배경이 보통 밝은 아이돌 사진이라
+                       * 그 위에 뜨는 박스가 어두우면 어울리지 않는다.
+                       *
+                       * 다만 **손대지 않은 슬롯일 때만** 바꾼다. 이미 색을 고른 슬롯에서
+                       * 서비스를 바꿨다고 그 선택을 지워버리면, 되돌릴 방법이 없다.
+                       */
+                      const untouched = draft.theme.colors.canvas === DARK_CANVAS
+                      if (next === 'luckydraw' && untouched) {
+                        applyBase(BASE_PRESETS.find((p) => p.id === 'light')!.base)
+                      }
+                    }}
                   >
                     {SERVICES.map((s) => (
                       <option key={s.id} value={s.id}>
@@ -488,6 +505,13 @@ export function SlotEditor() {
 
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">색 만들기</h2>
+              {/**
+               * 럭키드로우는 **AI 색 생성을 안 쓴다** — 배경이 대개 정해진 사진이고 그 위에
+               * 얹는 색이 몇 개뿐이라, 대표 색에서 한 벌을 만들 이유가 없다.
+               * 밝기 프리셋(다크·라이트)은 남긴다 — 바탕을 한 번에 맞추는 건 여기서도 쓸모 있다.
+               */}
+              {!luckydraw && (
+              <>
               <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
                 대표 색 하나와 밝기만 정하면 나머지 색을 다 만들어요. 마음에 안 드는 색은 아래에서
                 손으로 고치면 됩니다. <b>읽히는지는 자동으로 맞춰요</b> — 안 읽히는 색은 대비를
@@ -565,6 +589,8 @@ export function SlotEditor() {
                 <p className="t-text-xs" style={{ marginTop: 'var(--space-base)', color: 'var(--color-accent-soft)' }}>
                   안 읽히던 {repaired.join(' · ')} 색은 대비를 맞춰 조정했어요.
                 </p>
+              )}
+              </>
               )}
 
               <p className="t-text-xs t-muted" style={{ margin: 'var(--space-base) 0 var(--space-sm)' }}>
@@ -693,11 +719,36 @@ export function SlotEditor() {
                 </div>
                 <ImageField
                   slug={saved.slug}
-                  label="배경 패턴"
+                  label={luckydraw ? '배경 이미지' : '배경 패턴'}
                   name="background"
                   value={draft.theme.assets.backgroundPattern}
-                  onChange={(v) => patchAsset('backgroundPattern', v)}
+                  onChange={(v) =>
+                    /**
+                     * 럭키드로우는 배경이 **패턴이 아니라 사진**이다 — 화면을 꽉 채우는 한 장.
+                     * 그래서 올리는 순간 cover·안 반복·불투명 1 로 못박는다.
+                     * 원본 빌더도 파일 하나만 받았다: 사진을 올리는 사람에게 CSS
+                     * background-size 를 물어볼 이유가 없다.
+                     */
+                    luckydraw
+                      ? patchSlot((prev) => ({
+                          theme: {
+                            ...prev.theme,
+                            assets: {
+                              ...prev.theme.assets,
+                              backgroundPattern: v,
+                              backgroundPatternSize: 'cover',
+                              backgroundPatternRepeat: 'no-repeat',
+                              backgroundPatternOpacity: 1,
+                            },
+                          },
+                        }))
+                      : patchAsset('backgroundPattern', v)
+                  }
+                  hint={luckydraw ? '화면을 꽉 채워요. 박스가 얹힐 자리를 비워둔 사진이 좋아요.' : undefined}
                 />
+                {/* 패턴 세부(크기·반복·불투명도)는 타로 전용 — 사진 배경엔 물어볼 게 없다 */}
+                {!luckydraw && (
+                <>
                 <div className="field">
                   <label className="field__label" htmlFor="a-bgo">
                     배경 패턴 불투명도 (0~1)
@@ -739,7 +790,9 @@ export function SlotEditor() {
                     onChange={(e) => patchAsset('backgroundPatternRepeat', e.target.value)}
                   />
                 </div>
-                {/* 카드도 AI 리딩도 럭키드로우엔 없다 — 로고·배경 패턴만 남긴다 */}
+                </>
+                )}
+                {/* 카드도 AI 리딩도 럭키드로우엔 없다 — 로고·배경 이미지만 남긴다 */}
                 {!luckydraw && (
                   <>
                     <ImageField
@@ -968,6 +1021,35 @@ export function SlotEditor() {
                           value={d.closedText}
                           placeholder={DEFAULT_DISPLAY.closedText}
                           onChange={(e) => patchLd({ closedText: e.target.value })}
+                        />
+                      </label>
+
+                      <label className="field">
+                        <span className="field__label">박스 상단 여백 (px)</span>
+                        <input
+                          className="input"
+                          type="number"
+                          min={0}
+                          value={d.boxTopMargin}
+                          onChange={(e) =>
+                            patchLd({ boxTopMargin: Math.max(0, Number(e.target.value) || 0) })
+                          }
+                        />
+                        <span className="field__hint">
+                          박스를 화면 위에서 얼마나 내릴지. 배경 사진의 얼굴을 안 가리게 맞춰요.
+                        </span>
+                      </label>
+
+                      <label className="field">
+                        <span className="field__label">박스 안쪽 여백 (px)</span>
+                        <input
+                          className="input"
+                          type="number"
+                          min={0}
+                          value={d.boxPadding}
+                          onChange={(e) =>
+                            patchLd({ boxPadding: Math.max(0, Number(e.target.value) || 0) })
+                          }
                         />
                       </label>
 
