@@ -77,10 +77,15 @@ async function isOwner(req: Request): Promise<boolean> {
  * 이걸 안 보면 최고관리자가 **다른 최고관리자의 비밀번호를 바꾸거나 계정을 지울 수 있다.**
  * slot_admins 에 있는 계정만 만질 수 있게 잠근다 — 최고관리자 계정은 SQL 로만 다룬다
  * (docs/BACKEND.md §1-3).
+ *
+ * **`.maybeSingle()` 을 쓰면 안 된다** — 한 계정이 슬롯 여럿을 맡을 수 있게 되면서
+ * (`0006_multi_slot_admins.sql`) 겸업 주최자는 행이 여러 개다. maybeSingle 은 그 경우 에러를
+ * 주는데, 여기서 그 에러를 삼키면 `null` 이 되어 "주최자 계정이 아니에요" 404 가 된다 —
+ * 겸업 주최자만 비밀번호 재설정도 계정 삭제도 안 되는, **조용히 망가지는** 버그가 된다.
  */
-async function organizerSlug(userId: string): Promise<string | null> {
-  const { data } = await admin.from('slot_admins').select('slug').eq('user_id', userId).maybeSingle()
-  return data?.slug ?? null
+async function organizerSlugs(userId: string): Promise<string[]> {
+  const { data } = await admin.from('slot_admins').select('slug').eq('user_id', userId)
+  return (data ?? []).map((row) => row.slug as string)
 }
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -108,7 +113,29 @@ Deno.serve(async (req) => {
   const url = new URL(req.url)
   const route = url.pathname.split('/').filter(Boolean).pop()
 
-  // 아무 경로도 최고관리자 없이는 열리지 않는다 — 먼저 막고 본다
+  /**
+   * 만료 슬롯 청소 — **부르는 주체가 사람이 아니라 스케줄러다.**
+   *
+   * 최고관리자 세션이 없으므로 `is_owner()` 로는 못 막는다. 공유 비밀로 막고,
+   * 그 비밀은 Edge Function secret 에만 산다 (`CRON_SECRET`). 아래 isOwner 검사보다
+   * **먼저** 처리해야 한다 — 안 그러면 403 에 걸려 영영 안 돈다.
+   *
+   * secret 이 설정 안 돼 있으면 **닫는다.** 빈 문자열끼리 맞아떨어져 아무나 부를 수 있게 되면
+   * 그 순간 남이 우리 슬롯을 통째로 지울 수 있다 (fail-closed).
+   */
+  if (route === 'purge-expired') {
+    const expected = Deno.env.get('CRON_SECRET') ?? ''
+    if (!expected || req.headers.get('x-cron-secret') !== expected) {
+      return bad(403, '허용되지 않은 호출이에요', origin)
+    }
+    try {
+      return await purgeExpired(origin)
+    } catch (e) {
+      return bad(500, String(e), origin)
+    }
+  }
+
+  // 나머지 경로는 최고관리자 없이는 열리지 않는다 — 먼저 막고 본다
   if (!(await isOwner(req))) return bad(403, '최고관리자만 쓸 수 있어요', origin)
 
   try {
@@ -164,6 +191,26 @@ async function listOrganizers(url: URL, origin: string | null) {
   return json({ organizers }, 200, origin)
 }
 
+/**
+ * 이 이메일이 **이미 주최자인가** — 맞으면 그 user_id.
+ *
+ * `auth.users` 는 PostgREST 로 못 읽고 GoTrue 에는 "이메일로 찾기" 가 없다. 전체 사용자를
+ * 페이지로 훑는 대신 **slot_admins 에 있는 계정만** 확인한다: 훑는 양이 전체 사용자가 아니라
+ * 주최자 수(슬롯 수 남짓)로 줄고, 덤으로 "주최자가 아닌 계정은 안 걸린다" 가 공짜로 따라온다 —
+ * 최고관리자 계정이 이 경로로 슬롯에 묶이는 사고를 막는다.
+ */
+async function findOrganizerByEmail(email: string): Promise<string | null> {
+  const { data: rows } = await admin.from('slot_admins').select('user_id')
+  const ids = [...new Set((rows ?? []).map((r) => r.user_id as string))]
+  const found = await Promise.all(
+    ids.map(async (id) => {
+      const { data } = await admin.auth.admin.getUserById(id)
+      return data.user?.email?.toLowerCase() === email ? id : null
+    })
+  )
+  return found.find((id) => id !== null) ?? null
+}
+
 // ── 계정 생성 + 슬롯 지정 ───────────────────────────
 async function createOrganizer(body: Record<string, unknown>, origin: string | null) {
   const slug = String(body.slug ?? '')
@@ -190,7 +237,37 @@ async function createOrganizer(body: Record<string, unknown>, origin: string | n
     const message = createError?.message ?? '계정을 만들지 못했어요'
     // GoTrue 는 영어로 답한다 — 화면에 그대로 내보내지 않는다
     if (/already|exists|registered/i.test(message)) {
-      return bad(409, '이미 있는 이메일이에요', origin)
+      /**
+       * 이미 있는 이메일 = **겸업 주최자를 이 슬롯에도 연결**하는 자리다
+       * (`0006_multi_slot_admins.sql` 이 열어준 경로). 타로 슬롯을 쓰던 주최자에게
+       * 럭키드로우 슬롯을 열어줄 때 여기로 온다.
+       *
+       * **비밀번호는 건드리지 않는다.** 입력된 비번으로 덮으면 그 사람이 이미 쓰고 있는
+       * 다른 슬롯 로그인이 그 순간 깨진다 — 계정은 하나이기 때문이다.
+       * 비번을 새로 줘야 하면 목록의 "비밀번호 재발급" 을 쓴다.
+       */
+      const existing = await findOrganizerByEmail(email)
+      if (!existing) return bad(409, '이미 있는 이메일이에요', origin)
+
+      const { error: linkError } = await admin
+        .from('slot_admins')
+        .upsert({ user_id: existing, slug }, { onConflict: 'user_id,slug', ignoreDuplicates: true })
+      if (linkError) return bad(500, linkError.message, origin)
+
+      const { data: user } = await admin.auth.admin.getUserById(existing)
+      return json(
+        {
+          organizer: {
+            userId: existing,
+            email,
+            createdAt: user.user?.created_at ?? new Date().toISOString(),
+          },
+          // 화면이 "새 계정" 과 "기존 계정 연결" 을 다르게 안내해야 한다 (비번이 그대로이므로)
+          linked: true,
+        },
+        200,
+        origin
+      )
     }
     return bad(400, message, origin)
   }
@@ -232,7 +309,9 @@ async function createOrganizer(body: Record<string, unknown>, origin: string | n
 async function resetPassword(body: Record<string, unknown>, origin: string | null) {
   const userId = String(body.userId ?? '')
   if (!userId) return bad(400, '계정이 없어요', origin)
-  if (!(await organizerSlug(userId))) return bad(404, '주최자 계정이 아니에요', origin)
+  if ((await organizerSlugs(userId)).length === 0) {
+    return bad(404, '주최자 계정이 아니에요', origin)
+  }
 
   const password = tempPassword()
   const { error } = await admin.auth.admin.updateUserById(userId, { password })
@@ -257,55 +336,165 @@ async function purgeSlot(body: Record<string, unknown>, origin: string | null) {
   const slug = String(body.slug ?? '')
   if (!slug) return bad(400, '슬롯이 없어요', origin)
 
-  // 1) 이 슬롯 주최자들의 계정을 계정째 지운다
+  try {
+    return json({ ok: true, ...(await purgeOne(slug)) }, 200, origin)
+  } catch (e) {
+    return bad(500, String(e), origin)
+  }
+}
+
+/**
+ * 만료된 슬롯 자동 청소 — 스케줄러가 하루 한 번 부른다 (`0009_slot_lifecycle.sql` §5).
+ *
+ * **대상 판정을 여기서 하지 않는다.** "마감 +15일" 이라는 규칙은 DB 의 `expired_slots()` 에
+ * 하나만 있어야 한다 — 함수와 SQL 이 각자 날짜를 계산하면 언젠가 어긋나고, 어긋난 쪽이
+ * 지우는 쪽이면 **살아 있는 행사가 사라진다.**
+ *
+ * 한 슬롯이 실패해도 나머지는 계속 지운다. 실패를 통째로 물고 죽으면 그날 청소가 전부 밀린다.
+ */
+async function purgeExpired(origin: string | null) {
+  const { data, error } = await admin.rpc('expired_slots')
+  if (error) return bad(500, error.message, origin)
+
+  const targets = (data ?? []) as { slug: string; name: string }[]
+  const purged: { slug: string; deletedAccounts: number; deletedFiles: number }[] = []
+  const failed: { slug: string; error: string }[] = []
+
+  for (const t of targets) {
+    try {
+      purged.push({ slug: t.slug, ...(await purgeOne(t.slug)) })
+    } catch (e) {
+      failed.push({ slug: t.slug, error: String(e) })
+    }
+  }
+
+  /**
+   * 스케줄러가 읽을 로그다 — 무엇을 지웠는지 남겨야 나중에 "왜 없어졌지" 에 답할 수 있다.
+   * 슬러그까지 남기는 이유: 되살릴 수 없는 작업이라 "무엇이" 사라졌는지가 유일한 단서다.
+   */
+  for (const p of purged) {
+    console.log(`[purge-expired] ${p.slug} — 계정 ${p.deletedAccounts} · 파일 ${p.deletedFiles}`)
+  }
+  for (const f of failed) console.error(`[purge-expired] ${f.slug} 실패 — ${f.error}`)
+  console.log(`[purge-expired] 대상 ${targets.length} · 삭제 ${purged.length} · 실패 ${failed.length}`)
+
+  return json({ ok: true, purged, failed }, 200, origin)
+}
+
+/** 슬롯 하나를 통째로 지운다 — `purgeSlot`(수동)과 `purgeExpired`(자동)가 같이 쓴다 */
+async function purgeOne(slug: string): Promise<{ deletedAccounts: number }> {
+  // 1) 이 슬롯 주최자들의 계정 — **다른 슬롯도 맡고 있으면 지우지 않는다**
   const { data: admins, error: listError } = await admin
     .from('slot_admins')
     .select('user_id')
     .eq('slug', slug)
-  if (listError) return bad(500, listError.message, origin)
+  // 여기서는 Response 를 만들지 않고 던진다 — 부르는 쪽이 둘이고(수동·자동) 응답 모양이 다르다
+  if (listError) throw new Error(listError.message)
 
   let deletedAccounts = 0
   for (const a of admins ?? []) {
+    /**
+     * 한 계정이 슬롯 여럿을 맡을 수 있게 되면서(`0006_multi_slot_admins.sql`) 이 검사가 생겼다.
+     * 없으면 **타로 슬롯을 지웠을 뿐인데 그 주최자의 럭키드로우 슬롯 로그인까지 증발한다** —
+     * 계정이 사라지고 cascade 가 남은 매핑까지 쓸어가므로 되돌릴 수도 없다.
+     * 이 슬롯이 그 사람의 **마지막** 슬롯일 때만 계정을 지운다.
+     */
+    const slugs = await organizerSlugs(a.user_id)
+    if (slugs.some((s) => s !== slug)) continue
+
     const { error } = await admin.auth.admin.deleteUser(a.user_id)
     // 이미 대시보드에서 지운 계정이면 404 가 온다 — 매핑은 slot 삭제 때 cascade 로 정리된다
     if (!error) deletedAccounts++
   }
 
   // 2) 올린 이미지 — best-effort. 실패해도 슬롯 삭제로 넘어간다 (남아도 비용일 뿐)
+  let deletedFiles = 0
   try {
-    const paths: string[] = []
-    for (const prefix of [slug, `${slug}/cards`]) {
-      const { data: files } = await admin.storage.from('slots').list(prefix, { limit: 200 })
-      for (const f of files ?? []) {
-        // list 는 재귀가 아니다 — 하위 폴더(cards)는 id 가 없다. 파일만 지운다
-        if (f.id) paths.push(`${prefix}/${f.name}`)
-      }
+    const paths = await storagePaths(slug)
+    // remove 는 한 번에 받는 양에 한계가 있다 — 끊어서 보낸다
+    for (let i = 0; i < paths.length; i += 100) {
+      const chunk = paths.slice(i, i + 100)
+      const { error } = await admin.storage.from('slots').remove(chunk)
+      if (!error) deletedFiles += chunk.length
     }
-    if (paths.length) await admin.storage.from('slots').remove(paths)
   } catch {
     // 무시 — 이미지는 남아도 격리·보안 문제가 아니다
   }
 
-  // 3) 슬롯 행 — cascade 가 questions·slot_admins·ai_usage·reading_cache 를 쓸어간다
+  // 3) 슬롯 행 — cascade 가 questions·slot_admins·prizes·draw_logs·shipping_entries 까지 쓸어간다
   const { error: delError } = await admin.from('slots').delete().eq('slug', slug)
-  if (delError) return bad(500, delError.message, origin)
+  if (delError) throw new Error(delError.message)
 
-  return json({ ok: true, deletedAccounts }, 200, origin)
+  return { deletedAccounts, deletedFiles }
 }
 
-// ── 계정 삭제 ──────────────────────────────────────
+/**
+ * 슬롯이 올린 파일 **전부** — 재귀로 훑고 페이지를 끝까지 넘긴다.
+ *
+ * 예전엔 `list(prefix, {limit: 200})` 를 `slug` 와 `slug/cards` 두 곳에만 돌렸다. 둘 다 새는 구멍이다:
+ *  - 카드 앞면만 78장이고 다시 올린 것까지 쌓이면 **200을 넘긴다** — 넘긴 만큼 그대로 남는다.
+ *  - 폴더 이름을 손으로 적어 뒀으니 **새 폴더가 생기면 조용히 빠진다.**
+ * 남은 파일은 지운 이벤트의 이미지가 공개 버킷에 계속 서 있다는 뜻이다 (버킷이 public read 다).
+ *
+ * `id` 가 없는 항목이 폴더다 — Storage 의 list 는 재귀가 아니라서 직접 내려간다.
+ */
+async function storagePaths(prefix: string, depth = 0): Promise<string[]> {
+  // 폴더 구조는 slug/cards 정도라 3단이면 충분하다. 순환은 없지만 무한 재귀는 막아 둔다
+  if (depth > 3) return []
+
+  const PAGE = 100
+  const out: string[] = []
+
+  for (let offset = 0; ; offset += PAGE) {
+    const { data, error } = await admin.storage
+      .from('slots')
+      .list(prefix, { limit: PAGE, offset })
+    if (error || !data?.length) break
+
+    for (const entry of data) {
+      const path = `${prefix}/${entry.name}`
+      if (entry.id) out.push(path)
+      else out.push(...(await storagePaths(path, depth + 1)))
+    }
+
+    if (data.length < PAGE) break
+  }
+
+  return out
+}
+
+// ── 슬롯에서 빼기 (마지막 슬롯이면 계정 삭제) ────────
+/**
+ * **슬러그를 받는다.** 한 계정이 슬롯 여럿을 맡을 수 있게 되면서(`0006_multi_slot_admins.sql`)
+ * "이 계정을 지운다" 는 말이 모호해졌다 — 어느 슬롯에서 빼는 건지 말해야 한다.
+ *
+ * 마지막 슬롯이면 **계정째** 지운다. 매핑만 지우면 로그인은 되는데 아무 데도 못 들어가는
+ * 계정이 남고, 그 이메일로 다시 만들 수도 없어서(중복) 나중에 더 곤란해진다.
+ * 다른 슬롯이 남아 있으면 **매핑만** 뺀다 — 그 사람은 남은 슬롯에서 계속 일해야 한다.
+ */
 async function revokeOrganizer(body: Record<string, unknown>, origin: string | null) {
   const userId = String(body.userId ?? '')
+  const slug = String(body.slug ?? '')
   if (!userId) return bad(400, '계정이 없어요', origin)
-  if (!(await organizerSlug(userId))) return bad(404, '주최자 계정이 아니에요', origin)
+  if (!slug) return bad(400, '슬롯이 없어요', origin)
 
-  /**
-   * 매핑만 지우지 않고 **계정째** 지운다.
-   * 매핑만 지우면 로그인은 되는데 아무 데도 못 들어가는 계정이 남는다 —
-   * 그 이메일로 다시 계정을 만들 수도 없어서(중복) 나중에 더 곤란해진다.
-   * slot_admins 는 auth.users(id) 를 on delete cascade 로 참조하므로 매핑은 따라 지워진다.
-   */
+  const slugs = await organizerSlugs(userId)
+  if (slugs.length === 0) return bad(404, '주최자 계정이 아니에요', origin)
+  if (!slugs.includes(slug)) return bad(404, '이 슬롯의 주최자가 아니에요', origin)
+
+  // 다른 슬롯이 남아 있다 → 이 슬롯 매핑만 뺀다 (계정은 살려 둔다)
+  if (slugs.some((s) => s !== slug)) {
+    const { error } = await admin
+      .from('slot_admins')
+      .delete()
+      .eq('user_id', userId)
+      .eq('slug', slug)
+    if (error) return bad(500, error.message, origin)
+    return json({ ok: true, deletedAccount: false }, 200, origin)
+  }
+
+  // 마지막 슬롯 → 계정째. slot_admins 는 auth.users(id) 를 on delete cascade 로 참조한다
   const { error } = await admin.auth.admin.deleteUser(userId)
   if (error) return bad(400, error.message, origin)
-  return json({ ok: true }, 200, origin)
+  return json({ ok: true, deletedAccount: true }, 200, origin)
 }

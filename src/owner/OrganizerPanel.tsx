@@ -43,6 +43,12 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
    */
   const [issued, setIssued] = useState<{ email: string; password: string } | null>(null)
   const [copied, setCopied] = useState(false)
+  /**
+   * 방금 **기존 주최자를 이 슬롯에 연결**했다 (계정을 만든 게 아니다).
+   * 안내문을 안 띄우는 대신 이 사실을 말해 줘야 한다 — 최고관리자가 "비번이 왜 안 나오지?" 하고
+   * 헤매거나, 입력했던 비번을 그대로 전달하는 사고를 막는다.
+   */
+  const [linked, setLinked] = useState(false)
 
   const load = useCallback(async () => {
     try {
@@ -75,9 +81,15 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
     run(async () => {
       const trimmed = email.trim()
       const pw = password
-      await repo.organizers.create(slug, trimmed, pw)
-      // 방금 만든 계정으로 안내문을 채운다 — 비번은 지금 아는 값이다
-      setIssued({ email: trimmed, password: pw })
+      const created = await repo.organizers.create(slug, trimmed, pw)
+      /**
+       * 이미 주최자인 이메일이면 **계정을 새로 만든 게 아니라 이 슬롯에 연결**한 것이다
+       * (겸업 주최자 — 타로 슬롯을 쓰던 사람에게 럭키드로우 슬롯을 열어줄 때).
+       * 그 경우 비밀번호는 **그 사람이 쓰던 그대로**라 여기서 입력한 값이 아니다 —
+       * 안내문에 넣으면 틀린 비번을 전달하게 된다.
+       */
+      setIssued(created.linked ? null : { email: trimmed, password: pw })
+      setLinked(created.linked === true)
       setCopied(false)
       setEmail('')
       setPassword('')
@@ -86,7 +98,8 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
   function handleReset(o: Organizer) {
     if (
       !confirm(
-        `${o.email} 의 비밀번호를 새로 발급할까요?\n지금 쓰던 비밀번호는 그 즉시 못 씁니다.`
+        // 겸업 주최자면 **다른 슬롯 로그인도 같이** 바뀐다 — 계정이 하나이기 때문이다
+        `${o.email} 의 비밀번호를 새로 발급할까요?\n지금 쓰던 비밀번호는 그 즉시 못 씁니다.\n그 계정이 맡은 다른 슬롯의 로그인도 같이 바뀝니다.`
       )
     ) {
       return
@@ -94,6 +107,7 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
     void run(async () => {
       const password = await repo.organizers.resetPassword(o.userId)
       setIssued({ email: o.email, password })
+      setLinked(false)
       setCopied(false)
     }, '비밀번호를 발급하지 못했어요')
   }
@@ -140,9 +154,11 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
   }
 
   function handleRemove(o: Organizer) {
-    // 되돌릴 수 없다 — 계정째 지운다
-    if (!confirm(`${o.email} 계정을 지울까요?\n이 슬롯의 관리 화면에 더는 못 들어옵니다.`)) return
-    void run(() => repo.organizers.remove(o.userId), '계정을 지우지 못했어요')
+    // 되돌릴 수 없다. 다른 슬롯도 맡고 있으면 이 슬롯에서만 빠지고 계정은 남는다 (서버가 판단한다)
+    if (!confirm(`${o.email} 을 이 슬롯에서 뺄까요?\n이 슬롯의 관리 화면에 더는 못 들어옵니다.`)) {
+      return
+    }
+    void run(() => repo.organizers.remove(slug, o.userId), '계정을 빼지 못했어요')
   }
 
   const canCreate =
@@ -159,6 +175,17 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
       {slugPending && (
         <p className="field__error" style={{ marginTop: 'var(--space-sm)' }}>
           슬러그를 고쳤어요. 계정은 저장된 슬롯(<b>{slug}</b>)에 매이니 먼저 저장하세요.
+        </p>
+      )}
+
+      {/**
+       * 기존 주최자를 이 슬롯에 **연결**한 경우 — 계정을 만든 게 아니라 슬롯을 하나 더 준 것이다.
+       * 비밀번호는 그 사람이 쓰던 그대로라 안내문을 만들 값이 없다 (있다고 착각하면 안 된다).
+       */}
+      {linked && (
+        <p className="t-text-s" data-linked>
+          이미 있는 주최자 계정이라 <b>이 슬롯에 연결</b>했어요. 비밀번호는 그 계정이 쓰던 그대로라
+          따로 전달할 값이 없어요 — 새 비밀번호가 필요하면 아래 목록에서 재발급하세요.
         </p>
       )}
 

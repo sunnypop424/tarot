@@ -34,7 +34,14 @@ export function Login() {
     setError(null)
     try {
       await signIn(email, password)
-      navigate(`/${slot.slug}/admin/questions`, { replace: true })
+      /**
+       * **첫 화면을 여기서 정하지 않는다.** 예전엔 `/admin/questions` 로 박아 뒀는데,
+       * 럭키드로우 슬롯엔 그 경로가 없어서 catch-all 로 떨어지고 무한 리다이렉트가 났다
+       * (`/admin/questions/prizes/prizes/prizes/…` 로 URL 이 끝없이 자란다).
+       * `/admin` 으로만 보내고 어느 화면이 첫 화면인지는 AdminRoutes 의 index 가 정한다 —
+       * 서비스가 늘어도 이 줄은 안 바뀐다.
+       */
+      navigate(`/${slot.slug}/admin`, { replace: true })
     } catch (e) {
       // 왜 안 되는지 말한다 — "이 슬롯 관리자가 아니에요" 와 "비번이 틀렸어요"는 다른 문제다
       setError(e instanceof Error ? reasonOf(e.message) : '로그인하지 못했어요.')

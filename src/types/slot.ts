@@ -1,5 +1,6 @@
 import type { Theme } from './theme'
 import type { DeckRange } from '@/data/cards'
+import type { LuckydrawDisplay } from '@/data/luckydraw'
 import type { ServiceId } from '@/data/services'
 import type { PlanId } from '@/data/plans'
 
@@ -98,4 +99,10 @@ export interface Slot {
   period?: SlotPeriod
   theme: Theme
   event: EventConfig
+  /**
+   * 럭키드로우 서비스의 **겉모습** — 최고관리자만 정한다 (`src/data/luckydraw.ts`).
+   * 타로 슬롯엔 없다. `event` 가 타로 전용인 것과 같은 짝이고,
+   * 서비스와 무관한 색·형태는 `theme` 이 갖는다.
+   */
+  luckydraw?: Partial<LuckydrawDisplay>
 }

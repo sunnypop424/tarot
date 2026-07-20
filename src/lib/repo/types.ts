@@ -49,8 +49,17 @@ export interface QuestionRepo {
 
 export interface AdminUser {
   email: string
-  /** 이 관리자가 관리할 수 있는 슬롯 — 다른 슬롯의 관리 화면은 막아야 한다 */
-  slug: string
+  /**
+   * 이 관리자가 맡은 슬롯들 — 여기 없는 슬롯의 관리 화면은 막아야 한다.
+   *
+   * **한 계정이 여러 슬롯을 가질 수 있다** (`0006_multi_slot_admins.sql`). 같은 행사 주최자가
+   * 타로 슬롯과 럭키드로우 슬롯을 동시에 갖는 경우가 생겼기 때문이다 — 계정을 두 개 주면
+   * 행사 당일 두 번 로그인해야 한다.
+   *
+   * 배열이어도 **"지금 어느 슬롯인가"는 여기서 정하지 않는다** — 늘 URL 이 정한다(SlotProvider).
+   * 이 배열은 "그 주소에 들어갈 자격이 있나"만 답한다.
+   */
+  slugs: string[]
 }
 
 export interface AuthRepo {
@@ -182,16 +191,26 @@ export interface OrganizersRepo {
   /**
    * 계정 생성 + 슬롯 지정을 **한 번에**. 둘로 나누면 사이에서 실패했을 때
    * 로그인은 되는데 아무 슬롯도 못 보는 유령 계정이 남는다 (그 이메일은 이미 쓰여서 재사용도 안 된다).
+   *
+   * **이미 주최자인 이메일이면 그 계정을 이 슬롯에도 연결한다** (`linked: true`) —
+   * 타로 슬롯을 쓰던 주최자에게 럭키드로우 슬롯을 열어주는 자리다. 이때 **비밀번호는
+   * 바뀌지 않는다**: 계정이 하나이므로 덮어쓰면 그 사람의 다른 슬롯 로그인이 깨진다.
    */
-  create(slug: string, email: string, password: string): Promise<Organizer>
+  create(slug: string, email: string, password: string): Promise<Organizer & { linked?: boolean }>
   /**
    * **임시 비밀번호를 발급받는다** — 최고관리자가 정하는 게 아니라 서버가 만들어 돌려준다.
    * 돌아온 값은 **이때 한 번만** 볼 수 있다 (해시로만 저장되므로 다시 못 꺼낸다).
    * 주최자는 그걸로 들어와 `AuthRepo.changePassword` 로 자기 것으로 바꾼다.
    */
   resetPassword(userId: string): Promise<string>
-  /** 매핑만이 아니라 **계정째** 지운다 */
-  remove(userId: string): Promise<void>
+  /**
+   * 이 슬롯에서 뺀다 — **마지막 슬롯이면 계정째** 지운다.
+   *
+   * slug 를 받는 이유: 한 계정이 슬롯 여럿을 맡을 수 있으므로(`0006_multi_slot_admins.sql`)
+   * "계정을 지운다" 만으로는 어느 슬롯에서 빼는지 알 수 없다. 다른 슬롯이 남아 있으면
+   * 매핑만 빼고 계정은 살린다 — 그 사람은 남은 슬롯에서 계속 일해야 한다.
+   */
+  remove(slug: string, userId: string): Promise<void>
   /**
    * 슬롯과 관련된 **모든 것**을 지운다 — 주최자 계정·이미지·질문·사용량까지.
    *
@@ -199,7 +218,105 @@ export interface OrganizersRepo {
    * 남긴다 (`auth.users`, service_role 이라야 지운다). 그래서 슬롯 삭제는 이 경로를 탄다.
    * 돌려주는 수는 실제로 지운 계정 수.
    */
-  purgeSlot(slug: string): Promise<{ deletedAccounts: number }>
+  purgeSlot(slug: string): Promise<{ deletedAccounts: number; deletedFiles?: number }>
+}
+
+/** 상품 한 줄 — 등수는 표의 행 순서다 (1등이 위) */
+export interface Prize {
+  id: string
+  rank: number
+  name: string
+  /**
+   * **지금 뽑을 수 있는 수량 — 이게 단일 진실이다.**
+   *
+   * 원본(Firebase)엔 '전체 수량'과 '남은 수량'이 따로 있었지만, 전체를 고치면 남은 수량이
+   * 그 값으로 덮이는 구조라 매일 재입력하는 순간 '전체'가 거짓이 됐다. 칸은 하나고,
+   * **관리자가 적은 값이 곧 뽑을 수 있는 수량**이다 (운영이 이 약속 위에 서 있다).
+   */
+  remaining: number
+  requiresShipping: boolean
+  /**
+   * 한 묶음에 이 상품이 나올 수 있는 최대 비율 — 상한은 `ceil(뽑기수 × ratio)`.
+   * null 이면 이 상품은 제한 없음. **슬롯 설정이 꺼져 있으면 값이 있어도 무시된다.**
+   */
+  batchCapRatio?: number | null
+}
+
+/** 마감 리포트 행 — 상품 + 소진 집계 (소진은 draw_logs 에서 센다) */
+export interface PrizeReport extends Prize {
+  /** 오늘(KST) 실제로 나간 수 — 리허설분은 빠진다 */
+  consumedToday: number
+  consumedTotal: number
+}
+
+/** 주최자가 행사 중에 바꾸는 값들 — 테마(최고관리자 소관)와 섞지 않는다 */
+export interface LuckydrawSettings {
+  displayMode: 'rank' | 'prize' | 'both'
+  /** 설정 잠금 — 스태프 오입력 방지. 추첨은 계속 된다 */
+  locked: boolean
+  /** 행사 마감 — 추첨이 막힌다 */
+  closed: boolean
+  /** 리허설 — 뽑아도 재고가 안 깎인다. **기본이 켜짐**이다 (실수로 재고를 태우는 게 더 비싸다) */
+  rehearsal: boolean
+  /** 다중 뽑기 출현 제한 마스터 스위치 — 기본 꺼짐. 원하는 주최자만 켠다 */
+  batchCapEnabled: boolean
+}
+
+export interface DrawnPrize {
+  prizeId: string
+  rank: number
+  name: string
+  requiresShipping: boolean
+}
+
+export interface DrawResult {
+  batchId: string
+  /** 리허설이었나 — 화면이 "재고가 안 깎였다"고 말해야 한다 */
+  rehearsal: boolean
+  /** 뽑은 순서 그대로 */
+  results: DrawnPrize[]
+  /** 추첨 직후의 재고 — 왕복을 한 번 아끼려고 같이 온다 */
+  prizes: Prize[]
+}
+
+export interface ShippingEntry {
+  id: string
+  name: string
+  phone: string
+  address: string
+  /** 당첨 시점 스냅샷 */
+  prizes: { rank: number; name: string; count: number }[]
+  createdAt: string
+}
+
+/**
+ * 럭키드로우 (두 번째 서비스).
+ *
+ * **추첨은 클라이언트가 하지 않는다.** 원본(Firebase)은 재고를 읽고 뽑고 깎는 걸 전부
+ * 브라우저에서 했다 — 관리자 토큰만 있으면 재고를 마음대로 쓸 수 있는 구조다.
+ * 여기서 `draw` 는 서버 함수 한 발이고(`draw_prizes`), 화면은 그 사실조차 몰라도 된다.
+ *
+ * `ready()` 가 false 면 이 서비스는 **아예 못 돈다** — 타로와 달리 localStorage 로 흉내 낼 수
+ * 없기 때문이다. 럭키드로우의 값어치는 "여러 기기가 같은 재고를 원자적으로 나눠 갖는 것" 인데
+ * 그건 브라우저 저장소로는 성립하지 않는다 (태블릿 두 대가 재고를 공유하지 못한다).
+ * 흉내 내면 로컬에선 되는데 현장에서 이중 당첨이 나는, 제일 나쁜 종류의 거짓말이 된다.
+ */
+export interface LuckydrawRepo {
+  ready(): boolean
+  listPrizes(slug: string): Promise<Prize[]>
+  /** 관리자용 — 상품 + 오늘/누적 소진 (마감 리포트) */
+  report(slug: string): Promise<PrizeReport[]>
+  savePrizes(slug: string, prizes: Prize[]): Promise<void>
+  getSettings(slug: string): Promise<LuckydrawSettings>
+  saveSettings(slug: string, settings: LuckydrawSettings): Promise<void>
+  /**
+   * 추첨 — **재고 검사·차감·기록이 서버 안에서 한 번에** 일어난다.
+   * 남은 수량보다 많이 요청하면 던진다 (그 검사도 서버가 한다 — 화면을 믿지 않는다).
+   */
+  draw(slug: string, count: number): Promise<DrawResult>
+  submitShipping(slug: string, entry: Omit<ShippingEntry, 'id' | 'createdAt'>): Promise<void>
+  listShipping(slug: string): Promise<ShippingEntry[]>
+  clearShipping(slug: string): Promise<void>
 }
 
 export interface Repo {
@@ -209,4 +326,5 @@ export interface Repo {
   ownerAuth: OwnerAuthRepo
   organizers: OrganizersRepo
   ai: AiRepo
+  luckydraw: LuckydrawRepo
 }

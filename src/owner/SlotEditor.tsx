@@ -814,6 +814,22 @@ export function SlotEditor() {
                 지금 이 슬롯은 <b>{periodLabel(draft)}</b> 상태예요. 두 기간 중 하나라도 오늘을 품으면
                 열려요. 대여가 끝나면 <b>주최자도</b> 못 들어옵니다 (최고관리자만 볼 수 있어요).
               </p>
+
+              {/**
+               * 럭키드로우만 유예가 있다 — 행사가 끝나도 **배송을 보내야** 하기 때문이다
+               * (`0009_slot_lifecycle.sql`). 타로엔 남는 방문자 데이터가 없어서 유예가 없다.
+               * 삭제는 되돌릴 수 없으므로 편집기에서 미리 말해 둔다.
+               */}
+              <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+                {getSlotService(draft) === 'luckydraw' ? (
+                  <>
+                    럭키드로우는 대여 종료 <b>+14일</b>까지 배송 정보를 꺼낼 수 있어요. 추첨은 그
+                    전에 닫힙니다.
+                  </>
+                ) : null}{' '}
+                대여 종료 <b>+15일</b>이 지나면 이 슬롯은 주최자 계정·질문·이미지까지{' '}
+                <b>자동으로 삭제</b>돼요. 종료일을 비워 두면 삭제하지 않아요.
+              </p>
               <PeriodFields
                 period={draft.period}
                 onChange={(period) => patchSlot(() => ({ period }))}

@@ -1,0 +1,129 @@
+/* 주최자의 럭키드로우 화면 — 표가 본체다 */
+
+.warn {
+  margin: 0 0 var(--space-base);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--color-wash);
+  color: var(--color-fg2);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.headActions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+/* 좁은 화면에서 표가 화면을 밀지 않게 — 표만 가로로 스크롤된다 */
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-s);
+}
+
+.table th,
+.table td {
+  padding: var(--space-sm);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.table thead th {
+  font-size: var(--text-xs);
+  color: var(--color-fg3);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.colName {
+  min-width: 180px;
+  width: 40%;
+}
+
+.rank {
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.num {
+  width: 88px;
+}
+
+/* 읽기 전용 집계 — draw_logs 에서 센 값이라 손으로 못 고친다.
+   입력칸과 눈에 띄게 달라야 "왜 안 고쳐지지" 를 안 만든다 */
+.stat {
+  color: var(--color-fg3);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.center {
+  text-align: center;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.tableFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin-top: var(--space-base);
+}
+
+/* 표가 길어도 저장 버튼이 늘 손 닿는 곳에 있어야 한다 */
+.saveBar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding: var(--space-md) 0;
+  background: var(--color-canvas);
+  border-top: 1px solid var(--color-border);
+}
+
+.toggles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.toggle:hover {
+  border-color: var(--color-border-hover);
+}
+
+.toggle > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

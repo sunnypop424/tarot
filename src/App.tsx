@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Outlet, useNavigate } from 'react-router-
 import { BookOpen } from 'lucide-react'
 
 import { SlotProvider, useSlotState } from '@/slot/SlotProvider'
+import { getSlotService } from '@/data/services'
 import { QuestionsProvider } from '@/lib/questions'
 import { TabBar } from '@/components/TabBar'
 import { Home } from '@/screens/Home'
@@ -43,10 +44,17 @@ const OwnerRoutes =
     : null
 
 /**
- * 슬롯 사용자 앱 셸.
+ * 럭키드로우 — **방문자에게 내려가는 코드가 서비스마다 다르다.**
+ * 타로 슬롯을 여는 사람이 추첨 화면을 받을 이유가 없다 (그 반대도 마찬가지).
+ */
+const LuckydrawApp = lazy(() => import('@/luckydraw/LuckydrawApp'))
+
+/**
+ * 슬롯 사용자 앱 셸 — 서비스별로 갈린다 (`src/data/services.ts`).
  *
- * 지금은 모든 슬롯이 타로 서비스라 바로 타로 화면을 얹는다. 서비스가 늘면
- * `getSlotService(slot)` 로 여기서 갈라 서비스별 화면을 얹는다 (`src/data/services.ts`).
+ * 럭키드로우는 **셸 자체가 다르다**: 탭바도 카드 도감도 없고 화면이 하나뿐이다.
+ * 조작 주체도 반대다 — 타로는 방문자가 자기 폰으로 뽑고, 럭키드로우는 부스 태블릿에서
+ * 스태프가 뽑는다. 그래서 `Outlet` 을 안 그린다: 이 슬롯엔 하위 화면이 없다.
  */
 function SlotLayout() {
   const navigate = useNavigate()
@@ -60,6 +68,8 @@ function SlotLayout() {
   if (state.status === 'loading') return <div className="app" aria-busy="true" />
   if (state.status === 'missing') return <NotFound />
   const slot = state.slot
+
+  if (getSlotService(slot) === 'luckydraw') return <LuckydrawApp />
 
   return (
     <QuestionsProvider>

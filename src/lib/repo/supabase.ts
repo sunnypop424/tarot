@@ -4,6 +4,7 @@ import type { Slot } from '@/types/slot'
 import { httpAi } from './ai'
 import { publishSlotChange } from './changed'
 import { db } from './client'
+import { supabaseLuckydraw } from './luckydraw'
 import { httpOrganizers } from './organizers'
 import type {
   AdminUser,
@@ -27,7 +28,7 @@ import type {
 /** slots 테이블 행 ↔ Slot. 컬럼 이름이 곧 필드 이름이라 매핑이 얇다 */
 type SlotRow = Slot
 
-const SLOT_COLUMNS = 'slug, name, service, plan, limits, deck, period, theme, event'
+const SLOT_COLUMNS = 'slug, name, service, plan, limits, deck, period, theme, event, luckydraw'
 
 /**
  * 번들된 씨앗 — **네트워크가 죽었을 때의 마지막 방어선**.
@@ -76,6 +77,8 @@ const slots: SlotRepo = {
       period: slot.period ?? {},
       theme: slot.theme,
       event: slot.event,
+      // 타로 슬롯이면 늘 {} 다 — 컬럼이 not null 이고 빈 객체가 "전부 기본값" 이라는 뜻이다
+      luckydraw: slot.luckydraw ?? {},
     }
 
     /**
@@ -159,11 +162,17 @@ const questions: QuestionRepo = {
   },
 }
 
-/** 로그인한 사용자가 맡은 슬롯 (`slot_admins` 는 자기 행만 읽힌다) */
-async function myAdminSlug(): Promise<string | null> {
-  const { data, error } = await (await db()).from('slot_admins').select('slug').maybeSingle()
+/**
+ * 로그인한 사용자가 맡은 슬롯들 (`slot_admins` 는 자기 행만 읽힌다).
+ *
+ * **`.maybeSingle()` 을 쓰면 안 된다** — 겸업 주최자는 행이 여러 개라 그 순간 에러가 되고,
+ * 이 함수를 부르는 signIn·currentUser 가 통째로 throw 해 **로그인 자체가 막힌다**
+ * (`0006_multi_slot_admins.sql`).
+ */
+async function myAdminSlugs(): Promise<string[]> {
+  const { data, error } = await (await db()).from('slot_admins').select('slug')
   if (error) throw new Error(error.message)
-  return data?.slug ?? null
+  return (data ?? []).map((row) => row.slug as string)
 }
 
 const auth: AuthRepo = {
@@ -175,13 +184,13 @@ const auth: AuthRepo = {
     const { data, error } = await (await db()).auth.signInWithPassword({ email, password })
     if (error) throw new Error(error.message)
 
-    const mine = await myAdminSlug()
-    if (mine !== slug) {
+    const mine = await myAdminSlugs()
+    if (!mine.includes(slug)) {
       // 남의 슬롯 로그인 화면에서 맞는 비번을 넣은 경우 — 세션을 남기지 않는다
       await (await db()).auth.signOut()
       throw new Error('이 슬롯의 관리자 계정이 아니에요')
     }
-    return { email: data.user.email ?? email, slug }
+    return { email: data.user.email ?? email, slugs: mine }
   },
 
   async signOut() {
@@ -200,9 +209,9 @@ const auth: AuthRepo = {
   async currentUser(): Promise<AdminUser | null> {
     const { data } = await (await db()).auth.getUser()
     if (!data.user) return null
-    const slug = await myAdminSlug()
-    if (!slug) return null
-    return { email: data.user.email ?? '', slug }
+    const slugs = await myAdminSlugs()
+    if (slugs.length === 0) return null
+    return { email: data.user.email ?? '', slugs }
   },
 }
 
@@ -248,4 +257,5 @@ export const supabaseRepo: Repo = {
   ownerAuth,
   organizers: httpOrganizers,
   ai: httpAi,
+  luckydraw: supabaseLuckydraw,
 }

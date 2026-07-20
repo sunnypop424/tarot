@@ -4,6 +4,7 @@ import type { Question } from '@/types/question'
 import type { Slot } from '@/types/slot'
 import { httpAi } from './ai'
 import { publishSlotChange } from './changed'
+import { localLuckydraw } from './luckydraw'
 import { localOrganizers } from './organizers'
 import type {
   AdminUser,
@@ -128,7 +129,7 @@ const auth: AuthRepo = {
   // 아직 인증이 없다 — 어떤 값이든 통과시키고 요청한 슬롯에 매어 준다.
   // 로그인 화면이 이 사실을 사용자에게 명시한다.
   async signIn(slug, email) {
-    const user: AdminUser = { email, slug }
+    const user: AdminUser = { email, slugs: [slug] }
     write(KEY_USER, user)
     return user
   },
@@ -180,4 +181,6 @@ export const localRepo: Repo = {
   ownerAuth,
   organizers: localOrganizers,
   ai: httpAi,
+  // 럭키드로우는 local 짝이 없다 — 재고를 기기마다 따로 굴리면 이중 당첨이 난다 (luckydraw.ts)
+  luckydraw: localLuckydraw,
 }

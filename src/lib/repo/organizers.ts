@@ -38,12 +38,11 @@ export const httpOrganizers: OrganizersRepo = {
   },
 
   async create(slug, email, password) {
-    const { organizer } = await post<{ organizer: Organizer }>('organizers', {
-      slug,
-      email,
-      password,
-    })
-    return organizer
+    const { organizer, linked } = await post<{ organizer: Organizer; linked?: boolean }>(
+      'organizers',
+      { slug, email, password }
+    )
+    return { ...organizer, linked }
   },
 
   async resetPassword(userId) {
@@ -51,12 +50,12 @@ export const httpOrganizers: OrganizersRepo = {
     return password
   },
 
-  async remove(userId) {
-    await post('revoke', { userId })
+  async remove(slug, userId) {
+    await post('revoke', { slug, userId })
   },
 
   async purgeSlot(slug) {
-    return post<{ deletedAccounts: number }>('purge', { slug })
+    return post<{ deletedAccounts: number; deletedFiles?: number }>('purge', { slug })
   },
 }
 
