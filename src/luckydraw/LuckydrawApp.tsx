@@ -295,7 +295,7 @@ export default function LuckydrawApp() {
          */}
         {previewing ? (
           <span className={styles.adminLink} data-part="adminLink">
-            스태프 로그인
+            관리자로 로그인
           </span>
         ) : (
           /**
@@ -308,7 +308,7 @@ export default function LuckydrawApp() {
               ? '관리자 페이지로 이동'
               : authStatus === 'checking'
                 ? '확인 중…'
-                : '스태프 로그인'}
+                : '관리자로 로그인'}
           </Link>
         )}
 

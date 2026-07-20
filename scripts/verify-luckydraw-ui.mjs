@@ -163,7 +163,7 @@ try {
    */
   check('로그인 전에도 DRAW 버튼은 자리에 있다', shell.draw)
   check('로그인 전에는 DRAW 가 비활성이다', shell.drawDisabled)
-  check('스태프 로그인으로 유도한다', shell.text.includes('스태프 로그인'), shell.text.slice(0, 60))
+  check('관리자로 로그인 링크로 유도한다', shell.text.includes('관리자로 로그인'), shell.text.slice(0, 60))
   check('리허설 안내가 뜬다', shell.rehearsal)
 
   /**
