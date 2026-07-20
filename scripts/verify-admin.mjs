@@ -40,6 +40,41 @@ const browser = await puppeteer.launch({
   args: ['--no-sandbox', '--disable-gpu', '--hide-scrollbars'],
 })
 
+/**
+ * **이 검증은 씨앗 슬롯 두 개를 전제로 한다** — `demo` 와 `sample-pink`.
+ * 두 슬롯의 테마·이벤트 설정이 서로 다른 걸 이용해 "슬롯끼리 격리되나" 를 보기 때문이다.
+ *
+ * 그런데 그 슬롯들은 지워질 수 있다(실제로 지워졌다). 없는 채로 돌리면 로그인 폼을 못 찾는
+ * 엉뚱한 에러로 죽어서, **회귀인지 데이터가 없는 건지 구분이 안 된다.**
+ * 먼저 확인하고 없으면 이유를 말하고 멈춘다.
+ *
+ * 제대로 고치려면 `verify-luckydraw-ui.mjs` 처럼 **자기 슬롯을 만들었다 지우게** 해야 한다.
+ * 남의 데이터에 기대는 검증은 언젠가 또 이렇게 된다.
+ */
+{
+  const need = ['demo', 'sample-pink']
+  /**
+   * **주소로 확인하면 안 된다** — SPA 라 없는 슬러그도 index.html 을 200 으로 준다.
+   * (그렇게 짰다가 검사가 통째로 무의미했다.) 저장소에 직접 묻는다.
+   */
+  const missing = []
+  if (env.VITE_SUPABASE_URL && env.VITE_SUPABASE_ANON_KEY) {
+    const res = await fetch(
+      `${env.VITE_SUPABASE_URL}/rest/v1/slots?select=slug&slug=in.(${need.join(',')})`,
+      { headers: { apikey: env.VITE_SUPABASE_ANON_KEY } }
+    )
+    const found = res.ok ? (await res.json()).map((r) => r.slug) : []
+    missing.push(...need.filter((s) => !found.includes(s)))
+  }
+  if (missing.length) {
+    console.log(`⚠ 이 검증은 씨앗 슬롯 ${need.join(' · ')} 이 필요해요 — 없음: ${missing.join(', ')}`)
+    console.log('  회귀가 아니라 데이터가 없는 겁니다. 슬롯을 만들거나, 스크립트를')
+    console.log('  verify-luckydraw-ui.mjs 처럼 자기 슬롯을 만들었다 지우게 고쳐주세요.')
+    await browser.close()
+    process.exit(0)
+  }
+}
+
 const errors = []
 function watch(page) {
   page.on('pageerror', (e) => errors.push(String(e)))
