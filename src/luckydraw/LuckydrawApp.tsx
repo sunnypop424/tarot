@@ -298,12 +298,21 @@ export default function LuckydrawApp() {
             스태프 로그인
           </span>
         ) : (
-          authStatus !== 'in' && (
-            <Link to={`/${slot.slug}/admin`} className={styles.adminLink}>
-              {authStatus === 'checking' ? '확인 중…' : '스태프 로그인'}
-            </Link>
-          )
+          /**
+           * **로그인한 뒤에도 남는다** (원본과 같다). 로그인하면 링크가 사라지게 해뒀더니
+           * 스태프가 관리 화면으로 갈 길이 없어졌다 — 행사 중에 수량을 고치거나 마감하려면
+           * 여기로 들어가야 한다.
+           */
+          <Link to={`/${slot.slug}/admin`} className={styles.adminLink}>
+            {authStatus === 'in'
+              ? '관리자 페이지로 이동'
+              : authStatus === 'checking'
+                ? '확인 중…'
+                : '스태프 로그인'}
+          </Link>
         )}
+
+        {display.footerNote && <p className={styles.footerNote}>{display.footerNote}</p>}
       </main>
     </div>
   )

@@ -34,6 +34,12 @@ export interface LuckydrawDisplay {
   closedText: string
 
   /**
+   * 화면 오른쪽 아래에 아주 흐리게 들어가는 제작사 표기 (원본의 Copyright 자리).
+   * 비우면 안 그린다 — 표기가 필요 없는 행사도 있다.
+   */
+  footerNote: string
+
+  /**
    * 박스를 화면 위에서 얼마나 내릴지 (px).
    *
    * 옮겨온 원본의 `boxMarginTop` 이다. 가운데 정렬이 아니라 **위에서 내려 앉히는** 이유는
@@ -122,7 +128,10 @@ export const LUCKYDRAW_GROUPS: {
   hint?: string
   colors?: LuckydrawColorField[]
   /** 이 카드에 같이 오는 형태·여백·문구 칸 (편집기가 이름으로 알아본다) */
-  extras?: ('boxRadius' | 'boxPadding' | 'boxTopMargin' | 'buttonRadius' | 'font' | 'background' | 'texts' | 'cover' | 'badge')[]
+  extras?: (
+    | 'boxRadius' | 'boxPadding' | 'boxTopMargin' | 'buttonRadius'
+    | 'font' | 'background' | 'texts' | 'cover' | 'badge' | 'footer'
+  )[]
 }[] = [
   {
     title: '박스',
@@ -166,7 +175,7 @@ export const LUCKYDRAW_GROUPS: {
       { key: 'fg1', label: '제목', part: 'title' },
       { key: 'fg3', label: '안내 문구', part: 'note' },
     ],
-    extras: ['font', 'badge'],
+    extras: ['font', 'badge', 'footer'],
   },
   {
     title: '배경',
@@ -202,6 +211,7 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   lowStockThreshold: 50,
   drawLabel: 'DRAW!',
   closedText: '럭키드로우가 마감되었습니다',
+  footerNote: '',
   // 원본 빌더의 기본값 그대로 (160px / 2rem)
   boxTopMargin: 160,
   boxPadding: 32,
@@ -233,6 +243,8 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
         : saved.lowStockThreshold,
     drawLabel: saved.drawLabel || DEFAULT_DISPLAY.drawLabel,
     closedText: saved.closedText || DEFAULT_DISPLAY.closedText,
+    // 빈 문자열은 "안 그린다" 는 뜻이라 살려야 한다 (|| 로 기본값을 덮으면 그 의도가 사라진다)
+    footerNote: saved.footerNote ?? DEFAULT_DISPLAY.footerNote,
     // 0 은 유효한 값이다 (박스를 맨 위에 붙임) — ?? 로 기본값에 먹히면 안 된다
     boxTopMargin: saved.boxTopMargin ?? DEFAULT_DISPLAY.boxTopMargin,
     boxPadding: saved.boxPadding ?? DEFAULT_DISPLAY.boxPadding,

@@ -225,6 +225,13 @@ function LuckydrawExtra({
           </select>
         </div>
       )
+    case 'footer':
+      return text(
+        '오른쪽 아래 표기',
+        d.footerNote,
+        (v) => patchLd({ footerNote: v }),
+        '제작사 표기 같은 것. 비우면 안 나와요'
+      )
     case 'badge':
       return (
         <div className="field">

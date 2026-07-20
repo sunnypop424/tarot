@@ -36,7 +36,7 @@ export function ResultReveal({
 }: Props) {
   const { results } = result
   const [revealed, setRevealed] = useState<number[]>([])
-  const [scratching, setScratching] = useState<number | null>(null)
+  const [scratching, setScratching] = useState<number[]>([])
   const [summary, setSummary] = useState(startAtSummary)
   const [shipping, setShipping] = useState(false)
   const [celebrate, setCelebrate] = useState(false)
@@ -52,12 +52,14 @@ export function ResultReveal({
   }, [results, isHigh])
 
   function reveal(index: number) {
-    if (revealed.includes(index) || scratching !== null) return
-    setScratching(index)
+    // **다른 타일이 긁히는 중이어도 긁을 수 있다** (원본과 같다).
+    // 0.7초씩 줄 세우면 10개 뽑았을 때 7초를 기다려야 한다.
+    if (revealed.includes(index) || scratching.includes(index)) return
+    setScratching((prev) => [...prev, index])
     setCelebrate(true)
     window.setTimeout(() => {
       setRevealed((prev) => [...prev, index])
-      setScratching(null)
+      setScratching((prev) => prev.filter((i) => i !== index))
     }, SCRATCH_MS)
   }
 
@@ -83,12 +85,11 @@ export function ResultReveal({
   }, [results])
 
   const needsShipping = grouped.some((p) => p.requiresShipping)
-  const allRevealed = revealed.length === results.length
 
   if (summary) {
     return (
       <div className={styles.reveal}>
-        <h2 className="t-title-s" data-part="title">전체 결과</h2>
+        <h2 className={styles.revealTitle} data-part="title">전체 결과</h2>
 
         <ul className={`stack ${styles.summary}`}>
           {grouped.map((p) => (
@@ -133,18 +134,30 @@ export function ResultReveal({
   return (
     <div className={styles.reveal}>
       {celebrate && <Confetti />}
-      <h2 className="t-title-s" data-part="title">당첨 결과</h2>
+      <h2 className={styles.revealTitle} data-part="title">당첨 결과</h2>
 
       <ul className={styles.results} data-results>
         {results.map((p, i) => {
           const high = isHigh(p)
           const open = revealed.includes(i)
-          const busy = scratching === i
+          const busy = scratching.includes(i)
           return (
             <li
               key={i}
               className={styles.resultItem}
-              style={{ ['--i' as string]: i }}
+              /**
+               * **개수에 따라 폭이 다르다** (원본과 같다): 1개면 꽉, 2개면 절반, 3개 이상이면 1/3.
+               * 늘 1/3 로 두면 1개만 뽑았을 때 작은 칸 하나가 덩그러니 남아 초라해 보인다.
+               */
+              style={{
+                ['--i' as string]: i,
+                width:
+                  results.length === 1
+                    ? '100%'
+                    : results.length === 2
+                      ? 'calc((100% - 10px) / 2)'
+                      : undefined,
+              }}
               data-high={high || undefined}
               /**
                * **긁는 동안에도 열린 색이다.** `open` 만 보면 커버가 다 벗겨진 뒤에야 색이
@@ -174,10 +187,9 @@ export function ResultReveal({
       <button
         type="button"
         className="btn btn--primary btn--block"
-        disabled={!allRevealed}
         onClick={() => setSummary(true)}
       >
-        {allRevealed ? '전체 결과 보기' : '남은 카드를 눌러 확인하세요'}
+        전체 결과 보기
       </button>
     </div>
   )
