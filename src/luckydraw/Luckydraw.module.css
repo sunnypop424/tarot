@@ -68,12 +68,12 @@
  * "누르는 곳" 이라는 느낌이 흐려진다 — 원본의 인상이 여기서 나온다.
  */
 .controls {
-  width: 260px;
+  width: 100%;
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  /* 수량 덩어리와 DRAW 사이 — 안쪽(8px)보다 넓어야 두 덩어리로 읽힌다 */
-  gap: 20px;
+  align-items: stretch;
+  gap: 14px;
 }
 
 /** 카운터 + 빠른선택은 "수량 고르기" 한 덩어리다 — 붙여야 그렇게 읽힌다 */
@@ -142,35 +142,127 @@
   text-align: center;
 }
 
-/* ── 개수 고르기 ────────────────────────────── */
-.counter {
+/* ── 상단 밴드 (남은 수량 + 경품 미리보기) ───── */
+.band {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 40px;
-  padding: 0 8px;
-  border: 1px solid var(--color-border);
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px;
   border-radius: var(--radius-md);
-  background: var(--color-surface-raised);
+  background: var(--color-wash);
+  text-align: center;
+}
+.bandMsg {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-fg-2);
+}
+.bandMsg[data-low] {
+  font-weight: 700;
+  color: var(--color-accent-soft);
+}
+.previewBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1px solid var(--color-border-hover);
+  border-radius: 9999px;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--dur-micro, 0.12s) ease;
+}
+.previewBtn:hover {
+  background: var(--color-wash);
 }
 
-/* 원본과 같은 40×40 — 토큰 기본(44px)이면 카운터가 52px 로 부푼다 */
-.counter :global(.btn-icon) {
-  width: 40px;
-  height: 40px;
-  min-height: 0;
+/* 리허설 안내 — 아이콘 배너 (시안) */
+.infoBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 13px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-hover);
+  background: var(--color-wash);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-fg-2);
+}
+.infoBanner svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-primary);
+}
+.infoBanner b {
+  color: var(--color-fg-1);
+}
+
+.pickLabel {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-fg-2);
+}
+
+/* ── 개수 고르기 (원형 카운터, 시안) ───────────── */
+.counter {
+  display: inline-flex;
+  align-self: center;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  background: var(--color-wash);
+}
+
+/* 원형 +/- — 슬롯 primary 로 채운다 */
+.step {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9999px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  cursor: pointer;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  transition: background var(--dur-micro, 0.12s) ease, transform 0.1s ease;
+}
+.step:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+.step:active:not(:disabled) {
+  transform: scale(0.94);
+}
+.step:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-fg);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .countInput {
-  flex: 1;
+  width: 72px;
   min-width: 0;
+  height: 52px;
   border: 0;
   background: transparent;
   color: var(--color-fg-1);
   text-align: center;
-  font-size: 14px;
-  font-weight: 700;
-  /* 숫자 스피너는 손가락으로 누르기엔 너무 작다 — 좌우 버튼이 그 일을 한다 */
+  font-size: 28px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
   appearance: textfield;
   -moz-appearance: textfield;
 }
@@ -182,65 +274,119 @@
 }
 
 .quick {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: center;
   gap: 8px;
 }
 
-/**
- * **누를 수 있는 것처럼 보여야 한다.** ghost 버튼으로 뒀더니 테두리도 배경도 없어
- * 라벨인지 버튼인지 알 수 없었다 (원본은 흰 배경 + 회색 테두리였다).
- */
+/* 빠른선택 — 알약 (시안) */
 .quickBtn {
   height: 36px;
+  padding: 0 16px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-raised);
+  border-radius: 9999px;
+  background: var(--color-surface);
   color: var(--color-fg-2);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: border-color var(--dur-micro, 0.12s) ease, background var(--dur-micro, 0.12s) ease;
 }
 
 .quickBtn:hover {
   border-color: var(--color-border-hover);
+  background: var(--color-wash);
 }
 
-/* 고른 것은 **채워서** 구분한다 — 글자색만 바꾸면 뭘 골랐는지 잘 안 보인다 */
+/* 고른 것은 연보라로 (시안) — 채우기보다 은은하게 */
 .quickBtn[data-on] {
   border-color: var(--color-primary);
-  background: var(--color-primary);
-  color: var(--color-on-primary);
+  background: var(--color-wash);
+  color: var(--color-primary);
 }
 
-/**
- * 럭키드로우의 버튼은 원본과 같은 **40px · 14px** 이다.
- * 앱 기본(44px · 18px)은 타로 화면 기준이라 260px 컨트롤 안에서 과하게 크다.
- */
+/* 뽑기 버튼 — 큰 알약 (시안) */
 .controls :global(.btn),
 .reveal :global(.btn) {
-  min-height: 40px;
-  height: 40px;
+  min-height: 44px;
+  height: 44px;
   padding: 0 16px;
-  font-size: 14px;
-  letter-spacing: 0.025em;
+  font-size: 15px;
+  border-radius: 9999px;
 }
 
-/**
- * **이 화면은 이 버튼을 누르는 화면이다.** 수량 입력칸과 같은 크기로 세 번째 줄에 두면
- * 주인공이 아니라 그냥 항목 하나가 된다. 높이·글자를 키우고 살짝 띄워 눌러야 할 곳을 못박는다.
- */
 .drawBtn {
-  min-height: 52px;
-  height: 52px;
+  margin-top: 6px;
+  min-height: 54px;
+  height: 54px;
   font-size: 17px;
-  letter-spacing: 0.04em;
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  border-radius: 9999px;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-primary) 32%, transparent);
 }
 
 .drawBtn:disabled {
   box-shadow: none;
+}
+
+/* 스태프 미로그인 안내 */
+.staffHint {
+  margin: 4px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--color-fg-3);
+}
+.staffHint svg {
+  flex-shrink: 0;
+}
+
+/* ── 마감 화면 (시안) ──────────────────────────── */
+.closedScreen {
+  width: 100%;
+  padding: 32px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+.closedIcon {
+  width: 60px;
+  height: 60px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--color-wash);
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+.closedTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-fg-1);
+}
+.closedSub {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-fg-3);
+}
+
+/* 스크래치 캔버스 — 결과 타일 위를 덮는다 */
+.scratch {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  cursor: pointer;
+  touch-action: none;
 }
 
 /* ── 결과 ──────────────────────────────────── */
@@ -447,6 +593,7 @@
 .stage[data-hl='title'] [data-part='title'],
 .stage[data-hl='tile'] .resultItem:not([data-high]),
 .stage[data-hl='cover'] .cover,
+.stage[data-hl='cover'] .scratch,
 .stage[data-hl='high'] .resultItem[data-high],
 .stage[data-hl='note'] .rehearsal,
 .stage[data-hl='note'] .lowStock,
@@ -529,6 +676,111 @@
   .confetti {
     display: none;
   }
+}
+
+/* ── 경품 미리보기 모달 ─────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: rgb(0 0 0 / 0.5);
+}
+
+.previewBody {
+  width: 100%;
+  max-width: 400px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.3);
+}
+
+.previewHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+.previewIcon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--color-wash);
+  color: var(--color-primary);
+}
+.previewTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-fg-1);
+}
+.previewSub {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--color-fg-3);
+}
+
+.prizeList {
+  margin: 0 0 var(--space-lg);
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.prizeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 13px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+}
+.prizeRow[data-high] {
+  border-color: var(--color-accent);
+  background: var(--color-wash);
+}
+.prizeBadge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  background: var(--color-wash);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 800;
+}
+.prizeBadge[data-high] {
+  color: var(--color-accent);
+}
+.prizeName {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-fg-1);
+}
+.prizeCount {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-fg-2);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── 배송 시트 ─────────────────────────────── */

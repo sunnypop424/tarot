@@ -66,6 +66,14 @@ export interface LuckydrawDisplay {
    * 어두운 사진 위에선 같은 값이 그냥 검은 얼룩이 된다. 투명도를 0 으로 두면 그림자가 없다.
    */
   boxShadowColor: string
+  /**
+   * 그림자 **값** — 번짐(blur)과 아래로 내림(y), px.
+   *
+   * 색만으론 그림자 인상을 다 못 잡는다: 같은 색이라도 크게 번지면 은은히 뜨고, 좁으면 또렷한
+   * 테두리처럼 앉는다. 번짐 0 이면 사실상 그림자가 사라진다.
+   */
+  boxShadowBlur: number
+  boxShadowY: number
 
   /**
    * 본문 폰트 — 옮겨온 원본이 고르게 하던 세 가지 (`WEBFONTS`).
@@ -230,6 +238,9 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
    */
   adminLinkColor: 'rgba(0, 0, 0, 0.45)',
   boxShadowColor: 'rgba(0, 0, 0, 0.12)',
+  // 은은하게 뜨는 기본값 — 밝은 사진 위에서 박스가 무겁지 않게
+  boxShadowBlur: 40,
+  boxShadowY: 12,
   // 원본 빌더의 기본이자 추천값이었다 — 획이 또렷해 부스 태블릿에서 멀리서도 읽힌다
   fontFamily: 'paperlogy',
 }
@@ -259,6 +270,9 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
     boxPadding: saved.boxPadding ?? DEFAULT_DISPLAY.boxPadding,
     adminLinkColor: saved.adminLinkColor || DEFAULT_DISPLAY.adminLinkColor,
     boxShadowColor: saved.boxShadowColor || DEFAULT_DISPLAY.boxShadowColor,
+    // 0 은 유효한 값이다 (번짐 0 = 그림자 없음) — ?? 로 기본값에 먹히면 안 된다
+    boxShadowBlur: saved.boxShadowBlur ?? DEFAULT_DISPLAY.boxShadowBlur,
+    boxShadowY: saved.boxShadowY ?? DEFAULT_DISPLAY.boxShadowY,
     // 없는 폰트 id 가 저장돼 있으면 기본으로 (옛 저장분·손으로 고친 JSON)
     fontFamily: saved.fontFamily && saved.fontFamily in WEBFONTS ? saved.fontFamily : DEFAULT_DISPLAY.fontFamily,
   }

@@ -230,6 +230,18 @@ try {
   await wait(800)
   check('로그인하면 DRAW 버튼이 산다', !!(await page.$('[data-draw]')))
 
+  // ── 경품 미리보기 (주최자 기본 ON) — 열고 닫힌다 ─
+  const previewBtn = await page.$('[data-prize-preview]')
+  check('경품 미리보기 버튼이 뜬다', !!previewBtn)
+  if (previewBtn) {
+    await previewBtn.click()
+    await wait(400)
+    check('경품 미리보기 모달이 열린다', !!(await page.$('[aria-label="경품 미리보기"]')))
+    await page.$$eval('button', (bs) => bs.find((b) => b.textContent.trim() === '닫기')?.click())
+    await wait(300)
+    check('경품 미리보기 모달이 닫힌다', !(await page.$('[aria-label="경품 미리보기"]')))
+  }
+
   // 5개로 올려 뽑는다 — 하이라이트(1·2등)가 섞일 확률을 높인다
   await page.evaluate(() => {
     const input = document.querySelector('input[type="number"]')
@@ -245,7 +257,8 @@ try {
     const items = [...document.querySelectorAll('[data-results] li')]
     return {
       count: items.length,
-      covered: items.filter((li) => li.querySelector('button')).length,
+      // 커버가 버튼이 아니라 스크래치 캔버스로 바뀌었다 (data-scratch)
+      covered: items.filter((li) => li.querySelector('[data-scratch]')).length,
       high: items.filter((li) => li.hasAttribute('data-high')).length,
     }
   })
@@ -257,9 +270,9 @@ try {
   )
   await page.screenshot({ path: join(outDir, 'luckydraw-3-result.png') })
 
-  // 덮인 게 있으면 긁어본다
+  // 덮인 게 있으면 긁어본다 — 캔버스를 누르면 자동으로 스크래치돼 열린다
   if (result.covered > 0) {
-    await page.click('[data-results] li button')
+    await page.click('[data-results] li [data-scratch]')
     await wait(1200)
     const opened = await page.evaluate(
       () => document.querySelectorAll('[data-results] li[data-open]').length

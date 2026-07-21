@@ -227,12 +227,21 @@ function LuckydrawExtra({
       )
     case 'shadow':
       return (
-        <AlphaColor
-          label="그림자 색"
-          value={d.boxShadowColor}
-          hint="밝은 사진 위엔 짙게, 어두운 사진 위엔 옅게. 0% 면 그림자 없음"
-          onChange={(v) => patchLd({ boxShadowColor: v })}
-        />
+        <>
+          <AlphaColor
+            label="그림자 색"
+            value={d.boxShadowColor}
+            hint="밝은 사진 위엔 짙게, 어두운 사진 위엔 옅게. 0% 면 그림자 없음"
+            onChange={(v) => patchLd({ boxShadowColor: v })}
+          />
+          {num(
+            '그림자 번짐 (px)',
+            d.boxShadowBlur,
+            (n) => patchLd({ boxShadowBlur: n }),
+            '클수록 은은하게 퍼져요. 0 이면 그림자가 사라져요'
+          )}
+          {num('그림자 내림 (px)', d.boxShadowY, (n) => patchLd({ boxShadowY: n }), '아래로 드리우는 정도')}
+        </>
       )
     case 'footer':
       return text(

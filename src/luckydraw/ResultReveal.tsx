@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { LuckydrawDisplay } from '@/data/luckydraw'
 import type { DrawResult, DrawnPrize, LuckydrawSettings } from '@/lib/repo'
 import { Confetti } from './Confetti'
+import { ScratchCover } from './ScratchCover'
 import { ShippingForm } from './ShippingForm'
 import styles from './Luckydraw.module.css'
 
@@ -170,14 +171,7 @@ export function ResultReveal({
               <span className={styles.resultLabel}>{label(p)}</span>
 
               {high && !open && (
-                <button
-                  type="button"
-                  className={`${styles.cover} ${busy ? styles.coverGone : ''}`}
-                  aria-label={`${i + 1}번째 결과 확인하기`}
-                  onClick={() => reveal(i)}
-                >
-                  {!busy && <span aria-hidden="true">{display.coverMark}</span>}
-                </button>
+                <ScratchCover mark={display.coverMark} onReveal={() => reveal(i)} />
               )}
             </li>
           )

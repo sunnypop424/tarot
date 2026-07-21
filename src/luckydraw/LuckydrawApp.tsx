@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Minus, Plus } from 'lucide-react'
+import { Flag, Gift, Info, Lock, Minus, Plus } from 'lucide-react'
 
 import { luckydrawDisplay, WEBFONTS, type LuckydrawDisplay } from '@/data/luckydraw'
 import { repo } from '@/lib/repo'
@@ -9,6 +9,7 @@ import { useAdminAuth } from '@/admin/useAdminAuth'
 import { useSlot } from '@/slot/SlotProvider'
 import { useLivePreview } from '@/slot/preview'
 import { ResultReveal } from './ResultReveal'
+import { PrizePreview } from './PrizePreview'
 import styles from './Luckydraw.module.css'
 
 /** 한 번에 뽑을 수 있는 최대 — 서버도 같은 값으로 막는다 (`draw_prizes`) */
@@ -58,6 +59,7 @@ export default function LuckydrawApp() {
   const [drawing, setDrawing] = useState(false)
   const [result, setResult] = useState<DrawResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [prizeOpen, setPrizeOpen] = useState(false)
 
   /**
    * 고른 웹폰트를 **그때 받는다.**
@@ -168,6 +170,14 @@ export default function LuckydrawApp() {
   const unavailable = previewing ? false : soldOut || closed
   const remaining = previewing && realRemaining === 0 ? 120 : realRemaining
 
+  const rehearsal = settings?.rehearsal === true
+  const lowStock =
+    display.lowStockThreshold !== null && remaining <= display.lowStockThreshold && !unavailable
+  const showCount = settings?.showPrizeCount ?? true
+  // 손님에게 경품 목록을 보여줄지 (주최자 설정) — 상품이 있고, 마감/품절이 아닐 때만
+  const canPreview =
+    (settings?.showPrizePreview ?? true) && (prizes?.length ?? 0) > 0 && !unavailable
+
   if (prizes === null && !previewing) return <div className="app" aria-busy="true" />
 
   return (
@@ -182,7 +192,8 @@ export default function LuckydrawApp() {
             '--ld-box-top': `${display.boxTopMargin}px`,
             '--ld-box-padding': `${display.boxPadding}px`,
             '--ld-admin-link': display.adminLinkColor,
-            '--ld-shadow': display.boxShadowColor,
+            // 색만이 아니라 **완전한 그림자 문자열** — 슬롯이 색·번짐·내림을 다 정한다
+            '--ld-shadow': `0 ${display.boxShadowY}px ${display.boxShadowBlur}px ${display.boxShadowColor}`,
             '--ld-font': WEBFONTS[display.fontFamily]?.stack,
           } as React.CSSProperties
         }
@@ -202,92 +213,121 @@ export default function LuckydrawApp() {
             />
           ) : (
             <>
-              {settings?.rehearsal && !unavailable && (
-                <p className={styles.rehearsal} data-rehearsal>
-                  지금은 리허설이에요. 뽑아도 실제 재고는 줄지 않아요.
-                </p>
-              )}
-
               {result ? (
-            <ResultReveal
-              result={result}
-              display={display}
-              displayMode={settings?.displayMode ?? 'both'}
-              slug={slot.slug}
-              onFinish={finish}
-            />
-          ) : unavailable ? (
-            <p className={styles.closed}>{display.closedText}</p>
-          ) : (
-            <div className={styles.controls}>
-              {display.lowStockThreshold !== null && remaining <= display.lowStockThreshold && (
-                <p className={styles.lowStock}>{remaining}개 남았어요</p>
-              )}
-
-              {/* 카운터 + 빠른선택은 "수량 고르기" 한 덩어리 — 붙여야 그렇게 읽힌다 */}
-              <div className={styles.countGroup}>
-              <div className={styles.counter}>
-                <button
-                  type="button"
-                  className="btn-icon"
-                  aria-label="한 개 줄이기"
-                  onClick={() => setCount((n) => Math.max(1, n - 1))}
-                >
-                  <Minus size={18} aria-hidden="true" />
-                </button>
-                <input
-                  className={styles.countInput}
-                  type="number"
-                  inputMode="numeric"
-                  aria-label="뽑을 개수"
-                  value={count}
-                  min={1}
-                  max={MAX_DRAW}
-                  onChange={(e) =>
-                    setCount(Math.max(1, Math.min(MAX_DRAW, Number(e.target.value) || 1)))
-                  }
+                <ResultReveal
+                  result={result}
+                  display={display}
+                  displayMode={settings?.displayMode ?? 'both'}
+                  slug={slot.slug}
+                  onFinish={finish}
                 />
-                <button
-                  type="button"
-                  className="btn-icon"
-                  aria-label="한 개 늘리기"
-                  onClick={() => setCount((n) => Math.min(MAX_DRAW, n + 1))}
-                >
-                  <Plus size={18} aria-hidden="true" />
-                </button>
-              </div>
+              ) : unavailable ? (
+                <div className={styles.closedScreen} data-part="box">
+                  <span className={styles.closedIcon}>
+                    <Flag size={26} aria-hidden="true" />
+                  </span>
+                  <p className={styles.closedTitle}>{display.closedText}</p>
+                  <p className={styles.closedSub}>
+                    참여해 주셔서 고맙습니다. 다음 이벤트에서 만나요!
+                  </p>
+                </div>
+              ) : (
+                <div className={styles.controls}>
+                  {/* 상단 밴드 — 남은 수량 문구 + 경품 미리보기 */}
+                  {(lowStock || canPreview) && (
+                    <div className={styles.band}>
+                      <span className={styles.bandMsg} data-low={lowStock || undefined}>
+                        {lowStock
+                          ? `남은 경품 ${remaining}개, 서둘러요!`
+                          : '어떤 경품이 있는지 확인해보세요!'}
+                      </span>
+                      {canPreview && (
+                        <button
+                          type="button"
+                          className={styles.previewBtn}
+                          onClick={() => setPrizeOpen(true)}
+                          data-prize-preview
+                        >
+                          <Gift size={14} aria-hidden="true" /> 경품 미리보기
+                        </button>
+                      )}
+                    </div>
+                  )}
 
-              <div className={styles.quick}>
-                {QUICK.map((n) => (
+                  {rehearsal && (
+                    <div className={styles.infoBanner} data-rehearsal>
+                      <Info size={16} aria-hidden="true" />
+                      <span>
+                        지금은 <b>리허설</b>이에요. 뽑아도 실제 재고는 줄지 않아요.
+                      </span>
+                    </div>
+                  )}
+
+                  <p className={styles.pickLabel}>몇 개를 뽑을까요?</p>
+
+                  <div className={styles.counter}>
+                    <button
+                      type="button"
+                      className={styles.step}
+                      aria-label="한 개 줄이기"
+                      disabled={count <= 1}
+                      onClick={() => setCount((n) => Math.max(1, n - 1))}
+                    >
+                      <Minus size={22} aria-hidden="true" />
+                    </button>
+                    <input
+                      className={styles.countInput}
+                      type="number"
+                      inputMode="numeric"
+                      aria-label="뽑을 개수"
+                      value={count}
+                      min={1}
+                      max={MAX_DRAW}
+                      onChange={(e) =>
+                        setCount(Math.max(1, Math.min(MAX_DRAW, Number(e.target.value) || 1)))
+                      }
+                    />
+                    <button
+                      type="button"
+                      className={styles.step}
+                      aria-label="한 개 늘리기"
+                      disabled={count >= MAX_DRAW}
+                      onClick={() => setCount((n) => Math.min(MAX_DRAW, n + 1))}
+                    >
+                      <Plus size={22} aria-hidden="true" />
+                    </button>
+                  </div>
+
+                  <div className={styles.quick}>
+                    {QUICK.map((n) => (
+                      <button
+                        key={n}
+                        type="button"
+                        className={styles.quickBtn}
+                        data-on={count === n || undefined}
+                        onClick={() => setCount(n)}
+                      >
+                        {n}개
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* 버튼은 늘 이 자리에 있고 로그인 전엔 비활성 (스태프만 뽑는다) */}
                   <button
-                    key={n}
                     type="button"
-                    className={styles.quickBtn}
-                    data-on={count === n || undefined}
-                    onClick={() => setCount(n)}
+                    className={`btn btn--primary btn--block ${styles.drawBtn}`}
+                    disabled={(authStatus !== 'in' && !previewing) || drawing}
+                    onClick={draw}
+                    data-draw
                   >
-                    {n}개
+                    {drawing ? '뽑는 중…' : display.drawLabel}
                   </button>
-                ))}
-              </div>
-              </div>
 
-              {/**
-               * 버튼은 **늘 이 자리에 있고 로그인 전엔 비활성**이다 (원본과 같다).
-               * 로그인 링크로 바꿔치우면 손님이 보는 화면의 주인공이 로그인 버튼이 되고,
-               * 로그인한 뒤엔 버튼 위치가 달라져 스태프가 한 번 더 헤맨다.
-               * 어디로 가야 하는지는 박스 아래 흐린 링크가 말해준다 (원본과 같은 자리).
-               */}
-              <button
-                type="button"
-                className={`btn btn--primary btn--block ${styles.drawBtn}`}
-                disabled={(authStatus !== 'in' && !previewing) || drawing}
-                onClick={draw}
-                data-draw
-              >
-                {drawing ? '뽑는 중…' : display.drawLabel}
-              </button>
-
+                  {authStatus !== 'in' && !previewing && (
+                    <p className={styles.staffHint}>
+                      <Lock size={13} aria-hidden="true" /> 스태프가 로그인해야 뽑을 수 있어요.
+                    </p>
+                  )}
                 </div>
               )}
             </>
@@ -331,6 +371,15 @@ export default function LuckydrawApp() {
 
         {display.footerNote && <p className={styles.footerNote}>{display.footerNote}</p>}
       </main>
+
+      {prizeOpen && prizes && (
+        <PrizePreview
+          prizes={[...prizes].sort((a, b) => a.rank - b.rank)}
+          showCount={showCount}
+          highlightRanks={display.highlightRanks}
+          onClose={() => setPrizeOpen(false)}
+        />
+      )}
     </div>
   )
 }
