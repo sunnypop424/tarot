@@ -169,7 +169,7 @@
   gap: 5px;
   padding: 5px 12px;
   border: 1px solid var(--color-border-hover);
-  border-radius: 9999px;
+  border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-primary);
   font-size: 12px;
@@ -219,11 +219,12 @@
   gap: 6px;
   padding: 6px;
   border: 1px solid var(--color-border);
-  border-radius: 9999px;
+  /* 버튼 둥글기(radiusMd) 를 따른다 — 크게 두면 알약, 작게 두면 각진 상자 */
+  border-radius: calc(var(--radius-md) + 6px);
   background: var(--color-wash);
 }
 
-/* 원형 +/- — 슬롯 primary 로 채운다 */
+/* +/- 버튼 — 슬롯 primary 로 채우고, 둥글기는 buttonRadius 를 따른다 */
 .step {
   width: 52px;
   height: 52px;
@@ -232,7 +233,7 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 9999px;
+  border-radius: var(--radius-md);
   background: var(--color-primary);
   color: var(--color-on-primary);
   cursor: pointer;
@@ -284,7 +285,7 @@
   height: 36px;
   padding: 0 16px;
   border: 1px solid var(--color-border);
-  border-radius: 9999px;
+  border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-fg-2);
   font-size: 13px;
@@ -305,14 +306,14 @@
   color: var(--color-primary);
 }
 
-/* 뽑기 버튼 — 큰 알약 (시안) */
+/* 버튼 둥글기는 buttonRadius(--radius-md) 를 따른다 — 크게 두면 알약이 된다 */
 .controls :global(.btn),
 .reveal :global(.btn) {
   min-height: 44px;
   height: 44px;
   padding: 0 16px;
   font-size: 15px;
-  border-radius: 9999px;
+  border-radius: var(--radius-md);
 }
 
 .drawBtn {
@@ -322,7 +323,7 @@
   font-size: 17px;
   font-weight: 800;
   letter-spacing: 0.02em;
-  border-radius: 9999px;
+  border-radius: var(--radius-md);
   box-shadow: 0 6px 18px color-mix(in srgb, var(--color-primary) 32%, transparent);
 }
 

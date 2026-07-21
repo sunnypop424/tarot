@@ -77,8 +77,11 @@ export function applyTheme(theme: Theme): void {
     if (cssVar) root.style.setProperty(cssVar, theme.colors[key as keyof ThemeColors])
   }
 
+  // radius 는 40px 까지만 — 편집기 상한과 같다. 옛 저장분에 큰 값(예: 999)이 있어도 박스가
+  // 알약처럼 뭉개지지 않게 여기서 한 번 더 막는다.
+  const clampRadius = (v: number) => Math.max(0, Math.min(40, v))
   for (const [key, cssVar] of Object.entries(SHAPE_VARS)) {
-    root.style.setProperty(cssVar, `${theme.shape[key as keyof ThemeShape]}px`)
+    root.style.setProperty(cssVar, `${clampRadius(theme.shape[key as keyof ThemeShape])}px`)
   }
 
   /**
@@ -86,7 +89,7 @@ export function applyTheme(theme: Theme): void {
    * 170px 짜리 홈 카드와 같은 16px 을 써서 3배로 뭉툭해진다 (`lib/card.ts`).
    * 슬롯이 고른 radiusLg 는 홈 카드 기준이고, 나머지 화면은 여기서 나온 퍼센트로 자동으로 줄어든다.
    */
-  root.style.setProperty('--card-radius', cardRadius(theme.shape.radiusLg))
+  root.style.setProperty('--card-radius', cardRadius(clampRadius(theme.shape.radiusLg)))
 
   // 인터랙션 글로우는 primary 에서 파생 — 테마 색이 바뀌면 글로우도 따라간다
   root.style.setProperty(

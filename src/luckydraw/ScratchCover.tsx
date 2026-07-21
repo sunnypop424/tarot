@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { mix } from '@/lib/color'
 import styles from './Luckydraw.module.css'
 
 interface Props {
@@ -11,14 +10,13 @@ interface Props {
 }
 
 /**
- * 스크래치 커버 — 캔버스를 슬롯 primary 그라디언트로 덮고 문지르면 지워진다.
+ * 스크래치 커버 — 문지르면 지워지고, **누르면(탭) 나머지가 부드럽게 쓸려** 열린다.
  *
- * 원래 시안은 **직접 드래그**해서 다 긁어야 열렸는데, 부스에선 손님이 한 번 톡 누르고 마는 일이
- * 잦다. 그래서 **누르면(탭/클릭) 나머지가 자동으로 스르륵 긁혀** 열리게 했다 — 문질러 긁는 재미는
- * 그대로 두되(누르고 끄는 동안 실제로 지워진다), 손을 떼는 순간 알아서 마무리한다.
+ * 색은 슬롯 테마를 그대로 입는다: 커버 배경은 `--color-wash`(편집기 '커버 배경'), 문자는
+ * `--color-accent`(편집기 '커버 문자색'). 캔버스라 CSS 변수를 직접 못 읽으니 computed style 로
+ * 읽어 채운다 — 편집기에서 이 색을 바꾸면 커버도 바뀐다.
  *
- * 색은 캔버스라 CSS 변수를 못 읽으니 `getComputedStyle` 로 `--color-primary` 를 읽어 슬롯 색을
- * 그대로 입힌다. 움직임을 줄이는 사용자에겐 탭 한 번에 여는 버튼으로 바꾼다(검증도 이걸 누른다).
+ * 움직임을 줄이는 사용자에겐 탭 한 번에 여는 버튼으로 바꾼다(.cover 는 CSS 로 같은 색을 입는다).
  */
 export function ScratchCover({ mark, onReveal }: Props) {
   const reduce =
@@ -26,7 +24,6 @@ export function ScratchCover({ mark, onReveal }: Props) {
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
   const sizeRef = useRef({ w: 0, h: 0 })
   const done = useRef(false)
   const rafRef = useRef(0)
@@ -55,22 +52,17 @@ export function ScratchCover({ mark, onReveal }: Props) {
       finish()
       return
     }
-    ctxRef.current = ctx
 
-    const primary = getComputedStyle(cv).getPropertyValue('--color-primary').trim() || '#816bff'
-    const light = mix(primary, 'white', 0.4)
-    const grad = ctx.createLinearGradient(0, 0, w, h)
-    grad.addColorStop(0, light)
-    grad.addColorStop(1, primary)
-    ctx.fillStyle = grad
+    const cs = getComputedStyle(cv)
+    const wash = cs.getPropertyValue('--color-wash').trim() || '#f0edff'
+    const accent = cs.getPropertyValue('--color-accent').trim() || '#c99700'
+    ctx.fillStyle = wash
     ctx.fillRect(0, 0, w, h)
-    ctx.fillStyle = 'rgba(255,255,255,0.92)'
+    ctx.fillStyle = accent
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.font = '700 13px Pretendard, sans-serif'
-    ctx.fillText('긁어서 확인', w / 2, h / 2 - 7)
-    ctx.font = '700 17px Pretendard, sans-serif'
-    ctx.fillText(mark || '✦', w / 2, h / 2 + 13)
+    ctx.font = '700 22px Pretendard, sans-serif'
+    ctx.fillText(mark || '♥', w / 2, h / 2)
 
     let painting = false
     const point = (e: PointerEvent) => {
@@ -83,17 +75,22 @@ export function ScratchCover({ mark, onReveal }: Props) {
       ctx.arc(x, y, 20, 0, Math.PI * 2)
       ctx.fill()
     }
-    // 손을 뗀 순간 나머지를 자동으로 긁어 낸다 (여러 프레임에 걸쳐 스르륵)
+    // 손을 떼면 나머지를 **부드럽게 쓸어** 낸다 — 왼쪽부터 가장자리를 물결지게 지운다
     const autoScratch = () => {
       if (done.current) return
-      let frame = 0
-      const total = 15
+      ctx.globalCompositeOperation = 'destination-out'
+      let x = 0
+      const speed = Math.max(7, w / 11)
       const step = () => {
-        for (let k = 0; k < 12; k++) {
-          erase(Math.random() * w, Math.random() * h)
+        ctx.fillRect(0, 0, x, h)
+        // 앞 가장자리를 둥근 붓으로 훑어 긁힌 결을 남긴다
+        for (let y = 8; y < h; y += 13) {
+          ctx.beginPath()
+          ctx.arc(x, y, 15, 0, Math.PI * 2)
+          ctx.fill()
         }
-        frame += 1
-        if (frame >= total) {
+        x += speed
+        if (x >= w + 18) {
           finish()
           return
         }
@@ -135,7 +132,7 @@ export function ScratchCover({ mark, onReveal }: Props) {
 
   if (gone) return null
 
-  // 움직임을 줄이는 사용자: 탭 한 번에 여는 버튼
+  // 움직임을 줄이는 사용자: 탭 한 번에 여는 버튼 (.cover 가 wash·accent 를 CSS 로 입는다)
   if (reduce) {
     return (
       <button
@@ -145,17 +142,12 @@ export function ScratchCover({ mark, onReveal }: Props) {
         aria-label="긁어서 확인"
         onClick={finish}
       >
-        <span aria-hidden="true">{mark || '✦'}</span>
+        <span aria-hidden="true">{mark || '♥'}</span>
       </button>
     )
   }
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={styles.scratch}
-      data-scratch
-      aria-label="긁어서 확인"
-    />
+    <canvas ref={canvasRef} className={styles.scratch} data-scratch aria-label="긁어서 확인" />
   )
 }

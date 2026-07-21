@@ -158,15 +158,22 @@ function LuckydrawExtra({
   const patchLd = (change: Partial<typeof d>) =>
     patchSlot((prev) => ({ luckydraw: { ...luckydrawDisplay(prev), ...change } }))
 
-  const num = (label: string, value: number, onChange: (n: number) => void, hint?: string) => (
+  const num = (
+    label: string,
+    value: number,
+    onChange: (n: number) => void,
+    hint?: string,
+    max?: number
+  ) => (
     <div className="field">
       <span className="field__label">{label}</span>
       <input
         className="input"
         type="number"
         min={0}
+        max={max}
         value={value}
-        onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
+        onChange={(e) => onChange(Math.max(0, Math.min(max ?? Infinity, Number(e.target.value) || 0)))}
       />
       {hint && <span className="field__hint">{hint}</span>}
     </div>
@@ -182,13 +189,25 @@ function LuckydrawExtra({
 
   switch (kind) {
     case 'boxRadius':
-      return num('둥글기 (px)', draft.theme.shape.radiusLg, (n) => patchShape('radiusLg', n))
+      return num(
+        '둥글기 (px)',
+        draft.theme.shape.radiusLg,
+        (n) => patchShape('radiusLg', n),
+        '박스·카드 둥글기 (0~40). 너무 크면 뭉개져요',
+        40
+      )
     case 'boxPadding':
       return num('안쪽 여백 (px)', d.boxPadding, (n) => patchLd({ boxPadding: n }))
     case 'boxTopMargin':
       return num('상단 여백 (px)', d.boxTopMargin, (n) => patchLd({ boxTopMargin: n }), '가운데에서 얼마나 내릴지 — 사진 얼굴을 안 가리게')
     case 'buttonRadius':
-      return num('둥글기 (px)', draft.theme.shape.radiusMd, (n) => patchShape('radiusMd', n))
+      return num(
+        '둥글기 (px)',
+        draft.theme.shape.radiusMd,
+        (n) => patchShape('radiusMd', n),
+        '버튼·입력칸·개수 선택 둥글기 (0~40). 크게 두면 알약',
+        40
+      )
     case 'texts':
       return (
         <>
