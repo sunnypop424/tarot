@@ -72,8 +72,8 @@ export function ShippingForm({ slug, prizes, onClose }: Props) {
 
             <form className={styles.form} onSubmit={submit}>
               {prizes.length > 0 && (
-                <div className={styles.shipCard}>
-                  <h3 className={styles.shipCardTitle}>배송 대상 상품</h3>
+                <div className={styles.field}>
+                  <span className="t-text-xs t-muted">배송 대상 상품</span>
                   <ul className={styles.shipList}>
                     {prizes.map((p) => (
                       <li key={`${p.rank}-${p.name}`} className={styles.shipItem}>
