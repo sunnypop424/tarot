@@ -262,6 +262,33 @@ function LuckydrawExtra({
           {num('그림자 내림 (px)', d.boxShadowY, (n) => patchLd({ boxShadowY: n }), '아래로 드리우는 정도')}
         </>
       )
+    case 'modal':
+      return (
+        <>
+          <AlphaColor
+            label="배경색"
+            value={d.modalBg || draft.theme.colors.surface}
+            hint="배송 창 배경. 비워두면 위 테마 '박스 배경색'을 써요"
+            onChange={(v) => patchLd({ modalBg: v })}
+          />
+          <AlphaColor
+            label="글자색"
+            value={d.modalText || draft.theme.colors.fg1}
+            onChange={(v) => patchLd({ modalText: v })}
+          />
+          <AlphaColor
+            label="요소 배경색"
+            value={d.modalItemBg || draft.theme.colors.surface}
+            hint="입력칸·배송 상품 줄 배경"
+            onChange={(v) => patchLd({ modalItemBg: v })}
+          />
+          <AlphaColor
+            label="테두리색"
+            value={d.modalBorder || draft.theme.colors.border}
+            onChange={(v) => patchLd({ modalBorder: v })}
+          />
+        </>
+      )
     case 'footer':
       return text(
         '오른쪽 아래 표기',

@@ -93,6 +93,20 @@ export default function LuckydrawApp() {
     document.head.appendChild(el)
   }, [display.fontFamily])
 
+  /**
+   * 모달 전용 색 — 배송·경품 모달은 body 로 포털돼 .stage 밖이라 :root 에 실어야 닿는다.
+   * 비어 있으면 변수를 지워 CSS 가 테마 토큰으로 폴백한다 (기본은 지금과 똑같다).
+   */
+  useEffect(() => {
+    const root = document.documentElement
+    const set = (name: string, value: string) =>
+      value ? root.style.setProperty(name, value) : root.style.removeProperty(name)
+    set('--ld-modal-bg', display.modalBg)
+    set('--ld-modal-text', display.modalText)
+    set('--ld-modal-item', display.modalItemBg)
+    set('--ld-modal-border', display.modalBorder)
+  }, [display.modalBg, display.modalText, display.modalItemBg, display.modalBorder])
+
   const load = useCallback(async () => {
     try {
       const [p, s] = await Promise.all([

@@ -331,6 +331,17 @@
   box-shadow: none;
 }
 
+/* 비활성 주요 버튼 — 회색으로 비우지 말고 **흐려진 주요 버튼**으로 (빈 느낌 제거) */
+.controls :global(.btn--primary):disabled,
+.reveal :global(.btn--primary):disabled,
+.sheet :global(.btn--primary):disabled,
+.overlay :global(.btn--primary):disabled {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  opacity: 0.5;
+  box-shadow: none;
+}
+
 /* 스태프 미로그인 안내 */
 .staffHint {
   margin: 4px 0 0;
@@ -794,6 +805,27 @@
   font-weight: 800;
   color: var(--color-fg-2);
   font-variant-numeric: tabular-nums;
+}
+
+/* ── 모달 색 (배송·경품) — 비우면 테마 색으로 폴백 ── */
+.sheet .sheetBody,
+.previewBody {
+  background: var(--ld-modal-bg, var(--color-surface));
+  color: var(--ld-modal-text, var(--color-fg-1));
+}
+/* 제목·상품명 등 주요 글자도 모달 글자색을 따른다 (보조 안내 문구는 테마 흐림색 유지) */
+.sheetBody :global(.t-title-s),
+.previewTitle {
+  color: var(--ld-modal-text, var(--color-fg-1));
+}
+/* 입력칸·배송 상품 줄·경품 줄 — 요소 배경·테두리 (뒤에 오는 .shipItem 규칙을 이기게 스코프) */
+.sheetBody :global(.input),
+.sheetBody :global(.textarea),
+.sheetBody :global(.select),
+.sheetBody .shipItem,
+.previewBody .prizeRow {
+  background: var(--ld-modal-item, var(--color-surface));
+  border-color: var(--ld-modal-border, var(--color-border));
 }
 
 /* ── 배송 시트 ─────────────────────────────── */

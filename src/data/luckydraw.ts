@@ -80,6 +80,17 @@ export interface LuckydrawDisplay {
    * 값은 `font-family` 스택 그대로 들어간다.
    */
   fontFamily: FontId
+
+  /**
+   * 배송·경품 **모달** 전용 색 — 비우면 슬롯 테마 색을 그대로 쓴다.
+   *
+   * 모달은 박스와 따로 꾸미고 싶을 때가 있다(박스는 반투명인데 입력창은 또렷한 흰색으로 등).
+   * 각 값이 비어 있으면 CSS 가 테마 토큰으로 폴백한다 — 그래서 기본은 지금과 똑같다.
+   */
+  modalBg: string
+  modalText: string
+  modalItemBg: string
+  modalBorder: string
 }
 
 /**
@@ -146,7 +157,7 @@ export const LUCKYDRAW_GROUPS: {
   /** 이 카드에 같이 오는 형태·여백·문구 칸 (편집기가 이름으로 알아본다) */
   extras?: (
     | 'boxRadius' | 'boxPadding' | 'boxTopMargin' | 'buttonRadius'
-    | 'font' | 'background' | 'texts' | 'cover' | 'badge' | 'footer' | 'shadow'
+    | 'font' | 'background' | 'texts' | 'cover' | 'badge' | 'footer' | 'shadow' | 'modal'
   )[]
 }[] = [
   {
@@ -192,6 +203,11 @@ export const LUCKYDRAW_GROUPS: {
       { key: 'fg3', label: '안내 문구', part: 'note' },
     ],
     extras: ['font', 'badge', 'footer'],
+  },
+  {
+    title: '배송·경품 모달',
+    hint: '배송 정보를 받는 창이에요. 비우면 위 테마 색을 그대로 써요.',
+    extras: ['modal'],
   },
   {
     title: '배경',
@@ -243,6 +259,11 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   boxShadowY: 12,
   // 원본 빌더의 기본이자 추천값이었다 — 획이 또렷해 부스 태블릿에서 멀리서도 읽힌다
   fontFamily: 'paperlogy',
+  // 비우면 슬롯 테마 색을 그대로 쓴다 (CSS 폴백)
+  modalBg: '',
+  modalText: '',
+  modalItemBg: '',
+  modalBorder: '',
 }
 
 /**
@@ -275,5 +296,10 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
     boxShadowY: saved.boxShadowY ?? DEFAULT_DISPLAY.boxShadowY,
     // 없는 폰트 id 가 저장돼 있으면 기본으로 (옛 저장분·손으로 고친 JSON)
     fontFamily: saved.fontFamily && saved.fontFamily in WEBFONTS ? saved.fontFamily : DEFAULT_DISPLAY.fontFamily,
+    // 빈 문자열은 "테마 색을 쓴다" 는 뜻이라 살린다
+    modalBg: saved.modalBg ?? DEFAULT_DISPLAY.modalBg,
+    modalText: saved.modalText ?? DEFAULT_DISPLAY.modalText,
+    modalItemBg: saved.modalItemBg ?? DEFAULT_DISPLAY.modalItemBg,
+    modalBorder: saved.modalBorder ?? DEFAULT_DISPLAY.modalBorder,
   }
 }
