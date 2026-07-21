@@ -270,6 +270,10 @@ export interface LuckydrawSettings {
   rehearsal: boolean
   /** 다중 뽑기 출현 제한 마스터 스위치 — 기본 꺼짐. 원하는 주최자만 켠다 */
   batchCapEnabled: boolean
+  /** 뽑기 전 '경품 미리보기' 를 손님에게 보여줄지 — 상품명이 스포일러인 행사는 끈다 */
+  showPrizePreview: boolean
+  /** 미리보기에서 남은 수량까지 보여줄지 — 수량이 민망하면 끈다 */
+  showPrizeCount: boolean
 }
 
 export interface DrawnPrize {

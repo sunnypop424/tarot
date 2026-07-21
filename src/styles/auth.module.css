@@ -22,6 +22,20 @@
 
 .head {
   margin-bottom: var(--space-sm);
+  text-align: center;
+}
+
+/* 로고 배지 (시안) */
+.logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--color-wash);
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
 }
 
 /* 인증 미구현 안내 — 눈에 띄되 겁주지 않게 */

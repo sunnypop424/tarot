@@ -12,107 +12,166 @@
  * 색·크기는 여기서도 토큰으로만 참조한다 (hex 는 tokens.css 밖에 두지 않는다).
  */
 
-/* 공통 셸 — 색·형태는 각자 다르게 잡는다 (.admin 은 슬롯 테마 상속, .owner 는 고정 라이트) */
+/**
+ * 공통 셸 — **.admin(주최자 관리)·.owner(슬롯 편집기) 모두 고정 라이트로 통일한다.**
+ *
+ * 예전엔 .admin 이 편집 중인 슬롯 테마를 상속해 이벤트 브랜드로 물들었는데, 이벤트마다
+ * 색·형태가 달라 관리 도구의 인상이 들쭉날쭉했다. 관리 화면의 색은 이벤트가 아니라 **도구의
+ * 것**이라, 어느 슬롯을 열든 늘 같은 라이트 디자인으로 고정한다 — :root 에 주입된 슬롯 테마
+ * 토큰을 이 subtree 에서 전부 덮어쓴다. (색·형태·그림자는 여기서도 토큰으로만 참조한다.)
+ */
 .admin,
 .owner {
   min-height: 100dvh;
+  color-scheme: light;
+  /* 입력·버튼은 4px, 카드는 8px (시안 값) */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 8px;
+  --color-canvas: #f7f7f7;
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-wash: #f0edff;
+  --color-primary: #816bff;
+  --color-primary-hover: #6e58ff;
+  --color-primary-soft: #6e58ff;
+  --color-accent: #a1740a;
+  --color-accent-soft: #a1740a;
+  /* 비활성 = 시안의 '저장됨' 버튼(연보라 위 흐린 보라) */
+  --color-disabled-bg: #f0edff;
+  --color-disabled-fg: #b4a8ff;
+  /* 흰 배경에서 읽히게 어둡게 잡은 빨강 (배너·삭제의 밝은 #f16361 은 각 자리에서 직접 준다) */
+  --color-error: #cc3b39;
+  --color-fg-1: #121212;
+  --color-fg-2: #505050;
+  --color-fg-3: #8a8a8a;
+  --color-border: #eeeeee;
+  --color-border-hover: #d9d3ff;
+  --color-on-primary: #ffffff;
+  --shadow-card: 0 4px 16px rgba(18, 18, 18, 0.06);
   background: var(--color-canvas);
   color: var(--color-fg-1);
 }
 
-/* .admin 은 색 토큰을 리셋하지 않는다 — :root 에 주입된 슬롯 테마를 그대로 쓴다 */
-
-/* 편집 중인 이벤트 색(어두울 수도, 밝을 수도)과 섞이지 않게 도구는 늘 라이트로 고정 */
-.owner {
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 16px;
-  color-scheme: light;
-  --color-canvas: #f5f4fa;
-  --color-surface: #ffffff;
-  --color-surface-raised: #ffffff;
-  --color-wash: #efecff;
-  --color-primary: #5b45e8;
-  --color-primary-hover: #4a34d6;
-  --color-primary-soft: #4a34d6;
-  --color-accent: #a1740a;
-  /* applyTheme 이 파생해주는 값 — .owner 는 슬롯 테마를 안 쓰므로 직접 준다.
-     안 주면 tokens.css 의 다크용 기본값(밝은 골드)이 흰 도구 화면에서 사라진다 */
-  --color-accent-soft: #a1740a;
-  /* 같은 이유로 비활성 색도 직접 준다. 빠뜨렸더니 :root 의 **다크용** 값(#2e2f45)이
-     흰 화면에 그대로 떠서, 비활성 버튼이 주요 CTA 보다 눈에 띄는 검정 덩어리가 됐다.
-     값은 theme.ts 의 DISABLED.light 와 같다 — 저긴 슬롯 테마용, 여긴 고정 라이트용이다. */
-  --color-disabled-bg: #eeeeee;
-  --color-disabled-fg: #8a8797;
-  /* 오류색도 마찬가지. :root 의 #f16361 은 어두운 배경 위에서 읽히라고 고른 밝은 빨강이라
-     흰 화면에선 대비가 3:1 밖에 안 나온다 (본문 기준 4.5:1 미달). 어두운 쪽으로 바꿔 잡는다 —
-     여기 오류는 "슬러그가 중복이에요" 처럼 **읽어야 하는 문장**이지 장식이 아니다. */
-  --color-error: #c62828;
-  --color-fg-1: #16172a;
-  --color-fg-2: #4a4860;
-  --color-fg-3: #7a7791;
-  --color-border: #e3e0ee;
-  --color-border-hover: #cfcbe0;
-  --color-on-primary: #ffffff;
-  --shadow-card: 0 4px 16px rgba(22, 23, 42, 0.1);
+/* ── 아이콘 배너 (경고·안내·오류) — 시안 공통 ── */
+.admin-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+.admin-banner svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.admin-banner b {
+  color: #121212;
+}
+.admin-banner--info {
+  background: #f0edff;
+  border: 1px solid #ddd6ff;
+  color: #505050;
+}
+.admin-banner--info svg {
+  color: #816bff;
+}
+.admin-banner--warn {
+  background: #fbf4e2;
+  border: 1px solid #f0e0b0;
+  color: #7a5a10;
+}
+.admin-banner--warn svg {
+  color: #c99700;
+}
+.admin-banner--err {
+  background: #fdeceb;
+  border: 1px solid #f6c9c8;
+  color: #b23b3a;
+}
+.admin-banner--err svg {
+  color: #f16361;
 }
 
 /* ══ 셸 ════════════════════════════════════════════ */
 
 .admin__shell {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-columns: 248px minmax(0, 1fr);
   min-height: 100dvh;
 }
 
+/* 사이드바는 흰 레일 — 회색 캔버스 위에 얹혀 내비게이션이 본문과 분리돼 보인다 */
 .admin__side {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  padding: var(--space-lg);
+  padding: var(--space-lg) var(--space-base);
+  background: var(--color-surface);
   border-right: 1px solid var(--color-border);
+}
+
+/* 슬롯 이름 블록 */
+.admin__brand {
+  padding: var(--space-xs) var(--space-sm);
 }
 
 .admin__nav {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: 2px;
 }
 
 .admin__navlink {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  min-height: var(--tap-min);
+  gap: 10px;
+  min-height: 42px;
   padding: 0 var(--space-md);
-  border-radius: var(--radius-md);
+  /* 알약 (시안) */
+  border-radius: var(--radius-full);
   color: var(--color-fg-2);
   font-size: var(--text-s);
-  font-weight: var(--weight-bold);
+  font-weight: 600;
   transition: background-color var(--dur-micro) var(--ease),
     color var(--dur-micro) var(--ease);
 }
 .admin__navlink:hover {
-  background: var(--color-surface);
+  background: var(--color-wash);
   color: var(--color-fg-1);
 }
+/* 지금 보고 있는 화면 — 채운 보라 알약으로 또렷하게 (아이콘도 흰색으로 따라온다) */
 .admin__navlink[aria-current='page'] {
-  background: var(--color-wash);
-  color: var(--color-primary-soft);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 700;
 }
 
 .admin__main {
   min-width: 0;
+  /* 콘텐츠는 폭 100% — 주최자 관리·테마 편집기 모두. (테마 편집기는 넓은 화면에서
+     폼+미리보기 2단으로 벌어져 폭이 필요하고, 관리자도 100% 로 통일한다.) */
+  width: 100%;
   padding: var(--space-xl);
 }
 
 .admin__head {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-md);
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-base);
+  border-bottom: 1px solid var(--color-border);
+}
+/* 제목 아래 설명 한 줄에 숨 쉴 틈 */
+.admin__head > div > p {
+  margin-top: 4px;
+  max-width: 60ch;
 }
 
 /* 모바일 — 사이드바를 상단 가로 탭으로 (항목이 적어 햄버거보다 가볍다) */
@@ -171,20 +230,33 @@
 .textarea,
 .select {
   width: 100%;
-  min-height: var(--tap-min);
+  min-height: 44px;
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   background: var(--color-surface);
   color: var(--color-fg-1);
   font-size: var(--text-m);
-  transition: border-color var(--dur-micro) var(--ease);
+  transition: border-color var(--dur-micro) var(--ease),
+    box-shadow var(--dur-micro) var(--ease);
 }
 .input:focus,
 .textarea:focus,
 .select:focus {
   border-color: var(--color-primary);
   outline: none;
+  /* 포커스 링 (시안) */
+  box-shadow: 0 0 0 3px rgba(129, 107, 255, 0.18);
+}
+
+/* 관리자 안에선 버튼·아이콘 버튼도 4px (시안) */
+.admin .btn,
+.owner .btn {
+  border-radius: var(--radius-sm);
+}
+.admin .btn-icon,
+.owner .btn-icon {
+  border-radius: var(--radius-sm);
 }
 
 .textarea {
@@ -238,11 +310,12 @@
 }
 
 .admin-section {
-  margin-bottom: var(--space-xl);
-  padding: var(--space-lg);
+  margin-bottom: 20px;
+  padding: 24px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .admin-section__title {
@@ -261,10 +334,14 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  padding: var(--space-md) var(--space-base);
+  padding: 14px 16px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
+  transition: border-color var(--dur-micro) var(--ease);
+}
+.row-item:hover {
+  border-color: var(--color-border-hover);
 }
 
 .row-item__grow {
@@ -279,4 +356,95 @@
 }
 .save-state--dirty {
   color: var(--color-accent-soft);
+}
+
+/* ══ 지표 타일 (KPI) — 대시보드·질문 목록 공용 ═══════ */
+.stat-row {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 20px 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+.stat-label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--color-fg-3);
+}
+.stat-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--color-fg-1);
+  font-variant-numeric: tabular-nums;
+}
+.stat-value--state {
+  font-size: 22px;
+  align-items: center;
+}
+.stat-unit {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-fg-3);
+}
+.stat-sub {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-fg-3);
+}
+.stat-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+.stat-dot[data-tone='live'] {
+  background: #3ea472;
+}
+.stat-dot[data-tone='rehearsal'] {
+  background: #816bff;
+}
+.stat-dot[data-tone='closed'] {
+  background: #f16361;
+}
+
+/* 빈 상태 박스 (배송·질문 목록 등) */
+.admin-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 56px 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.admin-empty svg {
+  color: #c4c4c4;
+  margin-bottom: 10px;
+}
+.admin-empty__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-fg-2);
+}
+.admin-empty__sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--color-fg-3);
 }

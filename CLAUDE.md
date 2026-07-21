@@ -19,7 +19,7 @@
 - **데이터 경계:** `src/lib/repo/` 는 인터페이스 + localStorage 어댑터. 모든 메서드가 slug 스코프(슬롯 격리). 백엔드를 붙일 땐 `repo/index.ts` 어댑터 한 줄만 교체. 스택은 **Supabase(DB·인증·이미지·서버함수) · Vercel(배포) · Claude API(AI)** 로 정했고 아직 안 붙었다 (**Cloudflare 는 안 쓴다** — Edge Functions 로 충분) — `docs/BACKEND.md`.
 - **테마:** `src/lib/theme.ts` `applyTheme()` 가 슬롯 색·형태를 `:root` 커스텀 프로퍼티로 주입. **배경 밝기 종속 토큰(그림자·딤·`primary-soft`·`disabled`)은 캔버스 휘도로 파생** (`src/lib/color.ts` `readableShade`). hex 는 `tokens.css` 밖에 두지 않는다. 색 이름은 역할 기반(`primary`/`accent`).
 - **이미지:** 슬롯 이미지(로고·배경·카드 앞/뒷면)는 **전부 `background-image`** 로 그린다 — `<img>` 는 모바일에서 길게 누르면 저장 메뉴가 뜬다. 로드 실패 폴백과 로고 비율은 `src/lib/image.ts` 의 `useImageAsset` 이 대신한다.
-- **관리 화면:** `.admin`(주최자)은 슬롯 테마를 그대로 상속, `.owner`(슬롯 편집기)만 고정 라이트. 슬롯 편집기는 **저장하기를 눌러야** 반영되고(초안 → 편집분), 주최자 질문 편집은 반대로 즉시 저장이다(저장을 잊어 날리는 게 더 나쁘다).
+- **관리 화면:** `.admin`(주최자)·`.owner`(슬롯 편집기) **둘 다 고정 라이트로 통일** — 관리 도구의 색은 이벤트가 아니라 도구의 것이라 어느 슬롯을 열든 같은 디자인이다 (`src/styles/admin.css` 가 `:root` 의 슬롯 테마 토큰을 subtree 에서 덮는다). 슬롯 편집기는 **저장하기를 눌러야** 반영되고(초안 → 편집분), 주최자 질문 편집은 반대로 즉시 저장이다(저장을 잊어 날리는 게 더 나쁘다).
 - **카드 의미:** 카드 단위 저작 (`docs/cards/*.md` → `npm run cards:build` → `cards.json`). 카드 × 방향(정/역) × 관점(종합·애정·금전·직업·조언). **조합 테이블은 없다.**
 - **검증은 실제로 돌려본다:** 개발 서버 포트 5174 고정, `scripts/verify-*.mjs`(puppeteer 측정), `npm run shot <경로> <출력>`. CSS 모듈 클래스 대신 `data-*` 속성으로 셀렉트.
 

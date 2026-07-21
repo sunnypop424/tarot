@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Download, Trash2 } from 'lucide-react'
+import { Download, Info, Trash2, Truck } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import type { ShippingEntry } from '@/lib/repo'
 import { useSlot } from '@/slot/SlotProvider'
+import { confirmAction, toast } from '../AdminFeedback'
 import styles from './Luckydraw.module.css'
 
 /** CSV 한 칸 — 쉼표·따옴표·줄바꿈이 들어가면 깨지므로 감싸고 따옴표는 두 번 쓴다 */
@@ -64,17 +65,18 @@ export function Shipping() {
      * 되돌릴 수 없다. 지우기 전에 **내려받았는지** 묻는다 —
      * 이 데이터는 다른 어디에도 사본이 없다 (방문자도 자기가 넣은 걸 못 읽는다).
      */
-    if (
-      !confirm(
-        `배송 정보 ${list.length}건을 모두 지울까요?\n되돌릴 수 없어요. 먼저 CSV로 내려받았는지 확인해주세요.`
-      )
-    ) {
-      return
-    }
+    const ok = await confirmAction({
+      title: `배송 정보 ${list.length}건을 모두 삭제할까요?`,
+      desc: '삭제하면 되돌릴 수 없어요. 필요하면 먼저 CSV로 내려받아 두세요.',
+      okLabel: '전체 삭제',
+      danger: true,
+    })
+    if (!ok) return
     setBusy(true)
     try {
       await repo.luckydraw.clearShipping(slug)
       await load()
+      toast('배송 정보를 모두 삭제했어요')
     } finally {
       setBusy(false)
     }
@@ -86,7 +88,7 @@ export function Shipping() {
     <div>
       <header className="admin__head">
         <div>
-          <h1 className="t-title-m">배송 정보</h1>
+          <h1 className="t-title-l">배송 정보</h1>
           <p className="t-text-xs t-muted">
             {list.length}건 · 배송이 끝나면 <b>반드시 지워주세요.</b> 남겨둘 이유가 없는 개인정보예요.
           </p>
@@ -111,13 +113,19 @@ export function Shipping() {
        * 슬롯이 사라질 때 이 데이터도 같이 사라진다는 걸 미리 말해 둔다 —
        * 마감 +15일 자동 삭제(`0009_slot_lifecycle.sql`)를 모르면 어느 날 통째로 없어진 걸 보게 된다.
        */}
-      <p className={styles.warn}>
-        이 슬롯은 행사 마감 <b>+14일</b>까지만 열려요. 그 안에 배송을 마치고 내려받아 주세요 —
-        <b> +15일이 지나면 이 정보는 자동으로 삭제</b>됩니다.
-      </p>
+      <div className="admin-banner admin-banner--info">
+        <Info size={16} aria-hidden="true" />
+        <span>
+          개인정보 보호를 위해 <b>마감 +14일까지만</b> 열람할 수 있어요.{' '}
+          <b>+15일이 지나면 자동으로 삭제</b>됩니다.
+        </span>
+      </div>
 
       {list.length === 0 ? (
-        <p className="t-text-s t-muted">아직 제출된 배송 정보가 없어요.</p>
+        <div className="admin-empty">
+          <Truck size={44} strokeWidth={1.6} aria-hidden="true" />
+          <div className="admin-empty__title">아직 제출된 배송 정보가 없어요.</div>
+        </div>
       ) : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>

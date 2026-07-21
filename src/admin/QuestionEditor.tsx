@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, Sparkles, TriangleAlert } from 'lucide-react'
+import { Check, ChevronLeft, Sparkles, TriangleAlert } from 'lucide-react'
 
 import { getDeck, type DeckRange } from '@/data/cards'
 import { repo } from '@/lib/repo'
@@ -172,12 +172,16 @@ export function QuestionEditor() {
         질문 목록
       </button>
 
-      <div className="admin__head">
+      <div className={styles.editorHead}>
         <h1 className="t-title-l">질문 편집</h1>
-        <span className={`save-state ${saving ? 'save-state--dirty' : ''}`}>
-          {saving ? '저장 중…' : '저장됨'}
+        <span className={styles.autoSaveChip} data-saving={saving || undefined}>
+          <Check size={13} strokeWidth={2.6} aria-hidden="true" />
+          {saving ? '저장 중…' : '자동 저장'}
         </span>
       </div>
+      <p className={styles.editorSub}>
+        답변은 고치는 즉시 저장돼요. 저장을 잊어 내용을 날리는 일이 없게요.
+      </p>
 
       <section className="admin-section">
         <h2 className={`t-title-s admin-section__title`}>질문</h2>

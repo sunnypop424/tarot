@@ -2,9 +2,8 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   MessageCircleQuestion,
   ExternalLink,
-  Gift,
+  LayoutDashboard,
   LogOut,
-  Settings2,
   Truck,
   UserCog,
 } from 'lucide-react'
@@ -13,6 +12,7 @@ import type { LucideIcon } from 'lucide-react'
 import { hasSupabase } from '@/lib/repo/client'
 import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
+import { AdminFeedbackHost } from './AdminFeedback'
 import { SlotSwitcher } from './SlotSwitcher'
 import { useAdminAuth } from './useAdminAuth'
 
@@ -34,8 +34,7 @@ function navFor(service: string): NavItem[] {
   const own: NavItem[] =
     service === 'luckydraw'
       ? [
-          { to: 'prizes', label: '상품과 수량', icon: Gift },
-          { to: 'operation', label: '운영 설정', icon: Settings2 },
+          { to: 'overview', label: '대시보드', icon: LayoutDashboard },
           { to: 'shipping', label: '배송 정보', icon: Truck },
         ]
       : [{ to: 'questions', label: '질문 타로', icon: MessageCircleQuestion }]
@@ -63,7 +62,7 @@ export function AdminLayout() {
     <div className="admin">
       <div className="admin__shell">
         <aside className="admin__side">
-          <div>
+          <div className="admin__brand">
             <p className="t-text-l">{slot.name}</p>
             <p className="t-text-xs t-muted">/{slot.slug} · 관리</p>
           </div>
@@ -119,6 +118,7 @@ export function AdminLayout() {
           <Outlet />
         </main>
       </div>
+      <AdminFeedbackHost />
     </div>
   )
 }

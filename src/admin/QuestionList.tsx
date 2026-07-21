@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Trash2, ChevronRight } from 'lucide-react'
+import { Plus, Trash2, ChevronRight, MessageCircleQuestion } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import { REVERSED_RATE } from '@/lib/deck'
 import { useSlot } from '@/slot/SlotProvider'
 import { getSlotDeck } from '@/data/slots'
 import { QUESTION_CARD_COUNT, type Question } from '@/types/question'
+import { confirmAction, toast } from './AdminFeedback'
 
 /**
  * 새 질문의 기본값.
@@ -52,12 +53,20 @@ export function QuestionList() {
   async function handleTogglePublish(q: Question) {
     await repo.questions.save(slug, { ...q, published: !q.published })
     await load()
+    toast('공개 설정을 저장했어요')
   }
 
   async function handleRemove(q: Question) {
-    if (!confirm(`"${q.question || '(제목 없음)'}" 질문을 삭제할까요?`)) return
+    const ok = await confirmAction({
+      title: `"${q.question || '(제목 없음)'}" 질문을 삭제할까요?`,
+      desc: '삭제하면 이 질문과 답변이 사라져요. 되돌릴 수 없어요.',
+      okLabel: '삭제',
+      danger: true,
+    })
+    if (!ok) return
     await repo.questions.remove(slug, q.id)
     await load()
+    toast('질문을 삭제했어요')
   }
 
   return (
@@ -75,6 +84,27 @@ export function QuestionList() {
         </button>
       </div>
 
+      {questions && questions.length > 0 && (
+        <div className="stat-row">
+          <div className="stat-tile">
+            <span className="stat-label">총 질문</span>
+            <span className="stat-value">
+              {questions.length}
+              <span className="stat-unit">개</span>
+            </span>
+            <span className="stat-sub">방문자에게 보이는 질문 목록</span>
+          </div>
+          <div className="stat-tile">
+            <span className="stat-label">공개 질문</span>
+            <span className="stat-value">
+              {questions.filter((q) => q.published).length}
+              <span className="stat-unit">개</span>
+            </span>
+            <span className="stat-sub">체크된 질문만 노출돼요</span>
+          </div>
+        </div>
+      )}
+
       {questions === null ? (
         <div className="row-list" aria-busy="true">
           {[0, 1, 2].map((i) => (
@@ -82,7 +112,11 @@ export function QuestionList() {
           ))}
         </div>
       ) : questions.length === 0 ? (
-        <p className="t-body t-muted">아직 질문이 없어요. 위에서 추가해 보세요.</p>
+        <div className="admin-empty">
+          <MessageCircleQuestion size={44} strokeWidth={1.6} aria-hidden="true" />
+          <div className="admin-empty__title">아직 질문이 없어요.</div>
+          <div className="admin-empty__sub">위에서 추가해 보세요.</div>
+        </div>
       ) : (
         <ul className="row-list">
           {questions.map((q) => (

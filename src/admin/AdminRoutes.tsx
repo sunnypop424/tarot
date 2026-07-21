@@ -9,8 +9,7 @@ import { AdminLayout } from './AdminLayout'
 import { Login } from './Login'
 import { QuestionList } from './QuestionList'
 import { QuestionEditor } from './QuestionEditor'
-import { Operation } from './luckydraw/Operation'
-import { Prizes } from './luckydraw/Prizes'
+import { Overview } from './luckydraw/Overview'
 import { Shipping } from './luckydraw/Shipping'
 import { useAdminAuth } from './useAdminAuth'
 
@@ -37,7 +36,7 @@ export default function AdminRoutes() {
    * 못 찾은 주소를 첫 화면으로 되돌리는 게 이 라우트의 일인데, 상대 경로면 되돌리는 게 아니라
    * 계속 파고든다.
    */
-  const home = `/${slot.slug}/admin/${luckydraw ? 'prizes' : 'questions'}`
+  const home = `/${slot.slug}/admin/${luckydraw ? 'overview' : 'questions'}`
 
   return (
     <Routes>
@@ -47,8 +46,7 @@ export default function AdminRoutes() {
         <Route element={<AdminLayout />}>
           {luckydraw ? (
             <>
-              <Route path="prizes" element={<Prizes />} />
-              <Route path="operation" element={<Operation />} />
+              <Route path="overview" element={<Overview />} />
               <Route path="shipping" element={<Shipping />} />
             </>
           ) : (

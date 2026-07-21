@@ -1,11 +1,12 @@
-/* 주최자의 럭키드로우 화면 — 표가 본체다 */
+/* 주최자의 럭키드로우 화면 — 시안(이벤트 관리자 콘솔)에 맞춘 값 */
 
+/* 남은 자리용 기본 배너 (아이콘 배너는 admin.css 의 .admin-banner 를 쓴다) */
 .warn {
-  margin: 0 0 var(--space-base);
-  padding: var(--space-sm) var(--space-md);
+  margin: 0 0 16px;
+  padding: 12px 14px;
   border-radius: var(--radius-md);
   background: var(--color-wash);
-  color: var(--color-fg2);
+  color: var(--color-fg-2);
   font-size: var(--text-xs);
   line-height: 1.6;
 }
@@ -16,7 +17,29 @@
   flex-wrap: wrap;
 }
 
-/* 좁은 화면에서 표가 화면을 밀지 않게 — 표만 가로로 스크롤된다 */
+/* 섹션 제목 + 바로 아래 설명 */
+.sectionTitle {
+  margin-bottom: 6px;
+  font-size: 17px;
+  font-weight: 800;
+}
+.sectionDesc {
+  margin: 0 0 16px;
+  max-width: 62ch;
+  color: var(--color-fg-3);
+}
+
+/* 섹션 안의 소제목 — 위에 옅은 구분선 */
+.subhead {
+  margin: 24px 0 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-fg-1);
+}
+
+/* 표 — 카드 안에 들어가므로 테두리만 (그림자는 카드가 진다) */
 .tableWrap {
   overflow-x: auto;
   border: 1px solid var(--color-border);
@@ -26,26 +49,50 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--text-s);
+  font-size: 14px;
 }
 
 .table th,
 .table td {
-  padding: var(--space-sm);
+  padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid var(--color-border);
   vertical-align: middle;
 }
 
+.table tbody td {
+  border-top: 1px solid #f0f0f0;
+}
+
 .table thead th {
-  font-size: var(--text-xs);
-  color: var(--color-fg3);
-  font-weight: 600;
+  padding: 11px 12px;
+  background: var(--color-wash);
+  font-size: 12px;
+  color: var(--color-fg-3);
+  font-weight: 800;
+  letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
-.table tbody tr:last-child td {
-  border-bottom: 0;
+/* 행 hover */
+.table tbody tr {
+  transition: background-color var(--dur-micro, 120ms) var(--ease, ease);
+}
+.table tbody tr:hover td {
+  background: #faf9ff;
+}
+
+/* 표 안 입력칸은 낮게(36px) + 4px (시안) */
+.table .input {
+  min-height: 36px;
+  border-radius: var(--radius-sm);
+}
+
+/* 표 안의 체크박스도 브랜드 색으로 */
+.table input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
 }
 
 .colName {
@@ -53,22 +100,45 @@
   width: 40%;
 }
 
+/* 등수 배지 (시안: 연보라 알약) */
 .rank {
   white-space: nowrap;
-  font-weight: 700;
+}
+.rankBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  background: var(--color-wash);
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .num {
-  width: 88px;
+  width: 76px;
+  text-align: right;
 }
 
-/* 읽기 전용 집계 — draw_logs 에서 센 값이라 손으로 못 고친다.
-   입력칸과 눈에 띄게 달라야 "왜 안 고쳐지지" 를 안 만든다 */
+/* '5개당 최대' 개수 입력 — placeholder("제한 없음")가 들어갈 만큼 */
+.cap {
+  width: 104px;
+  text-align: center;
+}
+
+/* 읽기 전용 집계 — 입력칸과 눈에 띄게 달라야 "왜 안 고쳐지지" 를 안 만든다 */
 .stat {
-  color: var(--color-fg3);
+  color: #b4b4b4;
   font-variant-numeric: tabular-nums;
   text-align: right;
   white-space: nowrap;
+}
+
+.statHead {
+  text-align: right;
 }
 
 .center {
@@ -85,45 +155,71 @@
   justify-content: space-between;
   gap: var(--space-md);
   flex-wrap: wrap;
-  margin-top: var(--space-base);
+  margin-top: 16px;
 }
 
-/* 표가 길어도 저장 버튼이 늘 손 닿는 곳에 있어야 한다 */
+/* 아래에 떠 있는 저장 액션 바 */
 .saveBar {
   position: sticky;
-  bottom: 0;
+  bottom: var(--space-md);
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-md);
   margin-top: var(--space-lg);
-  padding: var(--space-md) 0;
-  background: var(--color-canvas);
-  border-top: 1px solid var(--color-border);
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(18, 18, 18, 0.14);
 }
 
+/* ── 설정 토글 (즉시 저장) ───────────────────── */
 .toggles {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: 10px;
 }
 
 .toggle {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-md);
+  gap: 12px;
+  padding: 14px 16px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  background: var(--color-surface);
   cursor: pointer;
+  transition: border-color var(--dur-micro) var(--ease),
+    background-color var(--dur-micro) var(--ease);
 }
-
 .toggle:hover {
   border-color: var(--color-border-hover);
+}
+/* 켜져 있는 항목 — 연보라 테두리 + 옅은 배경 (시안) */
+.toggle[data-on] {
+  border-color: #d9d3ff;
+  background: #faf9ff;
+}
+
+.toggle input[type='checkbox'],
+.toggle input[type='radio'] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
 }
 
 .toggle > span {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+.toggle b {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-fg-1);
 }

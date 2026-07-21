@@ -12,6 +12,37 @@
   color: var(--color-fg-1);
 }
 
+/* 제목 + 자동 저장 칩 (시안) */
+.editorHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 14px 0 6px;
+}
+.editorSub {
+  margin: 0 0 var(--space-base);
+  padding-bottom: var(--space-base);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  color: var(--color-fg-3);
+}
+.autoSaveChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: #eaf6ef;
+  color: #3ea472;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.autoSaveChip[data-saving] {
+  background: #fbf4e2;
+  color: #a07b12;
+}
+
 /* ── 답변 목록 ────────────────────────────────────── */
 
 .answerHead {

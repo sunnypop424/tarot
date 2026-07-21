@@ -36,6 +36,8 @@ const DEFAULT_SETTINGS: LuckydrawSettings = {
   // 기본이 리허설이다 — 전날 시연에서 실수로 재고를 태우는 사고가 훨씬 비싸다
   rehearsal: true,
   batchCapEnabled: false,
+  showPrizePreview: true,
+  showPrizeCount: true,
 }
 
 export const supabaseLuckydraw: LuckydrawRepo = {
@@ -115,11 +117,15 @@ export const supabaseLuckydraw: LuckydrawRepo = {
       closed: data.closed === true,
       rehearsal: data.rehearsal === true,
       batchCapEnabled: data.batch_cap_enabled === true,
+      // 새 컬럼(0012). 없으면(마이그레이션 전) 기본 켜짐으로 — select('*') 라 컬럼이 없어도 안 깨진다
+      showPrizePreview: data.show_prize_preview ?? true,
+      showPrizeCount: data.show_prize_count ?? true,
     }
   },
 
   async saveSettings(slug, settings) {
-    const { error } = await (await db()).from('luckydraw_settings').upsert({
+    const client = await db()
+    const { error } = await client.from('luckydraw_settings').upsert({
       slug,
       display_mode: settings.displayMode,
       locked: settings.locked,
@@ -128,6 +134,18 @@ export const supabaseLuckydraw: LuckydrawRepo = {
       batch_cap_enabled: settings.batchCapEnabled,
     })
     if (error) throw new Error(error.message)
+    /**
+     * 경품 미리보기 토글은 **별도로** 쓴다 — 0012 컬럼이 아직 없는 배포에서도 위 저장(마감·잠금
+     * 등)은 그대로 돌아야 하기 때문이다. 컬럼이 없으면 이 update 만 조용히 실패한다(무시).
+     * 0012 를 적용하면 그때부터 저장된다.
+     */
+    await client
+      .from('luckydraw_settings')
+      .update({
+        show_prize_preview: settings.showPrizePreview,
+        show_prize_count: settings.showPrizeCount,
+      })
+      .eq('slug', slug)
   },
 
   /**

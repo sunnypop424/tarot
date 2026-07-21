@@ -14,7 +14,7 @@
   gap: 1px;
   padding: var(--space-sm);
   border-radius: var(--radius-sm);
-  color: var(--color-fg2);
+  color: var(--color-fg-2);
   text-decoration: none;
 }
 
@@ -25,7 +25,7 @@
 /* 지금 보고 있는 슬롯 — 어느 행사를 만지는 중인지 헷갈리면 남의 재고를 고친다 */
 .item[data-current] {
   background: var(--color-wash);
-  color: var(--color-fg1);
+  color: var(--color-fg-1);
 }
 
 .name {

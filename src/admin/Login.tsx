@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { TriangleAlert } from 'lucide-react'
+import { Sparkles, TriangleAlert } from 'lucide-react'
 
 import { useSlot } from '@/slot/SlotProvider'
 import { hasSupabase } from '@/lib/repo/client'
@@ -55,6 +55,9 @@ export function Login() {
       <div className={styles.wrap}>
         <form className={styles.card} onSubmit={handleSubmit}>
           <div className={styles.head}>
+            <div className={styles.logo}>
+              <Sparkles size={22} aria-hidden="true" />
+            </div>
             <h1 className="t-title-l">{slot.name}</h1>
             <p className="t-text-xs t-muted">/{slot.slug} 관리자</p>
           </div>

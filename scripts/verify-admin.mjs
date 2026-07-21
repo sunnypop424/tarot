@@ -237,6 +237,11 @@ try {
   await page.$$eval('.row-item', (rows) => {
     rows.find((r) => r.textContent.includes('테스트 질문'))?.querySelector('button[aria-label="삭제"]')?.click()
   })
+  await wait(400)
+  // 네이티브 confirm 이 아니라 확인 모달이 뜬다 — 모달의 '삭제' 를 눌러야 지워진다
+  await page.$$eval('[role="dialog"] button', (bs) =>
+    bs.find((b) => b.textContent.trim() === '삭제')?.click()
+  )
   await wait(1000)
   const afterDelete = await rowCount()
   check('만든 질문을 지워 원래대로 돌린다', afterDelete === before, `${after} → ${afterDelete}`)
