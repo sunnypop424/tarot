@@ -198,6 +198,17 @@ function LuckydrawExtra({
       )
     case 'boxPadding':
       return num('안쪽 여백 (px)', d.boxPadding, (n) => patchLd({ boxPadding: n }))
+    case 'boxBorder':
+      return (
+        <>
+          {num('테두리 두께 (px)', d.boxBorderWidth, (n) => patchLd({ boxBorderWidth: n }), '0 이면 테두리 없음', 20)}
+          <AlphaColor
+            label="테두리색"
+            value={d.boxBorderColor || draft.theme.colors.border}
+            onChange={(v) => patchLd({ boxBorderColor: v })}
+          />
+        </>
+      )
     case 'boxTopMargin':
       return num('상단 여백 (px)', d.boxTopMargin, (n) => patchLd({ boxTopMargin: n }), '가운데에서 얼마나 내릴지 — 사진 얼굴을 안 가리게')
     case 'buttonRadius':
@@ -309,9 +320,15 @@ function LuckydrawExtra({
       return (
         <>
           <AlphaColor
+            label="배경색"
+            value={d.counterBg || draft.theme.colors.wash}
+            hint="수량 알약 안쪽 배경. 비우면 테마 보조 배경색"
+            onChange={(v) => patchLd({ counterBg: v })}
+          />
+          <AlphaColor
             label="테두리색"
             value={d.counterBorder || draft.theme.colors.border}
-            hint="수량 알약 전체를 감싸는 테두리. 비우면 테마 테두리색"
+            hint="알약 전체를 감싸는 테두리. 비우면 테마 테두리색"
             onChange={(v) => patchLd({ counterBorder: v })}
           />
           <AlphaColor
@@ -321,6 +338,20 @@ function LuckydrawExtra({
             onChange={(v) => patchLd({ counterShadow: v })}
           />
         </>
+      )
+    case 'badgeStyle':
+      return (
+        <div className="field">
+          <span className="field__label">배지 스타일</span>
+          <select
+            className="select"
+            value={d.badgeStyle}
+            onChange={(e) => patchLd({ badgeStyle: e.target.value === 'solid' ? 'solid' : 'soft' })}
+          >
+            <option value="soft">옅게 (글자에 색, 배경은 글자색 따라감)</option>
+            <option value="solid">진하게 (배경 solid, 글자 흰색)</option>
+          </select>
+        </div>
       )
     case 'footer':
       return text(
@@ -467,6 +498,16 @@ const BASE_PRESETS: { id: 'dark' | 'light'; label: string; base: Pick<ThemeColor
 ]
 
 /**
+ * 럭키드로우 미리보기용 아이패드 해상도 — 가로 기준. 기본은 가장 큰 프로.
+ * 부스마다 세워두는 기기가 달라, 실제로 쓸 기기로 맞춰 봐야 여백·크기가 어긋나지 않는다.
+ */
+const IPADS = [
+  { id: 'pro', w: 1366, h: 1024, label: '아이패드 프로' },
+  { id: 'air', w: 1180, h: 820, label: '아이패드 에어' },
+  { id: 'mini', w: 1024, h: 768, label: '아이패드 미니' },
+] as const
+
+/**
  * 슬롯 하나의 색·형태·이미지·이벤트 설정 — `/theme-editor/:slug`, **최고관리자 전용**
  * (Supabase 가 설정된 빌드에만 존재한다 — App.tsx).
  * 슬롯을 만들고 지우는 건 목록(SlotList)이 맡는다.
@@ -548,13 +589,20 @@ export function SlotEditor() {
   const [previewState, setPreviewState] = useState<PreviewState>('draw')
 
   /**
+   * 럭키드로우 미리보기 기기 — 부스에 세워둔 아이패드를 **가로로** 쓴다. 모델마다 해상도가
+   * 달라 골라볼 수 있게 둔다 (기본은 가장 큰 프로).
+   */
+  const [ipad, setIpad] = useState<'pro' | 'air' | 'mini'>('pro')
+  const ipadSize = IPADS.find((d) => d.id === ipad) ?? IPADS[0]
+
+  /**
    * 미리보기 기기 — **서비스마다 실제로 쓰는 기기가 다르다.**
-   * 타로는 방문자가 자기 폰으로 보고, 럭키드로우는 부스에 세워둔 아이패드를 **가로로** 쓴다.
+   * 타로는 방문자가 자기 폰으로 보고, 럭키드로우는 아이패드를 가로로 쓴다.
    * 폰 세로로 보여주면 아이패드에서 어떻게 보일지 알 수 없어 미리보기가 제 일을 못 한다.
    */
   const previewDevice =
     draft && getSlotService(draft) === 'luckydraw'
-      ? { w: 1180, h: 820, label: '아이패드 가로' }
+      ? { w: ipadSize.w, h: ipadSize.h, label: `아이패드 가로 · ${ipadSize.label}` }
       : { w: 390, h: 844, label: '폰 세로' }
 
   /**
@@ -1566,6 +1614,21 @@ export function SlotEditor() {
                     {previewScale < 0.95 && ` · ${Math.round(previewScale * 100)}%`}
                     {dirty && ' · 저장 전 초안'}
                   </span>
+                  {getSlotService(draft) === 'luckydraw' && (
+                    <select
+                      className="select"
+                      style={{ width: 'auto', height: 32, padding: '0 28px 0 10px', fontSize: 12 }}
+                      value={ipad}
+                      aria-label="아이패드 해상도"
+                      onChange={(e) => setIpad(e.target.value as 'pro' | 'air' | 'mini')}
+                    >
+                      {IPADS.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.label} ({d.w}×{d.h})
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   <button
                     type="button"
                     className="btn btn--sm btn--ghost"

@@ -40,8 +40,8 @@ export function PrizePreview({ prizes, showCount, highlightRanks, onClose }: Pro
             <Gift size={18} aria-hidden="true" />
           </span>
           <div>
-            <h2 className={styles.previewTitle}>오늘의 경품</h2>
-            <p className={styles.previewSub}>이런 경품들이 준비돼 있어요.</p>
+            <h2 className={styles.previewTitle}>준비된 경품</h2>
+            <p className={styles.previewSub}>이런 경품들을 준비했어요.</p>
           </div>
         </div>
 

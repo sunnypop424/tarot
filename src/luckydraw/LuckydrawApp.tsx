@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Flag, Gift, Info, Lock, Minus, Plus } from 'lucide-react'
 
 import { luckydrawDisplay, WEBFONTS, type LuckydrawDisplay } from '@/data/luckydraw'
+import { luminance } from '@/lib/color'
 import { repo } from '@/lib/repo'
 import type { DrawResult, LuckydrawSettings, Prize } from '@/lib/repo'
 import { useAdminAuth } from '@/admin/useAdminAuth'
@@ -15,6 +16,15 @@ import styles from './Luckydraw.module.css'
 /** 한 번에 뽑을 수 있는 최대 — 서버도 같은 값으로 막는다 (`draw_prizes`) */
 const MAX_DRAW = 100
 const QUICK = [1, 5, 10]
+
+/** 두 색 중 **더 어두운 쪽** — 등수 배지가 옅은 배경에서도 읽히게 (휘도 못 재면 앞 색) */
+function darker(a: string, b: string): string {
+  const la = luminance(a)
+  const lb = luminance(b)
+  if (la === null) return b
+  if (lb === null) return a
+  return la <= lb ? a : b
+}
 
 /**
  * 럭키드로우 방문자 화면.
@@ -108,16 +118,31 @@ export default function LuckydrawApp() {
     // 타일 테두리 없애기 — 결과 타일·요약 줄·경품 모달 줄까지 (포털이라 :root 에 실어야 닿는다)
     set('--ld-tile-border', display.noBorder ? 'transparent' : '')
     // 수량 카운터 전용 색 (비우면 CSS 가 테마 색·시안 그림자로 폴백)
+    set('--ld-counter-bg', display.counterBg)
     set('--ld-counter-border', display.counterBorder)
     set('--ld-counter-shadow', display.counterShadow)
+    // 등수 배지 스타일 — 경품 미리보기 모달이 body 로 포털돼 :root 에 실어야 닿는다
+    root.setAttribute('data-ld-badge', display.badgeStyle)
+    /**
+     * 등수 배지의 등수색 — **짝(배경/글자) 중 더 어두운 쪽**을 쓴다.
+     * soft 는 옅은 배경에 이 색을 글자로, solid 는 이 색을 배경에 흰 글자로 얹는데,
+     * 밝은 쪽(예: onHigh 가 흰색)을 그대로 쓰면 soft 에서 글자가 안 보이고 solid 도 흰 배경이
+     * 된다. 늘 어두운 쪽을 골라 두 스타일 모두 대비를 확보한다.
+     */
+    const c = slot.theme.colors
+    set('--ld-rank', darker(c.primary, c.onPrimary))
+    set('--ld-rank-hi', darker(c.high, c.onHigh))
   }, [
     display.modalBg,
     display.modalText,
     display.modalItemBg,
     display.modalBorder,
     display.noBorder,
+    display.counterBg,
     display.counterBorder,
     display.counterShadow,
+    display.badgeStyle,
+    slot.theme.colors,
   ])
 
   const load = useCallback(async () => {
@@ -220,6 +245,8 @@ export default function LuckydrawApp() {
           {
             '--ld-box-top': `${display.boxTopMargin}px`,
             '--ld-box-padding': `${display.boxPadding}px`,
+            '--ld-box-border-w': `${display.boxBorderWidth}px`,
+            '--ld-box-border-c': display.boxBorderColor || 'transparent',
             '--ld-admin-link': display.adminLinkColor,
             // 색만이 아니라 **완전한 그림자 문자열** — 슬롯이 색·번짐·내림을 다 정한다
             '--ld-shadow': `0 ${display.boxShadowY}px ${display.boxShadowBlur}px ${display.boxShadowColor}`,

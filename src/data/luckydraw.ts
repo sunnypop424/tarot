@@ -76,6 +76,14 @@ export interface LuckydrawDisplay {
   boxShadowY: number
 
   /**
+   * 박스 테두리 — 두께(px)와 색. 두께 0 이면 테두리 없음(기본).
+   *
+   * 사진 위 박스가 배경과 색이 비슷해 경계가 흐릿할 때 얇은 테두리로 또렷하게 세운다.
+   */
+  boxBorderWidth: number
+  boxBorderColor: string
+
+  /**
    * 본문 폰트 — 옮겨온 원본이 고르게 하던 세 가지 (`WEBFONTS`).
    * 값은 `font-family` 스택 그대로 들어간다.
    */
@@ -102,11 +110,20 @@ export interface LuckydrawDisplay {
   /**
    * 수량 카운터(알약) 전용 색 — 비우면 테마 색으로 폴백한다.
    *
-   * 카운터는 화면 한가운데 큰 알약이라 따로 꾸미고 싶을 때가 있다. `counterBorder` 는
-   * 전체를 감싸는 테두리색, `counterShadow` 는 그 아래 그림자색(번짐·내림은 시안 고정).
+   * 카운터는 화면 한가운데 큰 알약이라 따로 꾸미고 싶을 때가 있다. `counterBg` 는 알약 배경,
+   * `counterBorder` 는 전체를 감싸는 테두리색, `counterShadow` 는 그 아래 그림자색(번짐·내림은 시안 고정).
    */
+  counterBg: string
   counterBorder: string
   counterShadow: string
+
+  /**
+   * 등수 배지 스타일 (전체 결과·경품 목록의 "1등" 알약).
+   *
+   * - `soft`: 배경이 **글자색을 따라 옅게** 깔린다 (글자에 색, 배경은 그 색의 투명 톤). 시안 기본.
+   * - `solid`: 배경이 **진한 solid**, 글자는 흰색(onPrimary). 또렷하게 도장 찍은 느낌.
+   */
+  badgeStyle: 'soft' | 'solid'
 }
 
 /**
@@ -174,17 +191,19 @@ export const LUCKYDRAW_GROUPS: {
   extras?: (
     | 'boxRadius' | 'boxPadding' | 'boxTopMargin' | 'buttonRadius'
     | 'font' | 'background' | 'texts' | 'cover' | 'badge' | 'footer' | 'shadow' | 'modal'
-    | 'noBorder' | 'counter'
+    | 'noBorder' | 'counter' | 'badgeStyle' | 'boxBorder'
   )[]
 }[] = [
+  // ── 박스 (사진 위에 뜨는 상자) — 배경·테두리·둥글기·여백·그림자 한자리에 ──
   {
     title: '박스',
-    hint: '사진 위에 뜨는 흰 상자예요.',
+    hint: '사진 위에 뜨는 상자예요. 배경·테두리·둥글기·여백·그림자를 여기서.',
     colors: [
       { key: 'surface', label: '배경색', part: 'box', alpha: true, hint: '사진이 비칠수록 낮게' },
     ],
-    extras: ['boxRadius', 'boxPadding', 'boxTopMargin', 'shadow'],
+    extras: ['boxBorder', 'boxRadius', 'boxPadding', 'boxTopMargin', 'shadow'],
   },
+  // ── 버튼 ──
   {
     title: '버튼',
     colors: [
@@ -193,21 +212,24 @@ export const LUCKYDRAW_GROUPS: {
     ],
     extras: ['buttonRadius', 'texts'],
   },
-  {
-    title: '상품 타일',
-    hint: '뽑은 결과가 놓이는 칸이에요.',
-    colors: [
-      { key: 'surfaceRaised', label: '배경색', part: 'tile' },
-      { key: 'fg2', label: '글자색', part: 'tile' },
-      { key: 'border', label: '테두리', part: 'tile' },
-    ],
-    extras: ['noBorder'],
-  },
+  // ── 수량 카운터 (가운데 큰 알약) — 배경·테두리·그림자색 ──
   {
     title: '수량 카운터',
-    hint: '가운데 큰 알약이에요. 비우면 테마 색을 써요.',
+    hint: '가운데 큰 알약이에요. 비우면 테마 색·시안 그림자를 써요.',
     extras: ['counter'],
   },
+  // ── 결과 화면 (상품 타일 · 등수 배지) ──
+  {
+    title: '상품 타일 · 등수 배지',
+    hint: '뽑은 결과가 놓이는 칸과 “1등” 배지예요.',
+    colors: [
+      { key: 'surfaceRaised', label: '타일 배경색', part: 'tile' },
+      { key: 'fg2', label: '타일 글자색', part: 'tile' },
+      { key: 'border', label: '타일 테두리', part: 'tile' },
+    ],
+    extras: ['noBorder', 'badgeStyle'],
+  },
+  // ── 당첨 연출 (긁는 등수) ──
   {
     title: '당첨 (긁는 등수)',
     hint: '비싼 등수만 덮어두고 직접 긁게 해요.',
@@ -219,6 +241,7 @@ export const LUCKYDRAW_GROUPS: {
     ],
     extras: ['cover'],
   },
+  // ── 글자 · 폰트 ──
   {
     title: '글자 · 폰트',
     colors: [
@@ -227,11 +250,13 @@ export const LUCKYDRAW_GROUPS: {
     ],
     extras: ['font', 'badge', 'footer'],
   },
+  // ── 배송·경품 모달 ──
   {
     title: '배송·경품 모달',
     hint: '배송 정보를 받는 창이에요. 비우면 위 테마 색을 그대로 써요.',
     extras: ['modal'],
   },
+  // ── 배경 (사진 · 관리자 링크) ──
   {
     title: '배경',
     colors: [],
@@ -280,6 +305,9 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   // 은은하게 뜨는 기본값 — 밝은 사진 위에서 박스가 무겁지 않게
   boxShadowBlur: 40,
   boxShadowY: 12,
+  // 기본은 테두리 없음 — 그림자만으로 떠 보이게
+  boxBorderWidth: 0,
+  boxBorderColor: '',
   // 원본 빌더의 기본이자 추천값이었다 — 획이 또렷해 부스 태블릿에서 멀리서도 읽힌다
   fontFamily: 'paperlogy',
   // 비우면 슬롯 테마 색을 그대로 쓴다 (CSS 폴백)
@@ -289,8 +317,11 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   modalBorder: '',
   noBorder: false,
   // 비우면 테마 색 / 시안 기본 그림자색으로 폴백
+  counterBg: '',
   counterBorder: '',
   counterShadow: '',
+  // 시안 기본 — 옅은 배경 + 글자색
+  badgeStyle: 'soft',
 }
 
 /**
@@ -321,6 +352,9 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
     // 0 은 유효한 값이다 (번짐 0 = 그림자 없음) — ?? 로 기본값에 먹히면 안 된다
     boxShadowBlur: saved.boxShadowBlur ?? DEFAULT_DISPLAY.boxShadowBlur,
     boxShadowY: saved.boxShadowY ?? DEFAULT_DISPLAY.boxShadowY,
+    // 0 은 유효한 값(테두리 없음) — ?? 로 살린다
+    boxBorderWidth: saved.boxBorderWidth ?? DEFAULT_DISPLAY.boxBorderWidth,
+    boxBorderColor: saved.boxBorderColor ?? DEFAULT_DISPLAY.boxBorderColor,
     // 없는 폰트 id 가 저장돼 있으면 기본으로 (옛 저장분·손으로 고친 JSON)
     fontFamily: saved.fontFamily && saved.fontFamily in WEBFONTS ? saved.fontFamily : DEFAULT_DISPLAY.fontFamily,
     // 빈 문자열은 "테마 색을 쓴다" 는 뜻이라 살린다
@@ -330,7 +364,10 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
     modalBorder: saved.modalBorder ?? DEFAULT_DISPLAY.modalBorder,
     // false 가 기본이라 ?? 로 살린다 (있는 그대로)
     noBorder: saved.noBorder ?? DEFAULT_DISPLAY.noBorder,
+    counterBg: saved.counterBg ?? DEFAULT_DISPLAY.counterBg,
     counterBorder: saved.counterBorder ?? DEFAULT_DISPLAY.counterBorder,
     counterShadow: saved.counterShadow ?? DEFAULT_DISPLAY.counterShadow,
+    // 'solid' 만 유효값으로 받고 나머지는 기본 soft
+    badgeStyle: saved.badgeStyle === 'solid' ? 'solid' : 'soft',
   }
 }
