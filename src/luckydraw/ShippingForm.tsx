@@ -56,26 +56,38 @@ export function ShippingForm({ slug, prizes, onClose }: Props) {
     <div className={styles.sheet} role="dialog" aria-modal="true" aria-label="배송 정보 입력">
       <div className={`surface ${styles.sheetBody}`}>
         {done ? (
-          <>
+          <div className={styles.done}>
             <h2 className="t-title-s">보냈어요</h2>
             <p className="t-text-s t-muted">배송 정보가 스태프에게 전달됐어요.</p>
             <button type="button" className="btn btn--primary btn--block" onClick={onClose}>
               닫기
             </button>
-          </>
+          </div>
         ) : (
-          <form className={styles.form} onSubmit={submit}>
-            <h2 className="t-title-s">배송 정보</h2>
+          <>
+            <header className={styles.sheetHead}>
+              <h2 className="t-title-s">배송 정보 입력</h2>
+              <p className="t-text-s t-muted">당첨 상품 수령을 위해 아래 정보를 입력해주세요.</p>
+            </header>
 
-            <ul className={styles.shipList}>
-              {prizes.map((p) => (
-                <li key={`${p.rank}-${p.name}`}>
-                  {p.rank}등 · {p.name} <b>{p.count}개</b>
-                </li>
-              ))}
-            </ul>
+            <form className={styles.form} onSubmit={submit}>
+              {prizes.length > 0 && (
+                <div className={styles.shipCard}>
+                  <h3 className={styles.shipCardTitle}>배송 대상 상품</h3>
+                  <ul className={styles.shipList}>
+                    {prizes.map((p) => (
+                      <li key={`${p.rank}-${p.name}`} className={styles.shipItem}>
+                        <span>
+                          {p.rank}등 · {p.name}
+                        </span>
+                        <b className={styles.shipCount}>{p.count}개</b>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-            <label className={styles.field}>
+              <label className={styles.field}>
               <span className="t-text-xs t-muted">받는 분</span>
               <input className="input" value={name} onChange={(e) => setName(e.target.value)} />
             </label>
@@ -101,32 +113,36 @@ export function ShippingForm({ slug, prizes, onClose }: Props) {
               />
             </label>
 
-            <label className={styles.agree}>
-              <input
-                type="checkbox"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-              />
-              <span className="t-text-xs">
-                경품 배송을 위해 개인정보 수집·이용에 동의해요. 배송이 끝나면 폐기됩니다.
-              </span>
-            </label>
+              <label className={styles.agree}>
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                />
+                <span className={styles.agreeText}>
+                  <b className="t-text-s">개인정보 수집·이용 동의</b>
+                  <span className="t-text-xs t-muted">
+                    목적: 경품 배송 · 이벤트가 끝나면 즉시 폐기됩니다.
+                  </span>
+                </span>
+              </label>
 
-            {error && (
-              <p className={styles.error} role="alert">
-                {error}
-              </p>
-            )}
+              {error && (
+                <p className={styles.error} role="alert">
+                  {error}
+                </p>
+              )}
 
-            <div className={styles.sheetActions}>
-              <button type="button" className="btn btn--ghost" onClick={onClose}>
-                취소
-              </button>
-              <button type="submit" className="btn btn--primary" disabled={!ready}>
-                {busy ? '보내는 중…' : '보내기'}
-              </button>
-            </div>
-          </form>
+              <div className={styles.sheetActions}>
+                <button type="button" className="btn btn--ghost" onClick={onClose}>
+                  취소
+                </button>
+                <button type="submit" className="btn btn--primary" disabled={!ready}>
+                  {busy ? '보내는 중…' : '보내기'}
+                </button>
+              </div>
+            </form>
+          </>
         )}
       </div>
     </div>,
