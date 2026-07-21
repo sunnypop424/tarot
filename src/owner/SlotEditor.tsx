@@ -498,6 +498,21 @@ const BASE_PRESETS: { id: 'dark' | 'light'; label: string; base: Pick<ThemeColor
 ]
 
 /**
+ * 키 순서에 흔들리지 않는 직렬화 — 객체 키를 재귀적으로 정렬해 문자열로 만든다.
+ * "저장 안 됨" 판정에만 쓴다: JSONB 저장소가 키 순서를 바꿔 돌려줘도 값이 같으면 같다고 봐야 한다.
+ */
+function stableStringify(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value) ?? 'null'
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`
+  const obj = value as Record<string, unknown>
+  const body = Object.keys(obj)
+    .sort()
+    .map((k) => `${JSON.stringify(k)}:${stableStringify(obj[k])}`)
+    .join(',')
+  return `{${body}}`
+}
+
+/**
  * 럭키드로우 미리보기용 아이패드 해상도 — 가로 기준. 기본은 가장 큰 프로.
  * 부스마다 세워두는 기기가 달라, 실제로 쓸 기기로 맞춰 봐야 여백·크기가 어긋나지 않는다.
  */
@@ -574,8 +589,15 @@ export function SlotEditor() {
     // slots 는 저장할 때만 바뀐다 — 저장 직후 초안을 되짚는 건 같은 값이라 무해하다
   }, [slug, slots])
 
+  /**
+   * "저장 안 됨" 판정 — **키 순서를 무시하고** 비교한다.
+   *
+   * 저장소가 Supabase(JSONB)면 저장된 `theme`·`luckydraw` 가 **키 순서를 재정렬해서** 돌아온다.
+   * 그냥 `JSON.stringify` 로 비교하면 값이 같아도 순서가 달라 문자열이 안 맞아, 저장한 뒤에도
+   * 영영 "저장 안 됨"으로 남는다 (실제로 그렇게 새 필드가 늘며 터졌다). 키를 정렬해 비교한다.
+   */
   const dirty = useMemo(
-    () => Boolean(draft && saved) && JSON.stringify(draft) !== JSON.stringify(saved),
+    () => Boolean(draft && saved) && stableStringify(draft) !== stableStringify(saved),
     [draft, saved]
   )
 
