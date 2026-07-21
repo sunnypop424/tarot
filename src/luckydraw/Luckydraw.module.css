@@ -877,7 +877,8 @@
   padding: var(--space-md);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
-  background: var(--color-wash);
+  /* 다른 입력 항목과 같은 배경 */
+  background: var(--color-surface);
   font-size: var(--text-s);
   text-align: left;
 }
@@ -888,14 +889,11 @@
   color: var(--color-primary);
 }
 
+/* 동의는 박스로 두지 않는다 — 테두리·배경 없이 체크박스 + 문구 한 줄 */
 .agree {
   display: flex;
   gap: var(--space-sm);
   align-items: flex-start;
-  padding: var(--space-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-wash);
   text-align: left;
   cursor: pointer;
 }
