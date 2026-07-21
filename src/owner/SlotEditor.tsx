@@ -289,6 +289,39 @@ function LuckydrawExtra({
           />
         </>
       )
+    case 'noBorder':
+      return (
+        <label
+          className="field"
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+        >
+          <input
+            type="checkbox"
+            checked={d.noBorder}
+            onChange={(e) => patchLd({ noBorder: e.target.checked })}
+          />
+          <span className="field__label" style={{ margin: 0 }}>
+            테두리 없음 (배경색만으로 구분)
+          </span>
+        </label>
+      )
+    case 'counter':
+      return (
+        <>
+          <AlphaColor
+            label="테두리색"
+            value={d.counterBorder || draft.theme.colors.border}
+            hint="수량 알약 전체를 감싸는 테두리. 비우면 테마 테두리색"
+            onChange={(v) => patchLd({ counterBorder: v })}
+          />
+          <AlphaColor
+            label="그림자색"
+            value={d.counterShadow || draft.theme.colors.primary}
+            hint="알약 아래 그림자. 번짐·내림은 시안 고정, 색만 골라요"
+            onChange={(v) => patchLd({ counterShadow: v })}
+          />
+        </>
+      )
     case 'footer':
       return text(
         '오른쪽 아래 표기',

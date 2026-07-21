@@ -91,6 +91,22 @@ export interface LuckydrawDisplay {
   modalText: string
   modalItemBg: string
   modalBorder: string
+
+  /**
+   * **타일 테두리를 아예 뺀다.** 결과 타일·요약 줄·수량 칸 같은 상자들의 테두리를
+   * 투명하게 만든다 — 배경색만으로 구분되는 더 납작한 인상을 원할 때. 색은 그대로 두고
+   * 테두리만 없앤다 (모달은 자기 테두리색을 따로 갖는다).
+   */
+  noBorder: boolean
+
+  /**
+   * 수량 카운터(알약) 전용 색 — 비우면 테마 색으로 폴백한다.
+   *
+   * 카운터는 화면 한가운데 큰 알약이라 따로 꾸미고 싶을 때가 있다. `counterBorder` 는
+   * 전체를 감싸는 테두리색, `counterShadow` 는 그 아래 그림자색(번짐·내림은 시안 고정).
+   */
+  counterBorder: string
+  counterShadow: string
 }
 
 /**
@@ -158,6 +174,7 @@ export const LUCKYDRAW_GROUPS: {
   extras?: (
     | 'boxRadius' | 'boxPadding' | 'boxTopMargin' | 'buttonRadius'
     | 'font' | 'background' | 'texts' | 'cover' | 'badge' | 'footer' | 'shadow' | 'modal'
+    | 'noBorder' | 'counter'
   )[]
 }[] = [
   {
@@ -184,6 +201,12 @@ export const LUCKYDRAW_GROUPS: {
       { key: 'fg2', label: '글자색', part: 'tile' },
       { key: 'border', label: '테두리', part: 'tile' },
     ],
+    extras: ['noBorder'],
+  },
+  {
+    title: '수량 카운터',
+    hint: '가운데 큰 알약이에요. 비우면 테마 색을 써요.',
+    extras: ['counter'],
   },
   {
     title: '당첨 (긁는 등수)',
@@ -264,6 +287,10 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   modalText: '',
   modalItemBg: '',
   modalBorder: '',
+  noBorder: false,
+  // 비우면 테마 색 / 시안 기본 그림자색으로 폴백
+  counterBorder: '',
+  counterShadow: '',
 }
 
 /**
@@ -301,5 +328,9 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
     modalText: saved.modalText ?? DEFAULT_DISPLAY.modalText,
     modalItemBg: saved.modalItemBg ?? DEFAULT_DISPLAY.modalItemBg,
     modalBorder: saved.modalBorder ?? DEFAULT_DISPLAY.modalBorder,
+    // false 가 기본이라 ?? 로 살린다 (있는 그대로)
+    noBorder: saved.noBorder ?? DEFAULT_DISPLAY.noBorder,
+    counterBorder: saved.counterBorder ?? DEFAULT_DISPLAY.counterBorder,
+    counterShadow: saved.counterShadow ?? DEFAULT_DISPLAY.counterShadow,
   }
 }

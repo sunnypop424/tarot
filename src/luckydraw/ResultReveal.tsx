@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Info, Truck } from 'lucide-react'
 
 import type { LuckydrawDisplay } from '@/data/luckydraw'
 import type { DrawResult, DrawnPrize, LuckydrawSettings } from '@/lib/repo'
@@ -26,6 +27,9 @@ interface Props {
  * 낮은 등수는 순서대로 스르륵 나타나고, 비싼 등수(`highlightRanks`)만 덮여 있어 직접 긁는다.
  * 전부 긁게 하면 10개 뽑을 때 10번 긁어야 해서 리추얼이 노동이 되고, 전부 그냥 보여주면
  * 1등이 나온 순간이 밋밋해진다. 원본(Firebase)의 이 감각이 좋아서 그대로 가져왔다.
+ *
+ * 레이아웃·여백·글자 크기는 방문자 시안(`럭키드로우 방문자 화면.dc.html`)을 그대로 따른다 —
+ * 색·테두리색·radius 만 슬롯 테마 토큰으로 갈아끼운다.
  */
 export function ResultReveal({
   result,
@@ -64,15 +68,6 @@ export function ResultReveal({
     }, SCRATCH_MS)
   }
 
-  const label = useCallback(
-    (p: DrawnPrize) => {
-      if (displayMode === 'rank') return `${p.rank}등`
-      if (displayMode === 'prize') return p.name
-      return `${p.rank}등 · ${p.name}`
-    },
-    [displayMode]
-  )
-
   /** 같은 상품끼리 묶는다 — 10개 뽑으면 낱개로 보는 것보다 이쪽이 읽힌다 */
   const grouped = useMemo(() => {
     const map = new Map<string, DrawnPrize & { count: number }>()
@@ -90,34 +85,60 @@ export function ResultReveal({
   if (summary) {
     return (
       <div className={styles.reveal}>
-        <h2 className={styles.revealTitle} data-part="title">전체 결과</h2>
+        <header className={styles.revealHead}>
+          <h2 className={styles.revealTitle} data-part="title">
+            전체 결과
+          </h2>
+          <p className={styles.revealSub}>받은 경품을 정리했어요.</p>
+        </header>
 
-        <ul className={`stack ${styles.summary}`}>
+        {result.rehearsal && (
+          <div className={styles.infoBanner}>
+            <Info size={16} aria-hidden="true" />
+            <span>
+              리허설이라 <b>재고는 줄지 않았어요</b>.
+            </span>
+          </div>
+        )}
+
+        <ul className={styles.summary}>
           {grouped.map((p) => (
-            <li key={`${p.rank}-${p.name}`} className={styles.summaryRow}>
-              <span>{label(p)}</span>
+            <li
+              key={`${p.rank}-${p.name}`}
+              className={styles.summaryRow}
+              data-high={isHigh(p) || undefined}
+            >
+              <span className={styles.summaryBadge} data-high={isHigh(p) || undefined}>
+                {p.rank}등
+              </span>
+              <span className={styles.summaryName}>
+                {displayMode === 'rank' ? '축하해요!' : p.name}
+              </span>
+              {p.requiresShipping && (
+                <span className={styles.shipChip}>
+                  <Truck size={13} aria-hidden="true" />
+                  배송
+                </span>
+              )}
               <span className={styles.summaryCount}>{p.count}개</span>
             </li>
           ))}
         </ul>
 
-        {result.rehearsal && (
-          <p className="t-text-xs t-muted">리허설이라 재고는 줄지 않았어요.</p>
-        )}
-
-        {needsShipping && (
-          <button
-            type="button"
-            className="btn btn--slight btn--block"
-            onClick={() => setShipping(true)}
-          >
-            배송 정보 입력하기
+        <div className={styles.revealFoot}>
+          {needsShipping && (
+            <button
+              type="button"
+              className="btn btn--primary btn--block"
+              onClick={() => setShipping(true)}
+            >
+              배송 정보 입력하기
+            </button>
+          )}
+          <button type="button" className="btn btn--slight btn--block" onClick={onFinish}>
+            처음으로
           </button>
-        )}
-
-        <button type="button" className="btn btn--primary btn--block" onClick={onFinish}>
-          처음으로
-        </button>
+        </div>
 
         {shipping && (
           <ShippingForm
@@ -132,12 +153,27 @@ export function ResultReveal({
     )
   }
 
+  const hasCovered = results.some((p, i) => isHigh(p) && !revealed.includes(i))
+  /** 1개면 1열, 2개면 2열, 그 이상은 3열 — 적게 뽑았을 때 빈 칸이 남지 않게 */
+  const cols = results.length === 1 ? 1 : results.length === 2 ? 2 : 3
+
   return (
     <div className={styles.reveal}>
       {celebrate && <Confetti />}
-      <h2 className={styles.revealTitle} data-part="title">당첨 결과</h2>
 
-      <ul className={styles.results} data-results>
+      <header className={styles.revealHead}>
+        <p className={styles.eyebrow}>✦ 두근두근</p>
+        <h2 className={styles.revealTitle} data-part="title">
+          당첨 결과
+        </h2>
+        {hasCovered && (
+          <p className={styles.revealHint}>
+            덮인 칸은 <b>긁어서</b> 확인해 보세요!
+          </p>
+        )}
+      </header>
+
+      <ul className={styles.results} data-results style={{ ['--cols' as string]: cols }}>
         {results.map((p, i) => {
           const high = isHigh(p)
           const open = revealed.includes(i)
@@ -146,29 +182,18 @@ export function ResultReveal({
             <li
               key={i}
               className={styles.resultItem}
-              /**
-               * **개수에 따라 폭이 다르다** (원본과 같다): 1개면 꽉, 2개면 절반, 3개 이상이면 1/3.
-               * 늘 1/3 로 두면 1개만 뽑았을 때 작은 칸 하나가 덩그러니 남아 초라해 보인다.
-               */
-              style={{
-                ['--i' as string]: i,
-                width:
-                  results.length === 1
-                    ? '100%'
-                    : results.length === 2
-                      ? 'calc((100% - 10px) / 2)'
-                      : undefined,
-              }}
+              style={{ ['--i' as string]: i }}
               data-high={high || undefined}
+              /** 덮인(비싼) 칸은 바로 보여 긁게 하고, 나머지만 순서대로 등장시킨다 */
+              data-anim={!high || undefined}
               /**
-               * **긁는 동안에도 열린 색이다.** `open` 만 보면 커버가 다 벗겨진 뒤에야 색이
-               * 바뀌어서, 긁는 0.7초 동안 기본 타일 색이 드러났다가 뒤늦게 당첨 색으로
-               * 튄다 — 긁어서 드러나는 게 아니라 나중에 칠해지는 것처럼 보인다.
-               * 커버가 움직이기 시작할 때 **이미 그 색이어야** 드러나는 연출이 된다.
+               * **긁는 동안에도 열린 색이다.** 커버 밑면이 이미 당첨 색이라, 긁혀 나가며
+               * 그 색이 드러난다 — 나중에 칠해지는 게 아니라.
                */
               data-open={open || busy || undefined}
             >
-              <span className={styles.resultLabel}>{label(p)}</span>
+              {displayMode !== 'prize' && <span className={styles.resultRank}>{p.rank}등</span>}
+              {displayMode !== 'rank' && <span className={styles.resultName}>{p.name}</span>}
 
               {high && !open && (
                 <ScratchCover mark={display.coverMark} onReveal={() => reveal(i)} />
@@ -178,13 +203,15 @@ export function ResultReveal({
         })}
       </ul>
 
-      <button
-        type="button"
-        className="btn btn--primary btn--block"
-        onClick={() => setSummary(true)}
-      >
-        전체 결과 보기
-      </button>
+      <div className={styles.revealFoot}>
+        <button
+          type="button"
+          className="btn btn--primary btn--block"
+          onClick={() => setSummary(true)}
+        >
+          전체 결과 보기
+        </button>
+      </div>
     </div>
   )
 }
