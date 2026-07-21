@@ -80,7 +80,8 @@ export function ScratchCover({ mark, onReveal }: Props) {
       if (done.current) return
       ctx.globalCompositeOperation = 'destination-out'
       let x = 0
-      const speed = Math.max(7, w / 11)
+      // 천천히 쓸린다 — 한 프레임에 조금씩만 (긁는 결이 눈에 보이게)
+      const speed = Math.max(2.5, w / 30)
       const step = () => {
         ctx.fillRect(0, 0, x, h)
         // 앞 가장자리를 둥근 붓으로 훑어 긁힌 결을 남긴다
