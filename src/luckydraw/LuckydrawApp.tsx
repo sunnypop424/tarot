@@ -71,6 +71,8 @@ export default function LuckydrawApp() {
   useEffect(() => {
     const font = WEBFONTS[display.fontFamily]
     if (!font) return
+    // 배송·경품 모달은 body 로 포털돼 .stage 밖에 있다 — :root 에도 실어야 웹폰트가 먹는다
+    document.documentElement.style.setProperty('--ld-font', font.stack)
     const id = `ld-font-${display.fontFamily}`
     if (document.getElementById(id)) return
 
