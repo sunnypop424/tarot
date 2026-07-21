@@ -30,10 +30,9 @@ function blankPrize(rank: number): PrizeReport {
  * 가지를 굳이 나눌 이유가 없었다. 위에 지표를 얹고, 손이 제일 자주 가는 상품 표를 먼저,
  * 그 아래 운영 설정을 이어 붙여 한눈에 본다.
  *
- * **저장 방식이 둘로 나뉘는 건 일부러다.**
- *  - 상품 표는 여러 칸을 고친 뒤 한 번에 검토하고 넣는 작업이라 **명시적 저장**이 맞다.
- *  - 운영 설정(리허설·마감·잠금 …)은 **누르는 즉시** 저장된다 — 대부분 행사 중에 눌리고,
- *    저장을 한 번 더 눌러야 반영되면 "왜 마감이 안 돼요" 가 현장에서 터진다.
+ * **상품 표도 운영 설정도 저장하기를 눌러야 반영된다** (한 화면, 한 저장 버튼).
+ * 토글은 초안일 뿐이고, 하단 저장 버튼이 바뀐 것(상품·설정)을 한 번에 넣는다.
+ * 다만 **실제 운영 전환·마감**은 되돌리기 어려우니 저장 직전에 한 번 더 확인한다.
  */
 export function Overview() {
   const slot = useSlot()
@@ -41,11 +40,11 @@ export function Overview() {
 
   const [rows, setRows] = useState<PrizeReport[] | null>(null)
   const [settings, setSettings] = useState<LuckydrawSettings | null>(null)
+  /** 저장된 기준값 — 초안(settings·rows)과 비교해 "저장 안 됨"을 가린다 */
+  const [savedSettings, setSavedSettings] = useState<LuckydrawSettings | null>(null)
   const [dirty, setDirty] = useState(false)
-  const [savingRows, setSavingRows] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [note, setNote] = useState<string | null>(null)
-  const [settingsBusy, setSettingsBusy] = useState(false)
-  const [settingsError, setSettingsError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     const [report, s] = await Promise.all([
@@ -54,6 +53,7 @@ export function Overview() {
     ])
     setRows(report)
     setSettings(s)
+    setSavedSettings(s)
     setDirty(false)
   }, [slug])
 
@@ -61,39 +61,25 @@ export function Overview() {
     void load()
   }, [load])
 
-  /** 표를 한참 고쳐놓고 저장 없이 나가려 하면 붙잡는다 (설정 토글은 즉시 저장이라 무관) */
+  /** 설정을 고쳤는지 — 저장된 기준값과 비교 (평면 객체라 키 순서 걱정 없음) */
+  const settingsDirty =
+    Boolean(settings && savedSettings) && JSON.stringify(settings) !== JSON.stringify(savedSettings)
+  const anyDirty = dirty || settingsDirty
+
+  /** 고쳐놓고 저장 없이 나가려 하면 붙잡는다 (상품·설정 어느 쪽이든) */
   useEffect(() => {
-    if (!dirty) return
+    if (!anyDirty) return
     const warn = (e: BeforeUnloadEvent) => e.preventDefault()
     window.addEventListener('beforeunload', warn)
     return () => window.removeEventListener('beforeunload', warn)
-  }, [dirty])
+  }, [anyDirty])
 
-  /** 운영 설정 — 즉시 저장 (되돌리기 어려운 건 확인 모달, 반영되면 토스트) */
-  async function patchSettings(
-    next: Partial<LuckydrawSettings>,
-    opts?: { confirm?: Parameters<typeof confirmAction>[0]; toast?: string }
-  ) {
-    if (!settings) return
-    if (opts?.confirm && !(await confirmAction(opts.confirm))) return
-    const merged = { ...settings, ...next }
-    // 먼저 그린다 — 토글은 즉각 반응해야 눌렀다는 느낌이 난다
-    setSettings(merged)
-    setSettingsBusy(true)
-    setSettingsError(null)
-    try {
-      await repo.luckydraw.saveSettings(slug, merged)
-      if (opts?.toast) toast(opts.toast)
-    } catch (e) {
-      // 실패하면 화면을 서버 상태로 되돌린다 — 안 그러면 "껐다" 고 믿는데 켜져 있다
-      setSettingsError(e instanceof Error ? e.message : '저장하지 못했어요')
-      await load()
-    } finally {
-      setSettingsBusy(false)
-    }
+  /** 운영 설정 — **초안만 고친다** (저장은 아래 저장 버튼) */
+  function patchSettings(next: Partial<LuckydrawSettings>) {
+    setSettings((prev) => prev && { ...prev, ...next })
   }
 
-  /** 상품 표 — 명시적 저장 */
+  /** 상품 표 — 초안만 고친다 */
   function patchRow(index: number, next: Partial<PrizeReport>) {
     setRows((prev) => prev && prev.map((r, i) => (i === index ? { ...r, ...next } : r)))
     setDirty(true)
@@ -115,18 +101,43 @@ export function Overview() {
     setRows((prev) => prev && prev.filter((_, i) => i !== index).map((r, i) => ({ ...r, rank: i + 1 })))
     setDirty(true)
   }
-  async function saveRows() {
-    if (!rows) return
-    setSavingRows(true)
+
+  /** 저장 — 상품·설정을 함께. 위험 전환(실제 운영·마감)은 넣기 직전에 확인한다 */
+  async function saveAll() {
+    if (!rows || !settings || !savedSettings) return
+    const goingLive = savedSettings.rehearsal && !settings.rehearsal
+    const closing = !savedSettings.closed && settings.closed
+    if (
+      goingLive &&
+      !(await confirmAction({
+        title: '실제 운영으로 바꿀까요?',
+        desc: '지금부터 방문자가 뽑을 때마다 재고가 실제로 줄어들어요. 되돌리면 리허설로 돌아가지만 나간 수량은 유지돼요.',
+        okLabel: '실제 운영으로 저장',
+      }))
+    )
+      return
+    if (
+      closing &&
+      !(await confirmAction({
+        title: '행사를 마감할까요?',
+        desc: '마감하면 방문자가 더 이상 추첨할 수 없어요. 언제든 다시 열 수 있어요.',
+        okLabel: '마감으로 저장',
+        danger: true,
+      }))
+    )
+      return
+
+    setSaving(true)
     setNote(null)
     try {
-      await repo.luckydraw.savePrizes(slug, rows)
+      if (settingsDirty) await repo.luckydraw.saveSettings(slug, settings)
+      if (dirty) await repo.luckydraw.savePrizes(slug, rows)
       await load()
       toast('저장되었어요')
     } catch (e) {
       setNote(e instanceof Error ? e.message : '저장하지 못했어요')
     } finally {
-      setSavingRows(false)
+      setSaving(false)
     }
   }
 
@@ -316,17 +327,12 @@ export function Overview() {
         </div>
       </section>
 
-      {settingsError && (
-        <div className="admin-banner admin-banner--err">
-          <TriangleAlert size={16} aria-hidden="true" />
-          <span>{settingsError}</span>
-        </div>
-      )}
-
-      {/* ── 운영 설정 (즉시 저장) ─────────────────── */}
+      {/* ── 운영 설정 (아래 저장 버튼으로 반영) ─────────────────── */}
       <section className="admin-section">
         <h2 className={`t-title-s ${styles.sectionTitle}`}>운영 설정</h2>
-        <p className={`t-text-xs t-muted ${styles.sectionDesc}`}>여기 있는 값은 누르는 즉시 반영돼요.</p>
+        <p className={`t-text-xs t-muted ${styles.sectionDesc}`}>
+          바꾼 값은 아래 <b>저장하기</b>를 눌러야 반영돼요.
+        </p>
 
         <div className={styles.toggles}>
           {/**
@@ -337,22 +343,8 @@ export function Overview() {
             <input
               type="checkbox"
               checked={!settings.rehearsal}
-              disabled={settingsBusy}
-              onChange={(e) =>
-                void patchSettings(
-                  { rehearsal: !e.target.checked },
-                  e.target.checked
-                    ? {
-                        confirm: {
-                          title: '실제 운영으로 바꿀까요?',
-                          desc: '지금부터 방문자가 뽑을 때마다 재고가 실제로 줄어들어요. 되돌리면 리허설로 돌아가지만 나간 수량은 유지돼요.',
-                          okLabel: '실제 운영 시작',
-                        },
-                        toast: '실제 운영으로 전환했어요',
-                      }
-                    : { toast: '리허설로 돌아갔어요' }
-                )
-              }
+              disabled={saving}
+              onChange={(e) => patchSettings({ rehearsal: !e.target.checked })}
             />
             <span>
               <b>실제 운영</b>
@@ -368,23 +360,8 @@ export function Overview() {
             <input
               type="checkbox"
               checked={settings.closed}
-              disabled={settingsBusy}
-              onChange={(e) =>
-                void patchSettings(
-                  { closed: e.target.checked },
-                  e.target.checked
-                    ? {
-                        confirm: {
-                          title: '행사를 마감할까요?',
-                          desc: '마감하면 방문자가 더 이상 추첨할 수 없어요. 언제든 다시 열 수 있어요.',
-                          okLabel: '행사 마감',
-                          danger: true,
-                        },
-                        toast: '행사를 마감했어요',
-                      }
-                    : { toast: '마감을 해제했어요' }
-                )
-              }
+              disabled={saving}
+              onChange={(e) => patchSettings({ closed: e.target.checked })}
             />
             <span>
               <b>행사 마감</b>
@@ -396,13 +373,8 @@ export function Overview() {
             <input
               type="checkbox"
               checked={settings.locked}
-              disabled={settingsBusy}
-              onChange={(e) =>
-                void patchSettings(
-                  { locked: e.target.checked },
-                  { toast: e.target.checked ? '설정을 잠갔어요' : '잠금을 풀었어요' }
-                )
-              }
+              disabled={saving}
+              onChange={(e) => patchSettings({ locked: e.target.checked })}
             />
             <span>
               <b>설정 잠금</b>
@@ -429,10 +401,8 @@ export function Overview() {
                 type="radio"
                 name="displayMode"
                 checked={settings.displayMode === value}
-                disabled={settingsBusy}
-                onChange={() =>
-                  void patchSettings({ displayMode: value }, { toast: '표시 방식을 바꿨어요' })
-                }
+                disabled={saving}
+                onChange={() => patchSettings({ displayMode: value })}
               />
               <span>{label}</span>
             </label>
@@ -449,13 +419,8 @@ export function Overview() {
             <input
               type="checkbox"
               checked={settings.showPrizePreview}
-              disabled={settingsBusy}
-              onChange={(e) =>
-                void patchSettings(
-                  { showPrizePreview: e.target.checked },
-                  { toast: e.target.checked ? '경품 미리보기를 켰어요' : '경품 미리보기를 껐어요' }
-                )
-              }
+              disabled={saving}
+              onChange={(e) => patchSettings({ showPrizePreview: e.target.checked })}
             />
             <span>
               <b>경품 미리보기 사용</b>
@@ -475,13 +440,8 @@ export function Overview() {
             <input
               type="checkbox"
               checked={settings.showPrizeCount}
-              disabled={settingsBusy || !settings.showPrizePreview}
-              onChange={(e) =>
-                void patchSettings(
-                  { showPrizeCount: e.target.checked },
-                  { toast: e.target.checked ? '남은 수량을 표시해요' : '남은 수량을 숨겨요' }
-                )
-              }
+              disabled={saving || !settings.showPrizePreview}
+              onChange={(e) => patchSettings({ showPrizeCount: e.target.checked })}
             />
             <span>
               <b>남은 수량 표시</b>
@@ -499,13 +459,8 @@ export function Overview() {
           <input
             type="checkbox"
             checked={settings.batchCapEnabled}
-            disabled={settingsBusy}
-            onChange={(e) =>
-              void patchSettings(
-                { batchCapEnabled: e.target.checked },
-                { toast: e.target.checked ? '묶음 제한을 켰어요' : '묶음 제한을 껐어요' }
-              )
-            }
+            disabled={saving}
+            onChange={(e) => patchSettings({ batchCapEnabled: e.target.checked })}
           />
           <span>
             <b>제한 사용</b>
@@ -527,15 +482,16 @@ export function Overview() {
       </section>
 
       <div className={styles.saveBar}>
-        {note && <span className="t-text-xs t-muted">{note}</span>}
+        {note && <span className="field__error">{note}</span>}
+        {/* 잠금은 상품 편집만 막는다 — 저장 버튼은 막지 않는다 (안 그러면 잠금 해제를 저장할 수 없다) */}
         <button
           type="button"
           className="btn btn--primary"
-          disabled={savingRows || locked || !dirty}
-          onClick={() => void saveRows()}
+          disabled={saving || !anyDirty}
+          onClick={() => void saveAll()}
           data-save
         >
-          {savingRows ? '저장 중…' : dirty ? '변경사항 저장' : '저장됨'}
+          {saving ? '저장 중…' : anyDirty ? '저장하기' : '저장됨'}
         </button>
       </div>
     </div>
