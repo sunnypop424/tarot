@@ -852,6 +852,13 @@
   text-align: left;
 }
 
+/* 배송 입력칸도 버튼 둥글기(radiusMd)를 따른다 — 전역 .input(radiusSm)보다 우선 */
+.form :global(.input),
+.form :global(.textarea),
+.form :global(.select) {
+  border-radius: var(--radius-md);
+}
+
 /* 배송 대상 상품 — 제목 붙은 카드, 상품마다 한 줄 */
 .shipCard {
   padding: var(--space-md);

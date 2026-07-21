@@ -75,23 +75,30 @@ export function ScratchCover({ mark, onReveal }: Props) {
       ctx.arc(x, y, 20, 0, Math.PI * 2)
       ctx.fill()
     }
-    // 손을 떼면 나머지를 **부드럽게 쓸어** 낸다 — 왼쪽부터 가장자리를 물결지게 지운다
+    // 마지막으로 누른/문지른 자리 — 여기서부터 번진다
+    let cx = w / 2
+    let cy = h / 2
+    // 손을 떼면 **누른 곳에서부터 원이 커지며** 나머지를 부드럽게 긁어 낸다
     const autoScratch = () => {
       if (done.current) return
       ctx.globalCompositeOperation = 'destination-out'
-      let x = 0
-      // 천천히 쓸린다 — 한 프레임에 조금씩만 (긁는 결이 눈에 보이게)
-      const speed = Math.max(2.5, w / 30)
+      // 네 모서리 중 가장 먼 곳까지 닿아야 다 지워진다
+      const maxR =
+        Math.max(
+          Math.hypot(cx, cy),
+          Math.hypot(w - cx, cy),
+          Math.hypot(cx, h - cy),
+          Math.hypot(w - cx, h - cy)
+        ) + 6
+      let r = 12
+      // 천천히 — 반지름을 조금씩만 키운다 (긁히는 결이 눈에 보이게)
+      const grow = maxR / 26
       const step = () => {
-        ctx.fillRect(0, 0, x, h)
-        // 앞 가장자리를 둥근 붓으로 훑어 긁힌 결을 남긴다
-        for (let y = 8; y < h; y += 13) {
-          ctx.beginPath()
-          ctx.arc(x, y, 15, 0, Math.PI * 2)
-          ctx.fill()
-        }
-        x += speed
-        if (x >= w + 18) {
+        ctx.beginPath()
+        ctx.arc(cx, cy, r, 0, Math.PI * 2)
+        ctx.fill()
+        r += grow
+        if (r >= maxR) {
           finish()
           return
         }
@@ -103,12 +110,16 @@ export function ScratchCover({ mark, onReveal }: Props) {
       painting = true
       cv.setPointerCapture?.(e.pointerId)
       const p = point(e)
+      cx = p.x
+      cy = p.y
       erase(p.x, p.y)
       e.preventDefault()
     }
     const move = (e: PointerEvent) => {
       if (!painting) return
       const p = point(e)
+      cx = p.x
+      cy = p.y
       erase(p.x, p.y)
       e.preventDefault()
     }
