@@ -4,6 +4,7 @@ import {
   ExternalLink,
   LayoutDashboard,
   LogOut,
+  StickyNote,
   Truck,
   UserCog,
 } from 'lucide-react'
@@ -37,7 +38,9 @@ function navFor(service: string): NavItem[] {
           { to: 'overview', label: '대시보드', icon: LayoutDashboard },
           { to: 'shipping', label: '배송 정보', icon: Truck },
         ]
-      : [{ to: 'questions', label: '질문 타로', icon: MessageCircleQuestion }]
+      : service === 'rolling'
+        ? [{ to: 'messages', label: '롤링페이퍼', icon: StickyNote }]
+        : [{ to: 'questions', label: '질문 타로', icon: MessageCircleQuestion }]
 
   return [...own, ...(hasSupabase ? [{ to: 'account', label: '내 계정', icon: UserCog }] : [])]
 }

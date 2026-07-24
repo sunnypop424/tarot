@@ -1,6 +1,7 @@
 import type { Theme } from './theme'
 import type { DeckRange } from '@/data/cards'
 import type { LuckydrawDisplay } from '@/data/luckydraw'
+import type { RollingDisplay } from '@/data/rolling'
 import type { ServiceId } from '@/data/services'
 import type { PlanId } from '@/data/plans'
 
@@ -105,4 +106,9 @@ export interface Slot {
    * 서비스와 무관한 색·형태는 `theme` 이 갖는다.
    */
   luckydraw?: Partial<LuckydrawDisplay>
+  /**
+   * 롤링페이퍼 서비스의 **겉모습** — 최고관리자만 정한다 (`src/data/rolling.ts`).
+   * `luckydraw` 필드와 같은 짝이고, 서비스와 무관한 색·형태는 `theme` 이 갖는다.
+   */
+  rolling?: Partial<RollingDisplay>
 }

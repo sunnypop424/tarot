@@ -11,6 +11,7 @@ import { QuestionList } from './QuestionList'
 import { QuestionEditor } from './QuestionEditor'
 import { Overview } from './luckydraw/Overview'
 import { Shipping } from './luckydraw/Shipping'
+import { Moderation } from './rolling/Moderation'
 import { useAdminAuth } from './useAdminAuth'
 
 /**
@@ -29,14 +30,16 @@ export default function AdminRoutes() {
    * 상품·수량·배송을 만진다. 라우트를 합쳐두면 럭키드로우 슬롯에서 `/admin/questions` 가
    * 빈 화면으로 열리고, 그게 "질문 기능이 고장났나" 로 읽힌다.
    */
-  const luckydraw = getSlotService(slot) === 'luckydraw'
+  const service = getSlotService(slot)
   /**
    * **절대 경로여야 한다.** 상대 경로(`to="prizes"`)를 catch-all 에 쓰면 리다이렉트가
    * 경로를 **덧붙여서** `/admin/x/prizes/prizes/prizes/…` 로 무한히 자란다.
    * 못 찾은 주소를 첫 화면으로 되돌리는 게 이 라우트의 일인데, 상대 경로면 되돌리는 게 아니라
    * 계속 파고든다.
    */
-  const home = `/${slot.slug}/admin/${luckydraw ? 'overview' : 'questions'}`
+  const home = `/${slot.slug}/admin/${
+    service === 'luckydraw' ? 'overview' : service === 'rolling' ? 'messages' : 'questions'
+  }`
 
   return (
     <Routes>
@@ -44,11 +47,13 @@ export default function AdminRoutes() {
       <Route element={<RequireAuth />}>
         <Route index element={<Navigate to={home} replace />} />
         <Route element={<AdminLayout />}>
-          {luckydraw ? (
+          {service === 'luckydraw' ? (
             <>
               <Route path="overview" element={<Overview />} />
               <Route path="shipping" element={<Shipping />} />
             </>
+          ) : service === 'rolling' ? (
+            <Route path="messages" element={<Moderation />} />
           ) : (
             <>
               <Route path="questions" element={<QuestionList />} />

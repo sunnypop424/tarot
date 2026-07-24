@@ -6,6 +6,7 @@ import { httpAi } from './ai'
 import { publishSlotChange } from './changed'
 import { localLuckydraw } from './luckydraw'
 import { localOrganizers } from './organizers'
+import { localRolling } from './rolling'
 import type {
   AdminUser,
   AuthRepo,
@@ -183,4 +184,6 @@ export const localRepo: Repo = {
   ai: httpAi,
   // 럭키드로우는 local 짝이 없다 — 재고를 기기마다 따로 굴리면 이중 당첨이 난다 (luckydraw.ts)
   luckydraw: localLuckydraw,
+  // 롤링페이퍼는 local 짝이 진짜다 — 원자성 요구가 없어 localStorage 로도 성립한다 (rolling.ts)
+  rolling: localRolling,
 }
