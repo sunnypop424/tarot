@@ -9,7 +9,6 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: var(--layout-max);
   height: 100dvh;
   margin: 0 auto;
   background: var(--color-canvas);
@@ -25,7 +24,6 @@
   background-size: var(--bg-pattern-size);
   background-repeat: var(--bg-pattern-repeat);
   background-position: center;
-  opacity: var(--bg-pattern-opacity);
   pointer-events: none;
 }
 
