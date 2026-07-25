@@ -497,7 +497,7 @@
 
 .resultItem {
   position: relative;
-  min-height: 52px;
+  min-height: 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -657,7 +657,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 46vh;
+  max-height: 20vh;
   overflow-y: auto;
   scrollbar-width: none;
 }
@@ -789,28 +789,32 @@
   width: 9px;
   height: 14px;
   border-radius: 2px;
-  background: var(--color-primary);
+  background: var(--confetti-1);
   /* 시간·회전은 조각마다 다르다 (Confetti.tsx 가 인라인으로 준다) — 뭉치면 한 번 번쩍이고 만다 */
   animation: fall 4s cubic-bezier(0.2, 0.6, 0.5, 1) forwards;
 }
 
 /**
- * **최고관리자가 고른 색으로만 만든다.**
+ * **축하는 슬롯 색이 아니라 "축하" 그 자체다.**
  *
- * 전에는 primary · accent · accent-soft 를 섞었는데, 럭키드로우에서 accent 는 "커버 문자색"
- * 이라 축하와 무관하고 accent-soft 는 대비 계산으로 **자동 파생되는 값**이라 아무도 고른 적 없는
- * 색이 끼어들었다. 당첨 배경 · 버튼 배경 · 당첨 글자 — 이 화면이 이미 쓰는 색으로 맞춘다.
+ * 전에는 최고관리자가 고른 색(primary·high·혼합)만 뿌렸는데, 슬롯에 따라 색이 한두 톤으로
+ * 비슷해져 "폭죽" 보다 "색종이 한 색" 처럼 밋밋했다. 축하 팡파레는 어느 슬롯을 열든 화사한
+ * 파티 색이 쏟아져야 한다 — 고정 팔레트(tokens.css --confetti-*)를 조각마다 돌려 쓴다.
  */
 .confettiPiece[data-tone='1'] {
-  background: var(--color-high);
+  background: var(--confetti-2);
 }
-
-/**
- * 세 번째 색은 **두 색을 섞어** 만든다. 당첨 글자색을 쓰려다 말았다 — 보통 흰색이라
- * 밝은 배경 위에선 조각이 안 보인다. 섞은 색은 어떤 조합에서도 실제 색이 나온다.
- */
 .confettiPiece[data-tone='2'] {
-  background: color-mix(in srgb, var(--color-primary) 50%, var(--color-high));
+  background: var(--confetti-3);
+}
+.confettiPiece[data-tone='3'] {
+  background: var(--confetti-4);
+}
+.confettiPiece[data-tone='4'] {
+  background: var(--confetti-5);
+}
+.confettiPiece[data-tone='5'] {
+  background: var(--confetti-6);
 }
 
 @keyframes fall {
