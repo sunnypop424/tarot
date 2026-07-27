@@ -1,6 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import { AlertCircle, ArrowLeft, Download, Save, Sparkles } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowLeft,
+  Download,
+  Image as ImageIcon,
+  MessageSquare,
+  Palette,
+  Save,
+  Settings,
+  Smartphone,
+  Sparkles,
+  Square,
+} from 'lucide-react'
 
 import defaultThemeJson from '@/data/slot-default.json'
 import { getSlotDeck } from '@/data/slots'
@@ -940,7 +952,11 @@ export function SlotEditor() {
         >
           <div>
             <section className="admin-section">
-              <h2 className="t-title-s admin-section__title">슬롯</h2>
+              <h2 className="t-title-s admin-section__title">
+                <Settings size={15} strokeWidth={2} aria-hidden="true" />
+                기본
+                <span className="admin-section__note">모든 서비스 공통</span>
+              </h2>
               <div className="form-grid">
                 <div className="field">
                   <label className="field__label" htmlFor="slot-slug">
@@ -1021,7 +1037,10 @@ export function SlotEditor() {
              */}
             {!luckydraw && (
             <section className="admin-section">
-              <h2 className="t-title-s admin-section__title">색 만들기</h2>
+              <h2 className="t-title-s admin-section__title">
+                <Sparkles size={15} strokeWidth={2} aria-hidden="true" />
+                색 만들기
+              </h2>
               {/**
                * 럭키드로우는 **AI 색 생성을 안 쓴다** — 배경이 대개 정해진 사진이고 그 위에
                * 얹는 색이 몇 개뿐이라, 대표 색에서 한 벌을 만들 이유가 없다.
@@ -1202,8 +1221,15 @@ export function SlotEditor() {
              * 색·형태는 위 테마 패널이 이미 정한다 (롤페는 타로처럼 테마를 그대로 쓴다).
              */}
             {rolling && (
+              <>
+              <div className="svc-divider">
+                <span>서비스 설정 · 롤링페이퍼</span>
+              </div>
               <section className="admin-section">
-                <h2 className="t-title-s admin-section__title">롤링페이퍼</h2>
+                <h2 className="t-title-s admin-section__title">
+                  <MessageSquare size={15} strokeWidth={2} aria-hidden="true" />
+                  롤링페이퍼
+                </h2>
                 <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
                   방문자가 포스트잇으로 메시지를 남기면 벽에 쌓여요. 남긴 즉시 벽에 보이고,
                   부적절한 건 주최자가 숨겨요. 아래 색·글꼴은 롤페 전용이에요 (위 테마와 별개).
@@ -1394,11 +1420,15 @@ export function SlotEditor() {
                   />
                 </div>
               </section>
+              </>
             )}
 
             {/* 웹앱 아이콘 — 모든 서비스 공통. "홈 화면에 추가" 하면 이 아이콘·행사명으로 앱이 된다 */}
             <section className="admin-section">
-              <h2 className="t-title-s admin-section__title">웹앱 아이콘</h2>
+              <h2 className="t-title-s admin-section__title">
+                <Smartphone size={15} strokeWidth={2} aria-hidden="true" />
+                웹앱 아이콘
+              </h2>
               <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
                 방문자가 브라우저에서 "홈 화면에 추가" 하면 이 아이콘과 행사명으로 앱처럼 열려요.
                 정사각형 PNG 를 권장해요 (512×512).
@@ -1419,7 +1449,10 @@ export function SlotEditor() {
               g.services.includes(getSlotService(draft))
             ).map(({ title, keys, hint }) => (
               <section key={title} className="admin-section">
-                <h2 className="t-title-s admin-section__title">{title}</h2>
+                <h2 className="t-title-s admin-section__title">
+                  <Palette size={15} strokeWidth={2} aria-hidden="true" />
+                  {title}
+                </h2>
                 {hint && (
                   <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
                     {hint}
@@ -1456,7 +1489,10 @@ export function SlotEditor() {
             {/* 럭키드로우는 박스·버튼 카드 안에서 각각 고친다 — 여기 두면 같은 값이 두 군데 뜬다 */}
             {!luckydraw && (
             <section className="admin-section">
-              <h2 className="t-title-s admin-section__title">형태 (radius)</h2>
+              <h2 className="t-title-s admin-section__title">
+                <Square size={15} strokeWidth={2} aria-hidden="true" />
+                형태 (radius)
+              </h2>
               <div className="form-grid">
                 {(Object.keys(SHAPE_LABELS) as (keyof ThemeShape)[]).map((key) => (
                   <div key={key} className="field">
@@ -1485,7 +1521,10 @@ export function SlotEditor() {
              */}
             {!luckydraw && !rolling && (
             <section className="admin-section">
-              <h2 className="t-title-s admin-section__title">이미지</h2>
+              <h2 className="t-title-s admin-section__title">
+                <ImageIcon size={15} strokeWidth={2} aria-hidden="true" />
+                이미지
+              </h2>
               {/* 이미지가 어디로 가는지는 저장소가 정한다 — 화면이 거짓말하면 안 된다 */}
               <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
                 {hasSupabase ? (
