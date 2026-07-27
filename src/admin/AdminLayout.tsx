@@ -9,6 +9,8 @@ import {
   ExternalLink,
   LayoutDashboard,
   LogOut,
+  BarChart3,
+  GraduationCap,
   ScanLine,
   Dices,
   Stamp,
@@ -64,6 +66,10 @@ const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
   ],
   // 보상 메뉴(수령확인·추첨·응모자)는 여기 없다 — 아래 REWARD_NAV 가 설정값으로 붙인다
   stamp: [{ to: 'stamp', label: '스탬프', icon: Stamp }],
+  quiz: [
+    { to: 'quiz', label: '모의고사', icon: GraduationCap },
+    { to: 'stats', label: '통계', icon: BarChart3 },
+  ],
 }
 
 /**
@@ -83,16 +89,24 @@ const REWARD_NAV: Record<'guaranteed' | 'raffle', NavItem[]> = {
   ],
 }
 
-/** 보상을 쓰는 서비스만 여기 등록한다 (모의고사·포토카드가 뒤따른다) */
+/**
+ * 보상을 쓰는 서비스만 여기서 설정을 읽는다 (포토카드가 뒤따른다).
+ * 모의고사의 `threshold` 는 스탬프의 `guaranteed` 와 **같은 흐름**이다 — 조건을 넘으면
+ * 교환코드가 나오고 스태프가 확인한다. 그래서 같은 메뉴로 접는다.
+ */
 function useRewardNav(service: ServiceId, slug: string): NavItem[] {
   const [mode, setMode] = useState<'none' | 'guaranteed' | 'raffle'>('none')
 
   useEffect(() => {
-    if (service !== 'stamp' || !repo.stamp.ready()) return
     let alive = true
-    void repo.stamp.settings(slug).then((s) => {
-      if (alive) setMode(s.rewardMode)
-    })
+    const put = (m: 'none' | 'guaranteed' | 'raffle') => alive && setMode(m)
+    if (service === 'stamp' && repo.stamp.ready()) {
+      void repo.stamp.settings(slug).then((s) => put(s.rewardMode))
+    } else if (service === 'quiz' && repo.quiz.ready()) {
+      void repo.quiz
+        .settings(slug)
+        .then((s) => put(s.rewardMode === 'threshold' ? 'guaranteed' : s.rewardMode))
+    }
     return () => {
       alive = false
     }

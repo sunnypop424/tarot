@@ -537,6 +537,105 @@ export interface StampRepo {
   ): Promise<void>
 }
 
+export type QuizKind = 'choice' | 'short'
+
+/**
+ * 방문자용 문항 — **`answers` 가 아예 없다.**
+ * 타입에 없으면 방문자 화면이 **실수로도** 정답을 못 그린다. 서버 쪽 방어(별도 테이블 +
+ * anon grant 없음)와 짝을 이룬다 — 한쪽만으로는 다음 사람이 무심코 뚫는다.
+ */
+export interface QuizQuestion {
+  id: string
+  order: number
+  kind: QuizKind
+  body: string
+  image?: string
+  /** 객관식 보기. 주관식이면 빈 배열 */
+  choices: string[]
+  points: number
+  hidden: boolean
+}
+
+/** 주최자용 — 정답이 붙는다 */
+export interface QuizQuestionFull extends QuizQuestion {
+  /** 객관식은 보기 인덱스 문자열('0'), 주관식은 허용 정답들 */
+  answers: string[]
+}
+
+export interface QuizSettings {
+  rewardMode: 'none' | 'threshold' | 'raffle'
+  /** `threshold` 에서 이 점수 이상이면 확정 */
+  rewardMinScore: number
+  rewardLabel: string
+  entryFields: { handle: boolean; contact: boolean; address: boolean }
+  /** 0 = 무제한 */
+  timeLimitSec: number
+  /** **보상이 있으면 서버가 강제로 끈다** (0024 트리거) */
+  allowRetry: boolean
+  showAnswers: 'none' | 'after' | 'wrongOnly'
+  closed: boolean
+}
+
+/** 제출 결과 — `detail` 은 `showAnswers` 정책대로 **서버가 잘라서** 준다 */
+export interface QuizResult {
+  attemptId: string
+  score: number
+  total: number
+  correct: number
+  count: number
+  detail: {
+    id: string
+    order: number
+    ok: boolean
+    body?: string | null
+    given?: string | null
+    answer?: string | null
+  }[]
+  rewardCode?: string | null
+  rewardKind?: 'guaranteed' | 'raffle' | null
+}
+
+/** 문항별 정답률 — 주최자 통계 */
+export interface QuizStat {
+  questionId: string
+  body: string
+  tried: number
+  correct: number
+}
+
+/**
+ * 최애 모의고사 (여덟 번째 서비스).
+ *
+ * **`ready()` 가 false 다** — 정답이 localStorage 에 있으면 개발자도구로 100점이 나온다.
+ * 보상은 **공용 인프라(0019)** 를 쓴다 (`repo.rewards` + 아래 `myReward`/`enter`).
+ */
+export interface QuizRepo {
+  ready(): boolean
+  /** 방문자 — 공개 문항만, **정답 없이** */
+  list(slug: string): Promise<QuizQuestion[]>
+  /** 주최자 — 비공개 포함, 정답 포함 */
+  listAll(slug: string): Promise<QuizQuestionFull[]>
+  saveQuestion(slug: string, q: QuizQuestionFull): Promise<void>
+  removeQuestion(slug: string, id: string): Promise<void>
+  settings(slug: string): Promise<QuizSettings>
+  saveSettings(slug: string, s: QuizSettings): Promise<void>
+  /** 채점은 서버가 한다 — 정답이 브라우저에 한 번도 안 내려간다 */
+  submit(slug: string, subject: string, answers: { id: string; value: string }[]): Promise<QuizResult>
+  /** 이미 냈나 (재응시 금지 이벤트에서 시작 화면이 물어본다) */
+  mine(slug: string, subject: string): Promise<{ attempts: number }>
+  stats(slug: string): Promise<{ attempts: number; avg: number; questions: QuizStat[] }>
+  /** 주관식 허용 정답을 늘린 뒤 기존 응시분을 다시 채점한다 */
+  regrade(slug: string): Promise<number>
+  /** 내 보상 (공용 rewards) */
+  myReward(slug: string, subject: string): Promise<MyReward | null>
+  /** 응모 제출 (공용 rewards) */
+  enter(
+    slug: string,
+    code: string,
+    form: { nickname: string; handle?: string; contact?: string; address?: string }
+  ): Promise<void>
+}
+
 /** 응모 추첨의 후보/결과 한 줄 — 주최자만 본다 (준-PII) */
 export interface RewardEntry {
   rewardId: string
@@ -582,5 +681,6 @@ export interface Repo {
   rolling: RollingRepo
   poll: PollRepo
   stamp: StampRepo
+  quiz: QuizRepo
   rewards: RewardsRepo
 }

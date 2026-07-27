@@ -66,6 +66,9 @@ const PollApp = lazy(() => import('@/poll/PollApp'))
 /** 방문 스탬프 — 현장 암호로 도장을 모은다 (별도 청크) */
 const StampApp = lazy(() => import('@/stamp/StampApp'))
 
+/** 최애 모의고사 — 칭호 카드를 캔버스로 그린다 (compose.ts 를 함께 끌고 온다) */
+const QuizApp = lazy(() => import('@/quiz/QuizApp'))
+
 /**
  * 서비스별 방문자 앱 — **`Record` 라 모든 서비스가 필수다.**
  *
@@ -86,6 +89,7 @@ const SERVICE_APPS: Record<ServiceId, ComponentType | null> = {
   wish: WishApp,
   poll: PollApp,
   stamp: StampApp,
+  quiz: QuizApp,
 }
 
 /**

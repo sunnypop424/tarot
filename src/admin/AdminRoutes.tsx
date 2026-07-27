@@ -22,6 +22,8 @@ import { Board as StampBoard } from './stamp/Board'
 import { Redeem } from './reward/Redeem'
 import { Picker } from './reward/Picker'
 import { Entries } from './reward/Entries'
+import { Questions as QuizQuestions } from './quiz/Questions'
+import { Stats as QuizStats } from './quiz/Stats'
 import { useAdminAuth } from './useAdminAuth'
 
 /**
@@ -45,6 +47,7 @@ const ADMIN_HOME: Record<ServiceId, string> = {
   wish: 'messages',
   poll: 'polls',
   stamp: 'stamp',
+  quiz: 'quiz',
 }
 
 const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
@@ -84,6 +87,16 @@ const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
   stamp: (
     <>
       <Route path="stamp" element={<StampBoard />} />
+      <Route path="redeem" element={<Redeem />} />
+      <Route path="picker" element={<Picker />} />
+      <Route path="entries" element={<Entries />} />
+    </>
+  ),
+  // 스탬프와 같은 공용 보상 화면 셋을 그대로 쓴다 — 문항·통계만 자기 것이다
+  quiz: (
+    <>
+      <Route path="quiz" element={<QuizQuestions />} />
+      <Route path="stats" element={<QuizStats />} />
       <Route path="redeem" element={<Redeem />} />
       <Route path="picker" element={<Picker />} />
       <Route path="entries" element={<Entries />} />

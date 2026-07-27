@@ -8,6 +8,7 @@ import { localLuckydraw } from './luckydraw'
 import { localOrganizers } from './organizers'
 import { localRolling } from './rolling'
 import { localPoll } from './poll'
+import { localQuiz } from './quiz'
 import { localRewards } from './rewards'
 import { localStamp } from './stamp'
 import type {
@@ -191,5 +192,6 @@ export const localRepo: Repo = {
   rolling: localRolling,
   poll: localPoll,
   stamp: localStamp,
+  quiz: localQuiz,
   rewards: localRewards,
 }

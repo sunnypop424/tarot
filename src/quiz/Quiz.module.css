@@ -1,0 +1,838 @@
+/* 최애 모의고사 — 시안 "최애 모의고사 방문자.dc.html".
+   색은 전부 --qz-* 커스텀 프로퍼티로 들어온다 (QuizApp 이 슬롯 값에서 주입). */
+
+.root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--qz-bg);
+  color: var(--qz-head);
+  font-family: var(--qz-font);
+}
+.phone {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── ① 시작 ── */
+.startWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 30px;
+  text-align: center;
+}
+.startWrap[data-align='left'] {
+  align-items: flex-start;
+  text-align: left;
+}
+.startWrap[data-align='right'] {
+  align-items: flex-end;
+  text-align: right;
+}
+.logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  margin-bottom: 14px;
+}
+.startTitle {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.3;
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+.startIntro {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--qz-sub);
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+.facts {
+  margin-top: 26px;
+  width: 100%;
+  display: flex;
+  gap: 10px;
+}
+.fact {
+  flex: 1;
+  background: var(--qz-wash);
+  border-radius: 12px;
+  padding: 16px 12px;
+  border: 1px solid var(--qz-line);
+  text-align: left;
+}
+.factLabel {
+  font-size: 11px;
+  color: var(--qz-sub);
+  font-weight: 700;
+}
+.factValue {
+  margin-top: 5px;
+  font-size: 22px;
+  font-weight: 800;
+}
+.bottom {
+  flex: none;
+  padding: 0 20px 22px;
+}
+.cta {
+  width: 100%;
+  height: 58px;
+  border: none;
+  border-radius: 13px;
+  background: var(--qz-btn);
+  color: var(--qz-btnFg);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.cta:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.adminRow {
+  text-align: center;
+  margin-top: 14px;
+}
+.adminLink {
+  font-size: 11px;
+  color: var(--qz-sub);
+  opacity: 0.6;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── ② 문항 ── */
+.progressTop {
+  padding: 20px var(--layout-pad) 0;
+}
+.progressRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 9px;
+}
+.step {
+  font-size: 13px;
+  font-weight: 800;
+}
+.clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--qz-sub);
+}
+/* 1분 남으면 눈에 띄어야 한다 — 색이 아니라 굵기·깜빡임으로 (슬롯 색을 모르므로) */
+.clock[data-hurry] {
+  color: var(--qz-head);
+  animation: qzPulse 1.1s ease-in-out infinite;
+}
+.track {
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--qz-line);
+  overflow: hidden;
+}
+.bar {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--qz-btn);
+  transition: width 320ms var(--ease, ease);
+}
+.qHead {
+  padding: 26px 22px 0;
+}
+.qBody {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.45;
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+.qScroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 22px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+.qImage {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  background-color: var(--qz-wash);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border: 1px solid var(--qz-line);
+  flex: none;
+}
+.choice {
+  width: 100%;
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--qz-head);
+  background: var(--qz-wash);
+  border: 1px solid var(--qz-line);
+  text-align: left;
+  transition: background-color 140ms var(--ease, ease), color 140ms var(--ease, ease);
+}
+.choice[data-on] {
+  font-weight: 800;
+  color: var(--qz-btnFg);
+  background: var(--qz-btn);
+  border-color: var(--qz-btn);
+}
+.choiceNum {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  background: var(--qz-line);
+  color: var(--qz-sub);
+}
+.choice[data-on] .choiceNum {
+  background: var(--qz-btnFg);
+  color: var(--qz-btn);
+}
+.choiceLabel {
+  flex: 1;
+}
+.shortInput {
+  width: 100%;
+  height: 56px;
+  border-radius: 12px;
+  background: var(--qz-wash);
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--qz-head);
+  outline: none;
+  border: 1px solid var(--qz-line);
+}
+.shortHint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--qz-sub);
+}
+/* 아래로 이어지는 걸 보여주되 버튼이 글을 안 가리게 — 시안의 그라데이션 바닥 */
+.submitBar {
+  flex: none;
+  padding: 12px 20px 30px;
+  background: linear-gradient(rgba(0, 0, 0, 0), var(--qz-bg) 30%);
+}
+.submitBar .cta {
+  height: 54px;
+  font-size: 16px;
+  border-radius: 12px;
+}
+
+/* ── ③ 채점 중 ── */
+.grading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  border: 3px solid var(--qz-line);
+  border-top-color: var(--qz-btn);
+  animation: qzSpin 0.9s linear infinite;
+}
+.gradingText {
+  font-size: 16px;
+  font-weight: 800;
+  animation: qzPulse 1.4s ease-in-out infinite;
+}
+
+/* ── ④ 결과 ── */
+.resultRoot {
+  background: var(--qz-resultBg);
+}
+.resultScroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 22px 10px;
+  min-height: 0;
+}
+/* 저장·공유되는 카드. 화면에 보이는 이 카드와 캔버스가 같은 값을 그린다 */
+.card {
+  width: 100%;
+  aspect-ratio: 1 / 1.06;
+  background: var(--qz-bg);
+  border-radius: 18px;
+  box-shadow: 0 16px 44px rgba(20, 20, 20, 0.16);
+  padding: 26px 22px;
+  display: flex;
+  flex-direction: column;
+  animation: qzPop 0.45s ease both;
+}
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.cardLogo {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  flex: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.cardTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--qz-sub);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cardMid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 0;
+}
+.kicker {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--qz-sub);
+}
+.titleBig {
+  margin-top: 12px;
+  font-size: clamp(28px, 10vw, 40px);
+  font-weight: 800;
+  line-height: 1.2;
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+.rule {
+  margin-top: 16px;
+  height: 1px;
+  width: 56px;
+  background: var(--qz-line);
+}
+.scoreLine {
+  margin-top: 16px;
+  font-size: 15px;
+  color: var(--qz-sub);
+}
+.scoreLine b {
+  color: var(--qz-head);
+}
+.cardFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 10px;
+  color: var(--qz-sub);
+  opacity: 0.75;
+}
+.cardFoot span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.actions button {
+  flex: 1;
+  height: 52px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  border: none;
+  background: var(--qz-btn);
+  color: var(--qz-btnFg);
+}
+.actions button.ghost {
+  background: var(--qz-bg);
+  color: var(--qz-head);
+  font-weight: 700;
+  border: 1px solid var(--qz-line);
+}
+.review {
+  margin-top: 20px;
+  background: var(--qz-bg);
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid var(--qz-line);
+}
+.reviewTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.reviewTitle {
+  font-size: 14px;
+  font-weight: 800;
+}
+.reviewCount {
+  font-size: 12px;
+  color: var(--qz-sub);
+}
+.reviewItem {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--qz-line);
+}
+.reviewQ {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+.reviewRow {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 12px;
+}
+.reviewRow span:first-child {
+  color: var(--qz-sub);
+  flex: none;
+}
+
+/* 저장 안내 토스트 — iOS 가 <a download> 를 무시하고 그냥 열어버릴 때 */
+.saveNote {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  background: var(--qz-wash);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--qz-line);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--qz-sub);
+}
+
+/* ── ⑤ 보상 ── */
+.topBar {
+  flex: none;
+  padding: 14px var(--layout-pad) 0;
+}
+.backBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 9999px;
+  border: none;
+  background: var(--qz-wash);
+  color: var(--qz-head);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 34px;
+  text-align: center;
+}
+.bigIcon {
+  width: 66px;
+  height: 66px;
+  border-radius: 9999px;
+  background: var(--qz-wash);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--qz-head);
+}
+.centerTitle {
+  margin-top: 20px;
+  font-size: 22px;
+  font-weight: 800;
+}
+.centerBody {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--qz-sub);
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+.ghostBtn {
+  margin-top: 22px;
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: var(--qz-wash);
+  color: var(--qz-head);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--qz-line);
+}
+
+.ticketWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 22px;
+  min-height: 0;
+}
+.ticket {
+  position: relative;
+  background: var(--qz-wash);
+  border-radius: 18px;
+  padding: 30px 18px 26px;
+  text-align: center;
+  overflow: hidden;
+  border: 1px solid var(--qz-line);
+}
+.ticketLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--qz-sub);
+}
+/* **한 줄에 들어가야 한다** — 줄바꿈되면 스태프가 읽다 자리를 놓친다 */
+.code {
+  margin-top: 18px;
+  font-size: clamp(28px, 9.4vw, 44px);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.faded {
+  opacity: 0.28;
+}
+.redeemedMark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-11deg);
+  border: 3px solid var(--qz-head);
+  color: var(--qz-head);
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  background: color-mix(in srgb, var(--qz-bg) 72%, transparent);
+  white-space: nowrap;
+}
+.note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  background: var(--qz-wash);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--qz-line);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--qz-sub);
+}
+
+/* ── 응모 폼 ── */
+.formHead {
+  padding: 16px 22px 0;
+}
+.formKicker {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--qz-sub);
+  letter-spacing: 0.04em;
+}
+.formTitle {
+  margin: 8px 0 0;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+.formIntro {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--qz-sub);
+  word-break: keep-all;
+}
+.formScroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+}
+.label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.req {
+  color: var(--qz-btn);
+}
+.input {
+  width: 100%;
+  height: 54px;
+  border-radius: 12px;
+  background: var(--qz-wash);
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--qz-head);
+  outline: none;
+  border: 1px solid var(--qz-line);
+}
+.inputHint {
+  margin-top: 7px;
+  font-size: 12px;
+  color: var(--qz-sub);
+}
+.atRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 54px;
+  border-radius: 12px;
+  background: var(--qz-wash);
+  padding: 0 16px;
+  border: 1px solid var(--qz-line);
+}
+.atRow span {
+  font-size: 15px;
+  color: var(--qz-sub);
+  font-weight: 700;
+}
+.atRow input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--qz-head);
+  outline: none;
+}
+.consent {
+  background: var(--qz-wash);
+  border-radius: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--qz-line);
+}
+.consentTitle {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--qz-head);
+  margin-bottom: 7px;
+}
+.consentBody {
+  font-size: 11px;
+  line-height: 1.75;
+  color: var(--qz-sub);
+}
+.consentCheck {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.box {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 5px;
+  border: 1px solid var(--qz-line);
+  background: var(--qz-bg);
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.consentCheck input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.consentCheck input:checked + .box {
+  background: var(--qz-btn);
+  border-color: var(--qz-btn);
+  color: var(--qz-btnFg);
+}
+.error {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--qz-head);
+}
+.summary {
+  margin-top: 20px;
+  width: 100%;
+  background: var(--qz-wash);
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: left;
+  border: 1px solid var(--qz-line);
+}
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+.summaryRow + .summaryRow {
+  margin-top: 8px;
+}
+.summaryRow span:first-child {
+  color: var(--qz-sub);
+}
+.summaryRow span:last-child {
+  font-weight: 800;
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 30px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--qz-sub);
+  line-height: 1.7;
+}
+
+@keyframes qzSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes qzPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes qzPop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner,
+  .gradingText,
+  .card,
+  .clock[data-hurry] {
+    animation: none;
+  }
+}
+
+/* 넓은 화면 — 시안 ⑥: 문항을 가운데 카드로 모은다 */
+@media (min-width: 900px) {
+  .qHead,
+  .qScroll,
+  .submitBar,
+  .progressTop {
+    padding-left: 34px;
+    padding-right: 34px;
+  }
+  .qBody {
+    font-size: 28px;
+  }
+  /* 보기 두 줄 그리드 — 세로로 길게 늘어지면 한 화면에 안 들어온다 */
+  .qScroll[data-choices] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: start;
+    gap: 12px;
+  }
+  .choice {
+    min-height: 72px;
+    font-size: 17px;
+    padding: 16px 20px;
+  }
+}

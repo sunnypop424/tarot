@@ -1,0 +1,148 @@
+/* 모의고사 주최자 화면 — .admin 서브트리라 색은 이미 고정 라이트다 (src/styles/admin.css) */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+}
+.row[data-hidden] {
+  opacity: 0.62;
+  border-style: dashed;
+}
+/* 정답이 비면 그 문항은 아무도 못 맞힌다 — 눈에 띄어야 한다 */
+.row[data-noanswer] {
+  border-color: var(--color-accent);
+}
+
+.rowNum {
+  width: 22px;
+  flex: none;
+  text-align: right;
+  font-size: var(--text-s);
+  color: var(--color-fg-3);
+  padding-top: 2px;
+}
+.rowMain {
+  flex: 1;
+  min-width: 0;
+}
+.rowBody {
+  font-size: var(--text-m);
+  font-weight: var(--weight-bold);
+  line-height: 1.5;
+  word-break: keep-all;
+}
+.rowMeta {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: var(--text-xs);
+  color: var(--color-fg-3);
+}
+.tag {
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: var(--color-wash);
+  font-weight: var(--weight-bold);
+}
+.warn {
+  color: var(--color-accent);
+  font-weight: var(--weight-bold);
+}
+.rowActions {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+
+/* ── 편집 ── */
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.choiceRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* 정답 표시는 라디오다 — 체크박스로 두면 "복수 정답" 을 만들 수 있는데 화면이 그걸 안 그린다 */
+.choiceRow input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  accent-color: var(--color-primary);
+}
+
+.answerList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px 5px 11px;
+  border-radius: 9999px;
+  background: var(--color-wash);
+  font-size: var(--text-s);
+  font-weight: var(--weight-bold);
+}
+.chip button {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  color: var(--color-fg-3);
+}
+
+/* ── 통계 ── */
+.statBar {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--color-wash);
+  overflow: hidden;
+  margin-top: 7px;
+}
+.statFill {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--color-primary);
+}
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.kpi {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+.kpiLabel {
+  font-size: var(--text-xs);
+  color: var(--color-fg-3);
+  font-weight: var(--weight-bold);
+}
+.kpiValue {
+  margin-top: 5px;
+  font-size: 24px;
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}

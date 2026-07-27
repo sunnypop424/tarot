@@ -6,6 +6,7 @@ import type { PhotozoneDisplay } from '@/data/photozone'
 import type { WishDisplay } from '@/data/wish'
 import type { PollDisplay } from '@/data/poll'
 import type { StampDisplay } from '@/data/stamp'
+import type { QuizDisplay } from '@/data/quiz'
 import type { ServiceId } from '@/data/services'
 import type { PlanId } from '@/data/plans'
 
@@ -138,4 +139,9 @@ export interface Slot {
    * 현장 암호·보상 방식 같은 운영값은 **주최자**가 정한다 (`stamp_settings` 테이블).
    */
   stamp?: Partial<StampDisplay>
+  /**
+   * 최애 모의고사 서비스의 **겉모습 + 칭호** — 최고관리자만 정한다 (`src/data/quiz.ts`).
+   * 문항·정답·커트라인은 **주최자**가 만든다 (`quiz_questions`·`quiz_settings`).
+   */
+  quiz?: Partial<QuizDisplay>
 }

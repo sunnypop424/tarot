@@ -18,6 +18,7 @@ import { PhotozoneCard } from './service/PhotozoneCard'
 import { WishCard } from './service/WishCard'
 import { PollCard } from './service/PollCard'
 import { StampCard } from './service/StampCard'
+import { QuizCard } from './service/QuizCard'
 import { PaletteField } from './service/PaletteField'
 import { checkThemeContrast } from './contrast'
 import { repairContrast, type GeneratedTheme } from './aiTheme'
@@ -41,6 +42,7 @@ import { photozoneDisplay, type PhotozoneDisplay } from '@/data/photozone'
 import { wishDisplay, type WishDisplay } from '@/data/wish'
 import { pollDisplay, type PollDisplay } from '@/data/poll'
 import { stampDisplay, type StampDisplay } from '@/data/stamp'
+import { quizDisplay, type QuizDisplay } from '@/data/quiz'
 import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 import { exportSlots } from './slotsFile'
 
@@ -766,6 +768,9 @@ export function SlotEditor() {
   const stamp = getSlotService(draft) === 'stamp'
   const patchStamp = (change: Partial<StampDisplay>) =>
     patchSlot((prev) => ({ stamp: { ...stampDisplay(prev), ...change } }))
+  const quiz = getSlotService(draft) === 'quiz'
+  const patchQuiz = (change: Partial<QuizDisplay>) =>
+    patchSlot((prev) => ({ quiz: { ...quizDisplay(prev), ...change } }))
 
   const patchColor = (key: keyof ThemeColors, value: string) =>
     patchSlot((prev) => ({
@@ -1425,6 +1430,9 @@ export function SlotEditor() {
 
           {/* ══ 방문 스탬프 설정 ══ (칸 정의가 여기 있는 이유는 StampCard.tsx 주석) */}
           {stamp && <StampCard slot={draft} patch={patchStamp} />}
+
+          {/* ══ 최애 모의고사 설정 ══ (칭호가 여기 있는 이유는 QuizCard.tsx 주석) */}
+          {quiz && <QuizCard slot={draft} patch={patchQuiz} />}
 
           {/* ══ 롤링페이퍼 서비스 설정 ══ */}
           {rolling && (
