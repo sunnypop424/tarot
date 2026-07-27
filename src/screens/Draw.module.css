@@ -21,11 +21,13 @@
   gap: var(--space-md);
   margin-top: var(--space-base);
 }
-/* 넓은 화면 — 버튼을 가로로 나란히, 가운데 */
+/* 넓은 화면 — 버튼을 한 줄로 나란히, 가운데. btn--block(100%)을 풀어 auto 폭으로 */
 @media (min-width: 720px) {
   .resultActions {
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: center;
+  }
+  .resultActions > * {
+    width: auto;
   }
 }
