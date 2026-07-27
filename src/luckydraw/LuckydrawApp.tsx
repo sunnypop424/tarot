@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Flag, Gift, Info, Lock, Minus, Plus } from 'lucide-react'
 
-import { luckydrawDisplay, WEBFONTS, type LuckydrawDisplay } from '@/data/luckydraw'
+import { luckydrawDisplay, loadWebfont, fontStack, type LuckydrawDisplay } from '@/data/luckydraw'
 import { luminance } from '@/lib/color'
 import { repo } from '@/lib/repo'
 import type { DrawResult, LuckydrawSettings, Prize } from '@/lib/repo'
@@ -79,28 +79,9 @@ export default function LuckydrawApp() {
    * Paperlogy 는 CSS 가 아니라 woff2 라 @font-face 를 직접 만든다.
    */
   useEffect(() => {
-    const font = WEBFONTS[display.fontFamily]
-    if (!font) return
     // 배송·경품 모달은 body 로 포털돼 .stage 밖에 있다 — :root 에도 실어야 웹폰트가 먹는다
-    document.documentElement.style.setProperty('--ld-font', font.stack)
-    const id = `ld-font-${display.fontFamily}`
-    if (document.getElementById(id)) return
-
-    // woff2 를 직접 주는 폰트는 @font-face 를 굵기별로 만든다 (CSS 를 주는 폰트는 link 하나)
-    const el =
-      'faces' in font
-        ? Object.assign(document.createElement('style'), {
-            id,
-            textContent: font.faces
-              .map(
-                (f) =>
-                  `@font-face{font-family:'Paperlogy';src:url('${f.href}') format('woff2');font-weight:${f.weight};font-display:swap}`
-              )
-              .join(''),
-          })
-        : Object.assign(document.createElement('link'), { id, rel: 'stylesheet', href: font.href })
-
-    document.head.appendChild(el)
+    document.documentElement.style.setProperty('--ld-font', fontStack(display.fontFamily))
+    loadWebfont(display.fontFamily)
   }, [display.fontFamily])
 
   /**
@@ -252,7 +233,7 @@ export default function LuckydrawApp() {
             '--ld-admin-link': display.adminLinkColor,
             // 색만이 아니라 **완전한 그림자 문자열** — 슬롯이 색·번짐·내림을 다 정한다
             '--ld-shadow': `0 ${display.boxShadowY}px ${display.boxShadowBlur}px ${display.boxShadowColor}`,
-            '--ld-font': WEBFONTS[display.fontFamily]?.stack,
+            '--ld-font': fontStack(display.fontFamily),
           } as React.CSSProperties
         }
       >
