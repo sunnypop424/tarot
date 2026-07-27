@@ -90,13 +90,21 @@
  * 프레임 띠 — 가로 스크롤. **썸네일이 실제 비율대로** 보여야 한다 (네컷은 길고 와이드는 납작).
  * 칸 높이를 고정하고 아래 정렬해서, 비율이 달라도 라벨 줄이 가지런하다.
  */
+/**
+ * 가로 스크롤 띠 — **좌우로 화면 끝까지 늘리고 안쪽에서 패딩으로 민다.**
+ *
+ * 오른쪽만 늘렸더니 첫 프레임의 **선택 테두리(box-shadow 링)가 왼쪽에서 잘렸다**
+ * (`overflow-x:auto` 가 자른다). 마지막 프레임은 오른쪽에서 같은 일이 난다.
+ * 양쪽에 패딩을 주면 링이 들어갈 자리가 생기고, 스크롤은 여전히 화면 끝까지 간다.
+ * 위쪽 패딩도 같은 이유 — 링이 위로도 2px 나간다.
+ */
 .frames {
-  margin: 14px calc(var(--layout-pad) * -1) 0 0;
+  margin: 14px calc(var(--layout-pad) * -1) 0;
   display: flex;
   gap: 14px;
   align-items: flex-end;
   overflow-x: auto;
-  padding: 2px var(--layout-pad) 12px 0;
+  padding: 4px var(--layout-pad) 12px;
   list-style: none;
   scrollbar-width: none;
 }
