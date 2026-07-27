@@ -43,3 +43,6 @@ logs/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# 검증 스크립트가 루트에 떨군 스크린샷 — 레포에 안 남긴다
+/*.png
