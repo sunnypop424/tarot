@@ -8,6 +8,8 @@ import { localLuckydraw } from './luckydraw'
 import { localOrganizers } from './organizers'
 import { localRolling } from './rolling'
 import { localPoll } from './poll'
+import { localRewards } from './rewards'
+import { localStamp } from './stamp'
 import type {
   AdminUser,
   AuthRepo,
@@ -188,4 +190,6 @@ export const localRepo: Repo = {
   // 롤링페이퍼는 local 짝이 진짜다 — 원자성 요구가 없어 localStorage 로도 성립한다 (rolling.ts)
   rolling: localRolling,
   poll: localPoll,
+  stamp: localStamp,
+  rewards: localRewards,
 }

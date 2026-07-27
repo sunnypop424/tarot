@@ -17,6 +17,7 @@ import { CSS, Card, Field, Swatch, SwatchColor } from './editorUi'
 import { PhotozoneCard } from './service/PhotozoneCard'
 import { WishCard } from './service/WishCard'
 import { PollCard } from './service/PollCard'
+import { StampCard } from './service/StampCard'
 import { PaletteField } from './service/PaletteField'
 import { checkThemeContrast } from './contrast'
 import { repairContrast, type GeneratedTheme } from './aiTheme'
@@ -39,6 +40,7 @@ import { rollingDisplay } from '@/data/rolling'
 import { photozoneDisplay, type PhotozoneDisplay } from '@/data/photozone'
 import { wishDisplay, type WishDisplay } from '@/data/wish'
 import { pollDisplay, type PollDisplay } from '@/data/poll'
+import { stampDisplay, type StampDisplay } from '@/data/stamp'
 import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 import { exportSlots } from './slotsFile'
 
@@ -761,6 +763,9 @@ export function SlotEditor() {
   const poll = getSlotService(draft) === 'poll'
   const patchPoll = (change: Partial<PollDisplay>) =>
     patchSlot((prev) => ({ poll: { ...pollDisplay(prev), ...change } }))
+  const stamp = getSlotService(draft) === 'stamp'
+  const patchStamp = (change: Partial<StampDisplay>) =>
+    patchSlot((prev) => ({ stamp: { ...stampDisplay(prev), ...change } }))
 
   const patchColor = (key: keyof ThemeColors, value: string) =>
     patchSlot((prev) => ({
@@ -1417,6 +1422,9 @@ export function SlotEditor() {
 
           {/* ══ 실시간 투표 설정 ══ */}
           {poll && <PollCard slot={draft} patch={patchPoll} />}
+
+          {/* ══ 방문 스탬프 설정 ══ (칸 정의가 여기 있는 이유는 StampCard.tsx 주석) */}
+          {stamp && <StampCard slot={draft} patch={patchStamp} />}
 
           {/* ══ 롤링페이퍼 서비스 설정 ══ */}
           {rolling && (

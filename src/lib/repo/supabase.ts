@@ -8,6 +8,8 @@ import { supabaseLuckydraw } from './luckydraw'
 import { httpOrganizers } from './organizers'
 import { supabaseRolling } from './rolling'
 import { supabasePoll } from './poll'
+import { supabaseRewards } from './rewards'
+import { supabaseStamp } from './stamp'
 import type {
   AdminUser,
   AuthRepo,
@@ -42,7 +44,7 @@ type SlotRow = Slot
  */
 const SLOT_FIELDS = [
   'slug', 'name', 'service', 'plan', 'limits', 'deck', 'period',
-  'theme', 'event', 'luckydraw', 'rolling', 'photozone', 'wish', 'poll',
+  'theme', 'event', 'luckydraw', 'rolling', 'photozone', 'wish', 'poll', 'stamp',
 ] as const
 
 /**
@@ -68,6 +70,7 @@ const SLOT_DEFAULTS: Partial<Record<(typeof SLOT_FIELDS)[number], unknown>> = {
   photozone: {},
   wish: {},
   poll: {},
+  stamp: {},
 }
 
 /** 저장할 행 — 컬럼 목록에서 뽑아 만든다 (위 주석) */
@@ -308,4 +311,6 @@ export const supabaseRepo: Repo = {
   luckydraw: supabaseLuckydraw,
   rolling: supabaseRolling,
   poll: supabasePoll,
+  stamp: supabaseStamp,
+  rewards: supabaseRewards,
 }

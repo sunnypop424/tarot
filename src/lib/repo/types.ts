@@ -460,6 +460,117 @@ export interface PollRepo {
   watch(slug: string, onChange: () => void): () => void
 }
 
+/** 공용 보상(0019)에서 내 것 하나 — **응모 정보는 안 온다** (닉네임·연락처·주소) */
+export interface MyReward {
+  code: string
+  label: string
+  kind: 'guaranteed' | 'raffle'
+  /** 스태프가 수령 처리한 시각 — null 이면 아직 */
+  redeemedAt: string | null
+  /** 응모(raffle)에서 이미 냈나 */
+  entered: boolean
+  createdAt: string
+}
+
+export interface StampSettings {
+  rewardMode: 'none' | 'guaranteed' | 'raffle'
+  /** 켜면 KST 00시에 판이 비워진다 (실제로 지우지 않는다 — 0022 주석) */
+  dailyReset: boolean
+  closed: boolean
+  /** 응모 폼에서 받을 필드 — 안 켠 건 폼에도 DB 에도 안 들어간다 */
+  entryFields: { handle: boolean; contact: boolean; address: boolean }
+  rewardLabel: string
+}
+
+/**
+ * 체크인 결과.
+ *
+ * **틀린 암호는 예외가 아니라 `ok: false` 로 온다** — 예외를 던지면 트랜잭션이 되감기면서
+ * 바로 앞에서 넣은 레이트리밋 카운터까지 같이 사라져 브루트포스 차단이 무력화된다
+ * (`supabase/migrations/0023_stamp_fail_counts.sql`). 슬롯 자체가 잘못됐거나 리밋에
+ * 걸린 건 여전히 예외다 — 그건 화면이 통째로 다른 상태여야 하는 상황이다.
+ */
+export interface StampCheckinResult {
+  ok: boolean
+  /** `ok=false` 일 때 화면에 그대로 보여줄 문장 */
+  message?: string
+  stampId?: string
+  got?: number
+  total?: number
+  complete?: boolean
+  /** 완성했고 보상이 있으면 교환코드가 함께 온다 */
+  rewardCode?: string | null
+}
+
+export interface StampCodeRow {
+  stampId: string
+  code: string
+}
+
+/**
+ * 방문 스탬프 (일곱 번째 서비스).
+ *
+ * **`ready()` 가 false 다** — 현장 암호 검증과 보상 발급이 서버여야 의미가 있다.
+ * 코드가 localStorage 에 있으면 개발자도구로 그냥 읽힌다.
+ *
+ * 보상은 **공용 인프라(0019)를 쓴다** — 이 인터페이스에 `claim`·`redeem` 이 없는 게 그 증거다.
+ */
+export interface StampRepo {
+  ready(): boolean
+  settings(slug: string): Promise<StampSettings>
+  saveSettings(slug: string, s: StampSettings): Promise<void>
+  /** 내 판 (기기별 익명 id 로) */
+  mine(slug: string, subject: string): Promise<{ stampIds: string[]; day: string | null }>
+  /** 현장 암호로 도장 — 완성하면 서버가 같은 트랜잭션에서 보상까지 발급한다 */
+  checkin(slug: string, subject: string, code: string): Promise<StampCheckinResult>
+  /** 주최자만 — 코드는 anon 에게 안 읽힌다 */
+  codes(slug: string): Promise<StampCodeRow[]>
+  saveCode(slug: string, stampId: string, code: string): Promise<void>
+  report(slug: string): Promise<{ stampId: string; count: number }[]>
+  /** 내 보상 (공용 rewards) */
+  myReward(slug: string, subject: string): Promise<MyReward | null>
+  /** 응모 제출 (공용 rewards) */
+  enter(
+    slug: string,
+    code: string,
+    form: { nickname: string; handle?: string; contact?: string; address?: string }
+  ): Promise<void>
+}
+
+/** 응모 추첨의 후보/결과 한 줄 — 주최자만 본다 (준-PII) */
+export interface RewardEntry {
+  rewardId: string
+  code: string
+  label: string
+  nickname: string
+  handle: string | null
+  contact: string | null
+  address: string | null
+  score: number | null
+  won: boolean
+  pickedRound: number | null
+  createdAt: string
+}
+
+/**
+ * 공용 보상 — **주최자 쪽만** 있는 인터페이스다.
+ *
+ * 방문자 쪽(`myReward`·`enter`)은 각 서비스 repo 안에 있다 — 방문자는 자기가 참여한
+ * 서비스 화면에서만 보상을 만나고, `source` 를 클라이언트가 고르게 두면 남의 서비스
+ * 보상을 조회하는 통로가 된다.
+ *
+ * **`ready()` 가 false 다** — 추첨·수령 판정이 서버여야 의미가 있다.
+ */
+export interface RewardsRepo {
+  ready(): boolean
+  /** 응모자 명단 (`kind='raffle'` 만). 발표·CSV 의 원본 */
+  entries(slug: string, source: string): Promise<RewardEntry[]>
+  /** 랜덤 또는 점수순으로 cnt 명 — 이미 당첨된 사람은 후보에서 빠진다 */
+  pick(slug: string, source: string, count: number, method: 'random' | 'score'): Promise<RewardEntry[]>
+  /** 그 회차만 되돌린다 */
+  unpick(slug: string, source: string, round: number): Promise<number>
+}
+
 export interface Repo {
   slots: SlotRepo
   questions: QuestionRepo
@@ -470,4 +581,6 @@ export interface Repo {
   luckydraw: LuckydrawRepo
   rolling: RollingRepo
   poll: PollRepo
+  stamp: StampRepo
+  rewards: RewardsRepo
 }

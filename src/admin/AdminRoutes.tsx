@@ -18,6 +18,10 @@ import { Moderation } from './rolling/Moderation'
 import { Guide as PhotozoneGuide } from './photozone/Guide'
 import { Polls } from './poll/Polls'
 import { Live } from './poll/Live'
+import { Board as StampBoard } from './stamp/Board'
+import { Redeem } from './reward/Redeem'
+import { Picker } from './reward/Picker'
+import { Entries } from './reward/Entries'
 import { useAdminAuth } from './useAdminAuth'
 
 /**
@@ -40,6 +44,7 @@ const ADMIN_HOME: Record<ServiceId, string> = {
   photozone: 'photozone',
   wish: 'messages',
   poll: 'polls',
+  stamp: 'stamp',
 }
 
 const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
@@ -67,6 +72,21 @@ const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
     <>
       <Route path="polls" element={<Polls />} />
       <Route path="live" element={<Live />} />
+    </>
+  ),
+  /**
+   * 스탬프는 **자기 화면 하나 + 공용 보상 화면 셋**이다. 수령확인·추첨·응모자는
+   * `src/admin/reward/*` 라 모의고사·포토카드도 같은 컴포넌트를 가리키게 된다.
+   *
+   * 라우트는 셋 다 항상 등록한다 — 메뉴만 `rewardMode` 에 따라 켜고, 주소로 직접 들어와도
+   * 화면이 스스로 상황을 설명하는 편이 빈 화면보다 낫다.
+   */
+  stamp: (
+    <>
+      <Route path="stamp" element={<StampBoard />} />
+      <Route path="redeem" element={<Redeem />} />
+      <Route path="picker" element={<Picker />} />
+      <Route path="entries" element={<Entries />} />
     </>
   ),
 }

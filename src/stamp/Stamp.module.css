@@ -1,0 +1,657 @@
+/**
+ * 방문 스탬프 — claude.ai/design 시안 '방문 스탬프 방문자' 를 옮긴다.
+ * 시안의 중립 색은 슬롯 토큰(--st-*, StampApp 이 주입)으로 갈아끼운다.
+ *
+ * **도장이 쾅 찍히는 손맛**이 이 화면의 보상이다. 체크박스 목록처럼 보이면 실패다.
+ */
+
+.root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--st-bg);
+  color: var(--st-head);
+  font-family: var(--st-font);
+}
+.phone {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 헤더 ── */
+.head {
+  padding: var(--space-lg) var(--layout-pad) 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.head[data-align='center'] {
+  justify-content: center;
+  text-align: center;
+}
+.head[data-align='right'] {
+  justify-content: flex-end;
+  text-align: right;
+}
+.logoTile {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 10px;
+  background-color: color-mix(in srgb, var(--st-head) 9%, transparent);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--st-sub);
+}
+.title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+.intro {
+  margin: 12px var(--layout-pad) 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--st-sub);
+  word-break: keep-all;
+}
+
+/* ── 판 ── */
+/* 판은 남은 공간의 **가운데**에 둔다 — 칸이 적으면 아래가 통째로 비어 미완성으로 보인다 */
+.boardWrap {
+  flex: 1;
+  padding: 18px var(--layout-pad) 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+.boardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.boardLabel {
+  font-size: 14px;
+  font-weight: 800;
+}
+.boardCount {
+  font-size: 15px;
+  font-weight: 800;
+}
+/**
+ * 칸 수가 이벤트마다 다르다 (4·6·9…). **열 수를 개수에서 파생**시켜 어떤 수여도 성립하게 한다 —
+ * 4칸은 2열, 나머지는 3열이 시안의 모양이다.
+ */
+.board {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: var(--gap);
+  width: 100%;
+  align-self: center;
+  background: color-mix(in srgb, var(--st-head) 3%, transparent);
+  border-radius: 16px;
+  padding: var(--gap);
+  list-style: none;
+  margin: 0;
+}
+.cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 14px;
+  background: var(--st-bg);
+  border: 1px dashed color-mix(in srgb, var(--st-head) 18%, transparent);
+  overflow: hidden;
+}
+.cell[data-done] {
+  background: color-mix(in srgb, var(--st-head) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--st-head) 12%, transparent);
+}
+/* 도장 — 살짝 기울고 잉크가 번진 듯. 칸마다 각도가 달라야 "찍은" 티가 난다 */
+.stamp {
+  display: inline-flex;
+  color: var(--st-stamp);
+  transform: rotate(var(--tilt));
+  filter: blur(0.25px);
+  opacity: 0.88;
+}
+/* 방금 찍힌 칸 — 크게 들어와 쾅 내려앉는다 */
+.cell[data-fresh] .stamp {
+  animation: stStamp 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes stStamp {
+  0% {
+    transform: scale(2.1) rotate(calc(var(--tilt) - 6deg));
+    opacity: 0;
+  }
+  55% {
+    transform: scale(0.92) rotate(var(--tilt));
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.04) rotate(var(--tilt));
+  }
+  100% {
+    transform: scale(1) rotate(var(--tilt));
+    opacity: 1;
+  }
+}
+.ring {
+  position: absolute;
+  width: 76%;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  border: 3px solid var(--st-stamp);
+  animation: stRing 0.9s ease-out;
+  pointer-events: none;
+}
+@keyframes stRing {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cell[data-fresh] .stamp,
+  .ring {
+    animation: none;
+  }
+}
+.num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--numSize);
+  height: var(--numSize);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--st-head) 5%, transparent);
+  color: color-mix(in srgb, var(--st-head) 28%, transparent);
+  font-size: var(--numFont);
+  font-weight: 800;
+}
+.cellName {
+  font-size: var(--nameFont);
+  font-weight: 600;
+  color: color-mix(in srgb, var(--st-head) 35%, transparent);
+  text-align: center;
+  padding: 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.cell[data-done] .cellName {
+  font-weight: 700;
+  color: var(--st-sub);
+}
+
+/* ── 안내 배너 ── */
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--st-head) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--st-head) 9%, transparent);
+  border-radius: 10px;
+  padding: 11px 13px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--st-sub);
+}
+
+.bottom {
+  flex: none;
+  padding: 16px var(--layout-pad) 22px;
+}
+.cta {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: 13px;
+  background: var(--st-btn);
+  color: var(--st-btnFg);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.cta:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.adminRow {
+  text-align: center;
+  margin-top: 12px;
+}
+.adminLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--st-sub);
+  opacity: 0.5;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* ── 도장 찍힘 토스트 ── */
+.toast {
+  background: var(--st-btn);
+  color: var(--st-btnFg);
+  border-radius: 13px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  animation: stPop 0.4s ease both;
+}
+@keyframes stPop {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.toastTitle {
+  font-size: 15px;
+  font-weight: 800;
+}
+.toastSub {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+
+/* ── 암호 입력 ── */
+.topBar {
+  padding: var(--space-base) 18px 0;
+  display: flex;
+  align-items: center;
+}
+.backBtn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--st-head) 7%, transparent);
+  color: var(--st-head);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.codeWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 26px;
+  text-align: center;
+}
+.codeTitle {
+  font-size: 21px;
+  font-weight: 800;
+  word-break: keep-all;
+}
+.codeHint {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--st-sub);
+  word-break: keep-all;
+}
+/**
+ * OTP 칸 — 진짜 입력은 뒤에 숨은 `<input>` 하나다.
+ * 칸을 여러 개 두면 포커스가 튀고 자동완성·붙여넣기가 깨진다.
+ */
+.otp {
+  position: relative;
+  margin-top: 32px;
+  display: flex;
+  gap: 10px;
+}
+.otp[data-error] {
+  animation: stShake 0.45s ease;
+}
+@keyframes stShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+.otpInput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  border: none;
+  /* 글자가 안 보여도 캐럿·IME 가 이 요소에 붙어야 키보드가 뜬다 */
+  font-size: 16px;
+  letter-spacing: 3em;
+  cursor: pointer;
+}
+.otpCell {
+  width: clamp(52px, 16vw, 64px);
+  height: clamp(64px, 20vw, 78px);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(26px, 8vw, 34px);
+  font-weight: 800;
+  background: color-mix(in srgb, var(--st-head) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--st-head) 11%, transparent);
+  color: var(--st-head);
+}
+.otpCell[data-filled],
+.otp[data-error] .otpCell {
+  border: 2px solid var(--st-btn);
+}
+.codeSmall {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--st-sub);
+}
+.codeError {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--st-head);
+}
+
+/* ── 완성 ── */
+.doneWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 26px;
+  text-align: center;
+}
+.doneKicker {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--st-sub);
+}
+.doneTitle {
+  margin-top: 10px;
+  font-size: 26px;
+  font-weight: 800;
+}
+.doneText {
+  margin: 26px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--st-sub);
+  word-break: keep-all;
+}
+
+/* ── 교환권 ── */
+.ticket {
+  position: relative;
+  background: color-mix(in srgb, var(--st-head) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--st-head) 9%, transparent);
+  border-radius: 18px;
+  padding: 30px 18px 26px;
+  text-align: center;
+  overflow: hidden;
+}
+.ticketLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--st-sub);
+}
+/**
+ * **화면의 주인공.** 스태프가 손님 폰을 보고 자기 기기에 손으로 옮겨 적는 값이라
+ * 멀리서도 읽히게 크고, 글자 사이를 벌린다.
+ */
+/* **한 줄에 들어가야 한다.** 줄바꿈되면 스태프가 읽다 자리를 놓친다 — 자간을 줄이고 폭에 맞춘다 */
+.code {
+  margin-top: 18px;
+  font-size: clamp(28px, 9.4vw, 44px);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ticketFaded {
+  opacity: 0.28;
+}
+.redeemedMark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-11deg);
+  border: 3px solid var(--st-head);
+  color: var(--st-head);
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  background: color-mix(in srgb, var(--st-bg) 72%, transparent);
+}
+.ticketDivider {
+  margin-top: 20px;
+  height: 1px;
+  background: color-mix(in srgb, var(--st-head) 11%, transparent);
+}
+.prize {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.prizeName {
+  font-size: 14px;
+  font-weight: 800;
+  margin-top: 3px;
+}
+
+/* ── 응모 폼 ── */
+.form {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.req {
+  color: var(--st-btn);
+}
+.input {
+  width: 100%;
+  height: 54px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--st-head) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--st-head) 11%, transparent);
+  padding: 0 16px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--st-head);
+  outline: none;
+}
+.handleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 54px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--st-head) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--st-head) 11%, transparent);
+  padding: 0 16px;
+}
+.at {
+  font-size: 15px;
+  color: var(--st-sub);
+  font-weight: 700;
+}
+.handleInput {
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--st-head);
+  outline: none;
+}
+/** 개인정보 안내 — 응모 모드에서 **반드시** 뜬다 (편집기가 빈 값이면 저장을 막는다) */
+.privacy {
+  background: color-mix(in srgb, var(--st-head) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--st-head) 9%, transparent);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.privacyTitle {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--st-sub);
+  margin-bottom: 7px;
+}
+.privacyBody {
+  font-size: 11px;
+  line-height: 1.75;
+  color: var(--st-sub);
+}
+.agree {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.agreeBox {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 5px;
+  border: 1px solid color-mix(in srgb, var(--st-head) 22%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--st-btnFg);
+}
+.agree[data-on] .agreeBox {
+  background: var(--st-btn);
+  border-color: var(--st-btn);
+}
+
+.submitBar {
+  flex: none;
+  padding: 12px var(--layout-pad) calc(30px + env(safe-area-inset-bottom));
+  background: linear-gradient(transparent, var(--st-bg) 30%);
+}
+
+.summary {
+  margin-top: 20px;
+  width: 100%;
+  background: color-mix(in srgb, var(--st-head) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--st-head) 9%, transparent);
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: left;
+}
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  gap: 12px;
+}
+.summaryRow + .summaryRow {
+  margin-top: 8px;
+}
+.summaryKey {
+  color: var(--st-sub);
+}
+.ghostBtn {
+  margin-top: 20px;
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--st-head) 7%, transparent);
+  border: none;
+  color: var(--st-head);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.notice {
+  margin: var(--space-sm) var(--layout-pad) 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--st-sub);
+  word-break: keep-all;
+}
+.empty {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--st-sub);
+  font-size: 13px;
+  line-height: 1.7;
+}

@@ -55,6 +55,7 @@ const SVC: Record<ServiceId, { bg: string; fg: string }> = {
   photozone: { bg: '#e7eefb', fg: '#28518f' },
   wish: { bg: '#fbf0dd', fg: '#8a5c17' },
   poll: { bg: '#e9eaf3', fg: '#3c4276' },
+  stamp: { bg: '#fbeaea', fg: '#8d3540' },
 }
 
 function slotStatus(s: Slot): { label: string; dot: string } {

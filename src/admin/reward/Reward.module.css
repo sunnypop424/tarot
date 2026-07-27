@@ -1,0 +1,49 @@
+/* 공용 보상 화면 — 스탬프·모의고사·포토카드가 같이 쓴다.
+   .admin 서브트리라 색은 이미 고정 라이트다 (src/styles/admin.css). */
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-s);
+}
+
+.table th,
+.table td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table tbody td {
+  border-top: 1px solid #f0f0f0;
+}
+
+.table thead th {
+  padding: 11px 12px;
+  background: var(--color-wash);
+  font-size: var(--text-xxs);
+  color: var(--color-fg-3);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.table tbody tr {
+  transition: background-color var(--dur-micro, 120ms) var(--ease, ease);
+}
+.table tbody tr:hover td {
+  background: #faf9ff;
+}
+
+/* 주소는 길다 — 줄바꿈을 허용하되 표가 옆으로 안 터지게 폭을 잡는다 */
+.wrap {
+  max-width: 260px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

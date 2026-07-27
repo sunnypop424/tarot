@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   Camera,
@@ -8,12 +9,17 @@ import {
   ExternalLink,
   LayoutDashboard,
   LogOut,
+  ScanLine,
+  Dices,
+  Stamp,
   StickyNote,
   Truck,
+  Users,
   UserCog,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
+import { repo } from '@/lib/repo'
 import { hasSupabase } from '@/lib/repo/client'
 import { getSlotService } from '@/data/services'
 import type { ServiceId } from '@/data/services'
@@ -56,11 +62,50 @@ const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
     // 부스에 세워두는 화면 — 관리 도구가 아니라 손님에게 보여주는 것이다
     { to: 'live', label: '전광판', icon: MonitorPlay },
   ],
+  // 보상 메뉴(수령확인·추첨·응모자)는 여기 없다 — 아래 REWARD_NAV 가 설정값으로 붙인다
+  stamp: [{ to: 'stamp', label: '스탬프', icon: Stamp }],
 }
 
-function navFor(service: ServiceId): NavItem[] {
+/**
+ * **서비스가 아니라 설정값으로 메뉴가 갈리는 첫 사례다.**
+ *
+ * 확정선물 이벤트에 '추첨'·'응모자' 가 떠 있으면 주최자가 뭘 눌러야 하는지 헷갈린다.
+ * 반대로 응모 이벤트에 '수령 확인' 은 쓸 자리가 없다. 그래서 `rewardMode` 를 읽어 붙인다.
+ *
+ * 읽어오기 전에는 아무것도 안 붙인다 — 잠깐 뒤에 메뉴가 늘어나는 건 괜찮지만,
+ * 잘못된 메뉴가 먼저 떠 있다가 사라지면 그건 고장으로 읽힌다.
+ */
+const REWARD_NAV: Record<'guaranteed' | 'raffle', NavItem[]> = {
+  guaranteed: [{ to: 'redeem', label: '수령 확인', icon: ScanLine }],
+  raffle: [
+    { to: 'picker', label: '추첨', icon: Dices },
+    { to: 'entries', label: '응모자', icon: Users },
+  ],
+}
+
+/** 보상을 쓰는 서비스만 여기 등록한다 (모의고사·포토카드가 뒤따른다) */
+function useRewardNav(service: ServiceId, slug: string): NavItem[] {
+  const [mode, setMode] = useState<'none' | 'guaranteed' | 'raffle'>('none')
+
+  useEffect(() => {
+    if (service !== 'stamp' || !repo.stamp.ready()) return
+    let alive = true
+    void repo.stamp.settings(slug).then((s) => {
+      if (alive) setMode(s.rewardMode)
+    })
+    return () => {
+      alive = false
+    }
+  }, [service, slug])
+
+  return mode === 'none' ? [] : REWARD_NAV[mode]
+}
+
+function useNav(service: ServiceId, slug: string): NavItem[] {
+  const reward = useRewardNav(service, slug)
   return [
     ...SERVICE_NAV[service],
+    ...reward,
     ...(hasSupabase ? [{ to: 'account', label: '내 계정', icon: UserCog }] : []),
   ]
 }
@@ -69,7 +114,7 @@ export function AdminLayout() {
   const slot = useSlot()
   const navigate = useNavigate()
   const { user, signOut } = useAdminAuth(slot.slug)
-  const NAV = navFor(getSlotService(slot))
+  const NAV = useNav(getSlotService(slot), slot.slug)
 
   /**
    * 로그아웃하면 **바로** 나간다.

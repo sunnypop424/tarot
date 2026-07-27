@@ -63,6 +63,9 @@ const WishApp = lazy(() => import('@/wish/WishApp'))
 /** 실시간 투표 — 집계가 실시간으로 흐른다 (별도 청크) */
 const PollApp = lazy(() => import('@/poll/PollApp'))
 
+/** 방문 스탬프 — 현장 암호로 도장을 모은다 (별도 청크) */
+const StampApp = lazy(() => import('@/stamp/StampApp'))
+
 /**
  * 서비스별 방문자 앱 — **`Record` 라 모든 서비스가 필수다.**
  *
@@ -82,6 +85,7 @@ const SERVICE_APPS: Record<ServiceId, ComponentType | null> = {
   photozone: PhotozoneApp,
   wish: WishApp,
   poll: PollApp,
+  stamp: StampApp,
 }
 
 /**

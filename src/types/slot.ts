@@ -5,6 +5,7 @@ import type { RollingDisplay } from '@/data/rolling'
 import type { PhotozoneDisplay } from '@/data/photozone'
 import type { WishDisplay } from '@/data/wish'
 import type { PollDisplay } from '@/data/poll'
+import type { StampDisplay } from '@/data/stamp'
 import type { ServiceId } from '@/data/services'
 import type { PlanId } from '@/data/plans'
 
@@ -132,4 +133,9 @@ export interface Slot {
    * 럭드에서 상품표가 주최자 것인 것과 같은 경계다.
    */
   poll?: Partial<PollDisplay>
+  /**
+   * 방문 스탬프 서비스의 **겉모습** — 최고관리자만 정한다 (`src/data/stamp.ts`).
+   * 현장 암호·보상 방식 같은 운영값은 **주최자**가 정한다 (`stamp_settings` 테이블).
+   */
+  stamp?: Partial<StampDisplay>
 }
