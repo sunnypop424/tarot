@@ -77,9 +77,6 @@
   .screen {
     max-width: 980px;
   }
-  .topnav__inner {
-    max-width: 980px;
-  }
 }
 
 /* ── 데스크톱 상단 네비게이션 (넓은 화면 전용) ── */
@@ -147,6 +144,12 @@
   /* 하단 탭바가 없으니 스크롤 하단 여백도 뺀다 */
   .app__scroll {
     padding-bottom: 0;
+  }
+}
+/* PC — 상단바 안쪽 폭을 콘텐츠(980)와 맞춘다 (720 규칙 뒤에 와야 이긴다) */
+@media (min-width: 1080px) {
+  .topnav__inner {
+    max-width: 980px;
   }
 }
 
