@@ -281,9 +281,14 @@
     top: 50%;
     transform: translateY(-50%);
   }
-  /* 오른쪽 정렬이면 로고·제목이 절대배치된 CTA(남기기) 아래로 겹치지 않게 CTA 폭만큼 비운다 */
+  /* 로고 오른쪽 정렬이면 CTA(남기기)를 왼쪽 끝으로 빼고, 로고는 오른쪽 끝까지 —
+     대신 왼쪽 CTA 자리만큼 비워 긴 제목이 겹치지 않게 한다 */
+  .head[data-align='right'] .headCta {
+    right: auto;
+    left: var(--layout-pad);
+  }
   .headText[data-align='right'] {
-    padding-right: 160px;
+    padding-left: 160px;
   }
   .fixedBar {
     display: none;
