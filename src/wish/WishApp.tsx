@@ -125,34 +125,37 @@ function scatter(items: RollingMessage[], canopyW: number, canopyH: number): Pla
      */
     const swingOf = (dy: number) => (dy + size.h) * Math.sin((1.8 * Math.PI) / 180) + 4
 
+    /**
+     * 후보를 여러 번 뽑아 **겹침이 가장 적은 자리**를 고른다.
+     *
+     * 처음엔 "안 겹치는 자리를 찾으면 즉시 채택, 못 찾으면 아래로 밀어 쌓기" 였는데,
+     * 화면이 짧은 폰(브라우저 주소창·하단바가 먹는다)에서는 밀 자리마저 없어
+     * **등불이 통째로 포개져 글자가 가렸다.** 최선을 고르는 방식은 그런 파국이 없다 —
+     * 자리가 빠듯하면 조금 겹칠 뿐 알아볼 수는 있게 된다.
+     */
     let left = half
     let drop = 14
-    let ok = false
-    for (let t = 0; t < 24 && !ok; t++) {
+    let bestCost = Infinity
+    for (let t = 0; t < 40; t++) {
       const dy = 14 + seeded(w.id, 37 + t * 11) * (maxDrop - 14)
       const margin = size.w / 2 + swingOf(dy)
       const lo = margin
       const hi = Math.max(margin, canopyW - margin)
       const cx = lo + seeded(w.id, 21 + t * 7) * (hi - lo)
       const box = { l: cx - size.w / 2 - PAD, r: cx + size.w / 2 + PAD, t: dy, b: dy + size.h + PAD }
-      if (!boxes.some((p) => box.l < p.r && box.r > p.l && box.t < p.b && box.b > p.t)) {
+      // 겹친 넓이의 합 — 0 이면 완전히 빈 자리다
+      let cost = 0
+      for (const p of boxes) {
+        const ox = Math.min(box.r, p.r) - Math.max(box.l, p.l)
+        const oy = Math.min(box.b, p.b) - Math.max(box.t, p.t)
+        if (ox > 0 && oy > 0) cost += ox * oy
+      }
+      if (cost < bestCost) {
+        bestCost = cost
         left = cx
         drop = dy
-        ok = true
+        if (cost === 0) break
       }
-    }
-    const lo = size.w / 2 + swingOf(drop)
-    const hi = Math.max(lo, canopyW - lo)
-    if (!ok) {
-      // 24번 다 겹쳤다 — 가로만 잡고 그 열에서 제일 아래 등불 밑으로 내린다 (가지 안에서)
-      left = lo + seeded(w.id, 91) * (hi - lo)
-      const l = left - size.w / 2 - PAD
-      const r = left + size.w / 2 + PAD
-      const below = boxes.filter((p) => l < p.r && r > p.l).map((p) => p.b)
-      drop = Math.min((below.length ? Math.max(...below) : 14) + 16, maxDrop)
-      // 줄이 길어졌으면 흔들림 폭도 커진다 — 가로를 다시 안쪽으로 당긴다
-      const m = size.w / 2 + swingOf(drop)
-      left = Math.min(Math.max(left, m), Math.max(m, canopyW - m))
     }
 
     boxes.push({

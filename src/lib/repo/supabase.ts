@@ -30,13 +30,53 @@ import type {
 type SlotRow = Slot
 
 /**
- * ⚠ **서비스 설정 컬럼을 추가하면 여기에도 반드시 넣는다.**
- * 이 목록은 하드코딩이라 빠뜨려도 타입 에러가 안 난다 — 그 슬롯의 설정이 **조용히 통째로
- * 안 읽히고** 화면은 전부 기본값으로 그려진다. 증상이 "편집기에서 저장했는데 반영이 안 돼요" 라
- * 원인을 찾기 어렵다.
+ * slots 테이블 컬럼 — **읽기 목록과 저장 행이 이 배열 하나에서 나온다.**
+ *
+ * 예전엔 select 문자열과 save 의 row 객체가 **따로 손으로 나열**돼 있었고, 그래서
+ * 포토존·소원나무를 추가할 때 select 에만 넣고 save 를 빠뜨렸다 — 결과는
+ * **"편집기에서 저장을 눌렀는데 설정이 반영되지 않는다"** 였다. 타입 에러도 안 나고
+ * 저장 요청도 성공(200)해서 원인을 찾기 어려웠다.
+ *
+ * 새 서비스 컬럼은 여기 한 줄만 더하면 읽기·쓰기가 같이 따라온다. 두 목록이 어긋날 수가 없다.
  */
-const SLOT_COLUMNS =
-  'slug, name, service, plan, limits, deck, period, theme, event, luckydraw, rolling, photozone, wish'
+const SLOT_FIELDS = [
+  'slug', 'name', 'service', 'plan', 'limits', 'deck', 'period',
+  'theme', 'event', 'luckydraw', 'rolling', 'photozone', 'wish',
+] as const
+
+/**
+ * supabase-js 는 select 문자열이 **리터럴일 때만** 결과 타입을 추론한다. 배열에서 만들면
+ * 그냥 `string` 이라 추론이 죽는다 — 그래서 읽는 쪽에서 `as unknown as SlotRow` 로 받는다.
+ * 추론을 잃는 대신 **읽기·쓰기 목록이 갈라질 수 없다**는 걸 얻는다 (위 주석의 사고 방지).
+ */
+const SLOT_COLUMNS = SLOT_FIELDS.join(', ')
+
+/**
+ * 비어 있을 때 넣을 값 — 컬럼이 전부 not null 이라 undefined 를 그대로 보내면 저장이 깨진다.
+ * 빈 객체는 "전부 기본값" 이라는 뜻이다 (각 서비스의 `{svc}Display()` 가 키 단위로 채운다).
+ */
+const SLOT_DEFAULTS: Partial<Record<(typeof SLOT_FIELDS)[number], unknown>> = {
+  service: 'tarot',
+  plan: 'free',
+  limits: {},
+  deck: 'full',
+  // 빈 기간은 {} 로 — "안 정했다" = 제한 없음 (slot_open 이 그렇게 읽는다)
+  period: {},
+  luckydraw: {},
+  rolling: {},
+  photozone: {},
+  wish: {},
+}
+
+/** 저장할 행 — 컬럼 목록에서 뽑아 만든다 (위 주석) */
+function slotRow(slot: Slot): Record<string, unknown> {
+  const out: Record<string, unknown> = {}
+  for (const f of SLOT_FIELDS) {
+    const v = (slot as unknown as Record<string, unknown>)[f]
+    out[f] = v ?? SLOT_DEFAULTS[f]
+  }
+  return out
+}
 
 /**
  * 번들된 씨앗 — **네트워크가 죽었을 때의 마지막 방어선**.
@@ -54,7 +94,7 @@ const slots: SlotRepo = {
       .select(SLOT_COLUMNS)
       .order('created_at')
     if (error) throw new Error(error.message)
-    return data as SlotRow[]
+    return data as unknown as SlotRow[]
   },
 
   async get(slug) {
@@ -66,7 +106,7 @@ const slots: SlotRepo = {
         .maybeSingle()
       if (error) throw new Error(error.message)
       // 없는 슬러그면 폴백도 안 본다 — DB 가 답했고 답은 "없다" 다
-      return (data as SlotRow | null) ?? null
+      return (data as unknown as SlotRow | null) ?? null
     } catch {
       // DB 를 못 불렀다 — 번들에 있으면 그걸로라도 연다 (색이 조금 옛것일 수 있다)
       return seedSlot(slug)
@@ -74,22 +114,7 @@ const slots: SlotRepo = {
   },
 
   async save(slot, prevSlug) {
-    const row = {
-      slug: slot.slug,
-      name: slot.name,
-      service: slot.service ?? 'tarot',
-      plan: slot.plan ?? 'free',
-      limits: slot.limits ?? {},
-      deck: slot.deck ?? 'full',
-      // 컬럼이 not null 이라 빈 기간은 {} 로 — "안 정했다" = 제한 없음 (slot_open 이 그렇게 읽는다)
-      period: slot.period ?? {},
-      theme: slot.theme,
-      event: slot.event,
-      // 타로 슬롯이면 늘 {} 다 — 컬럼이 not null 이고 빈 객체가 "전부 기본값" 이라는 뜻이다
-      luckydraw: slot.luckydraw ?? {},
-      // 롤링페이퍼도 같은 규칙 — 빈 객체면 전부 기본값 (rollingDisplay 가 키 단위로 채운다)
-      rolling: slot.rolling ?? {},
-    }
+    const row = slotRow(slot)
 
     /**
      * 슬러그를 옮기는 중이면 **update 한 문장**이다 — 새로 만들고 옛것을 지우는 게 아니다.

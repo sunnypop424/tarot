@@ -20,7 +20,8 @@
  */
 
 import { readFileSync, readdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const env = {}
 for (const line of readFileSync('.env.local', 'utf8').split('\n')) {
@@ -68,9 +69,17 @@ async function applied() {
   return new Set((Array.isArray(rows) ? rows : []).map((r) => r.name))
 }
 
-const arg = process.argv[2]
+/**
+ * **직접 실행할 때만 CLI 로 동작한다.** `import { exec }` 로 가져다 쓰는 검증 스크립트들이
+ * 있어서(verify-rewards 등), 모듈을 불러오는 것만으로 argv 를 SQL 로 실행하면 안 된다
+ * (실제로 스크린샷 경로를 SQL 로 넘겨 문법 오류가 났다).
+ */
+const isCli = process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])
+const arg = isCli ? process.argv[2] : undefined
 
-if (arg === '--pending' || arg === '--migrate' || arg === '--adopt') {
+if (!isCli) {
+  // 모듈로 불렸다 — exec 만 내주고 아무것도 실행하지 않는다
+} else if (arg === '--pending' || arg === '--migrate' || arg === '--adopt') {
   const done = await applied()
   const pending = files().filter((f) => !done.has(f))
 
