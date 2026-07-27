@@ -42,7 +42,8 @@
 @media (min-width: 720px) {
   .reading {
     flex-direction: row;
-    align-items: flex-start;
+    /* 카드와 해석을 세로 가운데로 */
+    align-items: center;
     gap: var(--space-xl);
   }
   .cardSide {
