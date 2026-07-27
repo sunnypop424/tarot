@@ -115,6 +115,7 @@ export function ShippingForm({ slug, prizes, onClose }: Props) {
 
               <label className={styles.agree}>
                 <input
+                  className={styles.check}
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}

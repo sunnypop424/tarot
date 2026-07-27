@@ -1120,6 +1120,53 @@
   cursor: pointer;
 }
 
+/**
+ * 커스텀 체크박스 — 브라우저 기본은 슬롯 색을 안 입어 모달 안에서 떠 보인다.
+ * appearance 를 지우고 네모+체크로 다시 그린다. 체크 표시는 회전한 사각형의
+ * 오른/아래 두 변(::after)으로 만든다. 색은 슬롯 primary/on-primary 를 따른다.
+ * 테두리는 모달 테두리색(modalNoBorder 로 투명해질 수 있다)이 아니라 늘 보이는
+ * 테마 border-hover 를 써서, 테두리 없음 모달에서도 체크칸은 또렷하다.
+ */
+.check {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin: 1px 0 0;
+  border: 2px solid var(--color-border-hover);
+  border-radius: var(--radius-sm);
+  background: var(--ld-modal-item, var(--color-surface));
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.check::after {
+  content: '';
+  width: 6px;
+  height: 11px;
+  margin-top: -2px;
+  border: solid var(--color-on-primary);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.15s ease;
+}
+.check:checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.check:checked::after {
+  transform: rotate(45deg) scale(1);
+}
+.check:hover:not(:checked) {
+  border-color: var(--color-primary);
+}
+.check:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .agreeText {
   display: flex;
   flex-direction: column;
