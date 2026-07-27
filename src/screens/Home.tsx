@@ -101,16 +101,19 @@ function PeriodEmpty({ category }: { category: Category }) {
       >
         <CardBack />
       </button>
-      <p className="t-text-l">{category.label} 카드가 당신을 기다리고 있어요</p>
-      {/* 기간 라벨은 세 세그먼트 모두 같은 자리에 — 없으면 버튼이 위아래로 움직인다 */}
-      <p className="t-text-xs t-muted">{category.periodLabel?.()}</p>
-      <button
-        type="button"
-        className={`btn btn--sm btn--primary btn--glow ${styles.emptyCta}`}
-        onClick={go}
-      >
-        카드 뽑기
-      </button>
+      {/* 넓은 화면에선 카드 오른쪽에 세로로 붙는 히어로 텍스트 (모바일은 카드 아래 가운데) */}
+      <div className={styles.emptyBody}>
+        <p className="t-text-l">{category.label} 카드가 당신을 기다리고 있어요</p>
+        {/* 기간 라벨은 세 세그먼트 모두 같은 자리에 — 없으면 버튼이 위아래로 움직인다 */}
+        <p className="t-text-xs t-muted">{category.periodLabel?.()}</p>
+        <button
+          type="button"
+          className={`btn btn--sm btn--primary btn--glow ${styles.emptyCta}`}
+          onClick={go}
+        >
+          카드 뽑기
+        </button>
+      </div>
     </div>
   )
 }
