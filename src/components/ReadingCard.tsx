@@ -26,7 +26,6 @@ interface ReadingCardProps {
  */
 export function ReadingCard({
   drawn,
-  position,
   aspect,
   brief = false,
   verdict,
@@ -39,9 +38,8 @@ export function ReadingCard({
 
   return (
     <section ref={ref} className={styles.reading}>
-      {/* 카드 쪽 — 넓은 화면에선 왼쪽, 모바일에선 위 */}
+      {/* 카드 쪽 — 넓은 화면에선 왼쪽, 모바일에선 위. 포지션 라벨은 안 보여준다 (군더더기) */}
       <div className={styles.cardSide}>
-        {position && <p className="t-title-s t-primary t-center">{position}</p>}
         <FlipCard drawn={drawn} flipped={inView} className={styles.card} />
       </div>
 

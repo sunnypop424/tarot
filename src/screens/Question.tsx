@@ -54,7 +54,7 @@ function QuestionFlow({ question }: { question: QuestionType }) {
   }
 
   return (
-    <div className="screen">
+    <div className={`screen ${styles.resultScreen}`}>
       {/* 리드는 다른 화면과 같은 모양·같은 자리 — 뽑기 화면에서 넘어와도 어긋나지 않게 */}
       <h1 className="t-title-l screen__title">질문 타로</h1>
       <p className="t-text-m screen__lead">{question.question}</p>

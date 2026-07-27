@@ -159,7 +159,7 @@ function Result({ category, drawn, synthesis, onRedraw, onDone }: ResultProps) {
   const positions = positionsFor(category, drawn.length)
 
   return (
-    <div className="screen">
+    <div className={`screen ${styles.resultScreen}`}>
       <h1 className="t-title-l screen__title">{category.label}</h1>
       {category.renews && <p className="t-text-xs t-muted screen__lead">{category.renews}</p>}
 

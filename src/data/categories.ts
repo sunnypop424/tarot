@@ -134,7 +134,7 @@ export const CATEGORIES: Category[] = [
     label: '예 / 아니오',
     desc: '가장 단순한 답',
     icon: Scale,
-    spreads: { 1: ['답'] },
+    spreads: { 1: [''] },
     defaultCount: 1,
     aspect: 'general',
     prompt: '예 또는 아니오로 답할 수 있는 질문을 떠올려 보세요.',

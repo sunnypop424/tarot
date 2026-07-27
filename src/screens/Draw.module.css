@@ -6,9 +6,16 @@
   gap: var(--space-xl);
   padding-bottom: var(--space-lg);
 }
-/* 넓은 화면 — 카드 옆에 해석(ReadingCard 2열), 종합은 그 아래. 읽기 좋은 폭으로 가운데 */
+/* 넓은 화면 — 타이틀 위·버튼 아래 고정, 내용은 세로 가운데. 카드 옆 해석(ReadingCard 2열) */
 @media (min-width: 720px) {
+  .resultScreen {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
   .results {
+    flex: 1;
+    justify-content: center;
     max-width: 720px;
     margin-inline: auto;
     width: 100%;
@@ -21,13 +28,16 @@
   gap: var(--space-md);
   margin-top: var(--space-base);
 }
-/* 넓은 화면 — 버튼을 한 줄로 나란히, 가운데. btn--block(100%)을 풀어 auto 폭으로 */
+/* 넓은 화면 — 버튼을 한 줄로, 총너비는 카드 선택 페이지 액션과 같게(460) 가운데 */
 @media (min-width: 720px) {
   .resultActions {
     flex-direction: row;
     justify-content: center;
+    align-self: center;
+    width: 100%;
+    max-width: 460px;
   }
-  .resultActions > * {
-    width: auto;
+  .resultActions > :global(.btn) {
+    flex: 1;
   }
 }
