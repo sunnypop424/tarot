@@ -196,6 +196,54 @@
   gap: var(--space-sm);
 }
 
+/* ── 형태 radius — 시안: 라벨 · 슬라이더 · 숫자 · px · 미리보기 박스 ── */
+.radiusList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.radiusRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.radiusLabel {
+  flex-shrink: 0;
+  width: 110px;
+  font-size: 12.5px;
+  color: var(--color-fg-2);
+}
+.radiusSlider {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+.radiusNum {
+  width: 56px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 1px solid var(--color-field-border);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 12.5px;
+  outline: none;
+  background: var(--color-surface);
+  color: var(--color-fg-1);
+}
+.radiusUnit {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  color: var(--color-fg-3);
+}
+.radiusPreview {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  background: #eeeeee;
+  border: 1px solid var(--color-field-border);
+}
+
 /* ── 슬롯 목록 ────────────────────────────────────── */
 
 /* 업로드한 앱 아이콘 썸네일 (시안) — 없으면 .swatch 색 견본 */

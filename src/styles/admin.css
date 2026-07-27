@@ -358,6 +358,18 @@
   border: none;
   border-right: 1px solid var(--color-border);
   border-radius: 0;
+  /* 네이티브 색 버튼의 둥근 크롬을 없애 시안의 평평한 스와치로 */
+  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+.color-field--hex input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.color-field--hex input[type='color']::-webkit-color-swatch {
+  border: none;
+  border-radius: 0;
 }
 .color-field--hex input.input {
   width: 86px;

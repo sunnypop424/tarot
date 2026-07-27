@@ -12,7 +12,6 @@ import {
   Settings,
   Smartphone,
   Sparkles,
-  Square,
 } from 'lucide-react'
 
 import defaultThemeJson from '@/data/slot-default.json'
@@ -495,10 +494,6 @@ const SHAPE_LABELS: Record<keyof ThemeShape, string> = {
  * radiusLg 만 힌트가 있는 이유: 입력값이 **카드 크기에 따라 달라지기** 때문이다.
  * 안 밝히면 "16 을 넣었는데 덱 카드는 왜 안 둥그냐" 가 된다 (`lib/card.ts`).
  */
-const SHAPE_HINTS: Partial<Record<keyof ThemeShape, string>> = {
-  radiusLg:
-    '홈의 오늘·주간·월간 카드 기준이에요 (px). 덱·도감처럼 작은 카드는 크기에 맞춰 자동으로 줄어들어요.',
-}
 
 /**
  * 바탕 계열 프리셋 — 배경·표면·텍스트 9개만 밝은/어두운 쪽으로 한 번에 스왑한다.
@@ -1445,70 +1440,74 @@ export function SlotEditor() {
               </div>
             </section>
 
-            {COLOR_GROUPS.filter((g) =>
-              g.services.includes(getSlotService(draft))
-            ).map(({ title, keys, hint }) => (
-              <section key={title} className="admin-section" style={{ order: 6 }}>
-                <h2 className="t-title-s admin-section__title">
-                  <Palette size={15} strokeWidth={2} aria-hidden="true" />
-                  {title}
-                </h2>
-                {hint && (
-                  <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                    {hint}
-                  </p>
-                )}
-                <div className="form-grid">
-                  {keys.map((key) => (
-                    <div key={key} className="color-item">
-                      <span className="color-item__text">
-                        <label className="field__label" htmlFor={`c-${key}`}>
-                          {COLOR_LABELS[key]}
-                        </label>
-                      </span>
-                      <div className="color-field color-field--hex">
-                        <input
-                          type="color"
-                          value={draft.theme.colors[key]}
-                          onChange={(e) => patchColor(key, e.target.value)}
-                          aria-label={`${COLOR_LABELS[key]} 색 고르기`}
-                        />
-                        <input
-                          id={`c-${key}`}
-                          className="input"
-                          value={draft.theme.colors[key]}
-                          onChange={(e) => patchColor(key, e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))}
-
-            {/* 럭키드로우는 박스·버튼 카드 안에서 각각 고친다 — 여기 두면 같은 값이 두 군데 뜬다 */}
+            {/* 테마 색 · 형태 — 시안대로 한 카드에 색 그리드 + radius 슬라이더 (럭드는 자기 색 카드가 따로) */}
             {!luckydraw && (
-            <section className="admin-section" style={{ order: 7 }}>
+            <section className="admin-section" style={{ order: 6 }}>
               <h2 className="t-title-s admin-section__title">
-                <Square size={15} strokeWidth={2} aria-hidden="true" />
-                형태 (radius)
+                <Palette size={15} strokeWidth={2} aria-hidden="true" />
+                테마 색 · 형태
               </h2>
-              <div className="form-grid">
+              {(() => {
+                const colorKeys = COLOR_GROUPS.filter((g) =>
+                  g.services.includes(getSlotService(draft))
+                ).flatMap((g) => g.keys)
+                if (colorKeys.length === 0) return null
+                return (
+                  <div className="form-grid" style={{ marginBottom: 'var(--space-lg)' }}>
+                    {colorKeys.map((key) => (
+                      <div key={key} className="color-item">
+                        <span className="color-item__text">
+                          <label className="field__label" htmlFor={`c-${key}`}>
+                            {COLOR_LABELS[key]}
+                          </label>
+                        </span>
+                        <div className="color-field color-field--hex">
+                          <input
+                            type="color"
+                            value={draft.theme.colors[key]}
+                            onChange={(e) => patchColor(key, e.target.value)}
+                            aria-label={`${COLOR_LABELS[key]} 색 고르기`}
+                          />
+                          <input
+                            id={`c-${key}`}
+                            className="input"
+                            value={draft.theme.colors[key]}
+                            onChange={(e) => patchColor(key, e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
+              <div className={styles.radiusList}>
                 {(Object.keys(SHAPE_LABELS) as (keyof ThemeShape)[]).map((key) => (
-                  <div key={key} className="field">
-                    <label className="field__label" htmlFor={`s-${key}`}>
-                      {SHAPE_LABELS[key]}
-                    </label>
+                  <div key={key} className={styles.radiusRow}>
+                    <span className={styles.radiusLabel}>{SHAPE_LABELS[key]}</span>
+                    <input
+                      type="range"
+                      min={0}
+                      max={28}
+                      className={styles.radiusSlider}
+                      value={draft.theme.shape[key]}
+                      aria-label={SHAPE_LABELS[key]}
+                      onChange={(e) => patchShape(key, Number(e.target.value))}
+                    />
                     <input
                       id={`s-${key}`}
-                      className="input"
+                      className={styles.radiusNum}
                       type="number"
                       min={0}
                       max={40}
                       value={draft.theme.shape[key]}
                       onChange={(e) => patchShape(key, Number(e.target.value))}
                     />
-                    {SHAPE_HINTS[key] && <span className="field__hint">{SHAPE_HINTS[key]}</span>}
+                    <span className={styles.radiusUnit}>px</span>
+                    <span
+                      className={styles.radiusPreview}
+                      style={{ borderRadius: draft.theme.shape[key] }}
+                      aria-hidden="true"
+                    />
                   </div>
                 ))}
               </div>
