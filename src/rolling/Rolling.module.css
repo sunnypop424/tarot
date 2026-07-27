@@ -281,6 +281,10 @@
     top: 50%;
     transform: translateY(-50%);
   }
+  /* 오른쪽 정렬이면 로고·제목이 절대배치된 CTA(남기기) 아래로 겹치지 않게 CTA 폭만큼 비운다 */
+  .headText[data-align='right'] {
+    padding-right: 160px;
+  }
   .fixedBar {
     display: none;
   }

@@ -108,6 +108,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
       <header className={styles.head}>
         <div
           className={styles.headText}
+          data-align={display.logoAlign}
           style={{ textAlign: display.logoAlign, marginTop: display.logoMarginTop || undefined }}
         >
           {display.logo ? (
