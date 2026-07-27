@@ -57,11 +57,39 @@ function Wish({ slot }: { slot: Slot }) {
   return composing ? <Compose slot={slot} display={display} /> : <Tree slot={slot} display={display} />
 }
 
-/** id 로 위치·흔들림을 안정적으로 파생 (렌더마다 안 흔들리게 — 롤페 `seeded` 와 같은 결) */
+const idHash = new Map<string, number>()
+
+/** FNV-1a — id 한 번만 접어둔다 (같은 id 로 수백 번 부르므로 캐시한다) */
+function hashOf(id: string): number {
+  const hit = idHash.get(id)
+  if (hit !== undefined) return hit
+  let h = 2166136261
+  for (let i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  const out = h >>> 0
+  idHash.set(id, out)
+  return out
+}
+
+/**
+ * id + salt → 0~1. **렌더마다 안 흔들리게** 값을 id 에서 파생한다 (`Math.random()` 을 쓰면
+ * 새로고침할 때마다 나무가 재배치된다).
+ *
+ * 처음엔 롤페처럼 `salt` 를 앞에 곱하고 문자마다 `*31 % 100000` 을 돌렸는데,
+ * **salt 를 바꿔도 결과가 촘촘한 등차수열처럼 나와** 자리 후보가 한쪽에 뭉쳤다 —
+ * 시도를 200번으로 늘려도 겹침이 안 줄던 이유가 그것이었다(탐색이 아니라 분포 문제).
+ * salt 를 **뒤에서** 섞고 murmur3 마무리로 비트를 흩는다.
+ */
 function seeded(id: string, salt: number): number {
-  let h = salt * 131
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 100000
-  return (h % 1000) / 1000
+  let x = (hashOf(id) ^ Math.imul(salt, 0x9e3779b1)) >>> 0
+  x ^= x >>> 16
+  x = Math.imul(x, 0x7feb352d)
+  x ^= x >>> 15
+  x = Math.imul(x, 0x846ca68b)
+  x ^= x >>> 16
+  return (x >>> 0) / 4294967296
 }
 
 interface Placed {
@@ -106,7 +134,13 @@ function scatter(items: RollingMessage[], canopyW: number, canopyH: number): Pla
      * 높이가 또 달라져서 실제로는 다 달라 보인다. 폭까지 두 값만 쓰면 그 인상이 안 나온다.
      * 세로:가로 비율은 시안의 106/96·126/116(≈1.09)을 따른다.
      */
-    const sw = Math.round(92 + seeded(w.id, 13) * 34)
+    /**
+     * 크기를 **화면 폭에 비례**시킨다. 시안은 390px 폭에 96~116px 이라 폭의 24.6~29.7% 다.
+     * 절대값으로 두면 360px 폰에서 등불이 상대적으로 커져 한 화면에 서너 개밖에 못 건다
+     * (실제로 그랬다). 아주 넓은 화면에서는 커지기만 하면 우스워지므로 위아래로 자른다.
+     */
+    const ratio = 0.246 + seeded(w.id, 13) * 0.051
+    const sw = Math.round(Math.min(Math.max(canopyW * ratio, 84), 132))
     // 높이는 CSS 에서 `height` 로 못박힌다 — 여기 값이 곧 실제 크기여야 겹침 판정이 맞는다
     const size = { w: sw, h: Math.round(sw * 1.09) }
     const half = size.w / 2 + 10
@@ -137,8 +171,11 @@ function scatter(items: RollingMessage[], canopyW: number, canopyH: number): Pla
     let left = half
     let drop = 14
     let bestCost = Infinity
-    // 80번까지 뽑아본다 — 전부 id 에서 파생한 결정적 계산이라 비용이 사실상 없다
-    for (let t = 0; t < 80; t++) {
+    /**
+     * 200번까지 뽑아본다. 전부 id 에서 파생한 결정적 계산이라 비용이 사실상 없고
+     * (등불 20개여도 4천 번), 시도가 적으면 넓은 화면에서 빈자리를 못 찾아 겹친다.
+     */
+    for (let t = 0; t < 200; t++) {
       const dy = 14 + seeded(w.id, 37 + t * 11) * (maxDrop - 14)
       const margin = size.w / 2 + swingOf(dy)
       const lo = margin
@@ -313,8 +350,12 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
    * 뽑아도 안 겹치는 곳이 없어 결국 포개진다. 0.30 은 "화면의 30%만 등불" 이라는 뜻으로,
    * 시안 모바일(390×약600 에 일곱 개)과 비슷한 여백감이다.
    */
-  const AVG_LANTERN = 109 * 119
-  const perPage = Math.max(3, Math.floor((canopy.w * canopy.h * 0.3) / AVG_LANTERN))
+  /**
+   * 0.36 은 **시안의 밀도** 그대로다: 390×600 가지에 96~116px 등불 일곱 개 ≈ 화면의 36%.
+   * 등불 크기도 폭에 비례하므로(`scatter`), 기기가 달라져도 보이는 개수가 비슷하게 유지된다.
+   */
+  const avgW = Math.min(Math.max(canopy.w * 0.271, 84), 132)
+  const perPage = Math.max(3, Math.floor((canopy.w * canopy.h * 0.36) / (avgW * avgW * 1.09)))
   const paged = usePaged(list, perPage)
 
   const placed = useMemo(
