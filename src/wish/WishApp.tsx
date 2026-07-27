@@ -1,0 +1,695 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { ChevronLeft, Lamp, Settings } from 'lucide-react'
+
+import { useSlotState } from '@/slot/SlotProvider'
+import { wishDisplay, type WishDisplay } from '@/data/wish'
+import { fontStack, fontStyle, loadWebfont, HANDWRITING_FONTS, WEBFONTS } from '@/data/fonts'
+import { repo } from '@/lib/repo'
+import { Pager, usePaged } from '@/components/Pager'
+import { isLight } from '@/lib/color'
+import { cssUrl } from '@/lib/image'
+import type { RollingMessage } from '@/lib/repo/types'
+import type { Slot } from '@/types/slot'
+import styles from './Wish.module.css'
+
+/**
+ * 소원 나무 — 방문자가 소원을 적어 **등불**로 나무에 매단다.
+ * 화면은 claude.ai/design 시안 '소원 나무 방문자' 를 옮긴 것이다.
+ *
+ * **데이터는 롤링페이퍼와 공유한다** (`repo.rolling` · `rolling_messages`). 소원 하나는
+ * 롤페 메시지 하나와 모양이 정확히 같고, 다른 건 그리는 방법뿐이다. 필드 셋을 재해석해 쓴다:
+ * `color`→등불 색 · `font`→손글씨 · `sticker`→매다는 장식 (`src/data/wish.ts` 주석).
+ *
+ * 화면이 둘이다: **나무**(`/{slug}`)와 **소원 적기**(`/{slug}/write`) — 롤페와 같은 방식이다.
+ */
+export default function WishApp() {
+  const state = useSlotState()
+  if (state.status === 'loading') return <div className="app" aria-busy="true" />
+  if (state.status === 'missing') return null
+  return <Wish slot={state.slot} />
+}
+
+/** 슬롯이 정한 색·폰트를 CSS 변수로 — 나무·작성이 같은 값을 쓴다 */
+function useWishVars(d: WishDisplay): React.CSSProperties {
+  return {
+    ['--wt-font' as string]: fontStack(d.font),
+    ['--wt-head' as string]: d.headText,
+    ['--wt-sub' as string]: d.subText,
+    ['--wt-body' as string]: d.wishBody,
+    ['--wt-name' as string]: d.wishName,
+    ['--wt-sky' as string]: d.skyBg,
+    ['--wt-btn' as string]: d.buttonColor,
+    // 버튼 글자색은 고르게 하지 않는다 — 버튼색 밝기에서 파생한다 (readableShade 와 같은 결)
+    ['--wt-btnFg' as string]: isLight(d.buttonColor) ? '#1f1f1f' : '#ffffff',
+  }
+}
+
+function Wish({ slot }: { slot: Slot }) {
+  const location = useLocation()
+  const display = useMemo(() => wishDisplay(slot), [slot])
+  const composing = location.pathname.replace(/\/+$/, '').endsWith('/write')
+
+  useEffect(() => {
+    loadWebfont(display.font)
+  }, [display.font])
+
+  return composing ? <Compose slot={slot} display={display} /> : <Tree slot={slot} display={display} />
+}
+
+/** id 로 위치·흔들림을 안정적으로 파생 (렌더마다 안 흔들리게 — 롤페 `seeded` 와 같은 결) */
+function seeded(id: string, salt: number): number {
+  let h = salt * 131
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 100000
+  return (h % 1000) / 1000
+}
+
+interface Placed {
+  w: RollingMessage
+  /** 가지에서 이 등불 중심까지의 가로 위치(px) */
+  left: number
+  /** 줄 길이(px) — 이게 제각각이라 높낮이가 생긴다 */
+  drop: number
+  size: { w: number; h: number }
+  dur: string
+  delay: string
+  glowDur: string
+}
+
+/**
+ * 등불을 **흩뿌린다** — 시안의 손배치를 개수에 상관없이 재현하는 규칙.
+ *
+ * 행·열로 묶으면 소원이 몇 개든 격자로 보인다(실제로 그렇게 보였다). 시안은 좌표를 손으로
+ * 찍어 제각각인데, 그 좌표는 **딱 7개일 때만** 맞는다. 그래서 시안의 *성질* 을 규칙으로 옮긴다:
+ *
+ *  · 가로·세로 모두 등불마다 따로 뽑는다 (열 중심 같은 건 없다)
+ *  · 크기는 두 종류(96×106 / 116×126)를 섞는다 — 시안도 약 40% 가 크다
+ *  · **겹치면 다시 뽑는다.** 후보를 24번까지 뽑아보고 안 되면 그 자리 아래로 내린다.
+ *    이 한 가지가 "손으로 건 것 같다" 와 "그냥 겹쳐 놨다" 를 가른다.
+ *
+ * 값은 전부 메시지 id 에서 파생한다 — 새로고침해도 자리가 안 바뀌고, 소원이 하나 늘어도
+ * 남의 등불이 안 움직인다 (`Math.random()` 을 쓰면 렌더마다 나무가 재배치된다).
+ */
+function scatter(items: RollingMessage[], canopyW: number, canopyH: number): Placed[] {
+  /**
+   * **음수다 — 살짝 겹치는 걸 허용한다.** 시안 모바일도 2·3번 등불이 16px 겹친다.
+   * 전혀 안 겹치게 하면 등불 사이가 훤해져 "나무에 걸린" 게 아니라 "칸마다 놓인" 것처럼 보인다.
+   * 충돌 상자를 실제 등불보다 이만큼 좁게 잡아 그 정도까지는 붙을 수 있게 둔다.
+   */
+  const PAD = -6
+  const out: Placed[] = []
+  const boxes: { l: number; r: number; t: number; b: number }[] = []
+
+  for (const w of items) {
+    /**
+     * 크기를 **연속으로** 흩는다. 시안은 두 종류(96/116)지만 min-height 라 글 길이에 따라
+     * 높이가 또 달라져서 실제로는 다 달라 보인다. 폭까지 두 값만 쓰면 그 인상이 안 나온다.
+     * 세로:가로 비율은 시안의 106/96·126/116(≈1.09)을 따른다.
+     */
+    const sw = Math.round(92 + seeded(w.id, 13) * 34)
+    const size = { w: sw, h: Math.round(sw * 1.09) }
+    const half = size.w / 2 + 10
+    /**
+     * **줄 길이는 가지 높이 안으로 자른다.** 안 자르면 아래쪽 등불이 화면 밖으로 나가
+     * 잘린 채 보인다 (`.tree` 가 overflow:hidden 이라 스크롤도 안 된다).
+     * 한 화면에 안 들어가는 만큼은 다음 페이지로 넘긴다 — 그게 페이지를 나눈 이유다.
+     */
+    const maxDrop = Math.max(14, canopyH - size.h - 14)
+
+    /**
+     * **줄이 길수록 좌우로 더 크게 흔들린다.** 흔들림은 `.hang` 전체를 줄 맨 위를 축으로
+     * ±1.8° 돌리는 거라, 축에서 먼 아래쪽일수록 이동량이 커진다 (drop 500px 이면 약 19px).
+     * 이걸 안 보고 여백을 고정하면 **긴 줄에 걸린 등불만 가장자리를 넘어 잘린다** — 실제로
+     * iPhone 15 Pro Max·iPad mini 에서 그렇게 잘렸다. 시안은 줄이 짧아(≤268px) 안 드러난 문제다.
+     * 진짜 등불도 줄이 길면 더 크게 흔들리니 물리적으로도 맞다.
+     */
+    const swingOf = (dy: number) => (dy + size.h) * Math.sin((1.8 * Math.PI) / 180) + 4
+
+    let left = half
+    let drop = 14
+    let ok = false
+    for (let t = 0; t < 24 && !ok; t++) {
+      const dy = 14 + seeded(w.id, 37 + t * 11) * (maxDrop - 14)
+      const margin = size.w / 2 + swingOf(dy)
+      const lo = margin
+      const hi = Math.max(margin, canopyW - margin)
+      const cx = lo + seeded(w.id, 21 + t * 7) * (hi - lo)
+      const box = { l: cx - size.w / 2 - PAD, r: cx + size.w / 2 + PAD, t: dy, b: dy + size.h + PAD }
+      if (!boxes.some((p) => box.l < p.r && box.r > p.l && box.t < p.b && box.b > p.t)) {
+        left = cx
+        drop = dy
+        ok = true
+      }
+    }
+    const lo = size.w / 2 + swingOf(drop)
+    const hi = Math.max(lo, canopyW - lo)
+    if (!ok) {
+      // 24번 다 겹쳤다 — 가로만 잡고 그 열에서 제일 아래 등불 밑으로 내린다 (가지 안에서)
+      left = lo + seeded(w.id, 91) * (hi - lo)
+      const l = left - size.w / 2 - PAD
+      const r = left + size.w / 2 + PAD
+      const below = boxes.filter((p) => l < p.r && r > p.l).map((p) => p.b)
+      drop = Math.min((below.length ? Math.max(...below) : 14) + 16, maxDrop)
+      // 줄이 길어졌으면 흔들림 폭도 커진다 — 가로를 다시 안쪽으로 당긴다
+      const m = size.w / 2 + swingOf(drop)
+      left = Math.min(Math.max(left, m), Math.max(m, canopyW - m))
+    }
+
+    boxes.push({
+      l: left - size.w / 2 - PAD,
+      r: left + size.w / 2 + PAD,
+      t: drop,
+      b: drop + size.h + PAD,
+    })
+    out.push({
+      w,
+      left,
+      drop,
+      size,
+      dur: `${(5.5 + seeded(w.id, 3) * 3).toFixed(2)}s`,
+      delay: `-${(seeded(w.id, 5) * 4).toFixed(2)}s`,
+      glowDur: `${(3.4 + seeded(w.id, 17) * 2.6).toFixed(2)}s`,
+    })
+  }
+  return out
+}
+
+/** 밤하늘·별·가지 — 슬롯이 배경 이미지를 올리면 그게 대신한다 */
+function Sky({ hasImage }: { hasImage: boolean }) {
+  if (hasImage) return null
+  return (
+    <>
+      <div className={styles.sky} aria-hidden="true" />
+      <div className={styles.stars} aria-hidden="true" />
+      <div className={styles.branch} aria-hidden="true" />
+    </>
+  )
+}
+
+/** 등불 한 개 — 줄 · 빛번짐 · 몸통. 위치는 부모가 인라인 변수로 준다 */
+function Lantern({
+  wish,
+  display,
+  w = 96,
+  h = 106,
+}: {
+  wish: RollingMessage
+  display: WishDisplay
+  w?: number
+  h?: number
+}) {
+  const color = wish.color || display.lanterns[0] || '#efe8cd'
+  const shaped = !!display.lanternShape
+  return (
+    <div
+      className={styles.lantern}
+      data-shaped={shaped || undefined}
+      data-wish-lantern
+      style={{
+        ['--lantern' as string]: color,
+        ['--w' as string]: `${w}px`,
+        ['--h' as string]: `${h}px`,
+        ...(shaped
+          ? { WebkitMaskImage: cssUrl(display.lanternShape), maskImage: cssUrl(display.lanternShape) }
+          : {}),
+      }}
+    >
+      <p className={styles.body} style={fontStyle(wish.font, '12px')}>
+        {wish.body}
+      </p>
+      {wish.nickname && (
+        <div className={styles.name} style={fontStyle(wish.font, '10px')}>
+          — {wish.nickname}
+        </div>
+      )}
+      {wish.sticker && (
+        <span className={styles.charm} style={{ backgroundImage: cssUrl(wish.sticker) }} aria-hidden="true" />
+      )}
+    </div>
+  )
+}
+
+/**
+ * 폭에 따라 가로로 몇 개나 걸지 — 넓어지면 가지가 퍼진다 (시안 ③④).
+ *
+ * 모바일에서 3열을 쓰면 등불 하나가 100px 도 못 받아 글씨가 두 줄에서 잘리고, 옆 등불과
+ * 빛번짐이 겹쳐 배경이 하얗게 뜬다. **한 등불이 최소 130px 은 받도록** 열 수를 정한다.
+ */
+function colsFor(width: number): number {
+  return Math.max(2, Math.min(7, Math.floor(width / 150)))
+}
+
+function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
+  const { slug } = slot
+  const navigate = useNavigate()
+  const vars = useWishVars(display)
+  const [wishes, setWishes] = useState<RollingMessage[]>([])
+
+  useEffect(() => {
+    let alive = true
+    const load = () =>
+      void repo.rolling
+        .list(slug)
+        .then((m) => {
+          if (alive) setWishes(m)
+        })
+        .catch(() => {})
+    load()
+    const stop = repo.rolling.watch(slug, load)
+    return () => {
+      alive = false
+      stop()
+    }
+  }, [slug])
+
+  // 편집기 미리보기(iframe)에선 소원이 없어도 샘플로 등불 색·글씨체를 보여준다 (롤페와 같은 장치)
+  const inPreview = typeof window !== 'undefined' && window.parent !== window
+  const list = useMemo(
+    () => (wishes.length > 0 ? wishes : inPreview ? sampleWishes(display) : []),
+    [wishes, inPreview, display]
+  )
+  useEffect(() => {
+    for (const w of list) if (w.font) loadWebfont(w.font)
+  }, [list])
+
+  // 가지 폭에 따라 열 수가 는다 — 모바일 확대판이 아니라 넓은 나무가 되게
+  const [canopy, setCanopy] = useState({ w: 390, h: 520 })
+  const roRef = useRef<ResizeObserver | null>(null)
+  /**
+   * **콜백 ref 여야 한다.** `useRef` + `useEffect([])` 로 붙이면, 소원을 아직 못 받아온
+   * 첫 렌더에는 가지 요소가 없어(빈 상태를 그린다) 관찰이 영영 안 걸린다 —
+   * 그 결과 폭이 초기값 390 에 멈춰 태블릿·데스크톱이 모바일 배치를 그대로 쓴다.
+   */
+  const canopyRef = useCallback((el: HTMLDivElement | null) => {
+    roRef.current?.disconnect()
+    if (!el) return
+    const ro = new ResizeObserver(([e]) =>
+      setCanopy({ w: e.contentRect.width, h: e.contentRect.height })
+    )
+    ro.observe(el)
+    roRef.current = ro
+  }, [])
+  useEffect(() => () => roRef.current?.disconnect(), [])
+  const cols = colsFor(canopy.w)
+
+  /**
+   * **격자가 아니라 흩뿌린다.** 열·행으로 자리를 잡되 그 안에서 좌우로 흔들고 줄 길이를
+   * 제각각으로 준다 — 시안의 인상이 여기서 나온다. 값은 id 에서 파생해 새로고침해도 안 바뀐다.
+   */
+  /**
+   * 값은 시안의 손배치를 재현하도록 맞췄다 (`lanternsM` 의 x·drop 분포):
+   *  · 줄 길이가 한 띠 안에서 **70px 까지 벌어진다** — 이게 높낮이의 정체다.
+   *    띠 간격(128)보다 좁게 잡아 띠끼리 살짝 겹치게 두면 줄 맞춘 티가 사라진다.
+   *  · 가로도 열 중심에서 좌우로 흔든다.
+   *  · 크기는 두 종류(96/116)를 섞는다 — 시안도 약 40% 가 큰 등불이다.
+   * 전부 id 에서 파생해 새로고침해도 안 바뀌고, 소원이 하나 늘어도 남의 자리가 안 흔들린다.
+   */
+  /**
+   * **한 화면에 세 줄만 건다.** 소원이 쌓여도 스크롤이 끝없이 길어지지 않고, 등불마다 붙는
+   * 흔들림·빛번짐도 그만큼만 돈다. 폭이 넓어지면 열이 늘어 한 페이지에 더 걸린다.
+   */
+  /**
+   * **한 페이지 = 한 화면.** 가지에 실제로 들어가는 만큼만 걸고 나머지는 다음 페이지로 넘긴다.
+   * 이렇게 해야 줄이 화면 밖으로 안 나가고(잘려 보인다), 등불마다 붙는 흔들림·빛번짐도
+   * 눈에 보이는 것만 돈다. 시안 모바일이 한 화면에 일곱 개다.
+   */
+  const perPage = Math.max(3, cols * Math.max(2, Math.round(canopy.h / 170)))
+  const paged = usePaged(list, perPage)
+
+  const placed = useMemo(
+    () => scatter(paged.items, canopy.w, canopy.h),
+    [paged.items, canopy.w, canopy.h]
+  )
+
+  /**
+   * **화면에 들어온 등불만 흔든다.** 롤페 벽엔 없던 장치다: 포스트잇은 정적이라 300장이 떠
+   * 있어도 그리기만 하면 끝이지만, 등불은 각자 흔들림+빛번짐이라 전부 돌리면 모바일이 죽는다.
+   */
+  const io = useRef<IntersectionObserver | null>(null)
+  const observe = useCallback((el: HTMLDivElement | null) => {
+    if (!el) return
+    if (!io.current) {
+      io.current = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) (e.target as HTMLElement).dataset.live = String(e.isIntersecting)
+        },
+        // 화면 밖 200px 까지 미리 켜둔다 — 스크롤하다 딱 멈추는 게 보이지 않게
+        { rootMargin: '200px 0px' }
+      )
+    }
+    io.current.observe(el)
+  }, [])
+  useEffect(() => () => io.current?.disconnect(), [])
+
+  const hasBg = !!display.treeBg
+
+  return (
+    <div
+      className={`app ${styles.tree}`}
+      /* 슬롯이 흔들림을 끄면 여기서 통째로 멈춘다 (움직임에 민감한 분들을 위한 설정) */
+      data-sway={display.sway ? 'on' : 'off'}
+      style={{
+        ...vars,
+        ...(hasBg
+          ? {
+              backgroundImage: cssUrl(display.treeBg),
+              backgroundRepeat: display.treeBgRepeat ? 'repeat' : 'no-repeat',
+              backgroundSize: display.treeBgRepeat ? 'auto' : 'cover',
+            }
+          : {}),
+      }}
+    >
+      <Sky hasImage={hasBg} />
+
+      {/* 헤더 — 롤페와 같은 규칙: 로고가 제목을 대신하고 정렬은 슬롯이 정한다 */}
+      <header className={styles.head}>
+        <div
+          className={styles.headText}
+          style={{ textAlign: display.logoAlign, marginTop: display.logoMarginTop || undefined }}
+        >
+          {display.logo ? (
+            <div
+              className={styles.logo}
+              style={{
+                backgroundImage: cssUrl(display.logo),
+                backgroundPosition: `${display.logoAlign} center`,
+              }}
+              role="img"
+              aria-label={display.treeTitle}
+            />
+          ) : (
+            display.showTitle && <h1 className={styles.title}>{display.treeTitle}</h1>
+          )}
+          {display.showSubtitle && display.treeSubtitle && (
+            <p className={styles.subtitle}>{display.treeSubtitle}</p>
+          )}
+        </div>
+        {wishes.length > 0 && (
+          <span className={styles.count}>
+            지금까지 걸린 소원 <b>{wishes.length}</b>
+          </span>
+        )}
+        <button type="button" className={styles.headCta} onClick={() => navigate(`/${slug}/write`)}>
+          <Lamp size={19} strokeWidth={1.6} aria-hidden="true" />
+          {display.hangLabel}
+        </button>
+      </header>
+
+      {list.length === 0 ? (
+        <div className={styles.empty}>
+          <div className={styles.emptyCord} aria-hidden="true" />
+          <div className={styles.emptyLantern} aria-hidden="true">
+            <Lamp size={26} strokeWidth={1.6} />
+          </div>
+          <div className={styles.emptyTitle}>아직 걸린 소원이 없어요</div>
+          <p className={styles.emptyText}>첫 소원을 걸어 보세요.</p>
+        </div>
+      ) : (
+        <div
+          ref={canopyRef}
+          className={styles.canopy}
+          data-wish-tree
+        >
+          {placed.map((p) => (
+            <div
+              key={p.w.id}
+              ref={observe}
+              className={styles.hang}
+              data-live="false"
+              data-wish-item
+              style={{
+                left: `${Math.round(p.left)}px`,
+                /**
+                 * **아래에 걸린 등불이 위로 온다.** 살짝 겹칠 때 위쪽 것이 앞으로 나오면
+                 * 아래 등불이 가려져 뒤로 물러난 것처럼 보인다 — 나무는 반대다(가까운 게 아래).
+                 * 시안 모바일도 그렇게 겹쳐 있다.
+                 */
+                zIndex: Math.round(p.drop),
+                ['--drop' as string]: `${p.drop}px`,
+                ['--w' as string]: `${p.size.w}px`,
+                ['--h' as string]: `${p.size.h}px`,
+                ['--lantern' as string]: p.w.color || display.lanterns[0] || '#efe8cd',
+                ['--dur' as string]: p.dur,
+                ['--delay' as string]: p.delay,
+                ['--glowDur' as string]: p.glowDur,
+              }}
+            >
+              <span className={styles.cord} aria-hidden="true" />
+              <span className={styles.glow} aria-hidden="true" />
+              <Lantern wish={p.w} display={display} w={p.size.w} h={p.size.h} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Pager page={paged.page} pages={paged.pages} onPage={paged.setPage} label="나무" />
+
+      <div className={styles.bottom}>
+        <button type="button" className={styles.cta} onClick={() => navigate(`/${slug}/write`)}>
+          <Lamp size={19} strokeWidth={1.6} aria-hidden="true" />
+          {display.hangLabel}
+        </button>
+        <div className={styles.adminRow}>
+          <button type="button" className={styles.adminLink} onClick={() => navigate(`/${slug}/admin`)}>
+            <Settings size={12} strokeWidth={1.6} aria-hidden="true" />
+            관리자
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const SAMPLE: [string, string][] = [
+  ['민지', '오래오래 건강하게 노래해 줘'],
+  ['', '올해도 무대에서 만나요'],
+  ['해달', '생일 축하해 진심으로'],
+  ['', '늘 웃는 하루만 가득하길'],
+  ['우주', '다음 앨범도 대박나자'],
+  ['시월', '언제나 응원할게요'],
+  ['', '좋은 사람들만 곁에 있길'],
+]
+function sampleWishes(display: WishDisplay): RollingMessage[] {
+  const colors = display.lanterns.length ? display.lanterns : ['#efe8cd']
+  const fonts = ['', ...HANDWRITING_FONTS]
+  return SAMPLE.map(([nickname, body], i) => ({
+    id: `sample-${i}`,
+    nickname,
+    body,
+    color: colors[i % colors.length],
+    font: fonts[i % fonts.length],
+    hidden: false,
+    createdAt: '',
+  }))
+}
+
+const MAX_BODY = 100
+
+function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
+  const { slug } = slot
+  const navigate = useNavigate()
+  const vars = useWishVars(display)
+
+  const [nickname, setNickname] = useState('')
+  const [body, setBody] = useState('')
+  const [color, setColor] = useState(display.lanterns[0] ?? '')
+  const [font, setFont] = useState('') // '' = 기본 폰트
+  const [charm, setCharm] = useState<string | undefined>(undefined)
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    for (const id of HANDWRITING_FONTS) loadWebfont(id)
+  }, [])
+
+  const canPost = body.trim().length > 0 && !busy
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!canPost) return
+    setBusy(true)
+    try {
+      // 롤페와 **같은 repo·같은 테이블** — 필드 의미만 소원나무로 읽는다
+      await repo.rolling.add(slug, {
+        nickname: nickname.trim(),
+        body: body.trim(),
+        color,
+        font,
+        sticker: charm,
+      })
+      navigate(`/${slug}`)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <form className={`app ${styles.compose}`} style={vars} onSubmit={submit} data-wish-composer>
+      <div className={styles.composeSky} aria-hidden="true" />
+
+      <div className={styles.composeTop}>
+        <button
+          type="button"
+          className={styles.backBtn}
+          onClick={() => navigate(`/${slug}`)}
+          aria-label="돌아가기"
+        >
+          <ChevronLeft size={18} strokeWidth={1.6} aria-hidden="true" />
+        </button>
+        <span className={styles.backLabel}>돌아가기</span>
+      </div>
+
+      <div className={`app__scroll ${styles.composeScroll}`}>
+        <div className={styles.composeCard}>
+          {/* 내 등불 미리보기 — 고른 색·글씨가 실제 등불 모양으로 보인다 (시안 ②⑤) */}
+          <div className={styles.previewCol}>
+            <span className={styles.previewCord} aria-hidden="true" />
+            <div className={styles.previewHolder}>
+              <Lantern
+                wish={{
+                  id: 'preview',
+                  nickname: nickname.trim(),
+                  body: body.trim() || '적은 소원이 여기에 보여요',
+                  color,
+                  font,
+                  sticker: charm,
+                  hidden: false,
+                  createdAt: '',
+                }}
+                display={display}
+                w={118}
+                h={126}
+              />
+            </div>
+            <div className={styles.previewLabel}>내 등불 미리보기</div>
+          </div>
+
+          <div className={styles.fields}>
+            <div>
+              <label className={styles.label} htmlFor="wish-name">
+                이름 <span className={styles.optional}>(선택)</span>
+              </label>
+              <input
+                id="wish-name"
+                className={styles.input}
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="남길 이름"
+                maxLength={20}
+              />
+            </div>
+
+            <div>
+              <label className={styles.label} htmlFor="wish-body">
+                소원
+              </label>
+              <textarea
+                id="wish-body"
+                className={styles.textarea}
+                value={body}
+                onChange={(e) => setBody(e.target.value.slice(0, MAX_BODY))}
+                placeholder={display.wishPrompt}
+                style={fontStyle(font, '15px')}
+              />
+              <div className={styles.counter}>
+                {body.length} / {MAX_BODY}
+              </div>
+            </div>
+
+            {display.lanterns.length > 0 && (
+              <div>
+                <span className={styles.label}>등불 색</span>
+                <div className={styles.swatches} role="radiogroup" aria-label="등불 색">
+                  {display.lanterns.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      role="radio"
+                      aria-checked={color === c}
+                      className={styles.swatch}
+                      data-active={color === c}
+                      style={{ background: c }}
+                      onClick={() => setColor(c)}
+                      aria-label={`색 ${c}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div>
+              <span className={styles.label}>글씨체</span>
+              <div className={styles.fontList} role="radiogroup" aria-label="글씨체">
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={font === ''}
+                  className={styles.fontBtn}
+                  data-active={font === ''}
+                  style={fontStyle(display.font, '15px')}
+                  onClick={() => setFont('')}
+                  title="기본 글씨체"
+                >
+                  {display.fontSample}
+                </button>
+                {HANDWRITING_FONTS.map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="radio"
+                    aria-checked={font === id}
+                    className={styles.fontBtn}
+                    data-active={font === id}
+                    style={fontStyle(id, '15px')}
+                    onClick={() => setFont(id)}
+                    title={WEBFONTS[id].label}
+                  >
+                    {display.fontSample}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {display.charms.length > 0 && (
+              <div>
+                <span className={styles.label}>
+                  장식 <span className={styles.optional}>(선택)</span>
+                </span>
+                <div className={styles.charms} role="radiogroup" aria-label="장식">
+                  {display.charms.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      role="radio"
+                      aria-checked={charm === c}
+                      className={styles.charmBtn}
+                      data-active={charm === c}
+                      style={{ backgroundImage: cssUrl(c) }}
+                      onClick={() => setCharm(charm === c ? undefined : c)}
+                      aria-label="장식"
+                    />
+                  ))}
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={charm === undefined}
+                    className={styles.charmBtn}
+                    data-active={charm === undefined}
+                    onClick={() => setCharm(undefined)}
+                  >
+                    없음
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.submitBar}>
+        <button type="submit" className={styles.submit} disabled={!canPost}>
+          {busy ? '거는 중…' : display.hangLabel}
+        </button>
+      </div>
+    </form>
+  )
+}

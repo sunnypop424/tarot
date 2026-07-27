@@ -29,8 +29,14 @@ import type {
 /** slots 테이블 행 ↔ Slot. 컬럼 이름이 곧 필드 이름이라 매핑이 얇다 */
 type SlotRow = Slot
 
+/**
+ * ⚠ **서비스 설정 컬럼을 추가하면 여기에도 반드시 넣는다.**
+ * 이 목록은 하드코딩이라 빠뜨려도 타입 에러가 안 난다 — 그 슬롯의 설정이 **조용히 통째로
+ * 안 읽히고** 화면은 전부 기본값으로 그려진다. 증상이 "편집기에서 저장했는데 반영이 안 돼요" 라
+ * 원인을 찾기 어렵다.
+ */
 const SLOT_COLUMNS =
-  'slug, name, service, plan, limits, deck, period, theme, event, luckydraw, rolling'
+  'slug, name, service, plan, limits, deck, period, theme, event, luckydraw, rolling, photozone, wish'
 
 /**
  * 번들된 씨앗 — **네트워크가 죽었을 때의 마지막 방어선**.

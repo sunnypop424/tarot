@@ -1,0 +1,652 @@
+/**
+ * 소원 나무 — claude.ai/design 시안 '소원 나무 방문자' 를 그대로 옮긴다.
+ *
+ * **격자로 보이면 실패다.** 시안은 등불을 좌표로 흩뿌린다 — 가로 위치와 줄 길이가 제각각이라
+ * 높낮이가 다르고, 각자 다른 주기로 흔들린다. 그래서 grid 가 아니라 absolute 배치다.
+ *
+ * 밤하늘·별·나뭇가지는 **전부 CSS 다** (이미지 없이 성립한다). 슬롯이 배경 이미지를 올리면
+ * 그게 덮는다 — 이미지 없는 이벤트도 그럴듯해야 하기 때문이다.
+ *
+ * 색은 슬롯 토큰(--wt-*, WishApp 이 주입)에서 온다. 등불 색만 방문자가 팔레트에서 고른다.
+ */
+
+.tree {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  /* 페이지 컨트롤 색 — 밤하늘 위라 밝은 글자를 준다 (components/Pager.module.css) */
+  --pager-fg: var(--wt-head);
+  --pager-accent: var(--wt-btn);
+  background-color: var(--wt-sky);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: var(--wt-font);
+  color: var(--wt-head);
+}
+
+/**
+ * 밤하늘 — 위가 밝고 아래로 어두워진다. 슬롯이 고른 하늘색 위에 **rgba 로만** 얹어
+ * 어떤 색을 골라도 성립하게 한다 (고정 hex 로 칠하면 슬롯 색이 무의미해진다).
+ */
+.sky {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(130% 70% at 50% 0%, rgb(255 255 255 / 0.1) 0%, rgb(0 0 0 / 0.06) 58%, rgb(0 0 0 / 0.3) 100%);
+}
+/* 별 — 작은 점들. 배경 이미지를 올린 슬롯에서는 숨긴다(이미지가 이미 하늘이다) */
+.stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  pointer-events: none;
+  background:
+    radial-gradient(1.6px 1.6px at 12% 12%, #fff, transparent),
+    radial-gradient(1.4px 1.4px at 62% 8%, #fff, transparent),
+    radial-gradient(1.6px 1.6px at 86% 20%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 32% 24%, #fff, transparent),
+    radial-gradient(1.4px 1.4px at 74% 34%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 20% 40%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 46% 16%, #fff, transparent),
+    radial-gradient(1.3px 1.3px at 92% 6%, #fff, transparent);
+}
+/**
+ * 나뭇가지 — 등불이 매달린 자리. 비스듬한 잔가지 결.
+ *
+ * **네 변을 전부 녹인다.** 시안은 폰 프레임 안이라 잘린 끝이 안 보였지만, 실제 화면에서는
+ * 결이 직선으로 뚝 끊겨 띠처럼 보인다. 마스크로 서서히 사라지게 하면 가지가 어둠 속으로
+ * 뻗어나간 것처럼 읽힌다 (색을 옅게 하는 것만으론 끊긴 자리가 그대로 보인다).
+ */
+.branch {
+  position: absolute;
+  left: -14%;
+  right: -14%;
+  top: 12%;
+  height: 34%;
+  pointer-events: none;
+  background: repeating-linear-gradient(78deg, rgb(255 255 255 / 0.06) 0 2px, transparent 2px 30px);
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 26%, #000 62%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 16%, #000 84%, transparent 100%);
+  mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 26%, #000 62%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 16%, #000 84%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/**
+ * ── 헤더 ── **롤링페이퍼와 같은 규칙이다.**
+ * 로고가 있으면 제목을 **대신**하고(옆에 붙는 타일이 아니다), 정렬은 슬롯이 고른
+ * `logoAlign` 이 정한다. 두 서비스가 같은 저장소를 쓰는데 헤더 조작만 다르면
+ * 최고관리자가 슬롯을 옮길 때마다 다시 배워야 한다.
+ */
+.head {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-base);
+  padding: var(--space-lg) var(--layout-pad) 0;
+}
+.headText {
+  min-width: 0;
+  flex: 1;
+}
+.logo {
+  height: 40px;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--wt-head);
+  line-height: 1.35;
+  word-break: keep-all;
+}
+.subtitle {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--wt-sub);
+  line-height: 1.6;
+  word-break: keep-all;
+}
+.headCta {
+  display: none;
+}
+.count {
+  display: none;
+}
+
+/* ── 등불이 걸리는 자리 ── */
+.canopy {
+  position: relative;
+  flex: 1;
+  margin-top: 6px;
+  min-height: 380px;
+}
+
+/**
+ * 등불 하나 — 줄 · 빛번짐 · 몸통.
+ * `left` 는 %, 줄 길이(`--drop`)는 px 로 인라인에서 온다 (WishApp 이 id 에서 파생).
+ */
+.hang {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: top center;
+  width: var(--w);
+  margin-left: calc(var(--w) / -2);
+}
+/* 화면에 들어온 것만 흔든다 — 300개가 동시에 움직이면 모바일이 죽는다 (IntersectionObserver) */
+[data-live='true'].hang {
+  animation: wtSway var(--dur) ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+@keyframes wtSway {
+  0% {
+    transform: rotate(-1.8deg);
+  }
+  50% {
+    transform: rotate(1.8deg);
+  }
+  100% {
+    transform: rotate(-1.8deg);
+  }
+}
+.cord {
+  width: 1px;
+  height: var(--drop);
+  background: linear-gradient(rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.32));
+  flex: none;
+}
+/**
+ * 빛 번짐 — 등불 색을 크게 흐려 뒤에 깐다. **이게 없으면 그냥 색종이로 보인다.**
+ *
+ * 중심 정렬을 `align-items` 에 맡기지 않는다: 절대배치 자식의 정적 위치를 flex 정렬이
+ * 정하는 건 스펙에 있지만 구현이 갈리고, 등불보다 26px 넓어서 조금만 어긋나도 빛이 한쪽으로
+ * 쏠린 게 눈에 띈다. `left:50%` + 음수 margin 으로 못박는다.
+ */
+.glow {
+  position: absolute;
+  top: calc(var(--drop) + 6px);
+  left: 50%;
+  width: calc(var(--w) + 26px);
+  height: calc(var(--h) + 20px);
+  margin-left: calc((var(--w) + 26px) / -2);
+  border-radius: 9999px;
+  background: var(--lantern);
+  filter: blur(22px);
+  /**
+   * 시안보다 옅다. 시안은 등불 일곱 개가 넓게 흩어져 있어 0.4~0.85 여도 각각 따로 보이는데,
+   * 실제로는 소원이 빽빽해질 수 있고 그러면 halo 가 서로 뭉쳐 **배경이 하얗게 뜬다**
+   * (실제로 그렇게 떴다). "잔잔한 빛" 이 목적이지 안개가 아니다.
+   */
+  opacity: 0.3;
+  pointer-events: none;
+}
+[data-live='true'] .glow {
+  animation: wtGlow var(--glowDur) ease-in-out infinite;
+}
+@keyframes wtGlow {
+  0% {
+    opacity: 0.34;
+  }
+  50% {
+    opacity: 0.62;
+  }
+  100% {
+    opacity: 0.34;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-live='true'].hang,
+  [data-live='true'] .glow {
+    animation: none;
+  }
+}
+
+.lantern {
+  position: relative;
+  width: var(--w);
+  min-height: var(--h);
+  border-radius: 16px 16px 22px 22px;
+  /* 위에서 아래로 살짝 어두워지는 몸통 + 윗면 하이라이트 = 종이 등불의 입체감 */
+  background: linear-gradient(180deg, var(--lantern), rgb(0 0 0 / 0.14)), var(--lantern);
+  padding: 12px 11px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  box-shadow:
+    0 10px 26px rgb(0 0 0 / 0.34),
+    inset 0 1px 0 rgb(255 255 255 / 0.5);
+}
+/* 실루엣 이미지를 올린 슬롯은 그 모양으로 마스크 — 색은 팔레트가 채운다 */
+.lantern[data-shaped] {
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--lantern);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+.body {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--wt-body);
+  /* 긴 소원은 두 줄로 자른다 — 등불 크기가 제각각이면 나무가 지저분해진다 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: keep-all;
+}
+.name {
+  font-size: 10px;
+  color: var(--wt-name);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* 매다는 장식 — 등불 아래에 (롤페 스티커와 같은 자리) */
+.charm {
+  position: absolute;
+  left: 50%;
+  bottom: -16px;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+/* ── 빈 상태 ── */
+.empty {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 40px;
+  text-align: center;
+}
+.emptyCord {
+  width: 1px;
+  height: 80px;
+  background: linear-gradient(var(--wt-sub), transparent);
+}
+.emptyLantern {
+  width: 66px;
+  height: 82px;
+  border-radius: 16px 16px 20px 20px;
+  border: 1px dashed color-mix(in srgb, var(--wt-sub) 70%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wt-sub);
+}
+.emptyTitle {
+  margin-top: 22px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--wt-head);
+}
+.emptyText {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--wt-sub);
+  line-height: 1.6;
+}
+
+/* ── 하단 CTA ── */
+.bottom {
+  position: relative;
+  padding: 0 18px 24px;
+}
+.cta {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 14px;
+  background: var(--wt-btn);
+  color: var(--wt-btnFg);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.4);
+}
+.adminRow {
+  text-align: center;
+  margin-top: 12px;
+}
+.adminLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--wt-sub);
+  opacity: 0.6;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/**
+ * 넓은 화면 — 시안 ③④: 가지가 넓게 퍼지고 CTA 가 헤더(태블릿)·우하단(데스크톱)으로 간다.
+ * 하단 고정 버튼이 나무를 가리지 않아야 다 같이 구경할 수 있다.
+ */
+@media (min-width: 760px) {
+  .head {
+    align-items: center;
+    padding: 26px 26px 0;
+  }
+  .title {
+    font-size: 22px;
+  }
+  .subtitle {
+    font-size: 13px;
+  }
+  .headCta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+    height: 46px;
+    padding: 0 22px;
+    border: none;
+    border-radius: 12px;
+    background: var(--wt-btn);
+    color: var(--wt-btnFg);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .count {
+    display: inline;
+    font-size: 13px;
+    color: var(--wt-sub);
+    margin-right: 14px;
+    white-space: nowrap;
+  }
+  .count b {
+    color: var(--wt-head);
+  }
+  .bottom .cta {
+    display: none;
+  }
+  .bottom {
+    padding: 0 26px 18px;
+  }
+  .adminRow {
+    text-align: left;
+    margin-top: 0;
+  }
+}
+@media (min-width: 1100px) {
+  .head {
+    padding: 30px 34px 0;
+  }
+  .title {
+    font-size: 25px;
+  }
+  .canopy {
+    min-height: 520px;
+  }
+}
+
+/* ══ 소원 적기 ══════════════════════════════ */
+.compose {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: var(--wt-sky);
+  font-family: var(--wt-font);
+  color: var(--wt-head);
+}
+.composeSky {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(90% 90% at 50% 20%, rgb(255 255 255 / 0.08) 0%, rgb(0 0 0 / 0.22) 70%);
+}
+.composeTop {
+  position: relative;
+  padding: var(--space-lg) 18px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.backBtn {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: none;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.1);
+  color: var(--wt-head);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.backLabel {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--wt-head);
+}
+
+.composeScroll {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px 16px;
+}
+/* 데스크톱은 가운데 카드 2단 (시안 ⑤) */
+.composeCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+@media (min-width: 900px) {
+  .composeScroll {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .composeCard {
+    width: 860px;
+    max-width: 100%;
+    background: rgb(255 255 255 / 0.05);
+    border: 1px solid rgb(255 255 255 / 0.16);
+    border-radius: 20px;
+    padding: 34px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 34px;
+    align-items: start;
+  }
+}
+
+/* 미리보기 등불 */
+.previewCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0 20px;
+}
+.previewCord {
+  width: 1px;
+  height: 26px;
+  background: var(--wt-sub);
+}
+.previewHolder {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.previewLabel {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--wt-sub);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wt-sub);
+  margin-bottom: 7px;
+}
+.optional {
+  font-weight: 600;
+  opacity: 0.75;
+}
+.input,
+.textarea {
+  width: 100%;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.07);
+  color: var(--wt-head);
+  font-family: inherit;
+  outline: none;
+}
+.input {
+  height: 46px;
+  padding: 0 14px;
+  font-size: 14px;
+}
+.textarea {
+  min-height: 132px;
+  padding: 13px 14px;
+  font-size: 15px;
+  line-height: 1.6;
+  resize: none;
+}
+.counter {
+  text-align: right;
+  font-size: 11px;
+  color: var(--wt-sub);
+  margin-top: 5px;
+}
+
+.swatches,
+.charms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+}
+.swatch[data-active='true'] {
+  box-shadow:
+    0 0 0 2px var(--wt-sky),
+    0 0 0 4px var(--wt-head);
+}
+.charmBtn {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  background-color: rgb(255 255 255 / 0.07);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 62%;
+  color: var(--wt-sub);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.charmBtn[data-active='true'] {
+  border-color: var(--wt-head);
+}
+.fontList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.fontBtn {
+  padding: 8px 12px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.07);
+  color: var(--wt-head);
+  cursor: pointer;
+}
+.fontBtn[data-active='true'] {
+  border-color: var(--wt-head);
+}
+
+.submitBar {
+  position: relative;
+  padding: 14px 18px calc(26px + env(safe-area-inset-bottom));
+  background: linear-gradient(rgb(0 0 0 / 0), color-mix(in srgb, var(--wt-sky) 88%, #000) 34%);
+}
+.submit {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 14px;
+  background: var(--wt-btn);
+  color: var(--wt-btnFg);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.submit:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+@media (min-width: 900px) {
+  .submitBar {
+    background: none;
+    padding: 0 0 34px;
+    display: flex;
+    justify-content: center;
+  }
+  .submit {
+    width: auto;
+    height: 52px;
+    padding: 0 40px;
+  }
+}

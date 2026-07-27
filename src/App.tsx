@@ -1,8 +1,10 @@
 import { lazy, Suspense } from 'react'
+import type { ComponentType } from 'react'
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
 
 import { SlotProvider, useSlotState } from '@/slot/SlotProvider'
 import { getSlotService } from '@/data/services'
+import type { ServiceId } from '@/data/services'
 import { QuestionsProvider } from '@/lib/questions'
 import { TabBar } from '@/components/TabBar'
 import { TopNav } from '@/components/TopNav'
@@ -52,12 +54,37 @@ const LuckydrawApp = lazy(() => import('@/luckydraw/LuckydrawApp'))
 /** 롤링페이퍼 — 방문자가 자기 폰으로 응원 메시지를 남기는 공개 벽 (별도 청크) */
 const RollingApp = lazy(() => import('@/rolling/RollingApp'))
 
+/** 포토존 — 카메라·캔버스 합성이 들어가 무겁다. 타로 방문자에게 내릴 이유가 없다 */
+const PhotozoneApp = lazy(() => import('@/photozone/PhotozoneApp'))
+
+/** 소원나무 — 롤페와 **데이터는 같고 화면만 다르다** (src/data/wish.ts) */
+const WishApp = lazy(() => import('@/wish/WishApp'))
+
+/**
+ * 서비스별 방문자 앱 — **`Record` 라 모든 서비스가 필수다.**
+ *
+ * 삼항 체인(`if (service === 'luckydraw') …`)이었을 땐 `SERVICES` 에 새 서비스를 넣어도
+ * 여기가 아무 말 없이 통과하고 그 슬롯이 **조용히 타로 셸로 떨어졌다.** `ServiceId` 는
+ * `as const` 로 자동 확장되는데 소비처가 그 확장을 강제받지 않는 게 원인이다.
+ * `Record` 는 키가 전부 필수라, 서비스를 추가하는 순간 여기가 컴파일 에러로 터진다.
+ *
+ * `tarot: null` = "전용 앱이 없다 — 아래 기본 셸(탭바 + Outlet)을 쓴다".
+ * 나머지는 **셸 자체가 다르다**: 탭바도 도감도 없고 `Outlet` 을 안 그린다(하위 화면이 없다).
+ * 하위 페이지가 필요하면 각 앱이 `useLocation()` 으로 자체 분기한다 (롤페 `/write`).
+ */
+const SERVICE_APPS: Record<ServiceId, ComponentType | null> = {
+  tarot: null,
+  luckydraw: LuckydrawApp,
+  rolling: RollingApp,
+  photozone: PhotozoneApp,
+  wish: WishApp,
+}
+
 /**
  * 슬롯 사용자 앱 셸 — 서비스별로 갈린다 (`src/data/services.ts`).
  *
- * 럭키드로우는 **셸 자체가 다르다**: 탭바도 카드 도감도 없고 화면이 하나뿐이다.
- * 조작 주체도 반대다 — 타로는 방문자가 자기 폰으로 뽑고, 럭키드로우는 부스 태블릿에서
- * 스태프가 뽑는다. 그래서 `Outlet` 을 안 그린다: 이 슬롯엔 하위 화면이 없다.
+ * 조작 주체가 서비스마다 다르다 — 타로·롤링페이퍼는 방문자가 자기 폰으로,
+ * 럭키드로우는 부스 태블릿에서 스태프가 만진다.
  */
 function SlotLayout() {
   const state = useSlotState()
@@ -71,8 +98,8 @@ function SlotLayout() {
   if (state.status === 'missing') return <NotFound />
   const slot = state.slot
 
-  if (getSlotService(slot) === 'luckydraw') return <LuckydrawApp />
-  if (getSlotService(slot) === 'rolling') return <RollingApp />
+  const ServiceApp = SERVICE_APPS[getSlotService(slot)]
+  if (ServiceApp) return <ServiceApp />
 
   return (
     <QuestionsProvider>

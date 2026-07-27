@@ -1,0 +1,63 @@
+/**
+ * 페이지 나누기 — 롤링페이퍼 벽과 소원나무가 공유한다.
+ * 색은 쓰는 쪽이 `--pager-fg` / `--pager-accent` 로 넣는다 (벽은 밝고 나무는 밤이라
+ * 한 색으로 둘 다 맞출 수 없다). 안 넣으면 현재 글자색을 따라간다.
+ */
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: var(--space-base) 0;
+}
+
+.arrow {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--pager-fg, currentColor) 10%, transparent);
+  color: var(--pager-fg, currentColor);
+  cursor: pointer;
+}
+.arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--pager-fg, currentColor) 28%, transparent);
+  cursor: pointer;
+}
+/* 지금 페이지는 알약처럼 길어진다 — 점 크기만 키우면 모바일에서 구분이 안 된다 */
+.dot[data-active] {
+  width: 20px;
+  background: var(--pager-accent, var(--pager-fg, currentColor));
+}
+
+.count {
+  font-size: var(--text-s);
+  color: var(--pager-fg, currentColor);
+  opacity: 0.75;
+  min-width: 56px;
+  text-align: center;
+}
+.count b {
+  opacity: 1;
+  font-weight: var(--weight-bold);
+}

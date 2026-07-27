@@ -1,7 +1,10 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 
+import type { ReactNode } from 'react'
+
 import { hasSupabase } from '@/lib/repo/client'
 import { getSlotService } from '@/data/services'
+import type { ServiceId } from '@/data/services'
 import { useSlotOrNull } from '@/slot/SlotProvider'
 import { NotFound } from '@/screens/NotFound'
 import { Account } from './Account'
@@ -12,7 +15,52 @@ import { QuestionEditor } from './QuestionEditor'
 import { Overview } from './luckydraw/Overview'
 import { Shipping } from './luckydraw/Shipping'
 import { Moderation } from './rolling/Moderation'
+import { Guide as PhotozoneGuide } from './photozone/Guide'
 import { useAdminAuth } from './useAdminAuth'
+
+/**
+ * **서비스마다 주최자가 만지는 게 다르다.** 타로 주최자는 질문·답변을, 럭키드로우 주최자는
+ * 상품·수량·배송을 만진다. 라우트를 합쳐두면 럭키드로우 슬롯에서 `/admin/questions` 가
+ * 빈 화면으로 열리고, 그게 "질문 기능이 고장났나" 로 읽힌다.
+ *
+ * **`Record` 라 모든 서비스가 필수다** — 삼항 체인이었을 땐 새 서비스가 조용히 `else`(타로 질문
+ * 화면)로 떨어졌다. 이제 `SERVICES` 에 한 줄 넣으면 여기가 컴파일 에러로 터진다.
+ *
+ * `home` 은 **경로 조각만** 든다. 절대 경로 조립은 아래에서 한다 — 상대 경로(`to="prizes"`)를
+ * catch-all 에 쓰면 리다이렉트가 경로를 **덧붙여서** `/admin/x/prizes/prizes/prizes/…` 로
+ * 무한히 자란다. 못 찾은 주소를 첫 화면으로 되돌리는 게 이 라우트의 일인데, 상대 경로면
+ * 되돌리는 게 아니라 계속 파고든다.
+ */
+const ADMIN_HOME: Record<ServiceId, string> = {
+  tarot: 'questions',
+  luckydraw: 'overview',
+  rolling: 'messages',
+  photozone: 'photozone',
+  wish: 'messages',
+}
+
+const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
+  tarot: (
+    <>
+      <Route path="questions" element={<QuestionList />} />
+      <Route path="questions/:questionId" element={<QuestionEditor />} />
+    </>
+  ),
+  luckydraw: (
+    <>
+      <Route path="overview" element={<Overview />} />
+      <Route path="shipping" element={<Shipping />} />
+    </>
+  ),
+  rolling: <Route path="messages" element={<Moderation />} />,
+  // 만질 데이터가 없어 안내 한 장뿐이다 (admin/photozone/Guide.tsx 의 주석)
+  photozone: <Route path="photozone" element={<PhotozoneGuide />} />,
+  /**
+   * 소원나무는 **롤페 후검수 화면을 그대로 쓴다** — 데이터가 같은 테이블이라 검수도 같은 일이다.
+   * 전용 화면을 만들면 같은 코드가 둘이 되고, 한쪽만 고치는 날이 온다.
+   */
+  wish: <Route path="messages" element={<Moderation />} />,
+}
 
 /**
  * 주최자 관리 — `/{slug}/admin/*`.
@@ -25,21 +73,8 @@ export default function AdminRoutes() {
   // 없는 슬롯의 관리 화면은 존재하지 않는다
   if (!slot) return <NotFound />
 
-  /**
-   * **서비스마다 주최자가 만지는 게 다르다.** 타로 주최자는 질문·답변을, 럭키드로우 주최자는
-   * 상품·수량·배송을 만진다. 라우트를 합쳐두면 럭키드로우 슬롯에서 `/admin/questions` 가
-   * 빈 화면으로 열리고, 그게 "질문 기능이 고장났나" 로 읽힌다.
-   */
   const service = getSlotService(slot)
-  /**
-   * **절대 경로여야 한다.** 상대 경로(`to="prizes"`)를 catch-all 에 쓰면 리다이렉트가
-   * 경로를 **덧붙여서** `/admin/x/prizes/prizes/prizes/…` 로 무한히 자란다.
-   * 못 찾은 주소를 첫 화면으로 되돌리는 게 이 라우트의 일인데, 상대 경로면 되돌리는 게 아니라
-   * 계속 파고든다.
-   */
-  const home = `/${slot.slug}/admin/${
-    service === 'luckydraw' ? 'overview' : service === 'rolling' ? 'messages' : 'questions'
-  }`
+  const home = `/${slot.slug}/admin/${ADMIN_HOME[service]}`
 
   return (
     <Routes>
@@ -47,19 +82,7 @@ export default function AdminRoutes() {
       <Route element={<RequireAuth />}>
         <Route index element={<Navigate to={home} replace />} />
         <Route element={<AdminLayout />}>
-          {service === 'luckydraw' ? (
-            <>
-              <Route path="overview" element={<Overview />} />
-              <Route path="shipping" element={<Shipping />} />
-            </>
-          ) : service === 'rolling' ? (
-            <Route path="messages" element={<Moderation />} />
-          ) : (
-            <>
-              <Route path="questions" element={<QuestionList />} />
-              <Route path="questions/:questionId" element={<QuestionEditor />} />
-            </>
-          )}
+          {ADMIN_ROUTES[service]}
           {/* local 어댑터엔 바꿀 비밀번호가 없다 (아무 값이나 통과한다) — 메뉴도 화면도 안 만든다 */}
           {hasSupabase && <Route path="account" element={<Account />} />}
         </Route>

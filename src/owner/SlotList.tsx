@@ -16,6 +16,7 @@ import {
 
 import { createSlot, getSlotDeck, isSlotExpired, isSlotOpen } from '@/data/slots'
 import { getSlotService, serviceLabel } from '@/data/services'
+import type { ServiceId } from '@/data/services'
 import { PLANS, getPlan, type PlanId } from '@/data/plans'
 import { repo } from '@/lib/repo'
 import { hasSupabase } from '@/lib/repo/client'
@@ -42,10 +43,17 @@ const PURPLE = '#816bff'
 const PURPLE_HOVER = '#6e58ff'
 const MONO = "Pretendard, ui-monospace, Menlo, monospace"
 
-const SVC: Record<string, { bg: string; fg: string }> = {
+/**
+ * 서비스 배지 색 — **`Record<ServiceId, …>` 라 모든 서비스가 필수다.**
+ * `Record<string, …>` 였을 땐 새 서비스가 조용히 타로 보라 배지를 받았다(아래 `?? SVC.tarot`).
+ * 이제 `SERVICES` 에 한 줄 넣으면 여기가 컴파일 에러로 터진다.
+ */
+const SVC: Record<ServiceId, { bg: string; fg: string }> = {
   tarot: { bg: '#efeafb', fg: '#5b3fa8' },
   luckydraw: { bg: '#fdf0e3', fg: '#a15c17' },
   rolling: { bg: '#e6f4ec', fg: '#22694a' },
+  photozone: { bg: '#e7eefb', fg: '#28518f' },
+  wish: { bg: '#fbf0dd', fg: '#8a5c17' },
 }
 
 function slotStatus(s: Slot): { label: string; dot: string } {
@@ -67,6 +75,19 @@ const inputStyle: React.CSSProperties = {
   minWidth: 0,
   width: '100%',
   boxSizing: 'border-box',
+}
+// 기본 select 화살표는 브라우저마다 제각각이라 chevron 을 직접 그린다 (SlotEditor 와 같은 모양)
+const selectStyle: React.CSSProperties = {
+  ...inputStyle,
+  cursor: 'pointer',
+  padding: '0 30px 0 9px',
+  appearance: 'none',
+  WebkitAppearance: 'none',
+  MozAppearance: 'none',
+  backgroundImage:
+    "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8a8a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>\")",
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'right 9px center',
 }
 const labelStyle: React.CSSProperties = { fontSize: 11.5, fontWeight: 650, color: INK2 }
 const ghostBtn: React.CSSProperties = {
@@ -335,7 +356,7 @@ export function SlotList() {
                     alignItems: 'center',
                     height: 38,
                     border: `1px solid ${LINE}`,
-                    borderRadius: 8,
+                    borderRadius: 4,
                     background: '#fff',
                     overflow: 'hidden',
                   }}
@@ -371,7 +392,7 @@ export function SlotList() {
                 <select
                   value={plan}
                   onChange={(e) => setPlan(e.target.value as PlanId)}
-                  style={{ ...inputStyle, cursor: 'pointer', padding: '0 9px' }}
+                  style={selectStyle}
                 >
                   {PLANS.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -389,7 +410,7 @@ export function SlotList() {
                 style={{
                   height: 38,
                   border: 'none',
-                  borderRadius: 8,
+                  borderRadius: 4,
                   background: PURPLE,
                   color: '#fff',
                   fontSize: 13.5,
@@ -456,7 +477,7 @@ export function SlotList() {
         ) : (
           <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 8, overflow: 'hidden' }} data-slot-list>
             {filtered.map((s) => {
-              const svc = SVC[getSlotService(s)] ?? SVC.tarot
+              const svc = SVC[getSlotService(s)]
               const st = slotStatus(s)
               const expired = isSlotExpired(s)
               return (

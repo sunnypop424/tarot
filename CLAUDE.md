@@ -18,7 +18,7 @@
 
 - **데이터 경계:** `src/lib/repo/` 는 인터페이스 + localStorage 어댑터. 모든 메서드가 slug 스코프(슬롯 격리). 백엔드를 붙일 땐 `repo/index.ts` 어댑터 한 줄만 교체. 스택은 **Supabase(DB·인증·이미지·서버함수) · Vercel(배포) · Claude API(AI)** 로 정했고 아직 안 붙었다 (**Cloudflare 는 안 쓴다** — Edge Functions 로 충분) — `docs/BACKEND.md`.
 - **테마:** `src/lib/theme.ts` `applyTheme()` 가 슬롯 색·형태를 `:root` 커스텀 프로퍼티로 주입. **배경 밝기 종속 토큰(그림자·딤·`primary-soft`·`disabled`)은 캔버스 휘도로 파생** (`src/lib/color.ts` `readableShade`). hex 는 `tokens.css` 밖에 두지 않는다. 색 이름은 역할 기반(`primary`/`accent`).
-- **이미지:** 슬롯 이미지(로고·배경·카드 앞/뒷면)는 **전부 `background-image`** 로 그린다 — `<img>` 는 모바일에서 길게 누르면 저장 메뉴가 뜬다. 로드 실패 폴백과 로고 비율은 `src/lib/image.ts` 의 `useImageAsset` 이 대신한다.
+- **이미지:** 슬롯 이미지(로고·배경·카드 앞/뒷면·프레임 PNG)는 **전부 `background-image`** 로 그린다 — `<img>` 는 모바일에서 길게 누르면 저장 메뉴가 뜬다. 로드 실패 폴백과 로고 비율은 `src/lib/image.ts` 의 `useImageAsset` 이 대신한다. **예외는 하나뿐이다:** 방문자가 **획득·합성한 결과물**(포토존 인증샷·뽑은 포토카드·칭호 카드)은 저장되는 게 목적이라 `<img>` 로 그린다. 그 자리는 `src/components/SavableImage.tsx` 하나고, 받는 값이 `src/lib/compose.ts` 만 만들 수 있는 `ResultImage` 라 **슬롯 자산 URL 은 타입상 못 넣는다** — 규칙을 주석이 아니라 컴파일러가 지킨다. 캔버스에 그릴 원격 이미지는 반드시 `compose.loadForCanvas`(`useImageAsset` 은 `crossOrigin` 을 안 걸어 캔버스를 오염시킨다 — 화면엔 멀쩡하고 저장에서만 터진다).
 - **관리 화면:** `.admin`(주최자)·`.owner`(슬롯 편집기) **둘 다 고정 라이트로 통일** — 관리 도구의 색은 이벤트가 아니라 도구의 것이라 어느 슬롯을 열든 같은 디자인이다 (`src/styles/admin.css` 가 `:root` 의 슬롯 테마 토큰을 subtree 에서 덮는다). 슬롯 편집기는 **저장하기를 눌러야** 반영되고(초안 → 편집분), 주최자 질문 편집은 반대로 즉시 저장이다(저장을 잊어 날리는 게 더 나쁘다).
 - **카드 의미:** 카드 단위 저작 (`docs/cards/*.md` → `npm run cards:build` → `cards.json`). 카드 × 방향(정/역) × 관점(종합·애정·금전·직업·조언). **조합 테이블은 없다.**
 - **검증은 실제로 돌려본다:** 개발 서버 포트 5174 고정, `scripts/verify-*.mjs`(puppeteer 측정), `npm run shot <경로> <출력>`. CSS 모듈 클래스 대신 `data-*` 속성으로 셀렉트.
@@ -53,5 +53,5 @@
 - 배포 루트(`/`)에 슬롯 목록을 노출하지 않는다(남의 이벤트가 다 보인다).
 - 슬롯 편집기를 주최자 `/admin` 에 넣지 않는다 — 최고관리자/주최자 역할 분리.
 - 슬롯 격리(테마·질문·권한이 slug 스코프)를 깨지 않는다.
-- 슬롯 이미지를 `<img>` 로 넣지 않는다 — 전부 `background-image` (모바일 저장 방지). 편집기 미리보기 썸네일도 같다.
+- 슬롯 이미지를 `<img>` 로 넣지 않는다 — 전부 `background-image` (모바일 저장 방지). 편집기 미리보기 썸네일도 같다. 새 `<img>` 를 넣고 싶으면 **왜 `SavableImage` 가 아니어야 하는지를 먼저 적는다** (거의 항상 답은 "그러면 안 된다" 다).
 - UI 변경 후엔 관련 `verify-*.mjs` 를 돌리고 스크린샷으로 확인한다(빌드 통과 ≠ 검증).

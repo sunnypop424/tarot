@@ -2,6 +2,8 @@ import type { Theme } from './theme'
 import type { DeckRange } from '@/data/cards'
 import type { LuckydrawDisplay } from '@/data/luckydraw'
 import type { RollingDisplay } from '@/data/rolling'
+import type { PhotozoneDisplay } from '@/data/photozone'
+import type { WishDisplay } from '@/data/wish'
 import type { ServiceId } from '@/data/services'
 import type { PlanId } from '@/data/plans'
 
@@ -111,4 +113,16 @@ export interface Slot {
    * `luckydraw` 필드와 같은 짝이고, 서비스와 무관한 색·형태는 `theme` 이 갖는다.
    */
   rolling?: Partial<RollingDisplay>
+  /**
+   * 포토존 서비스의 **겉모습** — 최고관리자만 정한다 (`src/data/photozone.ts`).
+   * `rolling`·`luckydraw` 와 같은 짝. **이 서비스는 데이터 테이블이 없다** — 방문자 사진은
+   * 폰에서 합성해 바로 내려받고 서버로 안 간다. 그래서 슬롯에 붙는 이 설정이 전부다.
+   */
+  photozone?: Partial<PhotozoneDisplay>
+  /**
+   * 소원나무 서비스의 **겉모습** — 최고관리자만 정한다 (`src/data/wish.ts`).
+   * **데이터는 롤링페이퍼와 공유한다** (`rolling_messages` 테이블 · `repo.rolling`) —
+   * 겉모습만 이 필드로 갈린다. 그래서 `wish` 전용 repo 도 테이블도 없다.
+   */
+  wish?: Partial<WishDisplay>
 }

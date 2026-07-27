@@ -6,6 +6,9 @@
 
 .wall {
   min-height: 100dvh;
+  /* 페이지 컨트롤 색 — 벽은 밝으니 어두운 글자 (components/Pager.module.css) */
+  --pager-fg: var(--rp-head);
+  --pager-accent: var(--rp-btn);
   /* 배경 이미지는 럭드처럼 화면을 꽉 채운다 (투명도 없이 cover) */
   background-size: cover;
   background-position: center;

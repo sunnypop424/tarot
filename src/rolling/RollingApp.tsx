@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Pencil, Settings } from 'lucide-react'
 
@@ -6,6 +6,7 @@ import { useSlotState } from '@/slot/SlotProvider'
 import { rollingDisplay, type RollingDisplay } from '@/data/rolling'
 import { loadWebfont, fontStack, fontStyle, HANDWRITING_FONTS, WEBFONTS } from '@/data/fonts'
 import { repo } from '@/lib/repo'
+import { Pager, usePaged } from '@/components/Pager'
 import { cssUrl } from '@/lib/image'
 import type { RollingMessage } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
@@ -85,10 +86,33 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
     () => (messages.length > 0 ? messages : inPreview ? sampleNotes(display) : []),
     [messages, inPreview, display]
   )
-  // 벽에 쓰인 쪽지 폰트만 로드 (전부 미리 받지 않는다)
+  /**
+   * **페이지로 나눈다** (소원나무와 같은 장치 — `components/Pager.tsx`).
+   * 쪽지가 쌓이면 스크롤이 끝없이 길어진다. 카페에서 폰으로 보는 화면이라 "아래로 계속"
+   * 보다 "넘겨서 본다" 가 낫고, 한 번에 그리는 쪽지 수도 그만큼만 유지된다.
+   *
+   * 한 페이지 분량은 **열 수 × 6** 이다. 열 수는 CSS 메이슨리(`column-count`)와 같은
+   * 분기점을 쓴다 — 한쪽만 고치면 페이지가 반쯤 비거나 넘친다.
+   */
+  const boardRef = useRef<HTMLElement | null>(null)
+  const roRef = useRef<ResizeObserver | null>(null)
+  const [boardW, setBoardW] = useState(390)
+  const setBoard = useCallback((el: HTMLElement | null) => {
+    boardRef.current = el
+    roRef.current?.disconnect()
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setBoardW(e.contentRect.width))
+    ro.observe(el)
+    roRef.current = ro
+  }, [])
+  useEffect(() => () => roRef.current?.disconnect(), [])
+  const cols = boardW >= 1200 ? 5 : boardW >= 900 ? 4 : boardW >= 640 ? 3 : 2
+  const paged = usePaged(notes, cols * 6)
+
+  // 벽에 쓰인 쪽지 폰트만 로드 (전부 미리 받지 않는다) — 지금 페이지 것만
   useEffect(() => {
-    for (const m of notes) if (m.font) loadWebfont(m.font)
-  }, [notes])
+    for (const m of paged.items) if (m.font) loadWebfont(m.font)
+  }, [paged.items])
 
   return (
     <div
@@ -136,7 +160,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
         </button>
       </header>
 
-      <main className={`app__scroll ${styles.board}`}>
+      <main ref={setBoard} className={`app__scroll ${styles.board}`}>
         {notes.length === 0 ? (
           <div className={styles.empty}>
             <div className={styles.emptyNote}>
@@ -150,11 +174,14 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
             </div>
           </div>
         ) : (
-          <ul className={styles.masonry} data-rolling-wall>
-            {notes.map((m) => (
-              <MessageNote key={m.id} message={m} papers={display.papers} />
-            ))}
-          </ul>
+          <>
+            <ul className={styles.masonry} data-rolling-wall>
+              {paged.items.map((m) => (
+                <MessageNote key={m.id} message={m} papers={display.papers} />
+              ))}
+            </ul>
+            <Pager page={paged.page} pages={paged.pages} onPage={paged.setPage} label="벽" />
+          </>
         )}
 
         {/* 관리자 진입 — 방문자 눈엔 잘 안 띄게 */}

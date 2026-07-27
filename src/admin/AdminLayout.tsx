@@ -1,5 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
+  Camera,
+  Lamp,
   MessageCircleQuestion,
   ExternalLink,
   LayoutDashboard,
@@ -12,6 +14,7 @@ import type { LucideIcon } from 'lucide-react'
 
 import { hasSupabase } from '@/lib/repo/client'
 import { getSlotService } from '@/data/services'
+import type { ServiceId } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
 import { AdminFeedbackHost } from './AdminFeedback'
 import { SlotSwitcher } from './SlotSwitcher'
@@ -31,18 +34,28 @@ interface NavItem {
  * 처음엔 남이 아는 비밀번호라 자기 것으로 바꿀 자리가 필요하다 (`Account`).
  * local 어댑터엔 바꿀 비번이 없으므로(아무 값이나 통과한다) 그 빌드에선 메뉴를 안 만든다.
  */
-function navFor(service: string): NavItem[] {
-  const own: NavItem[] =
-    service === 'luckydraw'
-      ? [
-          { to: 'overview', label: '대시보드', icon: LayoutDashboard },
-          { to: 'shipping', label: '배송 정보', icon: Truck },
-        ]
-      : service === 'rolling'
-        ? [{ to: 'messages', label: '롤링페이퍼', icon: StickyNote }]
-        : [{ to: 'questions', label: '질문 타로', icon: MessageCircleQuestion }]
+/**
+ * **`Record` 라 모든 서비스가 필수다** — 삼항 체인이었을 땐 새 서비스가 조용히 `else`(질문 타로)
+ * 메뉴를 받았다. 이제 `SERVICES` 에 한 줄 넣으면 여기가 컴파일 에러로 터진다.
+ * 경로는 `AdminRoutes` 의 `ADMIN_ROUTES` 와 짝이 맞아야 한다 — 한쪽만 고치면 빈 화면이 열린다.
+ */
+const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
+  tarot: [{ to: 'questions', label: '질문 타로', icon: MessageCircleQuestion }],
+  luckydraw: [
+    { to: 'overview', label: '대시보드', icon: LayoutDashboard },
+    { to: 'shipping', label: '배송 정보', icon: Truck },
+  ],
+  rolling: [{ to: 'messages', label: '롤링페이퍼', icon: StickyNote }],
+  photozone: [{ to: 'photozone', label: '포토존', icon: Camera }],
+  // 롤페와 같은 화면·같은 경로 — 메뉴 이름만 서비스에 맞춘다
+  wish: [{ to: 'messages', label: '소원나무', icon: Lamp }],
+}
 
-  return [...own, ...(hasSupabase ? [{ to: 'account', label: '내 계정', icon: UserCog }] : [])]
+function navFor(service: ServiceId): NavItem[] {
+  return [
+    ...SERVICE_NAV[service],
+    ...(hasSupabase ? [{ to: 'account', label: '내 계정', icon: UserCog }] : []),
+  ]
 }
 
 export function AdminLayout() {

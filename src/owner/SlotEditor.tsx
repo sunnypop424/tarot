@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { AlertCircle, ArrowLeft, Check, Download, ExternalLink, Eye, Sparkles } from 'lucide-react'
 
@@ -13,6 +13,10 @@ import type { ThemeColors, ThemeShape } from '@/types/theme'
 import { isLight } from '@/lib/color'
 import { repo } from '@/lib/repo'
 import { hasSupabase } from '@/lib/repo/client'
+import { CSS, Card, Field, Swatch, SwatchColor } from './editorUi'
+import { PhotozoneCard } from './service/PhotozoneCard'
+import { WishCard } from './service/WishCard'
+import { PaletteField } from './service/PaletteField'
 import { checkThemeContrast } from './contrast'
 import { repairContrast, type GeneratedTheme } from './aiTheme'
 import { ImageField } from './ImageField'
@@ -31,95 +35,10 @@ import {
   type FontId,
 } from '@/data/luckydraw'
 import { rollingDisplay } from '@/data/rolling'
+import { photozoneDisplay, type PhotozoneDisplay } from '@/data/photozone'
+import { wishDisplay, type WishDisplay } from '@/data/wish'
 import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 import { exportSlots } from './slotsFile'
-
-/**
- * 시안('서비스별 설정 화면.dc.html')에서 그대로 옮긴 인라인 스타일 원자들 —
- * 카드·헤더·입력·라벨·힌트·알약 버튼·색 알약. 서비스마다 같은 원자를 써서 한 몸으로 보인다.
- * (hex 는 여기 밖에 없다: 편집기는 고정 라이트 도구라 토큰을 안 쓴다 — CLAUDE.md 예외.)
- */
-const CSS = {
-  card: { background: '#fff', border: '1px solid #eeeeee', borderRadius: 8, overflow: 'hidden' },
-  head: { padding: '12px 18px', borderBottom: '1px solid #eeeeee', fontSize: 13.5, fontWeight: 700 },
-  headFlex: {
-    padding: '12px 18px', borderBottom: '1px solid #eeeeee', display: 'flex',
-    alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap',
-  },
-  body: { padding: 18 },
-  label: { fontSize: 11.5, fontWeight: 700, color: '#505050' },
-  hint: { fontSize: 11, color: '#8a8a8a', lineHeight: 1.5 },
-  input: {
-    height: 34, border: '1px solid #dddddd', borderRadius: 4, padding: '0 9px',
-    fontSize: 12.5, outline: 'none', minWidth: 0, background: '#fff', color: '#121212',
-  },
-  select: {
-    height: 34, border: '1px solid #dddddd', borderRadius: 4, padding: '0 30px 0 9px', fontSize: 12.5,
-    backgroundColor: '#fff', color: '#121212', cursor: 'pointer', outline: 'none', minWidth: 0,
-    appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none',
-    backgroundImage:
-      "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8a8a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>\")",
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'right 9px center',
-  },
-  fieldCol: { display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 },
-  ghostPill: {
-    height: 28, padding: '0 10px', border: '1px solid #dddddd', background: '#fff',
-    borderRadius: 9999, fontSize: 11.5, fontWeight: 700, color: '#505050', cursor: 'pointer', whiteSpace: 'nowrap',
-  },
-  primaryPill: {
-    height: 34, padding: '0 16px', border: 'none', borderRadius: 9999, background: '#816bff',
-    color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
-  },
-  colorPill: {
-    display: 'flex', alignItems: 'center', height: 30, border: '1px solid #dddddd',
-    borderRadius: 4, overflow: 'hidden', flexShrink: 0,
-  },
-  hexInput: { border: 'none', outline: 'none', width: 78, fontSize: 11.5, padding: '0 7px', background: '#fff', color: '#121212' },
-  colorRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
-  range: { flex: 1, minWidth: 0, accentColor: '#816bff' },
-  thumb: {
-    borderRadius: 4, background: '#f7f7f7', border: '1px solid #eeeeee', flexShrink: 0,
-    display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8a8a8a',
-    backgroundSize: 'cover', backgroundPosition: 'center',
-  },
-} satisfies Record<string, CSSProperties>
-
-/**
- * 평평한 색 스와치 — 시안은 색 span 이지만, 색을 고를 수 있어야 하니 투명한 네이티브 색
- * 고르개를 스와치 위에 겹쳐 둔다 (span 을 눌러 고르개가 열린다). 픽커가 준 hex 만 올려보낸다.
- *
- * **모듈 바깥에 둔다.** 안에서 정의하면 렌더마다 새 타입이 만들어져 색을 드래그하는 순간 닫힌다.
- */
-function Swatch({ value, label, size = 28, onChange }: { value: string; label: string; size?: number; onChange: (hex: string) => void }) {
-  return (
-    <label style={{ width: size, height: size, background: hexOf(value), borderRight: '1px solid #eeeeee', flexShrink: 0, cursor: 'pointer', position: 'relative', display: 'block' }}>
-      <input
-        type="color"
-        value={hexOf(value)}
-        aria-label={`${label} 고르기`}
-        onChange={(e) => onChange(e.target.value)}
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, border: 'none', padding: 0, cursor: 'pointer' }}
-      />
-    </label>
-  )
-}
-
-/** 시안 색 행 — 라벨(+힌트) 좌, [스와치 | hex] 우. 서비스 공통. */
-function SwatchColor({ label, value, hint, id, onChange }: { label: string; value: string; hint?: string; id?: string; onChange: (v: string) => void }) {
-  return (
-    <div style={CSS.colorRow}>
-      <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 12.5, color: '#505050' }}>{label}</div>
-        {hint && <div style={CSS.hint}>{hint}</div>}
-      </div>
-      <div style={CSS.colorPill}>
-        <Swatch value={value} label={label} onChange={onChange} />
-        <input id={id} value={value} onChange={(e) => onChange(e.target.value)} style={CSS.hexInput} />
-      </div>
-    </div>
-  )
-}
 
 /** hex + 투명도 → rgba (시안 박스·카운터·모달 색): 라벨·힌트 위, [스와치 | hex] · 슬라이더 · % 아래. */
 function AlphaColor({ label, value, hint, onChange }: { label: string; value: string; hint?: string; onChange: (v: string) => void }) {
@@ -207,43 +126,6 @@ function RankListField({
         }}
         style={CSS.input}
       />
-      {hint && <span style={CSS.hint}>{hint}</span>}
-    </label>
-  )
-}
-
-/** 시안 카드 — 흰 박스, 상단 헤더 바(제목 + 선택적 우측 노트/버튼), 본문. */
-function Card({
-  title,
-  note,
-  right,
-  children,
-  style,
-}: {
-  title: string
-  note?: string
-  right?: ReactNode
-  children: ReactNode
-  style?: CSSProperties
-}) {
-  return (
-    <div style={{ ...CSS.card, ...style }}>
-      <div style={CSS.headFlex}>
-        <span style={{ fontSize: 13.5, fontWeight: 700 }}>{title}</span>
-        {note && <span style={{ fontSize: 11.5, color: '#8a8a8a' }}>{note}</span>}
-        {right}
-      </div>
-      <div style={CSS.body}>{children}</div>
-    </div>
-  )
-}
-
-/** 시안 라벨-위 필드 — 라벨, 자식(입력), 선택적 힌트. */
-function Field({ label, hint, children }: { label: string; hint?: ReactNode; children: ReactNode }) {
-  return (
-    <label style={CSS.fieldCol}>
-      <span style={CSS.label}>{label}</span>
-      {children}
       {hint && <span style={CSS.hint}>{hint}</span>}
     </label>
   )
@@ -769,7 +651,11 @@ export function SlotEditor() {
   const [previewScale, setPreviewScale] = useState(1)
   /** '크게' — 미리보기를 위로 올리고 전체 폭을 준다 (아이패드 가로는 좁은 칸에선 못 읽는다) */
   const [previewBig, setPreviewBig] = useState(false)
-  /** 롤페 미리보기 — 벽 / 작성 화면 전환 (radius 등은 작성 화면에 반영되니 골라 봐야 한다) */
+  /**
+   * 롤페·소원나무 미리보기 — 목록 / 작성 화면 전환.
+   * 두 서비스가 같은 상태를 쓴다: 화면 구조가 같고(`/{slug}` 과 `/{slug}/write`),
+   * 한 슬롯은 둘 중 하나만 되므로 상태를 나눌 이유가 없다.
+   */
   const [rollingView, setRollingView] = useState<'wall' | 'write'>('wall')
   /** 지금 만지는 색이 화면의 **어느 자리**인지 — 미리보기가 그 부분을 깜빡인다 */
   const [highlight, setHighlight] = useState<string | null>(null)
@@ -852,9 +738,24 @@ export function SlotEditor() {
    * 그래서 색·형태 패널은 럭키드로우와 달리 숨기지 않고, 이미지 섹션만 롤페 전용 패널로 대신한다.
    */
   const rolling = getSlotService(draft) === 'rolling'
+  /**
+   * **타로 블록은 `!luckydraw && !rolling` 이 아니라 `tarot` 으로 판정한다.**
+   *
+   * 두 조건은 지금은 같은 값이지만, 서비스가 늘면 갈린다 — 부정 체인은 서비스가 추가될 때마다
+   * `&& !photozone && !quiz …` 로 자라고, 한 번 빠뜨리면 **새 서비스 슬롯에 타로 설정
+   * (78장 앞면 업로드·카테고리별 뽑기)이 통째로 뜬다.** 블록의 진짜 의미가 "타로일 때만" 이므로
+   * 그대로 적는다. 이러면 서비스가 몇 개 늘어도 이 판정은 영영 안 건드린다.
+   */
+  const tarot = getSlotService(draft) === 'tarot'
+  const photozone = getSlotService(draft) === 'photozone'
+  const wish = getSlotService(draft) === 'wish'
   const rd = rollingDisplay(draft)
   const patchRolling = (change: Partial<typeof rd>) =>
     patchSlot((prev) => ({ rolling: { ...rollingDisplay(prev), ...change } }))
+  const patchPhotozone = (change: Partial<PhotozoneDisplay>) =>
+    patchSlot((prev) => ({ photozone: { ...photozoneDisplay(prev), ...change } }))
+  const patchWish = (change: Partial<WishDisplay>) =>
+    patchSlot((prev) => ({ wish: { ...wishDisplay(prev), ...change } }))
 
   const patchColor = (key: keyof ThemeColors, value: string) =>
     patchSlot((prev) => ({
@@ -1251,7 +1152,7 @@ export function SlotEditor() {
           </div>
 
           {/* 색 만들기 — 타로만. 럭드는 색이 몇 개뿐이고, 롤페는 자체 색을 롤페 카드에서 고른다 */}
-          {!luckydraw && !rolling && (
+          {tarot && (
             <Card title="색 만들기">
               <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
                 대표 색 하나와 밝기만 정하면 나머지 색을 다 만들어요. 마음에 안 드는 색은 아래에서 손으로 고치면 됩니다. 읽히는지는 자동으로 맞춰요 — 안 읽히는 색은 대비를 넘게 조정해서 넣습니다.
@@ -1312,7 +1213,7 @@ export function SlotEditor() {
           )}
 
           {/* ══ 타로 서비스 설정 ══ */}
-          {!luckydraw && !rolling && (
+          {tarot && (
             <>
               <Card title="테마 색 · 형태">
                 {themeColorKeys.length > 0 && (
@@ -1503,6 +1404,12 @@ export function SlotEditor() {
             </div>
           )}
 
+          {/* ══ 포토존 서비스 설정 ══ (카드가 별도 파일에 있다 — service/PhotozoneCard.tsx 주석) */}
+          {photozone && <PhotozoneCard slot={draft} patch={patchPhotozone} />}
+
+          {/* ══ 소원나무 서비스 설정 ══ */}
+          {wish && <WishCard slot={draft} patch={patchWish} />}
+
           {/* ══ 롤링페이퍼 서비스 설정 ══ */}
           {rolling && (
             <>
@@ -1565,32 +1472,13 @@ export function SlotEditor() {
                   ))}
                 </div>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee' }}>
-                  <div style={{ ...CSS.label, marginBottom: 9 }}>포스트잇 종이색</div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                    {rd.papers.map((c, idx) => (
-                      <div key={idx} style={{ width: 42, height: 42, borderRadius: 4, background: c, border: '1px solid rgba(0,0,0,.09)', position: 'relative' }}>
-                        <label style={{ position: 'absolute', inset: 0, cursor: 'pointer' }}>
-                          <input type="color" value={c} aria-label={`종이색 ${idx + 1}`} onChange={(e) => patchRolling({ papers: rd.papers.map((p, j) => (j === idx ? e.target.value : p)) })} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, border: 'none', padding: 0, cursor: 'pointer' }} />
-                        </label>
-                        <button
-                          type="button"
-                          aria-label={`종이색 ${idx + 1} 빼기`}
-                          onClick={() => patchRolling({ papers: rd.papers.filter((_, j) => j !== idx) })}
-                          style={{ position: 'absolute', top: -6, right: -6, width: 17, height: 17, borderRadius: 9999, background: '#fff', border: '1px solid #dddddd', color: '#8a8a8a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontSize: 11, lineHeight: 1 }}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => patchRolling({ papers: [...rd.papers, '#f4efe2'] })}
-                      style={{ width: 42, height: 42, borderRadius: 4, border: '1px dashed #dddddd', background: '#f7f7f7', color: '#8a8a8a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, lineHeight: 1 }}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <div style={{ fontSize: 11, color: '#8a8a8a', marginTop: 8 }}>방문자가 쪽지마다 고르는 색이에요. 파스텔 여러 색이 벽을 알록달록하게 해요.</div>
+                  {/* 소원나무도 같은 위젯을 쓴다 (등불색) — service/PaletteField.tsx */}
+                  <PaletteField
+                    label="포스트잇 종이색"
+                    hint="방문자가 쪽지마다 고르는 색이에요. 파스텔 여러 색이 벽을 알록달록하게 해요."
+                    value={rd.papers}
+                    onChange={(papers) => patchRolling({ papers })}
+                  />
                 </div>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,230px),1fr))', gap: 16 }}>
                   <div style={CSS.fieldCol}>
@@ -1729,9 +1617,13 @@ export function SlotEditor() {
               </div>
             )}
 
-            {rolling && (
+            {(rolling || wish) && (
               <div style={{ padding: '9px 15px', borderBottom: '1px solid #eeeeee', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {([['wall', '벽'], ['write', '작성 화면']] as ['wall' | 'write', string][]).map(([value, label]) => {
+                {(
+                  wish
+                    ? ([['wall', '나무'], ['write', '소원 적기']] as ['wall' | 'write', string][])
+                    : ([['wall', '벽'], ['write', '작성 화면']] as ['wall' | 'write', string][])
+                ).map(([value, label]) => {
                   const on = rollingView === value
                   return (
                     <button
@@ -1750,9 +1642,9 @@ export function SlotEditor() {
             <div ref={previewBox} style={{ padding: '20px 18px', background: '#f7f7f7', display: 'flex', justifyContent: 'center' }}>
               <div style={{ width: previewDevice.w * previewScale, height: previewDevice.h * previewScale, overflow: 'hidden', borderRadius: 16, background: '#fff', border: '1px solid #dddddd', flexShrink: 0 }}>
                 <iframe
-                  key={`${saved.slug}${rolling ? `-${rollingView}` : ''}`}
+                  key={`${saved.slug}${rolling || wish ? `-${rollingView}` : ''}`}
                   ref={previewFrame}
-                  src={`/${saved.slug}${rolling && rollingView === 'write' ? '/write' : ''}`}
+                  src={`/${saved.slug}${(rolling || wish) && rollingView === 'write' ? '/write' : ''}`}
                   title="미리보기"
                   style={{ width: previewDevice.w, height: previewDevice.h, border: 0, transformOrigin: 'top left', transform: `scale(${previewScale})`, background: '#fff', display: 'block' }}
                 />

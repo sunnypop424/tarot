@@ -3,9 +3,20 @@ import { Eye, EyeOff, MessageSquareOff, Trash2 } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import type { RollingMessage } from '@/lib/repo'
+import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
 import styles from './Rolling.module.css'
+
+/**
+ * **이 화면은 롤링페이퍼와 소원나무가 같이 쓴다** (같은 테이블·같은 repo — `src/data/wish.ts`).
+ * 하는 일은 같지만 주최자가 산 물건의 이름이 다르다. "롤링페이퍼" 라고 적힌 화면을 소원나무
+ * 주최자가 보면 그건 그냥 틀린 화면이라, 부르는 말만 갈아 끼운다.
+ */
+const COPY = {
+  rolling: { title: '롤링페이퍼', place: '벽', unit: '메시지' },
+  wish: { title: '소원나무', place: '나무', unit: '소원' },
+} as const
 
 /**
  * 롤링페이퍼 후검수 — 주최자가 만지는 유일한 롤페 화면.
@@ -17,6 +28,7 @@ import styles from './Rolling.module.css'
 export function Moderation() {
   const slot = useSlot()
   const slug = slot.slug
+  const c = getSlotService(slot) === 'wish' ? COPY.wish : COPY.rolling
 
   const [list, setList] = useState<RollingMessage[] | null>(null)
   const [busy, setBusy] = useState(false)
@@ -35,7 +47,7 @@ export function Moderation() {
     try {
       await repo.rolling.setHidden(slug, m.id, !m.hidden)
       await load()
-      toast(m.hidden ? '다시 벽에 보여요' : '벽에서 숨겼어요')
+      toast(m.hidden ? `다시 ${c.place}에 보여요` : `${c.place}에서 숨겼어요`)
     } finally {
       setBusy(false)
     }
@@ -43,7 +55,7 @@ export function Moderation() {
 
   async function remove(m: RollingMessage) {
     const ok = await confirmAction({
-      title: '이 메시지를 삭제할까요?',
+      title: `이 ${c.unit}을 삭제할까요?`,
       desc: '삭제하면 되돌릴 수 없어요. 숨기기만 해도 방문자에겐 안 보여요.',
       okLabel: '삭제',
       danger: true,
@@ -67,9 +79,9 @@ export function Moderation() {
     <div>
       <header className="admin__head">
         <div>
-          <h1 className="t-title-l">롤링페이퍼</h1>
+          <h1 className="t-title-l">{c.title}</h1>
           <p className="t-text-xs t-muted">
-            {list.length}개 · 숨김 {hiddenCount}개 · 남긴 즉시 벽에 보여요.{' '}
+            {list.length}개 · 숨김 {hiddenCount}개 · 남긴 즉시 {c.place}에 보여요.{' '}
             <b>부적절한 것만 숨기거나 지우세요.</b>
           </p>
         </div>
@@ -78,7 +90,7 @@ export function Moderation() {
       {list.length === 0 ? (
         <div className="admin-empty">
           <MessageSquareOff size={44} strokeWidth={1.6} aria-hidden="true" />
-          <div className="admin-empty__title">아직 남긴 메시지가 없어요.</div>
+          <div className="admin-empty__title">아직 남긴 {c.unit}이 없어요.</div>
         </div>
       ) : (
         <ul className={styles.list} data-rolling-mod>

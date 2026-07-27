@@ -14,6 +14,9 @@ export const SERVICES = [
   { id: 'tarot', label: '타로', hint: '카드를 뽑고 해석을 본다' },
   { id: 'luckydraw', label: '럭키드로우', hint: '스태프가 경품을 추첨한다' },
   { id: 'rolling', label: '롤링페이퍼', hint: '방문자가 응원 메시지를 남긴다' },
+  { id: 'photozone', label: '포토존', hint: '이벤트 프레임을 씌워 인증샷을 저장한다' },
+  // 데이터는 롤링페이퍼와 공유한다 (같은 테이블·같은 repo) — 겉모습만 다르다. src/data/wish.ts
+  { id: 'wish', label: '소원나무', hint: '방문자가 소원을 등불로 매단다' },
 ] as const
 
 export type ServiceId = (typeof SERVICES)[number]['id']

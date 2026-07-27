@@ -2,6 +2,12 @@
  * 롤링페이퍼 검증 — **공개 벽·후검수·기간 게이트를 실제 DB 에 대고 돌린다.**
  *
  *   node scripts/verify-rolling.mjs
+ *   SERVICE=wish node scripts/verify-rolling.mjs    ← 소원나무도 같은 계약을 지키는지
+ *
+ * **소원나무(`wish`)는 이 테이블과 repo 를 그대로 쓴다** (`src/data/wish.ts`). 그래서 계약도
+ * 같아야 하는데, 0013 의 정책들이 `slot_visible(s.period, s.service)` 로 **service 를 넘기기만**
+ * 하고 값에 매여 있지 않다는 게 그 전제다. `SERVICE=wish` 로 한 번 더 돌려 그걸 실증한다 —
+ * "같은 정책이 두 서비스에 다 걸린다" 는 주장을 코드리뷰가 아니라 DB 가 답하게 한다.
  *
  * 럭키드로우와 반대다: 스태프가 아니라 **anon 이 직접 쓴다.** 그래서 지켜야 할 약속도 반대다 —
  * 여기서 보는 건 "누가 못 뽑나" 가 아니라 **"누가 못 읽고 못 고치나"** 다:
@@ -28,8 +34,10 @@ const URL_ = env.VITE_SUPABASE_URL
 const ANON = env.VITE_SUPABASE_ANON_KEY
 const OWNER_EMAIL = 'owner@example.com'
 const OWNER_PASSWORD = env.SEED_PASSWORD ?? 'tarot1234'
-const SLUG = 'rolling-verify'
-const SLUG_CLOSED = 'rolling-verify-closed'
+/** 'rolling' | 'wish' — 둘이 같은 테이블·같은 정책을 쓴다 (맨 위 주석) */
+const SERVICE = process.env.SERVICE ?? 'rolling'
+const SLUG = `${SERVICE}-verify`
+const SLUG_CLOSED = `${SERVICE}-verify-closed`
 
 if (!URL_ || !ANON) {
   console.error('.env.local 에 VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY 가 없어요')
@@ -71,8 +79,8 @@ const mkSlot = (slug, period) =>
     headers: { ...OWNER, prefer: 'return=minimal' },
     body: JSON.stringify({
       slug,
-      name: '롤링페이퍼 검증',
-      service: 'rolling',
+      name: `${SERVICE} 검증`,
+      service: SERVICE,
       period,
       theme: { colors: {}, shape: {}, assets: {} },
       event: {},
@@ -197,5 +205,5 @@ await cleanup()
   check('검증이 남긴 게 없다', rows.length === 0, `${rows.length}행 남음`)
 }
 
-console.log(failed === 0 ? '\n전부 통과' : `\n${failed}개 실패`)
+console.log(failed === 0 ? `\n전부 통과 (service=${SERVICE})` : `\n${failed}개 실패 (service=${SERVICE})`)
 process.exit(failed === 0 ? 0 : 1)
