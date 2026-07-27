@@ -9,6 +9,10 @@
     />
     <meta name="theme-color" content="#0F1020" />
     <meta name="description" content="주머니 속 타로 리더 — 카드를 뽑아 오늘의 조언을 만나보세요." />
+    <!-- 홈 화면에 추가(웹앱) — 이름·아이콘·매니페스트는 슬롯마다 SlotProvider 가 심는다 (src/slot/pwa.ts) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <script>
       // 테마 깜빡임 방지 — 첫 페인트 전에 이 슬롯의 배경색을 깐다.
       // SlotProvider 가 지난 방문 때 슬러그별로 캐시해 둔 값을 읽는다 (없으면 기본 다크 그대로).

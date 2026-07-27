@@ -7,6 +7,7 @@ import { onSlotChange } from '@/lib/repo/changed'
 import { applyTheme } from '@/lib/theme'
 import { isLight } from '@/lib/color'
 import { useLivePreview } from './preview'
+import { applyPwaHead } from './pwa'
 import type { Slot } from '@/types/slot'
 
 /**
@@ -109,6 +110,15 @@ export function SlotProvider({ children }: { children: ReactNode }) {
       document.title = before
     }
   }, [state])
+
+  /**
+   * 웹앱 매니페스트 + iOS 메타 — 방문자가 "홈 화면에 추가" 하면 이 이벤트로 열리는 앱이 된다.
+   * **미리보기(초안)일 땐 심지 않는다** — 편집기 iframe 이 부모의 매니페스트를 갈아치우면 안 된다.
+   */
+  useEffect(() => {
+    if (state.status !== 'ready' || preview) return
+    return applyPwaHead(state.slot)
+  }, [state, preview])
 
   return <SlotContext.Provider value={state}>{children}</SlotContext.Provider>
 }

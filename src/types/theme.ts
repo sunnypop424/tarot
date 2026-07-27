@@ -67,6 +67,12 @@ export interface ThemeAssets {
   /** 로고 표시 높이(px) */
   logoHeight: number
 
+  /**
+   * 웹앱 아이콘 URL — 방문자가 "홈 화면에 추가" 하면 이 아이콘으로 앱이 된다 (모든 서비스 공통).
+   * 정사각 PNG 권장(512×512). 없으면 홈 화면 아이콘이 기본(브라우저 생성)으로 뜬다.
+   */
+  appIcon: string | null
+
   /** 배경 패턴 이미지 URL */
   backgroundPattern: string | null
   /** 배경 패턴 불투명도 (0~1) — 카드를 가리지 않게 낮게 */

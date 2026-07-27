@@ -1346,6 +1346,25 @@ export function SlotEditor() {
               </section>
             )}
 
+            {/* 웹앱 아이콘 — 모든 서비스 공통. "홈 화면에 추가" 하면 이 아이콘·행사명으로 앱이 된다 */}
+            <section className="admin-section">
+              <h2 className="t-title-s admin-section__title">웹앱 아이콘</h2>
+              <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+                방문자가 브라우저에서 "홈 화면에 추가" 하면 이 아이콘과 행사명으로 앱처럼 열려요.
+                정사각형 PNG 를 권장해요 (512×512).
+              </p>
+              <div className="form-grid">
+                <ImageField
+                  slug={saved.slug}
+                  label="앱 아이콘"
+                  name="app-icon"
+                  value={draft.theme.assets.appIcon}
+                  onChange={(v) => patchAsset('appIcon', v)}
+                  hint="없으면 홈 화면 아이콘이 기본으로 떠요."
+                />
+              </div>
+            </section>
+
             {COLOR_GROUPS.filter((g) =>
               g.services.includes(getSlotService(draft))
             ).map(({ title, keys, hint }) => (

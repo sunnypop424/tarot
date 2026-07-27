@@ -29,6 +29,7 @@
     "logo": null,
     "logoAlt": "",
     "logoHeight": 28,
+    "appIcon": null,
     "backgroundPattern": null,
     "backgroundPatternOpacity": 0.12,
     "backgroundPatternSize": "cover",
