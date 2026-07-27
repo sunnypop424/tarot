@@ -6,6 +6,21 @@
   gap: var(--space-xl);
   padding-bottom: var(--space-lg);
 }
+
+/* 뽑힌 카드들 — 모바일은 세로, 넓은 화면은 장수만큼 한 줄 그리드 (한 장이면 카드 옆 2열) */
+.spread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+@media (min-width: 720px) {
+  .spread {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-lg);
+    align-items: start;
+  }
+}
 /* 넓은 화면 — 타이틀 위·버튼 아래 고정, 내용은 세로 가운데. 카드 옆 해석(ReadingCard 2열) */
 @media (min-width: 720px) {
   .resultScreen {

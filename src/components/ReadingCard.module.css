@@ -38,26 +38,26 @@
   gap: var(--space-md);
 }
 
-/* 넓은 화면(패드·태블릿·PC) — 카드 왼쪽, 해석 오른쪽. 이름·키워드는 왼쪽 정렬 */
+/* 넓은 화면 — 한 장(:not(.brief))만 카드 왼쪽·해석 오른쪽 2열, 세로 가운데.
+   여러 장(.brief)은 세로(카드 위·해석 아래) 유지 — 3장이 한 줄에 나열되므로. */
 @media (min-width: 720px) {
-  .reading {
+  .reading:not(.brief) {
     flex-direction: row;
-    /* 카드와 해석을 세로 가운데로 */
     align-items: center;
     gap: var(--space-xl);
   }
-  .cardSide {
+  .reading:not(.brief) .cardSide {
     flex-shrink: 0;
     width: 190px;
   }
-  .textSide {
+  .reading:not(.brief) .textSide {
     flex: 1;
     min-width: 0;
   }
-  .name {
+  .reading:not(.brief) .name {
     text-align: left;
   }
-  .keywords {
+  .reading:not(.brief) .keywords {
     justify-content: flex-start;
   }
 }

@@ -164,17 +164,20 @@ function Result({ category, drawn, synthesis, onRedraw, onDone }: ResultProps) {
       {category.renews && <p className="t-text-xs t-muted screen__lead">{category.renews}</p>}
 
       <div className={styles.results}>
-        {drawn.map((item, i) => (
-          <ReadingCard
-            key={item.card.id}
-            drawn={item}
-            position={positions[i]}
-            aspect={category.aspect}
-            // 3장 나열은 길어진다 — 각 장을 짧게
-            brief={drawn.length > 1}
-            verdict={isYesNo ? verdictFor(item) : undefined}
-          />
-        ))}
+        {/* 카드들 — 여러 장이면 넓은 화면에서 한 줄로 나열 */}
+        <div className={styles.spread}>
+          {drawn.map((item, i) => (
+            <ReadingCard
+              key={item.card.id}
+              drawn={item}
+              position={positions[i]}
+              aspect={category.aspect}
+              // 3장 나열은 길어진다 — 각 장을 짧게
+              brief={drawn.length > 1}
+              verdict={isYesNo ? verdictFor(item) : undefined}
+            />
+          ))}
+        </div>
 
         {/* 카드 아래 — 각 장을 읽고 나서 "그래서 종합하면?" 이 오는 자리 */}
         {synthesis && <Synthesis text={synthesis} />}
