@@ -30,11 +30,26 @@
   margin-bottom: var(--space-lg);
   text-align: center;
 }
+/* 넓은 화면 — 상단 네비 브랜드에 이미 이벤트명이 있으니 홈 로고는 감춘다 (중복 노출 방지) */
+@media (min-width: 720px) {
+  .logo {
+    display: none;
+  }
+}
 
 .segment {
   position: relative;
   z-index: 1;
   margin-bottom: var(--space-base);
+}
+/* 넓은 화면 — 폭 전체로 늘어진 큰 세그먼트는 어색하다. 컴팩트하게 가운데로.
+   (margin-inline:auto 는 세로 flex 자식을 콘텐츠 크기로 줄여 flex:1 을 깨므로 align-self 로 가운데) */
+@media (min-width: 720px) {
+  .segment {
+    width: 360px;
+    align-self: center;
+    margin-bottom: var(--space-lg);
+  }
 }
 
 .renews {

@@ -77,6 +77,9 @@
   .screen {
     max-width: 980px;
   }
+  .topnav__inner {
+    max-width: 980px;
+  }
 }
 
 /* ── 데스크톱 상단 네비게이션 (넓은 화면 전용) ── */
@@ -87,11 +90,12 @@
   .topnav {
     display: block;
     flex-shrink: 0;
+    /* 바 배경은 테마 표면색 — 다크/라이트 슬롯에 맞춰 자동. 구분선은 없음 */
     background: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
   }
   .topnav__inner {
-    max-width: 960px;
+    /* 아래 콘텐츠(.screen)와 같은 폭·패딩이라 브랜드·링크가 콘텐츠 가장자리와 정렬된다 */
+    max-width: 760px;
     margin: 0 auto;
     height: 62px;
     padding: 0 var(--layout-pad);
