@@ -4,7 +4,7 @@
  */
 
 html {
-  font-size: 16px;
+  font-size: var(--text-m);
 }
 
 body {

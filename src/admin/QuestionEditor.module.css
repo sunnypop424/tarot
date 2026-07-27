@@ -31,10 +31,10 @@
   align-items: center;
   gap: 5px;
   padding: 4px 10px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: #eaf6ef;
   color: #3ea472;
-  font-size: 12px;
+  font-size: var(--text-xxs);
   font-weight: var(--weight-bold);
   white-space: nowrap;
 }
