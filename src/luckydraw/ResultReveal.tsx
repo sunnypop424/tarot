@@ -125,19 +125,22 @@ export function ResultReveal({
           ))}
         </ul>
 
-        <div className={styles.revealFoot}>
-          {needsShipping && (
-            <button
-              type="button"
-              className="btn btn--primary btn--block"
-              onClick={() => setShipping(true)}
-            >
-              배송 정보 입력하기
+        {/* 배송이 있으면 두 버튼을 좌우로, 없으면 '처음으로' 하나만 꽉 차게 */}
+        <div className={styles.revealFoot} data-row={needsShipping || undefined}>
+          {needsShipping ? (
+            <>
+              <button type="button" className="btn btn--primary" onClick={() => setShipping(true)}>
+                배송지 입력
+              </button>
+              <button type="button" className="btn btn--slight" onClick={onFinish}>
+                처음으로
+              </button>
+            </>
+          ) : (
+            <button type="button" className="btn btn--slight btn--block" onClick={onFinish}>
+              처음으로
             </button>
           )}
-          <button type="button" className="btn btn--slight btn--block" onClick={onFinish}>
-            처음으로
-          </button>
         </div>
 
         {shipping && (
