@@ -17,6 +17,7 @@ import { CrystalBall } from '@/components/CrystalBall'
 import { checkThemeContrast } from './contrast'
 import { repairContrast, type GeneratedTheme } from './aiTheme'
 import { ImageField } from './ImageField'
+import { StickerField } from './StickerField'
 import { CardUploader } from './CardUploader'
 import { OrganizerPanel } from './OrganizerPanel'
 import { PeriodFields } from './PeriodFields'
@@ -30,6 +31,7 @@ import {
   luckydrawDisplay,
   type FontId,
 } from '@/data/luckydraw'
+import { rollingDisplay, ROLLING_COLOR_CHOICES, ROLLING_COLOR_LABELS } from '@/data/rolling'
 import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 import { exportSlots } from './slotsFile'
 import styles from './Owner.module.css'
@@ -409,28 +411,29 @@ const COLOR_GROUPS: {
   title: string
   keys: (keyof ThemeColors)[]
   hint?: string
-  /** 타로에서만 쓰이는 색 — 럭키드로우 슬롯에선 안 보인다 */
-  tarotOnly?: boolean
-  /** 럭키드로우에서만 쓰이는 색 — 타로 슬롯에선 안 보인다 */
-  luckydrawOnly?: boolean
+  /**
+   * 이 색 그룹을 보여줄 서비스 — 서비스가 늘면 여기 배열만 손댄다.
+   * 럭키드로우는 중립색이 붙박이라(LUCKYDRAW_NEUTRALS) 어느 그룹에도 안 낀다.
+   * 롤페는 타로 테마 토큰을 그대로 쓰되(배경·표면·CTA·포인트·텍스트), 카드가 없어 뒷면만 뺀다.
+   */
+  services: ServiceId[]
 }[] = [
-  // 럭키드로우는 중립색이 붙박이라(LUCKYDRAW_NEUTRALS) 이 그룹이 통째로 없다
-  { title: '배경 · 표면', keys: ['canvas', 'surface', 'surfaceRaised', 'wash'], tarotOnly: true },
+  { title: '배경 · 표면', keys: ['canvas', 'surface', 'surfaceRaised', 'wash'], services: ['tarot', 'rolling'] },
   {
     title: '인터랙션 (CTA · 활성)',
     keys: ['primary', 'primaryHover', 'onPrimary'],
     hint: '칩 · 보조버튼 글자색은 배경 밝기에 맞춰 자동 계산돼요.',
-    tarotOnly: true,
+    services: ['tarot', 'rolling'],
   },
   {
     title: '포인트 (카드 테두리 · 별 문양)',
     keys: ['accent'],
     hint: '어두운 카드 위 장식 기준으로 고르세요. 표면 위 아이콘·글자에 쓰일 색은 표면 밝기에 맞춰 자동 계산돼요.',
-    tarotOnly: true,
+    services: ['tarot', 'rolling'],
   },
-  { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'], tarotOnly: true },
-  // 럭키드로우엔 카드가 없다 — 그 슬롯에선 이 그룹을 통째로 감춘다
-  { title: '카드 뒷면 (내장 SVG용)', keys: ['cardBackFrom', 'cardBackTo'], tarotOnly: true },
+  { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'], services: ['tarot', 'rolling'] },
+  // 뒷면은 내장 SVG 카드 전용이라 타로에만 — 롤페엔 카드가 없다
+  { title: '카드 뒷면 (내장 SVG용)', keys: ['cardBackFrom', 'cardBackTo'], services: ['tarot'] },
 ]
 
 // primarySoft·accentSoft 는 자동 파생이라 편집기에 노출하지 않는다 → Partial
@@ -712,6 +715,14 @@ export function SlotEditor() {
    * "이 슬롯은 타로도 되나" 하고 헷갈린다.** 서비스가 정하는 건 화면만이 아니라 설정의 범위다.
    */
   const luckydraw = getSlotService(draft) === 'luckydraw'
+  /**
+   * 롤링페이퍼는 타로처럼 **테마 색·형태를 그대로 쓴다** (벽 배경·카드 틴트·버튼이 다 테마 토큰).
+   * 그래서 색·형태 패널은 럭키드로우와 달리 숨기지 않고, 이미지 섹션만 롤페 전용 패널로 대신한다.
+   */
+  const rolling = getSlotService(draft) === 'rolling'
+  const rd = rollingDisplay(draft)
+  const patchRolling = (change: Partial<typeof rd>) =>
+    patchSlot((prev) => ({ rolling: { ...rollingDisplay(prev), ...change } }))
 
   const patchColor = (key: keyof ThemeColors, value: string) =>
     patchSlot((prev) => ({
@@ -931,7 +942,9 @@ export function SlotEditor() {
                     이 슬롯이 파는 것.{' '}
                     {luckydraw
                       ? '아래 설정은 럭키드로우용이에요 (카드·AI 관련 항목은 안 나와요).'
-                      : '아래 카드 · 뽑기 관련 항목은 타로 서비스의 설정이에요.'}
+                      : rolling
+                        ? '아래 “롤링페이퍼” 칸에서 벽 문구·카드 색·스티커·배경을 정해요 (색·형태는 테마를 따라가요).'
+                        : '아래 카드 · 뽑기 관련 항목은 타로 서비스의 설정이에요.'}
                   </span>
                 </div>
               </div>
@@ -1120,9 +1133,106 @@ export function SlotEditor() {
                 </section>
               ))}
 
+            {/**
+             * 롤링페이퍼 전용 — 벽 문구·방문자가 고를 카드 색·스티커·벽 배경.
+             * 색·형태는 위 테마 패널이 이미 정한다 (롤페는 타로처럼 테마를 그대로 쓴다).
+             */}
+            {rolling && (
+              <section className="admin-section">
+                <h2 className="t-title-s admin-section__title">롤링페이퍼</h2>
+                <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+                  방문자가 남긴 메시지가 벽에 쌓여요. 남긴 즉시 벽에 보이고, 부적절한 건 주최자가
+                  숨겨요.
+                </p>
+                <div className="form-grid">
+                  <div className="field">
+                    <span className="field__label">벽 제목</span>
+                    <input
+                      className="input"
+                      value={rd.wallTitle}
+                      onChange={(e) => patchRolling({ wallTitle: e.target.value })}
+                    />
+                  </div>
+                  <div className="field">
+                    <span className="field__label">입력 안내</span>
+                    <input
+                      className="input"
+                      value={rd.prompt}
+                      onChange={(e) => patchRolling({ prompt: e.target.value })}
+                    />
+                    <span className="field__hint">메시지 입력칸에 흐리게 뜨는 문구예요.</span>
+                  </div>
+                  <div className="field">
+                    <span className="field__label">남기기 버튼</span>
+                    <input
+                      className="input"
+                      value={rd.postLabel}
+                      onChange={(e) => patchRolling({ postLabel: e.target.value })}
+                    />
+                  </div>
+                  <div className="field">
+                    <span className="field__label">카드 색</span>
+                    <div className="color-field" style={{ flexWrap: 'wrap', gap: 'var(--space-sm)' }}>
+                      {ROLLING_COLOR_CHOICES.map((key) => {
+                        const on = rd.cardColors.includes(key)
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            className={`btn btn--sm ${on ? 'btn--primary' : 'btn--slight'}`}
+                            aria-pressed={on}
+                            onClick={() =>
+                              patchRolling({
+                                cardColors: on
+                                  ? rd.cardColors.filter((c) => c !== key)
+                                  : [...rd.cardColors, key],
+                              })
+                            }
+                          >
+                            <span
+                              aria-hidden="true"
+                              style={{
+                                display: 'inline-block',
+                                width: 12,
+                                height: 12,
+                                borderRadius: '50%',
+                                marginRight: 6,
+                                verticalAlign: 'middle',
+                                background: draft.theme.colors[key as keyof ThemeColors],
+                              }}
+                            />
+                            {ROLLING_COLOR_LABELS[key]}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <span className="field__hint">
+                      방문자가 카드마다 고를 수 있는 색이에요. 실제 색은 위 테마를 따라가요.
+                    </span>
+                  </div>
+                </div>
+                <div className="form-grid">
+                  <ImageField
+                    slug={saved.slug}
+                    label="벽 배경 이미지"
+                    name="rolling-wallbg"
+                    value={rd.wallBg || null}
+                    onChange={(v) => patchRolling({ wallBg: v ?? '' })}
+                    hint="비우면 위 테마 배경을 써요. 화면을 꽉 채워요."
+                  />
+                  <StickerField
+                    slug={saved.slug}
+                    label="스티커"
+                    value={rd.stickers}
+                    onChange={(next) => patchRolling({ stickers: next })}
+                    hint="방문자가 카드에 붙일 수 있어요. 주최자에게 받은 이미지를 올려 주세요."
+                  />
+                </div>
+              </section>
+            )}
 
             {COLOR_GROUPS.filter((g) =>
-              luckydraw ? !g.tarotOnly : !g.luckydrawOnly
+              g.services.includes(getSlotService(draft))
             ).map(({ title, keys, hint }) => (
               <section key={title} className="admin-section">
                 <h2 className="t-title-s admin-section__title">{title}</h2>
@@ -1183,8 +1293,11 @@ export function SlotEditor() {
             </section>
             )}
 
-            {/* 럭키드로우는 '배경' 카드가 이미지를 받는다 (로고·카드 이미지는 애초에 없다) */}
-            {!luckydraw && (
+            {/**
+             * 럭키드로우는 '배경' 카드가 이미지를 받고(로고·카드 이미지는 애초에 없다),
+             * 롤링페이퍼는 위 '롤링페이퍼' 카드가 벽 배경·스티커를 받는다 — 그래서 둘 다 여기선 뺀다.
+             */}
+            {!luckydraw && !rolling && (
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">이미지</h2>
               {/* 이미지가 어디로 가는지는 저장소가 정한다 — 화면이 거짓말하면 안 된다 */}
@@ -1344,7 +1457,7 @@ export function SlotEditor() {
             </section>
             )}
 
-            {!luckydraw && (
+            {!luckydraw && !rolling && (
             <section className="admin-section">
               <div className="admin-section__title">
                 <h2 className="t-title-s">카드 앞면</h2>
@@ -1379,8 +1492,8 @@ export function SlotEditor() {
             </section>
             )}
 
-            {/* 플랜은 AI 한도다 — 럭키드로우는 AI 를 안 쓴다 */}
-            {!luckydraw && (
+            {/* 플랜은 AI 한도다 — 럭키드로우·롤링페이퍼는 AI 를 안 쓴다 */}
+            {!luckydraw && !rolling && (
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">플랜</h2>
               <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
@@ -1524,8 +1637,8 @@ export function SlotEditor() {
               <OrganizerPanel slot={saved} slugPending={draft.slug !== saved.slug} />
             )}
 
-            {/* 카테고리별 뽑기 설정 — 럭키드로우엔 카테고리도 카드도 없다 */}
-            {!luckydraw && (
+            {/* 카테고리별 뽑기 설정 — 럭키드로우·롤링페이퍼엔 카테고리도 카드도 없다 */}
+            {!luckydraw && !rolling && (
             <section className="admin-section">
               <h2 className="t-title-s admin-section__title">이벤트 설정</h2>
               <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>

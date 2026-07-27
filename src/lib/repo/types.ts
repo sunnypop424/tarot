@@ -343,6 +343,57 @@ export interface LuckydrawRepo {
   watch(slug: string, onChange: () => void): () => void
 }
 
+/**
+ * 롤링페이퍼 메시지 한 장 (세 번째 서비스).
+ *
+ * 방문자가 자기 폰으로 남긴다 — 럭키드로우와 **반대다**: 스태프 로그인이 필요 없다.
+ * **공개 벽 + 후검수**: 남기는 즉시 벽에 뜨고(hidden=false), 주최자가 나중에 부적절한 걸 숨긴다.
+ * 색·스티커는 **이름만** 든다 (hex·이미지가 아니다) — 실체는 테마 토큰과 슬롯 Storage 가 댄다.
+ */
+export interface RollingMessage {
+  id: string
+  /** 방문자가 적은 이름 — 비어도 된다 (익명) */
+  nickname: string
+  body: string
+  /** 카드 색 — RollingDisplay.cardColors 의 테마 토큰 키. 비면 기본 표면색 */
+  color: string
+  /** 붙인 스티커 — RollingDisplay.stickers 의 경로. 없으면 스티커 없음 */
+  sticker?: string
+  /** 후검수로 숨겼나 — 방문자 벽엔 안 나온다 (주최자만 본다) */
+  hidden: boolean
+  createdAt: string
+}
+
+/**
+ * 롤링페이퍼 (세 번째 서비스).
+ *
+ * 럭키드로우와 달리 **local 짝이 진짜로 있다** — 재고 같은 원자성 요구가 없어 localStorage 로도
+ * 성립한다. 그래서 `ready()` 가 없다: 어느 어댑터든 돈다 (QuestionRepo 와 같은 급).
+ *
+ * `list`(공개분)/`listAll`(숨김 포함)의 분리는 `QuestionRepo` 와 같다 — 방문자는 앞을, 주최자는 뒤를 본다.
+ */
+export interface RollingRepo {
+  /** 방문자용 — 숨김 아닌 것만, 최신이 위 */
+  list(slug: string): Promise<RollingMessage[]>
+  /** 주최자용 — 숨김 포함 전부 (후검수) */
+  listAll(slug: string): Promise<RollingMessage[]>
+  /** 방문자가 남긴다 — id·createdAt·hidden 은 저장소가 붙인다 */
+  add(
+    slug: string,
+    msg: Pick<RollingMessage, 'nickname' | 'body' | 'color' | 'sticker'>
+  ): Promise<void>
+  /** 후검수 — 숨기거나 되살린다 (주최자만) */
+  setHidden(slug: string, id: string, hidden: boolean): Promise<void>
+  /** 지운다 (주최자만) */
+  remove(slug: string, id: string): Promise<void>
+  /**
+   * 벽 실시간 — 다른 기기·탭이 남기면 그 자리에서 알려준다 (되돌리는 함수를 준다).
+   * 부스 태블릿을 벽 전용으로 띄우면 전광판이 된다. **무엇이 바뀌었는지는 안 본다** —
+   * 바뀌었다는 신호만 받고 화면이 다시 읽는다 (`LuckydrawRepo.watch` 와 같은 이유).
+   */
+  watch(slug: string, onChange: () => void): () => void
+}
+
 export interface Repo {
   slots: SlotRepo
   questions: QuestionRepo
@@ -351,4 +402,5 @@ export interface Repo {
   organizers: OrganizersRepo
   ai: AiRepo
   luckydraw: LuckydrawRepo
+  rolling: RollingRepo
 }

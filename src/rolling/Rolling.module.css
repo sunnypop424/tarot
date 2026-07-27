@@ -1,0 +1,131 @@
+/* 롤링페이퍼 벽 — 방문자가 남긴 응원 메시지가 카드로 쌓인다 */
+
+.wall {
+  min-height: 100dvh;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-canvas);
+}
+
+.head {
+  padding: var(--space-lg) var(--layout-pad) var(--space-md);
+  text-align: center;
+}
+
+.scroll {
+  max-width: var(--layout-max);
+  margin: 0 auto;
+  padding: 0 var(--layout-pad) var(--space-xxl);
+}
+
+/* ── 입력 ── */
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-base);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.nickname,
+.body {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-fg-1);
+  font: inherit;
+}
+
+.body {
+  resize: vertical;
+  line-height: var(--leading-body);
+}
+
+.colors,
+.stickers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-border);
+  cursor: pointer;
+  transition: transform var(--dur-micro) var(--ease);
+}
+
+.swatch[data-active='true'] {
+  border-color: var(--color-fg-1);
+  transform: scale(1.12);
+}
+
+.sticker {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border);
+  background-color: var(--color-surface-raised);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 70%;
+  cursor: pointer;
+}
+
+.sticker[data-active='true'] {
+  border-color: var(--color-primary);
+}
+
+/* ── 벽 ── */
+/* 세로로 흐르는 메이슨리 — 카드 높이가 제각각이라 컬럼으로 채운다 */
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 2;
+  column-gap: var(--space-sm);
+}
+
+.card {
+  break-inside: avoid;
+  margin-bottom: var(--space-sm);
+  padding: var(--space-base);
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  position: relative;
+}
+
+.cardSticker {
+  position: absolute;
+  top: calc(var(--space-sm) * -1);
+  right: calc(var(--space-sm) * -1);
+  width: 36px;
+  height: 36px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.cardBody {
+  color: var(--color-fg-1);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.cardName {
+  margin-top: var(--space-sm);
+  text-align: right;
+}
+
+.empty {
+  padding: var(--space-xxl) 0;
+  text-align: center;
+}

@@ -6,6 +6,7 @@ import { publishSlotChange } from './changed'
 import { db } from './client'
 import { supabaseLuckydraw } from './luckydraw'
 import { httpOrganizers } from './organizers'
+import { supabaseRolling } from './rolling'
 import type {
   AdminUser,
   AuthRepo,
@@ -28,7 +29,8 @@ import type {
 /** slots 테이블 행 ↔ Slot. 컬럼 이름이 곧 필드 이름이라 매핑이 얇다 */
 type SlotRow = Slot
 
-const SLOT_COLUMNS = 'slug, name, service, plan, limits, deck, period, theme, event, luckydraw'
+const SLOT_COLUMNS =
+  'slug, name, service, plan, limits, deck, period, theme, event, luckydraw, rolling'
 
 /**
  * 번들된 씨앗 — **네트워크가 죽었을 때의 마지막 방어선**.
@@ -79,6 +81,8 @@ const slots: SlotRepo = {
       event: slot.event,
       // 타로 슬롯이면 늘 {} 다 — 컬럼이 not null 이고 빈 객체가 "전부 기본값" 이라는 뜻이다
       luckydraw: slot.luckydraw ?? {},
+      // 롤링페이퍼도 같은 규칙 — 빈 객체면 전부 기본값 (rollingDisplay 가 키 단위로 채운다)
+      rolling: slot.rolling ?? {},
     }
 
     /**
@@ -269,4 +273,5 @@ export const supabaseRepo: Repo = {
   organizers: httpOrganizers,
   ai: httpAi,
   luckydraw: supabaseLuckydraw,
+  rolling: supabaseRolling,
 }

@@ -89,7 +89,6 @@ export function ResultReveal({
           <h2 className={styles.revealTitle} data-part="title">
             전체 결과
           </h2>
-          <p className={styles.revealSub}>받은 경품을 정리했어요.</p>
         </header>
 
         {result.rehearsal && (
@@ -111,9 +110,10 @@ export function ResultReveal({
               <span className={styles.summaryBadge} data-high={isHigh(p) || undefined}>
                 {p.rank}등
               </span>
-              <span className={styles.summaryName}>
-                {displayMode === 'rank' ? '축하해요!' : p.name}
-              </span>
+              {/* 전체 결과는 방문자 연출이 아니라 스태프 핸드오프 목록이다 —
+                  displayMode(등수만/상품명만) 와 무관하게 늘 상품명을 보여준다.
+                  스태프가 뭘 줘야 하는지 여기서 한눈에 봐야 하기 때문. */}
+              <span className={styles.summaryName}>{p.name}</span>
               {p.requiresShipping && (
                 <span className={styles.shipChip}>
                   <Truck size={13} aria-hidden="true" />
@@ -153,7 +153,6 @@ export function ResultReveal({
     )
   }
 
-  const hasCovered = results.some((p, i) => isHigh(p) && !revealed.includes(i))
   /** 1개면 1열, 2개면 2열, 그 이상은 3열 — 적게 뽑았을 때 빈 칸이 남지 않게 */
   const cols = results.length === 1 ? 1 : results.length === 2 ? 2 : 3
 
@@ -166,11 +165,6 @@ export function ResultReveal({
         <h2 className={styles.revealTitle} data-part="title">
           당첨 결과
         </h2>
-        {hasCovered && (
-          <p className={styles.revealHint}>
-            덮인 칸은 <b>긁어서</b> 확인해 보세요!
-          </p>
-        )}
       </header>
 
       <ul className={styles.results} data-results style={{ ['--cols' as string]: cols }}>

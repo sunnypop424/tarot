@@ -49,6 +49,9 @@ const OwnerRoutes =
  */
 const LuckydrawApp = lazy(() => import('@/luckydraw/LuckydrawApp'))
 
+/** 롤링페이퍼 — 방문자가 자기 폰으로 응원 메시지를 남기는 공개 벽 (별도 청크) */
+const RollingApp = lazy(() => import('@/rolling/RollingApp'))
+
 /**
  * 슬롯 사용자 앱 셸 — 서비스별로 갈린다 (`src/data/services.ts`).
  *
@@ -70,6 +73,7 @@ function SlotLayout() {
   const slot = state.slot
 
   if (getSlotService(slot) === 'luckydraw') return <LuckydrawApp />
+  if (getSlotService(slot) === 'rolling') return <RollingApp />
 
   return (
     <QuestionsProvider>

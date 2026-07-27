@@ -13,6 +13,7 @@ import type { Slot } from '@/types/slot'
 export const SERVICES = [
   { id: 'tarot', label: '타로', hint: '카드를 뽑고 해석을 본다' },
   { id: 'luckydraw', label: '럭키드로우', hint: '스태프가 경품을 추첨한다' },
+  { id: 'rolling', label: '롤링페이퍼', hint: '방문자가 응원 메시지를 남긴다' },
 ] as const
 
 export type ServiceId = (typeof SERVICES)[number]['id']
