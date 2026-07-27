@@ -1,77 +1,101 @@
 import type { Slot } from '@/types/slot'
+import type { FontId } from './fonts'
 
 /**
  * 롤링페이퍼 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다 (주최자는 못 건드린다).
  *
- * 럭키드로우(`luckydrawDisplay`)와 같은 짝이다: 서비스별 설정은 여기, 색·형태는 theme 이 갖는다.
- * **색·이미지의 실체는 여기 없다.** 카드 색은 테마 토큰 키로만 가리키고(hex 아님, tokens.css 규칙),
- * 스티커·벽 배경은 슬롯 이미지라 Storage 경로(슬롯 폴더 기준)만 든다.
+ * 럭키드로우(`luckydrawDisplay`)와 같은 짝이다: 서비스별 룩은 여기, 색은 hex 로 직접 든다
+ * (포스트잇 파스텔은 테마 토큰이 아니라 이 서비스만의 색이라 — 럭드 모달색과 같은 예외).
+ * 화면은 이 값들을 `--rp-*` CSS 변수로 주입해 그린다. 이미지(벽 배경·로고·스티커)는 업로드 URL.
  */
 export interface RollingDisplay {
-  /** 벽 제목 — 방문자 화면 맨 위 */
+  /** 벽 제목 — 방문자 화면 맨 위 (편집 가능, 고정 아님) */
   wallTitle: string
-  /** 입력 안내 — 방문자에게 무엇을 남기라고 할지 */
+  /** 벽 부제 — 제목 아래 한 줄 안내 */
+  wallSubtitle: string
+  /** 입력 안내 — 작성 화면 메시지칸에 흐리게 */
   prompt: string
   /** 남기기 버튼 문구 */
   postLabel: string
+
+  /** 벽 기본 글꼴 (제목·UI·작성 폼) — 방문자는 쪽지마다 따로 고른다 */
+  font: FontId
+
+  /** 제목·헤더 글자색 */
+  headText: string
+  /** 서브 글자색 (부제·안내) */
+  subText: string
+  /** 포스트잇 본문 글자색 */
+  noteBody: string
+  /** 포스트잇 이름 글자색 */
+  noteName: string
+  /** 벽 배경색 — 벽 배경 이미지가 없을 때 (있으면 이미지가 덮는다) */
+  boardBg: string
+  /** 남기기·보내기 버튼 색 */
+  buttonColor: string
+
   /**
-   * 방문자가 고를 수 있는 카드 색 — **테마 색 키**의 목록이다 (hex 아님, `ROLLING_COLOR_CHOICES`).
-   * 메시지엔 이 키 하나만 저장되고, 실제 색은 tokens.css/applyTheme 이 댄다.
-   * 비면 카드 색 선택이 없다 (전부 기본 표면색).
+   * 포스트잇 종이색 **팔레트** — hex 목록. 방문자가 쓸 때 이 중 하나를 고른다.
+   * 비면 쪽지 색 선택이 없고 전부 첫 색.
    */
-  cardColors: string[]
+  papers: string[]
+
   /**
-   * 붙일 수 있는 스티커 — 업로드된 이미지 **URL** 목록 (`uploadAsset` 이 돌려준 값 그대로,
-   * 로고·배경과 같은 규칙 — 화면이 직접 background-image 로 그린다). **최고관리자가 올린다**
-   * (주최자가 원본을 넘기고 편집기에서 업로드). 비면 스티커 없음.
+   * 붙일 수 있는 스티커 — 업로드된 이미지 **URL** 목록. **최고관리자가 올린다**.
+   * 화면이 직접 background-image 로 그린다 (로고·배경과 같은 규칙). 비면 스티커 없음.
    */
   stickers: string[]
-  /**
-   * 벽 전용 배경 이미지 **URL** — 비면 슬롯 테마 배경을 그대로 쓴다.
-   * 럭키드로우 배경처럼 `<img>` 가 아니라 background-image 로만 그린다.
-   */
+
+  /** 벽 전용 배경 이미지 **URL** — 비면 벽 배경색을 쓴다. */
   wallBg: string
+  /** 벽 헤더 로고 이미지 **URL** — 비면 제목 텍스트만. */
+  logo: string
 }
 
-/**
- * 방문자에게 내줄 수 있는 카드 색 후보 — **테마 색 키이자 CSS 토큰 접미사**다.
- * 단어 하나짜리만 골랐다 (`--color-primary`·`--color-high` 처럼 그대로 `var(--color-{key})` 로 쓰려고 —
- * `surfaceRaised`·`fg1` 같은 키는 토큰이 `--color-surface-raised`·`--color-fg-1` 라 어긋난다).
- */
-export const ROLLING_COLOR_CHOICES = ['primary', 'accent', 'high', 'wash'] as const
-
-/** 편집기에서 보여줄 이름 — 카드 색은 역할이 아니라 느낌으로 부른다 (스와치가 실제 색을 보여준다) */
-export const ROLLING_COLOR_LABELS: Record<string, string> = {
-  primary: '기본',
-  accent: '포인트',
-  high: '강조',
-  wash: '은은',
-}
+/** 기본 종이색 팔레트 — 중립 파스텔 (편집기에서 갈아끼운다) */
+const DEFAULT_PAPERS = ['#f4efe2', '#eef1e6', '#eceff4', '#f4ecec', '#f1ecf4', '#e9f0ef']
 
 export const DEFAULT_ROLLING: RollingDisplay = {
   wallTitle: '롤링페이퍼',
-  prompt: '응원 한마디를 남겨 주세요',
+  wallSubtitle: '따뜻한 한마디를 남겨 주세요',
+  prompt: '축하하는 마음을 자유롭게 적어 주세요',
   postLabel: '남기기',
-  // 테마에 늘 있는 두 색 — 편집기에서 더하거나 뺄 수 있다
-  cardColors: ['primary', 'accent'],
+  font: 'pretendard',
+  headText: '#3b3833',
+  subText: '#8c877e',
+  noteBody: '#3b3833',
+  noteName: '#8c877e',
+  boardBg: '#efeae0',
+  buttonColor: '#7d7364',
+  papers: DEFAULT_PAPERS,
   stickers: [],
   wallBg: '',
+  logo: '',
 }
 
 /**
  * 슬롯 설정 + 기본값 — **키 단위로 채운다** (`luckydrawDisplay` 와 같은 이유).
- * `slot.rolling ?? DEFAULT` 로 뭉뚱그리면 편집기가 한 값만 저장한 슬롯에서 나머지가 빈다.
+ * `slot.rolling ?? DEFAULT` 로 뭉뚱그리면 한 값만 저장한 슬롯에서 나머지가 빈다.
  */
 export function rollingDisplay(slot: Slot): RollingDisplay {
-  const saved = slot.rolling ?? {}
+  const saved = (slot.rolling ?? {}) as Partial<RollingDisplay>
   return {
     wallTitle: saved.wallTitle || DEFAULT_ROLLING.wallTitle,
+    wallSubtitle: saved.wallSubtitle ?? DEFAULT_ROLLING.wallSubtitle,
     prompt: saved.prompt || DEFAULT_ROLLING.prompt,
     postLabel: saved.postLabel || DEFAULT_ROLLING.postLabel,
-    // 빈 배열은 "선택 없음" 이라는 뜻이라 살린다 (|| 로 기본값을 덮으면 그 의도가 사라진다)
-    cardColors: saved.cardColors ?? DEFAULT_ROLLING.cardColors,
+    font: saved.font || DEFAULT_ROLLING.font,
+    headText: saved.headText || DEFAULT_ROLLING.headText,
+    subText: saved.subText || DEFAULT_ROLLING.subText,
+    noteBody: saved.noteBody || DEFAULT_ROLLING.noteBody,
+    noteName: saved.noteName || DEFAULT_ROLLING.noteName,
+    boardBg: saved.boardBg || DEFAULT_ROLLING.boardBg,
+    buttonColor: saved.buttonColor || DEFAULT_ROLLING.buttonColor,
+    // 빈 배열은 "색 선택 없음" 이라는 뜻이라 살린다
+    papers: saved.papers ?? DEFAULT_ROLLING.papers,
     stickers: saved.stickers ?? DEFAULT_ROLLING.stickers,
-    // 빈 문자열은 "테마 배경을 쓴다" 는 뜻이라 살린다
+    // 빈 문자열은 "이미지 없음(색/텍스트를 쓴다)" 는 뜻이라 살린다
     wallBg: saved.wallBg ?? DEFAULT_ROLLING.wallBg,
+    logo: saved.logo ?? DEFAULT_ROLLING.logo,
   }
 }

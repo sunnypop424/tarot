@@ -355,8 +355,10 @@ export interface RollingMessage {
   /** 방문자가 적은 이름 — 비어도 된다 (익명) */
   nickname: string
   body: string
-  /** 카드 색 — RollingDisplay.cardColors 의 테마 토큰 키. 비면 기본 표면색 */
+  /** 쪽지 종이색 — RollingDisplay.papers 의 hex 중 하나. 비면 첫 종이색 */
   color: string
+  /** 쪽지 손글씨 폰트 — fonts.ts WEBFONTS 의 id. 비면 벽 기본 폰트 */
+  font: string
   /** 붙인 스티커 — RollingDisplay.stickers 의 경로. 없으면 스티커 없음 */
   sticker?: string
   /** 후검수로 숨겼나 — 방문자 벽엔 안 나온다 (주최자만 본다) */
@@ -380,7 +382,7 @@ export interface RollingRepo {
   /** 방문자가 남긴다 — id·createdAt·hidden 은 저장소가 붙인다 */
   add(
     slug: string,
-    msg: Pick<RollingMessage, 'nickname' | 'body' | 'color' | 'sticker'>
+    msg: Pick<RollingMessage, 'nickname' | 'body' | 'color' | 'font' | 'sticker'>
   ): Promise<void>
   /** 후검수 — 숨기거나 되살린다 (주최자만) */
   setHidden(slug: string, id: string, hidden: boolean): Promise<void>

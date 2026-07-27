@@ -31,7 +31,7 @@ import {
   luckydrawDisplay,
   type FontId,
 } from '@/data/luckydraw'
-import { rollingDisplay, ROLLING_COLOR_CHOICES, ROLLING_COLOR_LABELS } from '@/data/rolling'
+import { rollingDisplay } from '@/data/rolling'
 import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 import { exportSlots } from './slotsFile'
 import styles from './Owner.module.css'
@@ -434,20 +434,20 @@ const COLOR_GROUPS: {
    */
   services: ServiceId[]
 }[] = [
-  { title: '배경 · 표면', keys: ['canvas', 'surface', 'surfaceRaised', 'wash'], services: ['tarot', 'rolling'] },
+  { title: '배경 · 표면', keys: ['canvas', 'surface', 'surfaceRaised', 'wash'], services: ['tarot'] },
   {
     title: '인터랙션 (CTA · 활성)',
     keys: ['primary', 'primaryHover', 'onPrimary'],
     hint: '칩 · 보조버튼 글자색은 배경 밝기에 맞춰 자동 계산돼요.',
-    services: ['tarot', 'rolling'],
+    services: ['tarot'],
   },
   {
     title: '포인트 (카드 테두리 · 별 문양)',
     keys: ['accent'],
     hint: '어두운 카드 위 장식 기준으로 고르세요. 표면 위 아이콘·글자에 쓰일 색은 표면 밝기에 맞춰 자동 계산돼요.',
-    services: ['tarot', 'rolling'],
+    services: ['tarot'],
   },
-  { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'], services: ['tarot', 'rolling'] },
+  { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'], services: ['tarot'] },
   // 뒷면은 내장 SVG 카드 전용이라 타로에만 — 롤페엔 카드가 없다
   { title: '카드 뒷면 (내장 SVG용)', keys: ['cardBackFrom', 'cardBackTo'], services: ['tarot'] },
 ]
@@ -1157,9 +1157,11 @@ export function SlotEditor() {
               <section className="admin-section">
                 <h2 className="t-title-s admin-section__title">롤링페이퍼</h2>
                 <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                  방문자가 남긴 메시지가 벽에 쌓여요. 남긴 즉시 벽에 보이고, 부적절한 건 주최자가
-                  숨겨요.
+                  방문자가 포스트잇으로 메시지를 남기면 벽에 쌓여요. 남긴 즉시 벽에 보이고,
+                  부적절한 건 주최자가 숨겨요. 아래 색·글꼴은 롤페 전용이에요 (위 테마와 별개).
                 </p>
+
+                {/* 문구 */}
                 <div className="form-grid">
                   <div className="field">
                     <span className="field__label">벽 제목</span>
@@ -1170,13 +1172,22 @@ export function SlotEditor() {
                     />
                   </div>
                   <div className="field">
+                    <span className="field__label">벽 부제</span>
+                    <input
+                      className="input"
+                      value={rd.wallSubtitle}
+                      onChange={(e) => patchRolling({ wallSubtitle: e.target.value })}
+                    />
+                    <span className="field__hint">제목 아래 한 줄 안내예요.</span>
+                  </div>
+                  <div className="field">
                     <span className="field__label">입력 안내</span>
                     <input
                       className="input"
                       value={rd.prompt}
                       onChange={(e) => patchRolling({ prompt: e.target.value })}
                     />
-                    <span className="field__hint">메시지 입력칸에 흐리게 뜨는 문구예요.</span>
+                    <span className="field__hint">작성 화면 메시지칸에 흐리게 뜨는 문구예요.</span>
                   </div>
                   <div className="field">
                     <span className="field__label">남기기 버튼</span>
@@ -1187,61 +1198,120 @@ export function SlotEditor() {
                     />
                   </div>
                   <div className="field">
-                    <span className="field__label">카드 색</span>
-                    <div className="color-field" style={{ flexWrap: 'wrap', gap: 'var(--space-sm)' }}>
-                      {ROLLING_COLOR_CHOICES.map((key) => {
-                        const on = rd.cardColors.includes(key)
-                        return (
-                          <button
-                            key={key}
-                            type="button"
-                            className={`btn btn--sm ${on ? 'btn--primary' : 'btn--slight'}`}
-                            aria-pressed={on}
-                            onClick={() =>
-                              patchRolling({
-                                cardColors: on
-                                  ? rd.cardColors.filter((c) => c !== key)
-                                  : [...rd.cardColors, key],
-                              })
-                            }
-                          >
-                            <span
-                              aria-hidden="true"
-                              style={{
-                                display: 'inline-block',
-                                width: 12,
-                                height: 12,
-                                borderRadius: '50%',
-                                marginRight: 6,
-                                verticalAlign: 'middle',
-                                background: draft.theme.colors[key as keyof ThemeColors],
-                              }}
-                            />
-                            {ROLLING_COLOR_LABELS[key]}
-                          </button>
-                        )
-                      })}
-                    </div>
-                    <span className="field__hint">
-                      방문자가 카드마다 고를 수 있는 색이에요. 실제 색은 위 테마를 따라가요.
-                    </span>
+                    <span className="field__label">기본 글꼴</span>
+                    <select
+                      className="select"
+                      value={rd.font}
+                      onChange={(e) => patchRolling({ font: e.target.value as FontId })}
+                    >
+                      {Object.entries(WEBFONTS).map(([id, f]) => (
+                        <option key={id} value={id}>
+                          {f.label}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="field__hint">제목·UI 글꼴이에요. 쪽지 글씨체는 방문자가 골라요.</span>
                   </div>
                 </div>
+
+                {/* 색 */}
                 <div className="form-grid">
+                  {(
+                    [
+                      ['headText', '글자색', '제목·헤더'],
+                      ['subText', '서브 글자색', '부제·안내'],
+                      ['noteBody', '포스트잇 본문색'],
+                      ['noteName', '이름색'],
+                      ['boardBg', '벽 배경색', '배경 이미지가 없을 때'],
+                      ['buttonColor', '버튼색', '남기기·보내기'],
+                    ] as [
+                      'headText' | 'subText' | 'noteBody' | 'noteName' | 'boardBg' | 'buttonColor',
+                      string,
+                      string?,
+                    ][]
+                  ).map(([key, label, hint]) => (
+                    <div key={key} className="field">
+                      <label className="field__label" htmlFor={`rp-${key}`}>
+                        {label}
+                      </label>
+                      <div className="color-field">
+                        <input
+                          type="color"
+                          value={rd[key]}
+                          aria-label={`${label} 고르기`}
+                          onChange={(e) => patchRolling({ [key]: e.target.value } as Partial<typeof rd>)}
+                        />
+                        <input
+                          id={`rp-${key}`}
+                          className="input"
+                          value={rd[key]}
+                          onChange={(e) => patchRolling({ [key]: e.target.value } as Partial<typeof rd>)}
+                        />
+                      </div>
+                      {hint && <span className="field__hint">{hint}</span>}
+                    </div>
+                  ))}
+                </div>
+
+                {/* 종이색 팔레트 */}
+                <div className="field">
+                  <span className="field__label">포스트잇 종이색</span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)', alignItems: 'center' }}>
+                    {rd.papers.map((c, i) => (
+                      <div key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <input
+                          type="color"
+                          value={c}
+                          aria-label={`종이색 ${i + 1}`}
+                          onChange={(e) =>
+                            patchRolling({ papers: rd.papers.map((p, j) => (j === i ? e.target.value : p)) })
+                          }
+                        />
+                        <button
+                          type="button"
+                          className="btn btn--slight btn--sm"
+                          aria-label={`종이색 ${i + 1} 빼기`}
+                          onClick={() => patchRolling({ papers: rd.papers.filter((_, j) => j !== i) })}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="btn btn--slight btn--sm"
+                      onClick={() => patchRolling({ papers: [...rd.papers, '#f4efe2'] })}
+                    >
+                      + 색 추가
+                    </button>
+                  </div>
+                  <span className="field__hint">방문자가 쪽지마다 고르는 색이에요. 파스텔 여러 색이 벽을 알록달록하게 해요.</span>
+                </div>
+
+                {/* 이미지 */}
+                <div className="form-grid">
+                  <ImageField
+                    slug={saved.slug}
+                    label="로고"
+                    name="rolling-logo"
+                    value={rd.logo || null}
+                    onChange={(v) => patchRolling({ logo: v ?? '' })}
+                    hint="벽 헤더에 떠요. 없으면 제목 텍스트가 나와요."
+                  />
                   <ImageField
                     slug={saved.slug}
                     label="벽 배경 이미지"
                     name="rolling-wallbg"
                     value={rd.wallBg || null}
                     onChange={(v) => patchRolling({ wallBg: v ?? '' })}
-                    hint="비우면 위 테마 배경을 써요. 화면을 꽉 채워요."
+                    hint="비우면 벽 배경색을 써요. 화면을 꽉 채워요."
                   />
                   <StickerField
                     slug={saved.slug}
                     label="스티커"
                     value={rd.stickers}
                     onChange={(next) => patchRolling({ stickers: next })}
-                    hint="방문자가 카드에 붙일 수 있어요. 주최자에게 받은 이미지를 올려 주세요."
+                    hint="방문자가 쪽지에 붙일 수 있어요. 주최자에게 받은 이미지를 올려 주세요."
                   />
                 </div>
               </section>

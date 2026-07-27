@@ -17,6 +17,7 @@ function toMessage(row: Record<string, unknown>): RollingMessage {
     nickname: (row.nickname as string) ?? '',
     body: (row.body as string) ?? '',
     color: (row.color as string) ?? '',
+    font: (row.font as string) ?? '',
     sticker: (row.sticker as string) || undefined,
     hidden: row.hidden === true,
     createdAt: row.created_at as string,
@@ -53,6 +54,7 @@ export const supabaseRolling: RollingRepo = {
       nickname: msg.nickname,
       body: msg.body,
       color: msg.color,
+      font: msg.font,
       sticker: msg.sticker ?? null,
     })
     if (error) throw new Error(error.message)
@@ -156,6 +158,7 @@ export const localRolling: RollingRepo = {
       nickname: msg.nickname,
       body: msg.body,
       color: msg.color,
+      font: msg.font,
       sticker: msg.sticker,
       hidden: false,
       createdAt: new Date().toISOString(),

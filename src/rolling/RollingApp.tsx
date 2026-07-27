@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { ArrowLeft, Pencil, Settings } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
 import { rollingDisplay, type RollingDisplay } from '@/data/rolling'
+import { loadWebfont, fontStack, HANDWRITING_FONTS, WEBFONTS } from '@/data/fonts'
 import { repo } from '@/lib/repo'
 import { cssUrl } from '@/lib/image'
 import type { RollingMessage } from '@/lib/repo/types'
@@ -9,38 +12,66 @@ import type { Slot } from '@/types/slot'
 import styles from './Rolling.module.css'
 
 /**
- * 롤링페이퍼 (세 번째 서비스) — 방문자가 자기 폰으로 응원 메시지를 남기고,
- * 남긴 즉시 **공개 벽**에 뜬다 (후검수: 부적절한 건 주최자가 나중에 숨긴다).
+ * 롤링페이퍼 (세 번째 서비스) — 방문자가 응원 메시지를 **포스트잇**으로 남기고, 남긴 즉시
+ * 공개 벽에 붙는다 (후검수: 부적절한 건 주최자가 나중에 숨긴다).
  *
- * 럭키드로우와 **반대**다: 스태프 로그인 게이트가 없다 — 손님이 직접 쓴다.
- * 벽은 실시간(watch)이라 옆 사람이 남긴 것도 새로고침 없이 올라온다.
+ * 화면이 둘이다: **벽**(`/{slug}`)과 **작성 페이지**(`/{slug}/write`). SlotLayout 이 롤페면
+ * 하위 경로 전부 이 컴포넌트를 그리므로, URL 로 벽/작성을 가른다 (진짜 페이지 · 브라우저 뒤로가기).
+ * PC·태블릿·모바일 다 쓰므로 벽은 넓은 게시판으로 반응형.
  */
 export default function RollingApp() {
-  // SlotLayout 이 이미 로딩·없음을 걸렀지만, 이 화면도 SlotProvider 아래라 방어적으로 한 번 더 본다
   const state = useSlotState()
   if (state.status === 'loading') return <div className="app" aria-busy="true" />
   if (state.status === 'missing') return null
-  return <Wall slot={state.slot} />
+  return <Rolling slot={state.slot} />
 }
 
-function Wall({ slot }: { slot: Slot }) {
-  const { slug } = slot
+/** 슬롯이 정한 색·폰트를 CSS 변수로 — 벽·작성이 같은 값을 쓴다 */
+function useRollingVars(display: RollingDisplay): React.CSSProperties {
+  return {
+    ['--rp-font' as string]: fontStack(display.font),
+    ['--rp-head' as string]: display.headText,
+    ['--rp-sub' as string]: display.subText,
+    ['--rp-note-body' as string]: display.noteBody,
+    ['--rp-note-name' as string]: display.noteName,
+    ['--rp-board' as string]: display.boardBg,
+    ['--rp-btn' as string]: display.buttonColor,
+  }
+}
+
+function Rolling({ slot }: { slot: Slot }) {
+  const location = useLocation()
   const display = useMemo(() => rollingDisplay(slot), [slot])
+  const composing = location.pathname.replace(/\/+$/, '').endsWith('/write')
+
+  // 벽 기본 폰트는 늘 로드 (제목·UI·작성 폼)
+  useEffect(() => {
+    loadWebfont(display.font)
+  }, [display.font])
+
+  return composing ? (
+    <Compose slot={slot} display={display} />
+  ) : (
+    <Wall slot={slot} display={display} />
+  )
+}
+
+function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
+  const { slug } = slot
+  const navigate = useNavigate()
+  const vars = useRollingVars(display)
   const [messages, setMessages] = useState<RollingMessage[]>([])
 
   useEffect(() => {
     let alive = true
-    const load = () => {
-      // 조회 실패(예: 마이그레이션 전 테이블 없음)면 빈 벽으로 — 화면이 던지지는 않게
+    const load = () =>
       void repo.rolling
         .list(slug)
         .then((m) => {
           if (alive) setMessages(m)
         })
         .catch(() => {})
-    }
     load()
-    // 다른 기기·탭이 남기면 다시 읽는다 (payload 는 안 본다 — 늘 서버가 맞다)
     const stop = repo.rolling.watch(slug, load)
     return () => {
       alive = false
@@ -48,51 +79,143 @@ function Wall({ slot }: { slot: Slot }) {
     }
   }, [slug])
 
-  // 벽 전용 배경 — 업로드 URL 을 background-image 로 그린다 (모바일 저장 방지). 없으면 테마 배경
+  // 벽에 실제로 쓰인 쪽지 폰트만 로드 (전부 미리 받지 않는다)
+  useEffect(() => {
+    for (const m of messages) if (m.font) loadWebfont(m.font)
+  }, [messages])
+
   return (
     <div
       className={`app ${styles.wall}`}
-      style={display.wallBg ? { backgroundImage: cssUrl(display.wallBg) } : undefined}
+      style={{ ...vars, ...(display.wallBg ? { backgroundImage: cssUrl(display.wallBg) } : {}) }}
     >
       <header className={styles.head}>
-        <h1 className="t-title-l">{display.wallTitle}</h1>
+        <div className={styles.headText}>
+          {display.logo ? (
+            <div className={styles.logo} style={{ backgroundImage: cssUrl(display.logo) }} role="img" aria-label={display.wallTitle} />
+          ) : (
+            <h1 className={styles.title}>{display.wallTitle}</h1>
+          )}
+          {display.wallSubtitle && <p className={styles.subtitle}>{display.wallSubtitle}</p>}
+        </div>
+        {/* 데스크톱: 헤더 CTA (모바일은 하단 고정) */}
+        <button
+          type="button"
+          className={styles.headCta}
+          onClick={() => navigate(`/${slug}/write`)}
+        >
+          <Pencil size={17} aria-hidden="true" />
+          {display.postLabel}
+        </button>
       </header>
 
-      <main className={`app__scroll ${styles.scroll}`}>
-        <Composer
-          slug={slug}
-          display={display}
-          onPosted={() => void repo.rolling.list(slug).then(setMessages).catch(() => {})}
-        />
-
+      <main className={`app__scroll ${styles.board}`}>
         {messages.length === 0 ? (
-          <p className={`t-text-m t-muted ${styles.empty}`}>첫 메시지를 남겨 보세요</p>
+          <div className={styles.empty}>
+            <div className={styles.emptyNote}>
+              <span className={styles.tape} aria-hidden="true" />
+              <Pencil size={26} strokeWidth={1.5} aria-hidden="true" className={styles.emptyIcon} />
+              <p className={styles.emptyText}>
+                첫 메시지를
+                <br />
+                남겨 보세요
+              </p>
+            </div>
+          </div>
         ) : (
-          <ul className={styles.grid} data-rolling-wall>
+          <ul className={styles.masonry} data-rolling-wall>
             {messages.map((m) => (
-              <MessageCard key={m.id} message={m} />
+              <MessageNote key={m.id} message={m} papers={display.papers} />
             ))}
           </ul>
         )}
+
+        {/* 관리자 진입 — 방문자 눈엔 잘 안 띄게 */}
+        <div className={styles.adminRow}>
+          <button type="button" className={styles.adminLink} onClick={() => navigate(`/${slug}/admin`)}>
+            <Settings size={13} aria-hidden="true" />
+            관리자
+          </button>
+        </div>
       </main>
+
+      {/* 모바일 하단 고정 CTA */}
+      <div className={styles.fixedBar}>
+        <button type="button" className={styles.fixedBtn} onClick={() => navigate(`/${slug}/write`)}>
+          <Pencil size={18} aria-hidden="true" />
+          {display.postLabel}
+        </button>
+      </div>
     </div>
   )
 }
 
-function Composer({
-  slug,
-  display,
-  onPosted,
-}: {
-  slug: string
-  display: RollingDisplay
-  onPosted: () => void
-}) {
+/** 손으로 붙인 티 — id 로 회전·테이프를 안정적으로 파생 (렌더마다 안 흔들리게) */
+function seeded(id: string, salt: number): number {
+  let h = salt * 131
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 100000
+  return (h % 1000) / 1000
+}
+
+function MessageNote({ message, papers }: { message: RollingMessage; papers: string[] }) {
+  const paper = message.color || papers[0] || '#f4efe2'
+  const rot = (seeded(message.id, 1) * 5 - 2.5).toFixed(2)
+  const twoTapes = seeded(message.id, 2) > 0.6
+  const tapeTilt = (seeded(message.id, 4) * 8 - 4).toFixed(1)
+
+  return (
+    <li className={styles.noteOuter} data-rolling-card>
+      <div
+        className={styles.note}
+        style={{ background: paper, transform: `rotate(${rot}deg)` }}
+      >
+        {twoTapes ? (
+          <>
+            <span className={`${styles.tape} ${styles.tapeL}`} aria-hidden="true" />
+            <span className={`${styles.tape} ${styles.tapeR}`} aria-hidden="true" />
+          </>
+        ) : (
+          <span
+            className={`${styles.tape} ${styles.tapeC}`}
+            style={{ transform: `translateX(-50%) rotate(${tapeTilt}deg)` }}
+            aria-hidden="true"
+          />
+        )}
+        {message.sticker && (
+          <span
+            className={styles.sticker}
+            style={{ backgroundImage: cssUrl(message.sticker) }}
+            aria-hidden="true"
+          />
+        )}
+        <p className={styles.noteBody} style={{ fontFamily: fontStack(message.font) }}>
+          {message.body}
+        </p>
+        {message.nickname && <div className={styles.noteName}>— {message.nickname}</div>}
+        <span className={styles.dogEar} aria-hidden="true" />
+      </div>
+    </li>
+  )
+}
+
+const MAX_BODY = 120
+
+function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
+  const { slug } = slot
+  const navigate = useNavigate()
+  const vars = useRollingVars(display)
+
   const [nickname, setNickname] = useState('')
   const [body, setBody] = useState('')
-  const [color, setColor] = useState(display.cardColors[0] ?? '')
+  const [color, setColor] = useState(display.papers[0] ?? '')
+  const [font, setFont] = useState('') // '' = 벽 기본 폰트
   const [sticker, setSticker] = useState<string | undefined>(undefined)
   const [busy, setBusy] = useState(false)
+
+  // 작성 화면은 폰트 목록을 미리보기하므로 손글씨를 전부 로드
+  useEffect(() => {
+    for (const id of HANDWRITING_FONTS) loadWebfont(id)
+  }, [])
 
   const canPost = body.trim().length > 0 && !busy
 
@@ -105,101 +228,156 @@ function Composer({
         nickname: nickname.trim(),
         body: body.trim(),
         color,
+        font,
         sticker,
       })
-      // 남기고 나면 본문·스티커만 비운다 — 이름은 이어 남길 수 있게 둔다
-      setBody('')
-      setSticker(undefined)
-      onPosted()
+      navigate(`/${slug}`)
     } finally {
       setBusy(false)
     }
   }
 
   return (
-    <form className={styles.composer} onSubmit={submit} data-rolling-composer>
-      <input
-        className={styles.nickname}
-        value={nickname}
-        onChange={(e) => setNickname(e.target.value)}
-        placeholder="이름 (선택)"
-        maxLength={20}
-        aria-label="이름"
-      />
-      <textarea
-        className={styles.body}
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-        placeholder={display.prompt}
-        maxLength={200}
-        rows={3}
-        aria-label="메시지"
-      />
+    <div className={`app ${styles.compose}`} style={vars}>
+      <div className={styles.composeTop}>
+        <button type="button" className={styles.backBtn} onClick={() => navigate(`/${slug}`)}>
+          <ArrowLeft size={17} aria-hidden="true" />
+          돌아가기
+        </button>
+        <div className={styles.composeTitle}>메시지 남기기</div>
+        <span className={styles.composeTopSpacer} />
+      </div>
 
-      {display.cardColors.length > 0 && (
-        <div className={styles.colors} role="radiogroup" aria-label="카드 색">
-          {display.cardColors.map((c) => (
-            <button
-              key={c}
-              type="button"
-              role="radio"
-              aria-checked={color === c}
-              className={styles.swatch}
-              data-active={color === c}
-              style={{ background: `var(--color-${c})` }}
-              onClick={() => setColor(c)}
-              aria-label={`색 ${c}`}
+      <div className={`app__scroll ${styles.composeWrap}`}>
+        <form className={styles.formCard} onSubmit={submit} data-rolling-composer>
+          <div className={styles.formHead}>
+            <div className={styles.formHeadTitle}>{display.wallSubtitle || '한마디를 남겨 주세요'}</div>
+            <div className={styles.formHeadSub}>남기면 바로 벽에 붙어요.</div>
+          </div>
+
+          <label className={styles.field}>
+            <span className={styles.label}>
+              이름 <span className={styles.optional}>(선택)</span>
+            </span>
+            <input
+              className={styles.input}
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="남길 이름"
+              maxLength={20}
             />
-          ))}
-        </div>
-      )}
+          </label>
 
-      {display.stickers.length > 0 && (
-        <div className={styles.stickers} role="radiogroup" aria-label="스티커">
-          {display.stickers.map((s) => (
-            <button
-              key={s}
-              type="button"
-              role="radio"
-              aria-checked={sticker === s}
-              className={styles.sticker}
-              data-active={sticker === s}
-              style={{ backgroundImage: cssUrl(s) }}
-              onClick={() => setSticker(sticker === s ? undefined : s)}
-              aria-label="스티커"
+          <label className={styles.field}>
+            <span className={styles.label}>메시지</span>
+            <textarea
+              className={styles.textarea}
+              value={body}
+              onChange={(e) => setBody(e.target.value.slice(0, MAX_BODY))}
+              placeholder={display.prompt}
+              rows={5}
+              style={{ fontFamily: fontStack(font) }}
             />
-          ))}
+            <span className={styles.counter}>
+              {body.length} / {MAX_BODY}
+            </span>
+          </label>
+
+          {display.papers.length > 0 && (
+            <div className={styles.field}>
+              <span className={styles.label}>쪽지 색</span>
+              <div className={styles.swatches} role="radiogroup" aria-label="쪽지 색">
+                {display.papers.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    role="radio"
+                    aria-checked={color === c}
+                    className={styles.swatch}
+                    data-active={color === c}
+                    style={{ background: c }}
+                    onClick={() => setColor(c)}
+                    aria-label={`색 ${c}`}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className={styles.field}>
+            <span className={styles.label}>글씨체</span>
+            <div className={styles.fontList} role="radiogroup" aria-label="글씨체">
+              <button
+                type="button"
+                role="radio"
+                aria-checked={font === ''}
+                className={styles.fontBtn}
+                data-active={font === ''}
+                onClick={() => setFont('')}
+              >
+                기본
+              </button>
+              {HANDWRITING_FONTS.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="radio"
+                  aria-checked={font === id}
+                  className={styles.fontBtn}
+                  data-active={font === id}
+                  style={{ fontFamily: fontStack(id) }}
+                  onClick={() => setFont(id)}
+                >
+                  {WEBFONTS[id].label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {display.stickers.length > 0 && (
+            <div className={styles.field}>
+              <span className={styles.label}>
+                스티커 <span className={styles.optional}>(선택)</span>
+              </span>
+              <div className={styles.stickers} role="radiogroup" aria-label="스티커">
+                {display.stickers.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    role="radio"
+                    aria-checked={sticker === s}
+                    className={styles.stickerBtn}
+                    data-active={sticker === s}
+                    style={{ backgroundImage: cssUrl(s) }}
+                    onClick={() => setSticker(sticker === s ? undefined : s)}
+                    aria-label="스티커"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <button type="submit" className={styles.submit} disabled={!canPost}>
+            {busy ? '남기는 중…' : display.postLabel}
+          </button>
+        </form>
+
+        {/* 미리보기 — 데스크톱에서 곁에 (CSS 로 좁은 폭에선 숨긴다) */}
+        <div className={styles.previewCol}>
+          <div className={styles.previewLabel}>미리보기</div>
+          <div className={styles.note} style={{ background: color || display.papers[0] || '#f4efe2' }}>
+            <span className={`${styles.tape} ${styles.tapeC}`} aria-hidden="true" />
+            {sticker && (
+              <span className={styles.sticker} style={{ backgroundImage: cssUrl(sticker) }} aria-hidden="true" />
+            )}
+            <p className={styles.noteBody} style={{ fontFamily: fontStack(font) }}>
+              {body.trim() || '여기에 메시지가 보여요'}
+            </p>
+            {nickname.trim() && <div className={styles.noteName}>— {nickname.trim()}</div>}
+            <span className={styles.dogEar} aria-hidden="true" />
+          </div>
         </div>
-      )}
-
-      <button type="submit" className="btn btn--primary" disabled={!canPost}>
-        {display.postLabel}
-      </button>
-    </form>
-  )
-}
-
-function MessageCard({ message }: { message: RollingMessage }) {
-  // 카드 배경은 고른 색을 **표면색 위에 옅게 섞는다** — 토큰만 쓰고(hex 밖에 안 둔다) 글자 대비를 지킨다
-  const tint = message.color
-    ? {
-        background: `color-mix(in srgb, var(--color-${message.color}) 16%, var(--color-surface-raised))`,
-      }
-    : undefined
-
-  return (
-    <li className={styles.card} style={tint} data-rolling-card>
-      {message.sticker && (
-        <span
-          className={styles.cardSticker}
-          style={{ backgroundImage: cssUrl(message.sticker) }}
-          aria-hidden="true"
-        />
-      )}
-      <p className={`t-text-m ${styles.cardBody}`}>{message.body}</p>
-      {message.nickname && (
-        <p className={`t-text-xs t-muted ${styles.cardName}`}>— {message.nickname}</p>
-      )}
-    </li>
+      </div>
+    </div>
   )
 }
