@@ -460,8 +460,7 @@ const COLOR_GROUPS: {
     services: ['tarot'],
   },
   { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'], services: ['tarot'] },
-  // 뒷면은 내장 SVG 카드 전용이라 타로에만 — 롤페엔 카드가 없다
-  { title: '카드 뒷면 (내장 SVG용)', keys: ['cardBackFrom', 'cardBackTo'], services: ['tarot'] },
+  // 카드 뒷면(그라디언트 색)은 아래 전용 "카드 뒷면" 카드에서 이미지와 함께 조합한다 (시안)
 ]
 
 // primarySoft·accentSoft 는 자동 파생이라 편집기에 노출하지 않는다 → Partial
@@ -1657,27 +1656,77 @@ export function SlotEditor() {
                 </div>
                 </>
                 )}
-                {/* 카드도 AI 리딩도 럭키드로우엔 없다 — 로고·배경 이미지만 남긴다 */}
+                {/* 카드 뒷면은 아래 전용 카드로 옮겼다 (시안 조합). 수정구슬만 여기 남긴다 */}
                 {!luckydraw && (
-                  <>
-                    <ImageField
-                      slug={saved.slug}
-                      label="카드 뒷면"
-                      name="card-back"
-                      value={draft.theme.assets.cardBack}
-                      onChange={(v) => patchAsset('cardBack', v)}
-                      hint="없으면 내장 SVG 뒷면을 써요."
-                    />
-                    <ImageField
-                      slug={saved.slug}
-                      label="수정구슬 (AI 리딩 로더)"
-                      name="crystal-ball"
-                      value={draft.theme.assets.crystalBall}
-                      onChange={(v) => patchAsset('crystalBall', v)}
-                      hint="3장 리딩을 만드는 동안 뜨는 구슬이에요. 없으면 내장 SVG 구슬을 써요."
-                    />
-                  </>
+                  <ImageField
+                    slug={saved.slug}
+                    label="수정구슬 (AI 리딩 로더)"
+                    name="crystal-ball"
+                    value={draft.theme.assets.crystalBall}
+                    onChange={(v) => patchAsset('crystalBall', v)}
+                    hint="3장 리딩을 만드는 동안 뜨는 구슬이에요. 없으면 내장 SVG 구슬을 써요."
+                  />
                 )}
+              </div>
+            </section>
+            )}
+
+            {/* 카드 뒷면 — 이미지 + 내장 문양 그라디언트를 한 카드에 조합 (시안) */}
+            {!luckydraw && !rolling && (
+            <section className="admin-section">
+              <h2 className="t-title-s admin-section__title">
+                <ImageIcon size={15} strokeWidth={2} aria-hidden="true" />
+                카드 뒷면
+              </h2>
+              <ImageField
+                slug={saved.slug}
+                label="뒷면 이미지"
+                name="card-back"
+                value={draft.theme.assets.cardBack}
+                onChange={(v) => patchAsset('cardBack', v)}
+                hint="78장 공통으로 쓰여요. 없으면 아래 내장 문양을 써요."
+              />
+              <div
+                aria-hidden="true"
+                style={{ margin: '16px -18px', borderTop: '1px solid var(--color-border)' }}
+              />
+              <p className="field__hint" style={{ marginBottom: 12 }}>
+                뒷면 이미지가 없을 때 쓰는 내장 문양 그라디언트예요.
+              </p>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: 52,
+                    height: 78,
+                    flexShrink: 0,
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--color-field-border)',
+                    background: `linear-gradient(150deg, ${draft.theme.colors.cardBackFrom}, ${draft.theme.colors.cardBackTo})`,
+                  }}
+                />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {([['cardBackFrom', '문양 색 1'], ['cardBackTo', '문양 색 2']] as const).map(
+                    ([key, label]) => (
+                      <div key={key} className="color-item">
+                        <span className="field__label">{label}</span>
+                        <div className="color-field color-field--hex">
+                          <input
+                            type="color"
+                            value={draft.theme.colors[key]}
+                            aria-label={`${label} 고르기`}
+                            onChange={(e) => patchColor(key, e.target.value)}
+                          />
+                          <input
+                            className="input"
+                            value={draft.theme.colors[key]}
+                            onChange={(e) => patchColor(key, e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
             </section>
             )}

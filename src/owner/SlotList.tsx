@@ -8,6 +8,7 @@ import { getSlotService, serviceLabel } from '@/data/services'
 import { PLANS, getPlan, type PlanId } from '@/data/plans'
 import { repo } from '@/lib/repo'
 import { hasSupabase } from '@/lib/repo/client'
+import { cssUrl } from '@/lib/image'
 import type { Slot, SlotPeriod } from '@/types/slot'
 import { useOwnerAuth } from './useOwnerAuth'
 import { validateSlug } from './slug'
@@ -271,14 +272,22 @@ export function SlotList() {
                   data-slot={s.slug}
                   data-expired={expired || undefined}
                 >
-                  {/* 슬롯을 색으로 먼저 알아본다 — 이름보다 빠르다 */}
-                  <span className={styles.swatch} aria-hidden="true">
-                    {[s.theme.colors.canvas, s.theme.colors.primary, s.theme.colors.accent].map(
-                      (c) => (
-                        <span key={c} style={{ background: c }} />
-                      )
-                    )}
-                  </span>
+                  {/* 앱 아이콘을 올렸으면 그걸, 아니면 슬롯 색으로 알아본다 (시안) */}
+                  {s.theme.assets.appIcon ? (
+                    <span
+                      className={styles.slotIcon}
+                      style={{ backgroundImage: cssUrl(s.theme.assets.appIcon) }}
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <span className={styles.swatch} aria-hidden="true">
+                      {[s.theme.colors.canvas, s.theme.colors.primary, s.theme.colors.accent].map(
+                        (c) => (
+                          <span key={c} style={{ background: c }} />
+                        )
+                      )}
+                    </span>
+                  )}
 
                   <span className="row-item__grow">
                     <span className={styles.slotNameRow}>
