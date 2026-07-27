@@ -39,39 +39,44 @@ export function ReadingCard({
 
   return (
     <section ref={ref} className={styles.reading}>
-      <p className="t-title-s t-primary t-center">{position}</p>
+      {/* 카드 쪽 — 넓은 화면에선 왼쪽, 모바일에선 위 */}
+      <div className={styles.cardSide}>
+        {position && <p className="t-title-s t-primary t-center">{position}</p>}
+        <FlipCard drawn={drawn} flipped={inView} className={styles.card} />
+      </div>
 
-      <FlipCard drawn={drawn} flipped={inView} className={styles.card} />
+      {/* 해석 쪽 — 넓은 화면에선 카드 오른쪽, 모바일에선 아래 */}
+      <div className={styles.textSide}>
+        <p data-card-name className={`t-title-m ${styles.name}`}>
+          {drawn.card.name}
+          {drawn.orientation === 'reversed' && <span className="t-text-s t-muted"> (역방향)</span>}
+        </p>
 
-      <p data-card-name className={`t-title-m ${styles.name}`}>
-        {drawn.card.name}
-        {drawn.orientation === 'reversed' && <span className="t-text-s t-muted"> (역방향)</span>}
-      </p>
+        <ul className={styles.keywords}>
+          {drawn.card.keywords.slice(0, 4).map((k) => (
+            <li key={k} className="chip">
+              {k}
+            </li>
+          ))}
+        </ul>
 
-      <ul className={styles.keywords}>
-        {drawn.card.keywords.slice(0, 4).map((k) => (
-          <li key={k} className="chip">
-            {k}
-          </li>
-        ))}
-      </ul>
-
-      {/* 간결 모드는 조언 한 줄만 — 종합·관점 텍스트는 접는다 */}
-      <div className={styles.body}>
-        {verdict && (
-          <p className={`t-body ${styles.verdict}`}>
-            <b className={styles.verdictLabel}>{verdict.label}</b>
-            {verdict.note}
-          </p>
-        )}
-        {!brief && (
-          <>
-            <p className="t-body">{reading.general}</p>
-            {/* 카테고리 관점 텍스트 — 종합과 겹치면 생략 */}
-            {aspectText !== reading.general && <p className="t-body">{aspectText}</p>}
-          </>
-        )}
-        <p className={`t-body ${styles.advice}`}>{reading.advice}</p>
+        {/* 간결 모드는 조언 한 줄만 — 종합·관점 텍스트는 접는다 */}
+        <div className={styles.body}>
+          {verdict && (
+            <p className={`t-body ${styles.verdict}`}>
+              <b className={styles.verdictLabel}>{verdict.label}</b>
+              {verdict.note}
+            </p>
+          )}
+          {!brief && (
+            <>
+              <p className="t-body">{reading.general}</p>
+              {/* 카테고리 관점 텍스트 — 종합과 겹치면 생략 */}
+              {aspectText !== reading.general && <p className="t-body">{aspectText}</p>}
+            </>
+          )}
+          <p className={`t-body ${styles.advice}`}>{reading.advice}</p>
+        </div>
       </div>
     </section>
   )

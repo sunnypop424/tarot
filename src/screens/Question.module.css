@@ -6,12 +6,31 @@
   gap: var(--space-xl);
   padding-bottom: var(--space-lg);
 }
-/* 넓은 화면 — 답 해석은 읽기 좋은 폭으로 가운데 (과하게 늘어지지 않게) */
+/* 넓은 화면 — 답 해석은 읽기 좋은 폭으로 가운데, 카드 옆에 붙인다 */
 @media (min-width: 720px) {
   .results {
-    max-width: 620px;
+    max-width: 720px;
     margin-inline: auto;
     width: 100%;
+  }
+  .result {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-xl);
+  }
+  .cardSide {
+    flex-shrink: 0;
+    width: 190px;
+  }
+  .textSide {
+    flex: 1;
+    min-width: 0;
+  }
+  .name {
+    text-align: left;
+  }
+  .keywords {
+    justify-content: flex-start;
   }
   .actions {
     flex-direction: row;
@@ -21,6 +40,18 @@
 }
 
 .result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.cardSide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.textSide {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);

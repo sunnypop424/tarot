@@ -52,7 +52,8 @@ export const CATEGORIES: Category[] = [
     label: '오늘',
     desc: '하루 한 장의 메시지',
     icon: Sparkles,
-    spreads: { 1: ['오늘의 메시지'] },
+    // 포지션 라벨 없음 — 홈 자체가 오늘의 카드라 "오늘의 메시지" 문구는 군더더기다
+    spreads: { 1: [''] },
     defaultCount: 1,
     aspect: 'general',
     prompt: '오늘 하루를 떠올리며 카드를 골라보세요.',

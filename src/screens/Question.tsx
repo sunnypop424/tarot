@@ -97,22 +97,26 @@ function AnswerCard({ question, drawn }: { question: QuestionType; drawn: DrawnC
 
   return (
     <section ref={ref} className={styles.result}>
-      <FlipCard drawn={drawn} flipped={inView} className={styles.card} />
+      <div className={styles.cardSide}>
+        <FlipCard drawn={drawn} flipped={inView} className={styles.card} />
+      </div>
 
-      <p data-card-name className={`t-title-m ${styles.name}`}>
-        {drawn.card.name}
-        {drawn.orientation === 'reversed' && <span className="t-text-s t-muted"> (역방향)</span>}
-      </p>
+      <div className={styles.textSide}>
+        <p data-card-name className={`t-title-m ${styles.name}`}>
+          {drawn.card.name}
+          {drawn.orientation === 'reversed' && <span className="t-text-s t-muted"> (역방향)</span>}
+        </p>
 
-      <ul className={styles.keywords}>
-        {drawn.card.keywords.slice(0, 4).map((k) => (
-          <li key={k} className="chip">
-            {k}
-          </li>
-        ))}
-      </ul>
+        <ul className={styles.keywords}>
+          {drawn.card.keywords.slice(0, 4).map((k) => (
+            <li key={k} className="chip">
+              {k}
+            </li>
+          ))}
+        </ul>
 
-      <p className="t-body">{answer.text}</p>
+        <p className="t-body">{answer.text}</p>
+      </div>
     </section>
   )
 }

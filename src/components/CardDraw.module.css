@@ -29,3 +29,12 @@
 .shuffleBtn {
   flex-shrink: 0;
 }
+
+/* 넓은 화면 — 결과 보기 버튼이 화면 폭을 꽉 채우면 과하다. 가운데로 모아 적당한 폭 */
+@media (min-width: 720px) {
+  .actions {
+    align-self: center;
+    width: 100%;
+    max-width: 460px;
+  }
+}

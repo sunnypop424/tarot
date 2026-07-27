@@ -4,6 +4,18 @@
   gap: var(--space-md);
 }
 
+.cardSide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.textSide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
 .card {
   width: 170px;
   margin: 0 auto;
@@ -24,6 +36,29 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+}
+
+/* 넓은 화면(패드·태블릿·PC) — 카드 왼쪽, 해석 오른쪽. 이름·키워드는 왼쪽 정렬 */
+@media (min-width: 720px) {
+  .reading {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-xl);
+  }
+  .cardSide {
+    flex-shrink: 0;
+    width: 190px;
+  }
+  .textSide {
+    flex: 1;
+    min-width: 0;
+  }
+  .name {
+    text-align: left;
+  }
+  .keywords {
+    justify-content: flex-start;
+  }
 }
 
 /* 조언은 포인트색 세로선으로 구분 — 읽고 나서 가져갈 한 줄 */

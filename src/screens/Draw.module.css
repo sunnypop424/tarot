@@ -6,10 +6,10 @@
   gap: var(--space-xl);
   padding-bottom: var(--space-lg);
 }
-/* 넓은 화면 — 리딩은 순서가 흐름이라 세로 유지, 읽기 좋은 폭으로 가운데 (종합도 그 아래) */
+/* 넓은 화면 — 카드 옆에 해석(ReadingCard 2열), 종합은 그 아래. 읽기 좋은 폭으로 가운데 */
 @media (min-width: 720px) {
   .results {
-    max-width: 620px;
+    max-width: 720px;
     margin-inline: auto;
     width: 100%;
   }
