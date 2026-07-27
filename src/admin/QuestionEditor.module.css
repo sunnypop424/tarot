@@ -35,7 +35,7 @@
   background: #eaf6ef;
   color: #3ea472;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   white-space: nowrap;
 }
 .autoSaveChip[data-saving] {

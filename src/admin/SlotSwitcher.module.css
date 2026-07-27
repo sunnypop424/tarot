@@ -30,5 +30,5 @@
 
 .name {
   font-size: var(--text-s);
-  font-weight: 600;
+  font-weight: var(--weight-bold);
 }

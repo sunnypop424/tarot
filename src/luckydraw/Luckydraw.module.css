@@ -98,7 +98,7 @@
 /** 박스 아래 흐릿하게 — 손님 눈에 띄지 않고 스태프만 찾는다 (원본과 같은 자리) */
 .adminLink {
   font-size: var(--text-xs);
-  font-weight: 500;
+  font-weight: var(--weight-normal);
   text-decoration: none;
   /* 슬롯이 정한다 — 사진 배경마다 눈에 띄는 정도가 다르다 (기본은 흐린 본문색) */
   color: var(--ld-admin-link, var(--color-fg-3));
@@ -120,7 +120,7 @@
   border-radius: 9999px;
   text-align: center;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: var(--weight-bold);
   line-height: 1.4;
   background: var(--color-wash);
   color: var(--color-fg-3);
@@ -133,7 +133,7 @@
   border-radius: 9999px;
   text-align: center;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--weight-bold);
   background: var(--color-wash);
   color: var(--color-fg-2);
 }
@@ -143,7 +143,7 @@
   padding: 32px 0;
   text-align: center;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: var(--weight-bold);
   color: var(--color-fg-2);
 }
 
@@ -173,11 +173,11 @@
 }
 .bandMsg {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: var(--weight-bold);
   color: var(--color-fg-2);
 }
 .bandMsg[data-low] {
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   color: var(--color-accent-soft);
 }
 .previewBtn {
@@ -190,7 +190,7 @@
   background: var(--color-surface);
   color: var(--color-primary);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   cursor: pointer;
   transition: background var(--dur-micro, 0.12s) ease;
 }
@@ -225,7 +225,7 @@
   margin: 0 0 12px;
   text-align: center;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   color: var(--color-fg-2);
 }
 
@@ -290,7 +290,7 @@
   color: var(--color-fg-1);
   text-align: center;
   font-size: 30px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
   appearance: textfield;
   -moz-appearance: textfield;
@@ -318,7 +318,7 @@
   background: var(--color-surface);
   color: var(--color-fg-2);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   cursor: pointer;
   transition: border-color var(--dur-micro, 0.12s) ease, background var(--dur-micro, 0.12s) ease;
 }
@@ -342,7 +342,7 @@
   height: 54px;
   padding: 0 16px;
   font-size: 17px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   letter-spacing: 0.02em;
   border-radius: var(--radius-md);
   box-shadow: 0 6px 18px color-mix(in srgb, var(--color-primary) 32%, transparent);
@@ -413,7 +413,7 @@
 .closedTitle {
   margin: 0;
   font-size: 20px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   color: var(--color-fg-1);
 }
 .closedSub {
@@ -450,7 +450,7 @@
 .eyebrow {
   margin: 0 0 6px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   letter-spacing: 0.02em;
   color: var(--color-primary);
 }
@@ -458,7 +458,7 @@
 .revealTitle {
   margin: 0;
   font-size: 24px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   color: var(--color-fg-1);
 }
 
@@ -516,13 +516,13 @@
 
 .resultRank {
   font-size: 10px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   letter-spacing: 0.02em;
   color: var(--color-fg-3);
 }
 .resultName {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   line-height: 1.2;
   /* 편집기 '상품 타일 글자색' */
   color: var(--color-fg-2);
@@ -545,7 +545,7 @@
   background: var(--color-wash);
   color: var(--color-accent);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--weight-bold);
   letter-spacing: 0.025em;
   cursor: pointer;
   /* 왼쪽부터 긁혀 나간다 */
@@ -624,14 +624,14 @@
   padding: 0 16px;
   border-radius: var(--radius-md);
   font-size: 17px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 /* '처음으로' 는 한 단 작은 보조 버튼(48px) */
 .revealFoot :global(.btn--slight) {
   min-height: 48px;
   height: 48px;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
 }
 /* 배송지 입력 + 처음으로 를 좌우로 — 높이를 맞춰 나란히 선다 */
 .revealFoot[data-row] {
@@ -694,7 +694,7 @@
   color: var(--rank);
   background: color-mix(in srgb, var(--rank) 14%, transparent);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 /* 당첨 등수는 '열린 뒤' 짝 중 어두운 쪽을 등수색으로 */
 .summaryBadge[data-high] {
@@ -709,7 +709,7 @@
   flex: 1;
   min-width: 0;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: var(--weight-bold);
   color: var(--color-fg-1);
 }
 
@@ -725,13 +725,13 @@
   /* 배경은 글자색을 따라 옅게 (currentColor) */
   background: color-mix(in srgb, currentColor 14%, transparent);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
 }
 
 .summaryCount {
   flex-shrink: 0;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   color: var(--color-fg-1);
   font-variant-numeric: tabular-nums;
 }
@@ -926,7 +926,7 @@
 .previewTitle {
   margin: 0;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   color: var(--color-fg-1);
 }
 .previewSub {
@@ -969,7 +969,7 @@
   color: var(--rank);
   background: color-mix(in srgb, var(--rank) 14%, transparent);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 .prizeBadge[data-high] {
   --rank: var(--ld-rank-hi, var(--color-on-high));
@@ -982,13 +982,13 @@
   flex: 1;
   min-width: 0;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   color: var(--color-fg-1);
 }
 .prizeCount {
   flex-shrink: 0;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   color: var(--color-fg-2);
   font-variant-numeric: tabular-nums;
 }
@@ -1119,7 +1119,7 @@
 
 .shipCount {
   flex-shrink: 0;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   color: var(--color-primary);
 }
 
