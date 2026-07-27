@@ -1,6 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Outlet, useNavigate } from 'react-router-dom'
-import { BookOpen } from 'lucide-react'
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
 
 import { SlotProvider, useSlotState } from '@/slot/SlotProvider'
 import { getSlotService } from '@/data/services'
@@ -61,7 +60,6 @@ const RollingApp = lazy(() => import('@/rolling/RollingApp'))
  * 스태프가 뽑는다. 그래서 `Outlet` 을 안 그린다: 이 슬롯엔 하위 화면이 없다.
  */
 function SlotLayout() {
-  const navigate = useNavigate()
   const state = useSlotState()
 
   /**
@@ -79,19 +77,8 @@ function SlotLayout() {
   return (
     <QuestionsProvider>
       <div className="app">
-        {/* 데스크톱: 상단 네비 (모바일에선 CSS 로 숨김) */}
+        {/* 데스크톱: 상단 네비 (모바일에선 CSS 로 숨김). 모바일 도감은 하단 탭바에 있다 */}
         <TopNav />
-        {/* 모바일: 헤더 책 아이콘 → 도감 (데스크톱에선 CSS 로 숨김, 상단 네비에 있음) */}
-        <header className="app__header">
-          <button
-            type="button"
-            className="btn-icon"
-            aria-label="카드 도감"
-            onClick={() => navigate(`/${slot.slug}/cards`)}
-          >
-            <BookOpen size={24} strokeWidth={2} aria-hidden="true" />
-          </button>
-        </header>
 
         <main className="app__scroll">
           <Outlet />

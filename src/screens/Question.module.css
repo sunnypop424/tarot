@@ -13,6 +13,13 @@
     flex-direction: column;
     min-height: 100%;
   }
+  /* 타이틀·리드도 본문과 같은 720 폭·가운데로 정렬 */
+  .resultScreen > :global(.screen__title),
+  .resultScreen > :global(.screen__lead) {
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+  }
   .results {
     flex: 1;
     justify-content: center;
