@@ -6,8 +6,10 @@
 
 .wall {
   min-height: 100dvh;
+  /* 배경 이미지는 럭드처럼 화면을 꽉 채운다 (투명도 없이 cover) */
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   background-color: var(--rp-board, #efeae0);
   font-family: var(--rp-font);
 }
@@ -111,6 +113,8 @@
   position: relative;
   border-radius: 2px;
   padding: 22px 16px 16px;
+  /* 짧은 메시지도 쪽지답게 — 너무 납작하지 않게 최소 높이 */
+  min-height: 104px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05), 0 6px 12px -4px rgba(0, 0, 0, 0.16);
 }
 
@@ -231,9 +235,10 @@
 }
 
 /* ── 모바일 하단 고정 CTA ── */
+/* 배경 이미지를 가리지 않게 바탕은 투명 — 버튼 자체 그림자·색으로 읽힌다 */
 .fixedBar {
   padding: var(--space-md) var(--layout-pad) var(--space-base);
-  background: linear-gradient(to top, var(--rp-board) 62%, transparent);
+  background: transparent;
 }
 .fixedBtn {
   display: inline-flex;

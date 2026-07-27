@@ -11,8 +11,12 @@ import type { FontId } from './fonts'
 export interface RollingDisplay {
   /** 벽 제목 — 방문자 화면 맨 위 (편집 가능, 고정 아님) */
   wallTitle: string
+  /** 제목을 벽에 보일지 (로고만 쓰거나 제목을 숨기고 싶을 때 끈다) */
+  showTitle: boolean
   /** 벽 부제 — 제목 아래 한 줄 안내 */
   wallSubtitle: string
+  /** 부제를 벽에 보일지 */
+  showSubtitle: boolean
   /** 입력 안내 — 작성 화면 메시지칸에 흐리게 */
   prompt: string
   /** 남기기 버튼 문구 */
@@ -57,7 +61,9 @@ const DEFAULT_PAPERS = ['#f4efe2', '#eef1e6', '#eceff4', '#f4ecec', '#f1ecf4', '
 
 export const DEFAULT_ROLLING: RollingDisplay = {
   wallTitle: '롤링페이퍼',
+  showTitle: true,
   wallSubtitle: '따뜻한 한마디를 남겨 주세요',
+  showSubtitle: true,
   prompt: '축하하는 마음을 자유롭게 적어 주세요',
   postLabel: '남기기',
   font: 'pretendard',
@@ -81,7 +87,9 @@ export function rollingDisplay(slot: Slot): RollingDisplay {
   const saved = (slot.rolling ?? {}) as Partial<RollingDisplay>
   return {
     wallTitle: saved.wallTitle || DEFAULT_ROLLING.wallTitle,
+    showTitle: saved.showTitle ?? DEFAULT_ROLLING.showTitle,
     wallSubtitle: saved.wallSubtitle ?? DEFAULT_ROLLING.wallSubtitle,
+    showSubtitle: saved.showSubtitle ?? DEFAULT_ROLLING.showSubtitle,
     prompt: saved.prompt || DEFAULT_ROLLING.prompt,
     postLabel: saved.postLabel || DEFAULT_ROLLING.postLabel,
     font: saved.font || DEFAULT_ROLLING.font,

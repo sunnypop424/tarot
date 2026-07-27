@@ -89,7 +89,7 @@ export function Moderation() {
               data-hidden={m.hidden}
               data-rolling-mod-row
             >
-              {/* 카드 색을 왼쪽 띠로 — 방문자 벽에서 어떤 색인지 한눈에 (없으면 안 그린다) */}
+              {/* 쪽지 종이색을 왼쪽 띠로 — 방문자 벽에서 어떤 색인지 한눈에 (없으면 안 그린다) */}
               <span
                 className={styles.tint}
                 style={m.color ? { background: `var(--color-${m.color})` } : undefined}

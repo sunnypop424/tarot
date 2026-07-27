@@ -79,10 +79,16 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
     }
   }, [slug])
 
-  // 벽에 실제로 쓰인 쪽지 폰트만 로드 (전부 미리 받지 않는다)
+  // 편집기 미리보기(iframe)에선 메시지가 없어도 샘플 포스트잇으로 종이색·글씨체를 보여준다
+  const inPreview = typeof window !== 'undefined' && window.parent !== window
+  const notes = useMemo(
+    () => (messages.length > 0 ? messages : inPreview ? sampleNotes(display) : []),
+    [messages, inPreview, display]
+  )
+  // 벽에 쓰인 쪽지 폰트만 로드 (전부 미리 받지 않는다)
   useEffect(() => {
-    for (const m of messages) if (m.font) loadWebfont(m.font)
-  }, [messages])
+    for (const m of notes) if (m.font) loadWebfont(m.font)
+  }, [notes])
 
   return (
     <div
@@ -94,9 +100,11 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
           {display.logo ? (
             <div className={styles.logo} style={{ backgroundImage: cssUrl(display.logo) }} role="img" aria-label={display.wallTitle} />
           ) : (
-            <h1 className={styles.title}>{display.wallTitle}</h1>
+            display.showTitle && <h1 className={styles.title}>{display.wallTitle}</h1>
           )}
-          {display.wallSubtitle && <p className={styles.subtitle}>{display.wallSubtitle}</p>}
+          {display.showSubtitle && display.wallSubtitle && (
+            <p className={styles.subtitle}>{display.wallSubtitle}</p>
+          )}
         </div>
         {/* 데스크톱: 헤더 CTA (모바일은 하단 고정) */}
         <button
@@ -110,7 +118,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
       </header>
 
       <main className={`app__scroll ${styles.board}`}>
-        {messages.length === 0 ? (
+        {notes.length === 0 ? (
           <div className={styles.empty}>
             <div className={styles.emptyNote}>
               <span className={styles.tape} aria-hidden="true" />
@@ -124,7 +132,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
           </div>
         ) : (
           <ul className={styles.masonry} data-rolling-wall>
-            {messages.map((m) => (
+            {notes.map((m) => (
               <MessageNote key={m.id} message={m} papers={display.papers} />
             ))}
           </ul>
@@ -148,6 +156,29 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
       </div>
     </div>
   )
+}
+
+/** 편집기 미리보기용 샘플 쪽지 — 팔레트 색·손글씨를 돌려 써서 종이색·글씨체가 보이게 한다 */
+const SAMPLE_TEXTS: [string, string][] = [
+  ['지민', '생일 축하해요! 늘 행복하길 바라요.'],
+  ['', '오늘도 반짝반짝!'],
+  ['수현', '무대 위에서도 무대 밖에서도 응원해요.'],
+  ['', '늘 고마워요.'],
+  ['민서', '좋은 일만 가득한 한 해가 되길!'],
+  ['유나', '새 앨범 기다릴게요!'],
+]
+function sampleNotes(display: RollingDisplay): RollingMessage[] {
+  const papers = display.papers.length ? display.papers : ['#f4efe2']
+  const fonts = ['', ...HANDWRITING_FONTS]
+  return SAMPLE_TEXTS.map(([nickname, body], i) => ({
+    id: `sample-${i}`,
+    nickname,
+    body,
+    color: papers[i % papers.length],
+    font: fonts[i % fonts.length],
+    hidden: false,
+    createdAt: '',
+  }))
 }
 
 /** 손으로 붙인 티 — id 로 회전·테이프를 안정적으로 파생 (렌더마다 안 흔들리게) */

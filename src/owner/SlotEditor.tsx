@@ -1170,6 +1170,17 @@ export function SlotEditor() {
                       value={rd.wallTitle}
                       onChange={(e) => patchRolling({ wallTitle: e.target.value })}
                     />
+                    <label
+                      className="field__hint"
+                      style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={rd.showTitle}
+                        onChange={(e) => patchRolling({ showTitle: e.target.checked })}
+                      />
+                      벽에 제목 보이기
+                    </label>
                   </div>
                   <div className="field">
                     <span className="field__label">벽 부제</span>
@@ -1178,7 +1189,17 @@ export function SlotEditor() {
                       value={rd.wallSubtitle}
                       onChange={(e) => patchRolling({ wallSubtitle: e.target.value })}
                     />
-                    <span className="field__hint">제목 아래 한 줄 안내예요.</span>
+                    <label
+                      className="field__hint"
+                      style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={rd.showSubtitle}
+                        onChange={(e) => patchRolling({ showSubtitle: e.target.checked })}
+                      />
+                      벽에 부제 보이기
+                    </label>
                   </div>
                   <div className="field">
                     <span className="field__label">입력 안내</span>
@@ -1254,15 +1275,23 @@ export function SlotEditor() {
                 </div>
 
                 {/* 종이색 팔레트 */}
-                <div className="field">
+                <div className="field" style={{ marginTop: 'var(--space-lg)' }}>
                   <span className="field__label">포스트잇 종이색</span>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-md)', alignItems: 'center' }}>
                     {rd.papers.map((c, i) => (
                       <div key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                         <input
                           type="color"
                           value={c}
                           aria-label={`종이색 ${i + 1}`}
+                          style={{
+                            width: 40,
+                            height: 40,
+                            padding: 0,
+                            border: '1px solid var(--color-border)',
+                            borderRadius: 'var(--radius-sm)',
+                            cursor: 'pointer',
+                          }}
                           onChange={(e) =>
                             patchRolling({ papers: rd.papers.map((p, j) => (j === i ? e.target.value : p)) })
                           }

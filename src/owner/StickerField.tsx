@@ -53,33 +53,36 @@ export function StickerField({ slug, label, value, onChange, hint }: StickerFiel
   return (
     <div className="field">
       <span className="field__label">{label}</span>
-      <div className={styles.cardGrid}>
-        {value.map((url) => (
-          <span key={url} className={styles.cardSlot}>
-            <span className={styles.cardThumb} style={{ backgroundImage: cssUrl(url) }} />
-            <button
-              type="button"
-              className="btn-icon"
-              aria-label="스티커 지우기"
-              onClick={() => void removeOne(url)}
-            >
-              <X size={14} strokeWidth={2} aria-hidden="true" />
-            </button>
-          </span>
-        ))}
-        <label className={styles.uploadBtn}>
-          <Upload size={16} strokeWidth={2} aria-hidden="true" />
-          {busy ? '올리는 중…' : '스티커 추가'}
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            className="sr-only"
-            data-sticker-field
-            onChange={(e) => e.target.files?.length && void handleFiles(e.target.files)}
-          />
-        </label>
-      </div>
+      {value.length > 0 && (
+        <div className={styles.stickerGrid}>
+          {value.map((url) => (
+            <span key={url} className={styles.stickerSlot}>
+              <span className={styles.stickerThumb} style={{ backgroundImage: cssUrl(url) }} />
+              <button
+                type="button"
+                className={`btn-icon ${styles.stickerRemove}`}
+                aria-label="스티커 지우기"
+                onClick={() => void removeOne(url)}
+              >
+                <X size={14} strokeWidth={2} aria-hidden="true" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      {/* 추가 버튼은 그리드 밖 전체폭 — 타로 카드 그리드(작은 칸)에 끼우면 너비가 이상해진다 */}
+      <label className={styles.uploadBtn}>
+        <Upload size={16} strokeWidth={2} aria-hidden="true" />
+        {busy ? '올리는 중…' : '스티커 추가'}
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          className="sr-only"
+          data-sticker-field
+          onChange={(e) => e.target.files?.length && void handleFiles(e.target.files)}
+        />
+      </label>
       {hint && <span className="field__hint">{hint}</span>}
       {error && <span className="field__error">{error}</span>}
     </div>

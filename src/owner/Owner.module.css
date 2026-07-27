@@ -292,6 +292,36 @@
   color: var(--color-fg-3);
 }
 
+/* ── 스티커 세트 (정사각 썸네일 + 아래 전체폭 추가 버튼) ── */
+.stickerGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+.stickerSlot {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: 1px dashed var(--color-border-hover);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-canvas);
+}
+.stickerThumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.stickerRemove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+
 /* ── 카드 앞면 78장 ───────────────────────────────── */
 
 .cardHead {
