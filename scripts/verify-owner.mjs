@@ -437,8 +437,11 @@ check('경로 조작 차단', traversal === 400, `${traversal}`)
 // ── 슬롯 삭제 ──────────────────────────────────────
 await page.goto(`${BASE}/theme-editor`, { waitUntil: 'networkidle0' })
 await wait(500)
-await page.click(`[data-slot="${SLUG}"] .btn-icon`)
-await wait(500)
+await page.click(`[data-slot="${SLUG}"] [data-slot-delete]`)
+// 깊은 삭제(이미지·주최자·슬롯)는 네트워크로 도니 목록에서 사라질 때까지 기다린다
+await page
+  .waitForFunction((slug) => !document.querySelector(`[data-slot="${slug}"]`), { timeout: 8000 }, SLUG)
+  .catch(() => {})
 check('슬롯이 목록에서 사라짐', (await page.$(`[data-slot="${SLUG}"]`)) === null)
 
 // 지워진 슬롯의 편집 화면은 목록으로 되돌린다

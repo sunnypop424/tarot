@@ -93,12 +93,30 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
   return (
     <div
       className={`app ${styles.wall}`}
-      style={{ ...vars, ...(display.wallBg ? { backgroundImage: cssUrl(display.wallBg) } : {}) }}
+      style={{
+        ...vars,
+        ...(display.wallBg
+          ? {
+              backgroundImage: cssUrl(display.wallBg),
+              // 반복(타일) 또는 꽉 채우기 — 편집기 체크박스가 정한다
+              backgroundRepeat: display.wallBgRepeat ? 'repeat' : 'no-repeat',
+              backgroundSize: display.wallBgRepeat ? 'auto' : 'cover',
+            }
+          : {}),
+      }}
     >
       <header className={styles.head}>
-        <div className={styles.headText}>
+        <div
+          className={styles.headText}
+          style={{ textAlign: display.logoAlign, marginTop: display.logoMarginTop || undefined }}
+        >
           {display.logo ? (
-            <div className={styles.logo} style={{ backgroundImage: cssUrl(display.logo) }} role="img" aria-label={display.wallTitle} />
+            <div
+              className={styles.logo}
+              style={{ backgroundImage: cssUrl(display.logo), backgroundPosition: `${display.logoAlign} center` }}
+              role="img"
+              aria-label={display.wallTitle}
+            />
           ) : (
             display.showTitle && <h1 className={styles.title}>{display.wallTitle}</h1>
           )}
@@ -121,7 +139,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
         {notes.length === 0 ? (
           <div className={styles.empty}>
             <div className={styles.emptyNote}>
-              <span className={styles.tape} aria-hidden="true" />
+              <span className={`${styles.tape} ${styles.tapeC}`} aria-hidden="true" />
               <Pencil size={26} strokeWidth={1.5} aria-hidden="true" className={styles.emptyIcon} />
               <p className={styles.emptyText}>
                 첫 메시지를
@@ -344,9 +362,11 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
                 aria-checked={font === ''}
                 className={styles.fontBtn}
                 data-active={font === ''}
+                style={{ fontFamily: fontStack(display.font) }}
                 onClick={() => setFont('')}
+                title="기본 글씨체"
               >
-                기본
+                {display.fontSample}
               </button>
               {HANDWRITING_FONTS.map((id) => (
                 <button
@@ -358,8 +378,9 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
                   data-active={font === id}
                   style={{ fontFamily: fontStack(id) }}
                   onClick={() => setFont(id)}
+                  title={WEBFONTS[id].label}
                 >
-                  {WEBFONTS[id].label}
+                  {display.fontSample}
                 </button>
               ))}
             </div>

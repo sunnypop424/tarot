@@ -52,8 +52,16 @@ export interface RollingDisplay {
 
   /** 벽 전용 배경 이미지 **URL** — 비면 벽 배경색을 쓴다. */
   wallBg: string
+  /** 벽 배경을 패턴처럼 반복(타일)할지 — false 면 화면을 꽉 채운다(cover). */
+  wallBgRepeat: boolean
   /** 벽 헤더 로고 이미지 **URL** — 비면 제목 텍스트만. */
   logo: string
+  /** 로고·제목 가로 정렬 (벽 헤더). */
+  logoAlign: 'left' | 'center' | 'right'
+  /** 로고·제목 위 여백(px) — 벽 상단에서 얼마나 내릴지. */
+  logoMarginTop: number
+  /** 작성 화면 글씨체 고르기에 뜨는 예시 문구 — 폰트명 대신 이 문구를 각 글씨체로 보여준다. */
+  fontSample: string
 }
 
 /** 기본 종이색 팔레트 — 중립 파스텔 (편집기에서 갈아끼운다) */
@@ -76,7 +84,11 @@ export const DEFAULT_ROLLING: RollingDisplay = {
   papers: DEFAULT_PAPERS,
   stickers: [],
   wallBg: '',
+  wallBgRepeat: false,
   logo: '',
+  logoAlign: 'left',
+  logoMarginTop: 0,
+  fontSample: '생일 축하해!',
 }
 
 /**
@@ -104,6 +116,10 @@ export function rollingDisplay(slot: Slot): RollingDisplay {
     stickers: saved.stickers ?? DEFAULT_ROLLING.stickers,
     // 빈 문자열은 "이미지 없음(색/텍스트를 쓴다)" 는 뜻이라 살린다
     wallBg: saved.wallBg ?? DEFAULT_ROLLING.wallBg,
+    wallBgRepeat: saved.wallBgRepeat ?? DEFAULT_ROLLING.wallBgRepeat,
     logo: saved.logo ?? DEFAULT_ROLLING.logo,
+    logoAlign: saved.logoAlign ?? DEFAULT_ROLLING.logoAlign,
+    logoMarginTop: saved.logoMarginTop ?? DEFAULT_ROLLING.logoMarginTop,
+    fontSample: saved.fontSample || DEFAULT_ROLLING.fontSample,
   }
 }

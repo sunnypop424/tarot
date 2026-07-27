@@ -71,6 +71,13 @@
 /* ── 벽(보드) ── */
 .board {
   padding: var(--space-md) var(--layout-pad) var(--space-xl);
+  /* 관리자 줄을 맨 아래로 밀기 위해 세로 flex — 쪽지가 적어도 관리자는 화면 바닥에 붙는다 */
+  display: flex;
+  flex-direction: column;
+}
+.masonry,
+.empty {
+  flex-shrink: 0;
 }
 
 /* 메이슨리 — 높이 제각각인 포스트잇을 컬럼으로 채운다. 폭 넓을수록 열이 는다 */
@@ -201,8 +208,9 @@
   text-align: center;
 }
 .emptyIcon {
+  display: block;
+  margin: 0 auto 8px;
   color: var(--rp-sub);
-  margin-bottom: 8px;
 }
 .emptyText {
   margin: 0;
@@ -214,6 +222,8 @@
 
 /* ── 관리자 진입 (눈에 안 띄게) ── */
 .adminRow {
+  /* 쪽지 뒤가 아니라 스크롤 영역 맨 아래에 붙는다 */
+  margin-top: auto;
   text-align: center;
   padding: var(--space-lg) 0 var(--space-sm);
 }
@@ -260,8 +270,16 @@
 
 /* 데스크톱: 헤더 CTA 를 쓰고 하단 고정은 감춘다 */
 @media (min-width: 900px) {
+  .head {
+    position: relative;
+  }
+  /* CTA 를 절대배치로 빼서 헤더 폭을 먹지 않게 — 로고·제목 정렬이 화면 전체 폭 기준이 된다 */
   .headCta {
     display: inline-flex;
+    position: absolute;
+    right: var(--layout-pad);
+    top: 50%;
+    transform: translateY(-50%);
   }
   .fixedBar {
     display: none;
@@ -315,8 +333,8 @@
 .composeWrap {
   display: flex;
   gap: var(--space-xl);
-  align-items: flex-start;
-  justify-content: center;
+  /* 세로(모바일)에선 위에서부터 — center 로 두면 폼이 길 때 상단이 헤더 뒤로 밀려 잘린다 */
+  justify-content: flex-start;
   padding: var(--space-lg) var(--layout-pad) var(--space-xxl);
   flex-direction: column;
   align-items: stretch;
@@ -325,6 +343,8 @@
   .composeWrap {
     flex-direction: row;
     align-items: flex-start;
+    /* 가로 배치에선 폼+미리보기를 가운데로 (가로 중앙은 넘쳐도 안전) */
+    justify-content: center;
   }
 }
 

@@ -216,17 +216,17 @@
   gap: 6px;
 }
 
-/* 시안 밀도 — 라벨 11.5px, 힌트 11.5px (편집기는 데이터 밀도 높은 도구) */
+/* 시안 밀도 — 라벨 11.5px/700 #505050, 힌트 11px #8a8a8a */
 .field__label {
-  color: var(--color-fg-2);
+  color: #505050;
   font-size: 11.5px;
   font-weight: var(--weight-bold);
 }
 
 .field__hint {
-  color: var(--color-fg-3);
-  font-size: 11.5px;
-  line-height: 1.45;
+  color: #8a8a8a;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .field__error {
@@ -238,15 +238,15 @@
 .textarea,
 .select {
   width: 100%;
-  /* 시안 밀도 — 인풋 36px · 글자 13px */
-  min-height: 36px;
-  height: 36px;
-  padding: 0 10px;
+  /* 시안 밀도 — 인풋 34px · 글자 12.5px */
+  min-height: 34px;
+  height: 34px;
+  padding: 0 9px;
   border: 1px solid var(--color-field-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
   color: var(--color-fg-1);
-  font-size: 13px;
+  font-size: 12.5px;
   transition: border-color var(--dur-micro) var(--ease),
     box-shadow var(--dur-micro) var(--ease);
 }
@@ -265,32 +265,33 @@
  */
 .admin .btn,
 .owner .btn {
-  min-height: 38px;
+  min-height: 34px;
   height: auto;
-  padding: 0 14px;
+  padding: 0 16px;
   gap: 6px;
-  border-radius: var(--radius-sm);
-  font-size: 13.5px;
+  /* 시안 버튼은 전부 알약 */
+  border-radius: 9999px;
+  font-size: 12.5px;
 }
 .admin .btn--sm,
 .owner .btn--sm {
-  min-height: 31px;
-  height: 31px;
+  min-height: 28px;
+  height: 28px;
   padding: 0 11px;
-  font-size: 12.5px;
-  font-weight: var(--weight-normal);
+  font-size: 11.5px;
+  font-weight: var(--weight-bold);
 }
 .admin .btn--md,
 .owner .btn--md {
-  min-height: 40px;
-  height: 40px;
-  font-size: 13.5px;
+  min-height: 34px;
+  height: 34px;
+  font-size: 12.5px;
 }
 .admin .btn-icon,
 .owner .btn-icon {
-  width: 31px;
-  height: 31px;
-  border-radius: var(--radius-sm);
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
 }
 /* 버튼 안 아이콘도 시안 크기로 (인라인 size 지정을 덮진 않지만 기본을 맞춘다) */
 .admin .btn svg,
@@ -309,6 +310,14 @@
 
 .select {
   cursor: pointer;
+  /* 기본 브라우저 화살표 대신 커스텀 chevron (시안) */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 30px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8a8a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
 }
 
 /* 색 입력 — 피커 + hex 를 나란히 */
@@ -408,6 +417,10 @@
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 14px;
 }
+/* 반폭 카드 안에서는 항목을 한 열로 쌓아 깔끔하게 (auto-fit 이 애매하게 2열로 갈라지지 않게) */
+.form-grid--single {
+  grid-template-columns: 1fr;
+}
 
 /**
  * 섹션 = 흰 카드에 **헤더 바(제목+구분선) + 본문** (시안). 제목이 첫 자식이라, 위 패딩은 0 으로
@@ -420,6 +433,10 @@
   border-radius: var(--radius-md);
   background: var(--color-surface);
   overflow: hidden;
+}
+/* 편집기 폼 컬럼은 flex gap 으로 간격을 주니, 그 안의 admin-section(주최자 카드) 마진은 뺀다 (이중 여백 방지) */
+.owner .admin-section {
+  margin-bottom: 0;
 }
 
 /* 제목을 헤더 바로 — t-title-s(20px)를 이기게 .owner/.admin 로 스코프해 시안의 13.5px 급으로 */

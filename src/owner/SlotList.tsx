@@ -342,6 +342,7 @@ export function SlotList() {
                 >
                   <span style={{ padding: '0 2px 0 11px', fontSize: 13, color: INK3 }}>/</span>
                   <input
+                    id="new-slug"
                     value={slug}
                     placeholder="seventeen-dino"
                     onChange={(e) => {
@@ -355,6 +356,7 @@ export function SlotList() {
               <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <span style={labelStyle}>행사명</span>
                 <input
+                  id="new-name"
                   value={name}
                   placeholder="세븐틴 디노 생일카페"
                   onChange={(e) => {
@@ -407,7 +409,11 @@ export function SlotList() {
                 만들기
               </button>
             </div>
-            {error && <p style={{ margin: '10px 0 0', fontSize: 12, color: '#cc3b39' }}>{error}</p>}
+            {error && (
+              <p className="field__error" style={{ margin: '10px 0 0', fontSize: 12, color: '#cc3b39' }}>
+                {error}
+              </p>
+            )}
           </div>
         </form>
 
@@ -523,6 +529,7 @@ export function SlotList() {
                     </button>
                     <button
                       type="button"
+                      data-slot-delete
                       aria-label={`${s.name} 슬롯 지우기`}
                       onClick={() => handleRemove(s)}
                       style={{ width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #f7d5d4', background: '#fff', borderRadius: 4, color: '#f16361', cursor: 'pointer' }}

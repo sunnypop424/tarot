@@ -1,18 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { type CSSProperties, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import {
-  AlertCircle,
-  ArrowLeft,
-  Calendar,
-  Download,
-  Image as ImageIcon,
-  MessageSquare,
-  Palette,
-  Save,
-  Settings,
-  Smartphone,
-  Sparkles,
-} from 'lucide-react'
+import { AlertCircle, ArrowLeft, Check, Download, ExternalLink, Eye, Sparkles } from 'lucide-react'
 
 import defaultThemeJson from '@/data/slot-default.json'
 import { getSlotDeck } from '@/data/slots'
@@ -25,7 +13,6 @@ import type { ThemeColors, ThemeShape } from '@/types/theme'
 import { isLight } from '@/lib/color'
 import { repo } from '@/lib/repo'
 import { hasSupabase } from '@/lib/repo/client'
-import { CrystalBall } from '@/components/CrystalBall'
 import { checkThemeContrast } from './contrast'
 import { repairContrast, type GeneratedTheme } from './aiTheme'
 import { ImageField } from './ImageField'
@@ -33,7 +20,7 @@ import { StickerField } from './StickerField'
 import { CardUploader } from './CardUploader'
 import { OrganizerPanel } from './OrganizerPanel'
 import { PeriodFields } from './PeriodFields'
-import { periodLabel, rangeInvalid } from './period'
+import { periodLabel, rangeLabel, rangeInvalid } from './period'
 import { validateSlug } from './slug'
 import { onPreviewReady, postPreview, type PreviewState } from '@/slot/preview'
 import {
@@ -46,51 +33,129 @@ import {
 import { rollingDisplay } from '@/data/rolling'
 import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 import { exportSlots } from './slotsFile'
-import styles from './Owner.module.css'
 
 /**
- * hex 고르개 + 투명도 슬라이더 → rgba 한 값 (원본 빌더와 같은 짝).
- *
- * **모듈 바깥에 둔다.** 처음엔 SlotEditor 안에서 정의했는데, 그러면 렌더마다 **새 컴포넌트
- * 타입**이 만들어져 React 가 input 을 버리고 다시 만든다 — 색을 고르려고 누르는 순간
- * 브라우저 색 고르개가 닫혀서 **드래그로 색을 못 고른다.** 안에서 정의된 컴포넌트는
- * 눈에 잘 안 띄는 이런 방식으로 깨진다.
+ * 시안('서비스별 설정 화면.dc.html')에서 그대로 옮긴 인라인 스타일 원자들 —
+ * 카드·헤더·입력·라벨·힌트·알약 버튼·색 알약. 서비스마다 같은 원자를 써서 한 몸으로 보인다.
+ * (hex 는 여기 밖에 없다: 편집기는 고정 라이트 도구라 토큰을 안 쓴다 — CLAUDE.md 예외.)
  */
-function AlphaColor({
-  label,
-  value,
-  hint,
-  onChange,
-}: {
-  label: string
-  value: string
-  hint?: string
-  onChange: (v: string) => void
-}) {
+const CSS = {
+  card: { background: '#fff', border: '1px solid #eeeeee', borderRadius: 8, overflow: 'hidden' },
+  head: { padding: '12px 18px', borderBottom: '1px solid #eeeeee', fontSize: 13.5, fontWeight: 700 },
+  headFlex: {
+    padding: '12px 18px', borderBottom: '1px solid #eeeeee', display: 'flex',
+    alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap',
+  },
+  body: { padding: 18 },
+  label: { fontSize: 11.5, fontWeight: 700, color: '#505050' },
+  hint: { fontSize: 11, color: '#8a8a8a', lineHeight: 1.5 },
+  input: {
+    height: 34, border: '1px solid #dddddd', borderRadius: 4, padding: '0 9px',
+    fontSize: 12.5, outline: 'none', minWidth: 0, background: '#fff', color: '#121212',
+  },
+  select: {
+    height: 34, border: '1px solid #dddddd', borderRadius: 4, padding: '0 30px 0 9px', fontSize: 12.5,
+    backgroundColor: '#fff', color: '#121212', cursor: 'pointer', outline: 'none', minWidth: 0,
+    appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none',
+    backgroundImage:
+      "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8a8a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>\")",
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 9px center',
+  },
+  fieldCol: { display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 },
+  ghostPill: {
+    height: 28, padding: '0 10px', border: '1px solid #dddddd', background: '#fff',
+    borderRadius: 9999, fontSize: 11.5, fontWeight: 700, color: '#505050', cursor: 'pointer', whiteSpace: 'nowrap',
+  },
+  primaryPill: {
+    height: 34, padding: '0 16px', border: 'none', borderRadius: 9999, background: '#816bff',
+    color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+  },
+  colorPill: {
+    display: 'flex', alignItems: 'center', height: 30, border: '1px solid #dddddd',
+    borderRadius: 4, overflow: 'hidden', flexShrink: 0,
+  },
+  hexInput: { border: 'none', outline: 'none', width: 78, fontSize: 11.5, padding: '0 7px', background: '#fff', color: '#121212' },
+  colorRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  range: { flex: 1, minWidth: 0, accentColor: '#816bff' },
+  thumb: {
+    borderRadius: 4, background: '#f7f7f7', border: '1px solid #eeeeee', flexShrink: 0,
+    display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8a8a8a',
+    backgroundSize: 'cover', backgroundPosition: 'center',
+  },
+} satisfies Record<string, CSSProperties>
+
+/**
+ * 평평한 색 스와치 — 시안은 색 span 이지만, 색을 고를 수 있어야 하니 투명한 네이티브 색
+ * 고르개를 스와치 위에 겹쳐 둔다 (span 을 눌러 고르개가 열린다). 픽커가 준 hex 만 올려보낸다.
+ *
+ * **모듈 바깥에 둔다.** 안에서 정의하면 렌더마다 새 타입이 만들어져 색을 드래그하는 순간 닫힌다.
+ */
+function Swatch({ value, label, size = 28, onChange }: { value: string; label: string; size?: number; onChange: (hex: string) => void }) {
   return (
-    <div className="field">
-      <span className="field__label">{label}</span>
-      <div className="color-field">
-        <input
-          type="color"
-          value={hexOf(value)}
-          aria-label={`${label} 고르기`}
-          onChange={(e) => onChange(withAlphaValue(e.target.value, alphaOf(value)))}
-        />
-        <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.05}
-          value={alphaOf(value)}
-          aria-label={`${label} 투명도`}
-          onChange={(e) => onChange(withAlphaValue(hexOf(value), Number(e.target.value)))}
-        />
+    <label style={{ width: size, height: size, background: hexOf(value), borderRight: '1px solid #eeeeee', flexShrink: 0, cursor: 'pointer', position: 'relative', display: 'block' }}>
+      <input
+        type="color"
+        value={hexOf(value)}
+        aria-label={`${label} 고르기`}
+        onChange={(e) => onChange(e.target.value)}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, border: 'none', padding: 0, cursor: 'pointer' }}
+      />
+    </label>
+  )
+}
+
+/** 시안 색 행 — 라벨(+힌트) 좌, [스와치 | hex] 우. 서비스 공통. */
+function SwatchColor({ label, value, hint, id, onChange }: { label: string; value: string; hint?: string; id?: string; onChange: (v: string) => void }) {
+  return (
+    <div style={CSS.colorRow}>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 12.5, color: '#505050' }}>{label}</div>
+        {hint && <div style={CSS.hint}>{hint}</div>}
       </div>
-      <span className="field__hint">
-        {hint ? `${hint} · ` : ''}
-        불투명도 {Math.round(alphaOf(value) * 100)}%
-      </span>
+      <div style={CSS.colorPill}>
+        <Swatch value={value} label={label} onChange={onChange} />
+        <input id={id} value={value} onChange={(e) => onChange(e.target.value)} style={CSS.hexInput} />
+      </div>
+    </div>
+  )
+}
+
+/** hex + 투명도 → rgba (시안 박스·카운터·모달 색): 라벨·힌트 위, [스와치 | hex] · 슬라이더 · % 아래. */
+function AlphaColor({ label, value, hint, onChange }: { label: string; value: string; hint?: string; onChange: (v: string) => void }) {
+  const pct = Math.round(alphaOf(value) * 100)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ fontSize: 12.5, fontWeight: 700, color: '#505050' }}>{label}</div>
+      {hint && <div style={CSS.hint}>{hint}</div>}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={CSS.colorPill}>
+          <Swatch value={value} label={label} onChange={(hex) => onChange(withAlphaValue(hex, alphaOf(value)))} />
+          <input value={hexOf(value)} onChange={(e) => onChange(withAlphaValue(e.target.value, alphaOf(value)))} style={{ ...CSS.hexInput, width: 76 }} />
+        </div>
+        <input
+          type="range" min={0} max={1} step={0.05} value={alphaOf(value)} aria-label={`${label} 투명도`}
+          onChange={(e) => onChange(withAlphaValue(hexOf(value), Number(e.target.value)))}
+          style={{ ...CSS.range, minWidth: 50 }}
+        />
+        <span style={{ fontSize: 11.5, color: '#505050', width: 36, textAlign: 'right', flexShrink: 0 }}>{pct}%</span>
+      </div>
+    </div>
+  )
+}
+
+/** radius 슬라이더 (시안) — 라벨 위, [슬라이더 · 숫자칸+px] 아래. 그리드 셀 한 줄 차지. */
+function RadiusSlider({ label, value, max = 40, onChange }: { label: string; value: number; max?: number; onChange: (n: number) => void }) {
+  return (
+    <div style={CSS.fieldCol}>
+      <span style={CSS.label}>{label}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+        <input type="range" min={0} max={Math.min(max, 32)} value={value} aria-label={label} onChange={(e) => onChange(Number(e.target.value))} style={CSS.range} />
+        <div style={{ display: 'flex', alignItems: 'center', height: 30, border: '1px solid #dddddd', borderRadius: 4, overflow: 'hidden', flexShrink: 0 }}>
+          <input value={value} onChange={(e) => onChange(Math.max(0, Math.min(max, Number(e.target.value) || 0)))} style={{ border: 'none', outline: 'none', width: 38, textAlign: 'center', fontSize: 12, background: '#fff', color: '#121212' }} />
+          <span style={{ fontSize: 10.5, color: '#8a8a8a', padding: '0 7px', borderLeft: '1px solid #eeeeee' }}>px</span>
+        </div>
+      </div>
     </div>
   )
 }
@@ -126,10 +191,9 @@ function RankListField({
   }
 
   return (
-    <div className="field">
-      <span className="field__label">{label}</span>
+    <label style={CSS.fieldCol}>
+      <span style={CSS.label}>{label}</span>
       <input
-        className="input"
         value={text}
         inputMode="numeric"
         onChange={(e) => {
@@ -141,9 +205,47 @@ function RankListField({
               .filter((n) => Number.isFinite(n) && n > 0)
           )
         }}
+        style={CSS.input}
       />
-      {hint && <span className="field__hint">{hint}</span>}
+      {hint && <span style={CSS.hint}>{hint}</span>}
+    </label>
+  )
+}
+
+/** 시안 카드 — 흰 박스, 상단 헤더 바(제목 + 선택적 우측 노트/버튼), 본문. */
+function Card({
+  title,
+  note,
+  right,
+  children,
+  style,
+}: {
+  title: string
+  note?: string
+  right?: ReactNode
+  children: ReactNode
+  style?: CSSProperties
+}) {
+  return (
+    <div style={{ ...CSS.card, ...style }}>
+      <div style={CSS.headFlex}>
+        <span style={{ fontSize: 13.5, fontWeight: 700 }}>{title}</span>
+        {note && <span style={{ fontSize: 11.5, color: '#8a8a8a' }}>{note}</span>}
+        {right}
+      </div>
+      <div style={CSS.body}>{children}</div>
     </div>
+  )
+}
+
+/** 시안 라벨-위 필드 — 라벨, 자식(입력), 선택적 힌트. */
+function Field({ label, hint, children }: { label: string; hint?: ReactNode; children: ReactNode }) {
+  return (
+    <label style={CSS.fieldCol}>
+      <span style={CSS.label}>{label}</span>
+      {children}
+      {hint && <span style={CSS.hint}>{hint}</span>}
+    </label>
   )
 }
 
@@ -179,36 +281,40 @@ function LuckydrawExtra({
     hint?: string,
     max?: number
   ) => (
-    <div className="field">
-      <span className="field__label">{label}</span>
-      <input
-        className="input"
-        type="number"
-        min={0}
-        max={max}
-        value={value}
-        onChange={(e) => onChange(Math.max(0, Math.min(max ?? Infinity, Number(e.target.value) || 0)))}
-      />
-      {hint && <span className="field__hint">{hint}</span>}
-    </div>
+    <label style={CSS.fieldCol}>
+      <span style={CSS.label}>{label}</span>
+      <div style={{ display: 'flex', alignItems: 'center', height: 31, border: '1px solid #dddddd', borderRadius: 4, overflow: 'hidden' }}>
+        <input
+          type="number"
+          min={0}
+          max={max}
+          value={value}
+          onChange={(e) => onChange(Math.max(0, Math.min(max ?? Infinity, Number(e.target.value) || 0)))}
+          style={{ flex: 1, border: 'none', outline: 'none', fontSize: 12.5, padding: '0 9px', minWidth: 0, background: '#fff', color: '#121212' }}
+        />
+        <span style={{ fontSize: 10.5, color: '#8a8a8a', padding: '0 8px', borderLeft: '1px solid #eeeeee' }}>px</span>
+      </div>
+      {hint && <span style={CSS.hint}>{hint}</span>}
+    </label>
   )
 
   const text = (label: string, value: string, onChange: (v: string) => void, hint?: string) => (
-    <div className="field">
-      <span className="field__label">{label}</span>
-      <input className="input" value={value} onChange={(e) => onChange(e.target.value)} />
-      {hint && <span className="field__hint">{hint}</span>}
-    </div>
+    <label style={CSS.fieldCol}>
+      <span style={CSS.label}>{label}</span>
+      <input value={value} onChange={(e) => onChange(e.target.value)} style={CSS.input} />
+      {hint && <span style={CSS.hint}>{hint}</span>}
+    </label>
   )
 
   switch (kind) {
     case 'boxRadius':
-      return num(
-        '둥글기 (px)',
-        draft.theme.shape.radiusLg,
-        (n) => patchShape('radiusLg', n),
-        '박스·카드 둥글기 (0~40). 너무 크면 뭉개져요',
-        40
+      return (
+        <RadiusSlider
+          label="둥글기"
+          value={draft.theme.shape.radiusLg}
+          max={40}
+          onChange={(n) => patchShape('radiusLg', n)}
+        />
       )
     case 'boxPadding':
       return num('안쪽 여백 (px)', d.boxPadding, (n) => patchLd({ boxPadding: n }))
@@ -226,12 +332,13 @@ function LuckydrawExtra({
     case 'boxTopMargin':
       return num('상단 여백 (px)', d.boxTopMargin, (n) => patchLd({ boxTopMargin: n }), '가운데에서 얼마나 내릴지 — 사진 얼굴을 안 가리게')
     case 'buttonRadius':
-      return num(
-        '둥글기 (px)',
-        draft.theme.shape.radiusMd,
-        (n) => patchShape('radiusMd', n),
-        '버튼·입력칸·개수 선택 둥글기 (0~40). 크게 두면 알약',
-        40
+      return (
+        <RadiusSlider
+          label="둥글기"
+          value={draft.theme.shape.radiusMd}
+          max={40}
+          onChange={(n) => patchShape('radiusMd', n)}
+        />
       )
     case 'texts':
       return (
@@ -662,6 +769,8 @@ export function SlotEditor() {
   const [previewScale, setPreviewScale] = useState(1)
   /** '크게' — 미리보기를 위로 올리고 전체 폭을 준다 (아이패드 가로는 좁은 칸에선 못 읽는다) */
   const [previewBig, setPreviewBig] = useState(false)
+  /** 롤페 미리보기 — 벽 / 작성 화면 전환 (radius 등은 작성 화면에 반영되니 골라 봐야 한다) */
+  const [rollingView, setRollingView] = useState<'wall' | 'write'>('wall')
   /** 지금 만지는 색이 화면의 **어느 자리**인지 — 미리보기가 그 부분을 깜빡인다 */
   const [highlight, setHighlight] = useState<string | null>(null)
 
@@ -874,505 +983,600 @@ export function SlotEditor() {
     if (dirty && !confirm('저장하지 않은 수정이 있어요. 그냥 나갈까요?')) e.preventDefault()
   }
 
+  const themeColorKeys = COLOR_GROUPS.filter((g) =>
+    g.services.includes(getSlotService(draft))
+  ).flatMap((g) => g.keys)
+
+  const radiiGrid = (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,200px),1fr))', gap: 14 }}>
+      {(Object.keys(SHAPE_LABELS) as (keyof ThemeShape)[]).map((k) => (
+        <RadiusSlider key={k} label={SHAPE_LABELS[k]} value={draft.theme.shape[k]} max={40} onChange={(n) => patchShape(k, n)} />
+      ))}
+    </div>
+  )
+
+  const planFacts: { label: string; value: string }[] = [
+    { label: '3장 스프레드 (AI 종합 리딩)', value: plan.allowSpread ? '가능' : '불가 — 전부 1장' },
+    {
+      label: '질문 답변 AI 생성',
+      value: limits.answerGen === 0 ? '없음 — 주최자가 직접 입력' : `${limits.answerGen}회 (재생성 포함)`,
+    },
+    { label: '한도를 넘으면', value: 'AI 종합만 빠지고 카드별 해석으로 계속' },
+  ]
+
+  const contrastPill = (level: string | null): { text: string; bg: string; fg: string } =>
+    level === 'pass'
+      ? { text: '통과', bg: '#e6f4ec', fg: '#22694a' }
+      : level === 'large-only'
+        ? { text: '큰 글자만', bg: '#fdf0e3', fg: '#a15c17' }
+        : { text: '미달', bg: '#fdecec', fg: '#c0392b' }
+
   return (
-    // 라이트 — 색을 눈으로 고르는 작업이라 도구는 밝게 고정한다
+    // 라이트 — 색을 눈으로 고르는 작업이라 도구는 밝게 고정한다 (.owner 가 서브트리를 라이트로 덮는다)
     <div className="owner">
-      {/* 시안의 상단 스티키 바 — 뒤로 · 행사명/슬러그 · 저장 상태 · 액션 */}
-      <div className={styles.topbar}>
-        <div className={styles.topbarLeft}>
+      {/* ── 상단 스티키 바 (시안) ── */}
+      <div
+        style={{
+          minHeight: 54,
+          background: '#fff',
+          borderBottom: '1px solid #eeeeee',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          padding: '8px 20px',
+          position: 'sticky',
+          top: 0,
+          zIndex: 20,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
           <Link
             to="/theme-editor"
-            className={styles.backBtn}
             onClick={guardLeave}
             aria-label="슬롯 목록"
+            style={{
+              width: 29,
+              height: 29,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid #dddddd',
+              background: '#fff',
+              borderRadius: 4,
+              color: '#505050',
+              flexShrink: 0,
+            }}
           >
             <ArrowLeft size={15} strokeWidth={2} aria-hidden="true" />
           </Link>
           <div style={{ minWidth: 0 }}>
-            <div className={styles.topbarName}>{draft.name}</div>
-            <div className={styles.topbarSlug}>/{saved.slug}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {draft.name || '(이름 없음)'}
+            </div>
+            <div style={{ fontSize: 11.5, color: '#8a8a8a' }}>/{saved.slug}</div>
           </div>
+          <span
+            data-save-state={saveError ? 'error' : dirty ? 'dirty' : 'saved'}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              fontSize: 11.5,
+              fontWeight: 700,
+              whiteSpace: 'nowrap',
+              padding: '4px 9px',
+              borderRadius: 9999,
+              ...(saveError
+                ? { color: '#c0392b', background: '#fdecec' }
+                : dirty
+                  ? { color: '#a15c17', background: '#fdf0e3' }
+                  : { color: '#816bff', background: '#f0edff' }),
+            }}
+          >
+            {saveError ? (
+              <>
+                <AlertCircle size={12} strokeWidth={2.4} aria-hidden="true" />
+                저장 실패
+              </>
+            ) : dirty ? (
+              <>
+                <AlertCircle size={12} strokeWidth={2.4} aria-hidden="true" />
+                저장 안 됨
+              </>
+            ) : (
+              <>
+                <Check size={12} strokeWidth={2.4} aria-hidden="true" />
+                저장됨
+              </>
+            )}
+          </span>
         </div>
-        <div className={styles.topbarActions}>
-          {saveError ? (
-            <span className="field__error">{saveError}</span>
-          ) : dirty ? (
-            <span className={styles.dirtyPill}>
-              <AlertCircle size={12} strokeWidth={2.2} aria-hidden="true" />
-              저장 안 됨
-            </span>
-          ) : (
-            <span className="save-state">저장됨</span>
-          )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <a
             href={`/${saved.slug}/admin`}
             target="_blank"
             rel="noreferrer"
-            className="btn btn--sm btn--slight"
+            style={{ ...CSS.ghostPill, height: 32, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0 12px', fontSize: 12.5, textDecoration: 'none' }}
           >
+            <ExternalLink size={14} strokeWidth={2} aria-hidden="true" />
             주최자 콘솔
           </a>
           {dirty && (
-            <button type="button" className="btn btn--sm btn--slight" onClick={handleRevert}>
+            <button type="button" onClick={handleRevert} style={{ ...CSS.ghostPill, height: 32, padding: '0 12px', fontSize: 12.5 }}>
               되돌리기
             </button>
           )}
           <button
             type="button"
-            className="btn btn--sm btn--slight"
             onClick={() => slots && exportSlots(slots)}
+            style={{ ...CSS.ghostPill, height: 32, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0 12px', fontSize: 12.5 }}
           >
-            <Download size={16} strokeWidth={2} aria-hidden="true" />
+            <Download size={14} strokeWidth={2} aria-hidden="true" />
             {hasSupabase ? '백업' : 'slots.json'}
           </button>
           <button
             type="button"
-            className="btn btn--sm btn--primary"
+            data-save
             disabled={!dirty}
             onClick={() => void handleSave()}
-            data-save
+            style={{ height: 32, padding: '0 18px', border: 'none', borderRadius: 9999, background: '#816bff', color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: dirty ? 'pointer' : 'default', opacity: dirty ? 1 : 0.55, whiteSpace: 'nowrap' }}
           >
-            <Save size={16} strokeWidth={2} aria-hidden="true" />
             저장하기
           </button>
         </div>
       </div>
 
-      <div className="admin__main">
-        {/* 가로 미리보기는 좁은 칸에 넣으면 글자가 안 읽힌다 — 넓은 화면에선 칸을 키운다 */}
-        <div
-          className={styles.split}
-          data-wide-preview={luckydraw || undefined}
-          data-preview-big={previewBig || undefined}
-        >
-          <div className={styles.formCol}>
-            <section className="admin-section" style={{ order: 1 }}>
-              <h2 className="t-title-s admin-section__title">
-                <Settings size={15} strokeWidth={2} aria-hidden="true" />
-                기본
-                <span className="admin-section__note">모든 서비스 공통</span>
-              </h2>
-              <div className="form-grid">
-                <div className="field">
-                  <label className="field__label" htmlFor="slot-slug">
-                    슬러그 (URL 경로)
-                  </label>
-                  <input
-                    id="slot-slug"
-                    className="input"
-                    value={draft.slug}
-                    onChange={(e) => {
-                      patchSlot({ slug: e.target.value })
-                      setSlugError(null)
-                    }}
-                  />
-                  <span className="field__hint">
-                    /{saved.slug} 가 이 이벤트의 루트예요. 바꿔 저장하면 이미 올린 이미지는 옛 폴더에
-                    남으니 다시 올려야 해요.
-                  </span>
-                  {slugError && <span className="field__error">{slugError}</span>}
-                </div>
-                <div className="field">
-                  <label className="field__label" htmlFor="slot-name">
-                    이벤트명
-                  </label>
-                  <input
-                    id="slot-name"
-                    className="input"
-                    value={draft.name}
-                    onChange={(e) => patchSlot({ name: e.target.value })}
-                  />
-                </div>
-                <div className="field">
-                  <span className="field__label">서비스</span>
-                  {/* 세그먼트 토글 (시안) — 고르면 아래 설정 패널이 통째로 바뀐다 */}
-                  <div className={styles.segment} role="radiogroup" aria-label="서비스">
-                    {SERVICES.map((s) => {
-                      const on = getSlotService(draft) === s.id
-                      return (
-                        <button
-                          key={s.id}
-                          type="button"
-                          role="radio"
-                          aria-checked={on}
-                          className={styles.segmentBtn}
-                          data-active={on || undefined}
-                          onClick={() => {
-                            patchSlot({ service: s.id })
-                            /**
-                             * 럭키드로우로 바꾸면 **중립색을 base-template 값으로 못박는다** —
-                             * 이 색들은 편집기에 없어(고를 수 없어) 안 맞춰두면 다크 글자색이
-                             * 밝은 박스 안에 남아 아무것도 안 보인다.
-                             */
-                            if (s.id === 'luckydraw') applyBase(LUCKYDRAW_NEUTRALS)
-                          }}
-                        >
-                          {s.label}
-                        </button>
-                      )
-                    })}
+      {/* ── 본문: 폼 컬럼 + 미리보기 컬럼 (시안 2열 그리드) ── */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: previewBig ? '1fr' : 'repeat(auto-fit,minmax(min(100%,430px),1fr))',
+          gap: 20,
+          maxWidth: 1440,
+          margin: '0 auto',
+          padding: '20px 20px 80px',
+          alignItems: 'start',
+        }}
+      >
+        {/* ── 폼 컬럼 ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0 }}>
+
+          {/* 기본 */}
+          <div style={CSS.card}>
+            <div style={{ padding: '12px 18px', borderBottom: '1px solid #eeeeee', display: 'flex', alignItems: 'baseline', gap: '4px 9px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 13.5, fontWeight: 700 }}>기본</span>
+              <span style={{ fontSize: 11.5, color: '#8a8a8a' }}>모든 서비스 공통</span>
+            </div>
+            <div style={{ ...CSS.body, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 16 }}>
+                <div style={CSS.fieldCol}>
+                  <span style={CSS.label}>슬러그 (URL 경로)</span>
+                  <div style={{ display: 'flex', alignItems: 'center', height: 34, border: '1px solid #dddddd', borderRadius: 4, background: '#fff', overflow: 'hidden' }}>
+                    <span style={{ padding: '0 2px 0 10px', fontSize: 12.5, color: '#8a8a8a' }}>/</span>
+                    <input
+                      value={draft.slug}
+                      onChange={(e) => {
+                        patchSlot({ slug: e.target.value })
+                        setSlugError(null)
+                      }}
+                      style={{ flex: 1, border: 'none', outline: 'none', height: '100%', fontSize: 13, fontWeight: 600, padding: '0 10px 0 0', minWidth: 0, background: '#fff', color: '#121212' }}
+                    />
                   </div>
-                  {/* 서비스를 바꾸면 아래 설정 목록 자체가 갈린다 — 그 사실을 여기서 말해준다 */}
-                  <span className="field__hint">
-                    이 슬롯이 파는 것.{' '}
-                    {luckydraw
-                      ? '아래 설정은 럭키드로우용이에요 (카드·AI 관련 항목은 안 나와요).'
-                      : rolling
-                        ? '아래 “롤링페이퍼” 칸에서 벽 문구·카드 색·스티커·배경을 정해요 (색·형태는 테마를 따라가요).'
-                        : '아래 카드 · 뽑기 관련 항목은 타로 서비스의 설정이에요.'}
+                  <span style={CSS.hint}>
+                    /{saved.slug} 가 이 이벤트의 루트예요. 바꿔 저장하면 이미 올린 이미지는 옛 폴더에 남으니 다시 올려야 해요.
                   </span>
+                  {slugError && <span style={{ fontSize: 11, color: '#f16361' }}>{slugError}</span>}
+                </div>
+                <Field label="이벤트명">
+                  <input value={draft.name} onChange={(e) => patchSlot({ name: e.target.value })} style={CSS.input} />
+                </Field>
+              </div>
+              <div>
+                <div style={{ ...CSS.label, marginBottom: 7 }}>서비스</div>
+                <div role="radiogroup" aria-label="서비스" style={{ display: 'inline-flex', background: '#f7f7f7', border: '1px solid #eeeeee', borderRadius: 9999, padding: 3, gap: 2, flexWrap: 'wrap' }}>
+                  {SERVICES.map((s) => {
+                    const on = getSlotService(draft) === s.id
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={on}
+                        onClick={() => {
+                          patchSlot({ service: s.id })
+                          if (s.id === 'luckydraw') applyBase(LUCKYDRAW_NEUTRALS)
+                        }}
+                        style={{ height: 32, padding: '0 20px', border: 'none', borderRadius: 9999, fontSize: 13, fontWeight: 700, cursor: 'pointer', background: on ? '#816bff' : 'transparent', color: on ? '#fff' : '#8a8a8a' }}
+                      >
+                        {s.label}
+                      </button>
+                    )
+                  })}
+                </div>
+                <div style={{ fontSize: 11.5, color: '#8a8a8a', marginTop: 8, lineHeight: 1.55 }}>
+                  이 슬롯이 파는 것.{' '}
+                  {luckydraw
+                    ? '아래 설정은 럭키드로우용이에요 (카드·AI 관련 항목은 안 나와요).'
+                    : rolling
+                      ? '아래 “롤링페이퍼” 칸에서 벽 문구·카드 색·스티커·배경을 정해요 (색·형태는 테마를 따라가요).'
+                      : '아래 카드 · 뽑기 관련 항목은 타로 서비스의 설정이에요.'}
                 </div>
               </div>
-            </section>
-
-            {/* 공통 설정과 서비스 설정을 가르는 구분선 (시안) — order 로 서비스 카드들 바로 앞에 온다 */}
-            <div className="svc-divider" style={{ order: 10 }}>
-              <span>서비스 설정 · {serviceLabel(getSlotService(draft))}</span>
             </div>
+          </div>
 
-            {/**
-             * 색 만들기(AI 생성 + 밝기 프리셋) — **럭키드로우엔 통째로 없다.**
-             * 고를 수 있는 색이 넷뿐이라(버튼 2 · 당첨 2) 대표 색에서 한 벌을 만들 것도,
-             * 바탕을 밝기 계열로 스왑할 것도 없다. 중립색은 base-template 값으로 붙박이다.
-             */}
-            {!luckydraw && (
-            <section className="admin-section" style={{ order: 2 }}>
-              <h2 className="t-title-s admin-section__title">
-                <Sparkles size={15} strokeWidth={2} aria-hidden="true" />
-                색 만들기
-              </h2>
-              {/**
-               * 럭키드로우는 **AI 색 생성을 안 쓴다** — 배경이 대개 정해진 사진이고 그 위에
-               * 얹는 색이 몇 개뿐이라, 대표 색에서 한 벌을 만들 이유가 없다.
-               * 밝기 프리셋(다크·라이트)은 남긴다 — 바탕을 한 번에 맞추는 건 여기서도 쓸모 있다.
-               */}
-              <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                대표 색 하나와 밝기만 정하면 나머지 색을 다 만들어요. 마음에 안 드는 색은 아래에서
-                손으로 고치면 됩니다. <b>읽히는지는 자동으로 맞춰요</b> — 안 읽히는 색은 대비를
-                넘게 조정해서 넣습니다.
+          {/* 공통 설정 — 기본 바로 아래에 기간 · 주최자 계정 · 웹앱 아이콘 (세팅 흐름 순) */}
+          <div style={CSS.card}>
+            <div style={CSS.headFlex}>
+              <span style={{ fontSize: 13.5, fontWeight: 700 }}>기간</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                {rangeLabel(draft.period?.test) && (
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: '#505050', background: '#eeeeee', padding: '4px 9px', borderRadius: 9999 }}>
+                    테스트 {rangeLabel(draft.period?.test)}
+                  </span>
+                )}
+                <span style={{ fontSize: 11.5, fontWeight: 700, color: '#816bff', background: '#f0edff', padding: '4px 9px', borderRadius: 9999 }}>{periodLabel(draft)}</span>
+              </span>
+            </div>
+            <div style={{ ...CSS.body, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <PeriodFields period={draft.period} onChange={(period) => patchSlot(() => ({ period }))} />
+              {rangeInvalid(draft) && <div style={{ fontSize: 11.5, color: '#f16361' }}>종료일이 시작일보다 앞서요.</div>}
+              <div style={{ fontSize: 11, color: '#8a8a8a', lineHeight: 1.6, paddingTop: 12, borderTop: '1px solid #eeeeee' }}>
+                대여 종료 <b>+15일</b>이 지나면 슬롯이 자동 삭제돼요 (비워 두면 삭제 안 함).
+                {luckydraw ? ' 럭키드로우는 종료 +14일까지 배송 정보를 꺼낼 수 있어요.' : ''}
+              </div>
+            </div>
+          </div>
+
+          {repo.organizers.ready() && (
+            <OrganizerPanel slot={saved} slugPending={draft.slug !== saved.slug} />
+          )}
+
+          <Card title="웹앱 아이콘">
+            <p style={{ margin: '0 0 14px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
+              방문자가 브라우저에서 “홈 화면에 추가” 하면 이 아이콘과 행사명으로 앱처럼 열려요. 정사각형 PNG 를 권장해요 (512×512).
+            </p>
+            <ImageField slug={saved.slug} label="앱 아이콘" name="app-icon" title="앱 아이콘" value={draft.theme.assets.appIcon} onChange={(v) => patchAsset('appIcon', v)} thumbW={60} thumbH={60} thumbRadius={8} hint="없으면 홈 화면 아이콘이 기본으로 떠요." />
+          </Card>
+
+          {/* 공통 → 서비스 설정 구분선 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 2 }}>
+            <div style={{ height: 1, background: '#eeeeee', flex: 1 }} />
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#8a8a8a', whiteSpace: 'nowrap' }}>
+              서비스 설정 · {serviceLabel(getSlotService(draft))}
+            </span>
+            <div style={{ height: 1, background: '#eeeeee', flex: 1 }} />
+          </div>
+
+          {/* 색 만들기 — 타로만. 럭드는 색이 몇 개뿐이고, 롤페는 자체 색을 롤페 카드에서 고른다 */}
+          {!luckydraw && !rolling && (
+            <Card title="색 만들기">
+              <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
+                대표 색 하나와 밝기만 정하면 나머지 색을 다 만들어요. 마음에 안 드는 색은 아래에서 손으로 고치면 됩니다. 읽히는지는 자동으로 맞춰요 — 안 읽히는 색은 대비를 넘게 조정해서 넣습니다.
               </p>
-
-              <div className="form-grid">
-                <div className="field">
-                  <label className="field__label" htmlFor="ai-base">
-                    대표 색
-                  </label>
-                  <div className="color-field">
-                    <input
-                      type="color"
-                      value={baseColor}
-                      onChange={(e) => setBaseColor(e.target.value)}
-                      aria-label="대표 색 고르기"
-                    />
-                    <input
-                      id="ai-base"
-                      className="input"
-                      value={baseColor}
-                      onChange={(e) => setBaseColor(e.target.value)}
-                      data-ai-base
-                    />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,230px),1fr))', gap: 16, alignItems: 'start' }}>
+                <Field label="대표 색" hint="팬이 아는 그 색. CTA 버튼에 쓰여요.">
+                  <div style={{ ...CSS.colorPill, height: 34 }}>
+                    <Swatch value={baseColor} label="대표 색" size={32} onChange={setBaseColor} />
+                    <input value={baseColor} onChange={(e) => setBaseColor(e.target.value)} style={{ border: 'none', outline: 'none', flex: 1, minWidth: 0, fontSize: 12.5, padding: '0 9px', background: '#fff', color: '#121212' }} />
                   </div>
-                  <span className="field__hint">팬이 아는 그 색. CTA 버튼에 쓰여요.</span>
-                </div>
-
-                <div className="field">
-                  <label className="field__label" htmlFor="ai-mode">
-                    밝기
-                  </label>
-                  <select
-                    id="ai-mode"
-                    className="select"
-                    value={aiMode}
-                    onChange={(e) => setAiMode(e.target.value as 'light' | 'dark')}
-                    data-ai-mode
-                  >
+                </Field>
+                <div style={CSS.fieldCol}>
+                  <span style={CSS.label}>밝기</span>
+                  <select value={aiMode} onChange={(e) => setAiMode(e.target.value === 'light' ? 'light' : 'dark')} style={CSS.select}>
                     <option value="dark">다크 — 어두운 화면</option>
                     <option value="light">라이트 — 밝은 화면</option>
                   </select>
-                </div>
-
-                <div className="field">
-                  <span className="field__label" aria-hidden="true">
-                    &nbsp;
-                  </span>
-                  <button
-                    type="button"
-                    className="btn btn--primary"
-                    disabled={!aiReady || generating}
-                    onClick={() => void generateColors()}
-                    data-ai-theme
-                  >
-                    <Sparkles size={18} strokeWidth={2} aria-hidden="true" />
-                    AI로 색 만들기
-                  </button>
-                </div>
-              </div>
-
-              {!aiReady && (
-                <p className="t-text-xs t-muted" style={{ marginTop: 'var(--space-base)' }}>
-                  AI 가 아직 연결되지 않았어요 — 아래 프리셋으로 바탕만 맞추고 색은 손으로 고르세요.
-                </p>
-              )}
-              {generating && <CrystalBall label="색을 고르고 있어요" />}
-              {themeError && (
-                <p className="field__error" style={{ marginTop: 'var(--space-base)' }}>
-                  {themeError}
-                </p>
-              )}
-              {repaired && repaired.length > 0 && (
-                <p className="t-text-xs" style={{ marginTop: 'var(--space-base)', color: 'var(--color-accent-soft)' }}>
-                  안 읽히던 {repaired.join(' · ')} 색은 대비를 맞춰 조정했어요.
-                </p>
-              )}
-
-              <p className="t-text-xs t-muted" style={{ margin: 'var(--space-base) 0 var(--space-sm)' }}>
-                바탕만 밝기 계열로 바꾸기 (브랜드 색은 그대로)
-              </p>
-              <div className={styles.presetRow}>
-                {BASE_PRESETS.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    className={`btn btn--sm ${activeBase === p.id ? 'btn--primary' : 'btn--slight'}`}
-                    aria-pressed={activeBase === p.id}
-                    onClick={() => applyBase(p.base)}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-            </section>
-            )}
-
-            {/**
-             * 럭키드로우 설정은 **화면 요소별 카드**로 묶는다.
-             *
-             * 색은 색끼리, 크기는 크기끼리 늘어놓으면 "박스를 손보려면 색 목록에서 하나,
-             * 형태 목록에서 하나, 여백 목록에서 하나" 를 오가게 된다. 최고관리자가 실제로
-             * 하는 일은 "박스를 손본다" 이지 "색을 손본다" 가 아니다.
-             *
-             * 색 칸에 손을 올리면 미리보기에서 **그 자리가 깜빡인다** — "커버 배경" 이라는
-             * 이름만으로는 어디인지 모른다 (긁기 전에만 보이는 자리라 더 그렇다).
-             */}
-            {luckydraw &&
-              LUCKYDRAW_GROUPS.map((g) => (
-                <section key={g.title} className="admin-section">
-                  <h2 className="t-title-s admin-section__title">{g.title}</h2>
-                  {g.hint && (
-                    <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                      {g.hint}
-                    </p>
+                  {aiReady && (
+                    <button
+                      type="button"
+                      onClick={() => void generateColors()}
+                      disabled={generating}
+                      style={{ height: 34, marginTop: 2, border: 'none', borderRadius: 9999, background: '#f0edff', color: '#816bff', fontSize: 12.5, fontWeight: 700, cursor: generating ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, opacity: generating ? 0.6 : 1 }}
+                    >
+                      <Sparkles size={14} strokeWidth={2} aria-hidden="true" />
+                      {generating ? '만드는 중…' : 'AI로 색 만들기'}
+                    </button>
                   )}
-                  <div className={styles.fieldGrid}>
-                    {(g.colors ?? []).map((f) => {
-                      const key = f.key as keyof ThemeColors
+                </div>
+              </div>
+              {themeError && <div style={{ marginTop: 12, fontSize: 11.5, color: '#f16361' }}>{themeError}</div>}
+              {repaired && repaired.length > 0 && (
+                <div style={{ marginTop: 12, fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.5 }}>
+                  대비가 모자라 <b style={{ color: '#505050' }}>{repaired.join(', ')}</b> 색을 읽히게 조정했어요.
+                </div>
+              )}
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 12, color: '#505050' }}>
+                  바탕만 밝기 계열로 바꾸기 <span style={{ color: '#8a8a8a' }}>(브랜드 색은 그대로)</span>
+                </span>
+                <div style={{ display: 'inline-flex', background: '#f7f7f7', border: '1px solid #eeeeee', borderRadius: 9999, padding: 3, gap: 2 }}>
+                  {BASE_PRESETS.map((p) => {
+                    const on = activeBase === p.id
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => applyBase(p.base)}
+                        style={{ height: 28, padding: '0 15px', border: 'none', borderRadius: 9999, fontSize: 12, fontWeight: 700, cursor: 'pointer', background: on ? '#fff' : 'transparent', color: on ? '#121212' : '#8a8a8a' }}
+                      >
+                        {p.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* ══ 타로 서비스 설정 ══ */}
+          {!luckydraw && !rolling && (
+            <>
+              <Card title="테마 색 · 형태">
+                {themeColorKeys.length > 0 && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,250px),1fr))', gap: '12px 24px' }}>
+                    {themeColorKeys.map((k) => (
+                      <SwatchColor key={k} id={`c-${k}`} label={COLOR_LABELS[k] ?? k} value={draft.theme.colors[k]} onChange={(v) => patchColor(k, v)} />
+                    ))}
+                  </div>
+                )}
+                <div style={{ marginTop: themeColorKeys.length > 0 ? 16 : 0, paddingTop: themeColorKeys.length > 0 ? 14 : 0, borderTop: themeColorKeys.length > 0 ? '1px solid #eeeeee' : 'none' }}>
+                  {radiiGrid}
+                </div>
+              </Card>
+
+              <Card title="로고 · 배경 이미지">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 16 }}>
+                  <Field label="로고">
+                    <ImageField slug={saved.slug} label="로고" name="logo" value={draft.theme.assets.logo} onChange={(v) => patchAsset('logo', v)} hint="없으면 이벤트명 텍스트가 나와요." />
+                  </Field>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 10, alignItems: 'start' }}>
+                    <Field label="로고 대체 텍스트">
+                      <input value={draft.theme.assets.logoAlt} onChange={(e) => patchAsset('logoAlt', e.target.value)} style={CSS.input} />
+                    </Field>
+                    <Field label="로고 높이 (px)">
+                      <input type="number" min={16} max={80} value={draft.theme.assets.logoHeight} onChange={(e) => patchAsset('logoHeight', Number(e.target.value))} style={CSS.input} />
+                    </Field>
+                  </div>
+                  <Field label="배경 패턴">
+                    <ImageField slug={saved.slug} label="배경 패턴" name="background" value={draft.theme.assets.backgroundPattern} onChange={(v) => patchAsset('backgroundPattern', v)} />
+                  </Field>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,105px),1fr))', gap: 10 }}>
+                    <Field label="불투명도" hint="카드를 가리지 않게 낮게.">
+                      <input type="number" min={0} max={1} step={0.01} value={draft.theme.assets.backgroundPatternOpacity} onChange={(e) => patchAsset('backgroundPatternOpacity', Number(e.target.value))} style={CSS.input} />
+                    </Field>
+                    <Field label="패턴 크기" hint="cover, 200px auto …">
+                      <input value={draft.theme.assets.backgroundPatternSize} onChange={(e) => patchAsset('backgroundPatternSize', e.target.value)} style={CSS.input} />
+                    </Field>
+                    <Field label="반복">
+                      <select value={draft.theme.assets.backgroundPatternRepeat} onChange={(e) => patchAsset('backgroundPatternRepeat', e.target.value)} style={CSS.select}>
+                        <option value="no-repeat">no-repeat</option>
+                        <option value="repeat">repeat</option>
+                      </select>
+                    </Field>
+                  </div>
+                </div>
+              </Card>
+
+              <Card title="카드 뒷면">
+                <div style={{ paddingBottom: 14, borderBottom: '1px solid #eeeeee' }}>
+                  <ImageField slug={saved.slug} label="뒷면 이미지" name="card-back" title="뒷면 이미지" value={draft.theme.assets.cardBack} onChange={(v) => patchAsset('cardBack', v)} thumbW={52} thumbH={78} hint="78장 공통으로 쓰여요. 없으면 아래 내장 문양을 써요." />
+                </div>
+                <div style={{ fontSize: 11.5, color: '#8a8a8a', margin: '14px 0 12px' }}>뒷면 이미지가 없을 때 쓰는 내장 문양 그라디언트예요.</div>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <div aria-hidden="true" style={{ width: 52, height: 78, borderRadius: 4, border: '1px solid #eeeeee', flexShrink: 0, background: `linear-gradient(150deg, ${draft.theme.colors.cardBackFrom}, ${draft.theme.colors.cardBackTo})` }} />
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 9, minWidth: 0 }}>
+                    {(['cardBackFrom', 'cardBackTo'] as const).map((k) => (
+                      <SwatchColor key={k} label={COLOR_LABELS[k] ?? k} value={draft.theme.colors[k]} onChange={(v) => patchColor(k, v)} />
+                    ))}
+                  </div>
+                </div>
+              </Card>
+
+              <Card title="카드 앞면">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 10 }}>
+                  <span style={CSS.label}>사용할 카드 범위</span>
+                  <select id="card-deck" value={getSlotDeck(draft)} onChange={(e) => patchSlot({ deck: e.target.value as DeckRange })} style={{ ...CSS.select, width: 'auto', height: 32 }}>
+                    <option value="major">메이저 22장</option>
+                    <option value="full">메이저 + 마이너 78장</option>
+                  </select>
+                </div>
+                <p style={{ margin: '0 0 14px', fontSize: 11, color: '#8a8a8a', lineHeight: 1.6 }}>
+                  이 슬롯 전체의 카드 범위예요 — 도감·뽑기·질문 답변칸이 모두 이 값을 따릅니다. 선택한 범위만큼 앞면을 올리면 되고, 안 올린 카드는 이름 텍스트로 나옵니다.
+                </p>
+                <CardUploader
+                  slug={saved.slug}
+                  deck={getSlotDeck(draft)}
+                  ext={draft.theme.assets.cardFrontExt}
+                  onExtChange={(ext) => patchAsset('cardFrontExt', ext)}
+                  onBaseChange={(base) => patchAsset('cardFrontBase', base)}
+                  version={draft.theme.assets.cardFrontVersion ?? null}
+                  onVersionChange={(v) => patchAsset('cardFrontVersion', v)}
+                />
+              </Card>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,280px),1fr))', gap: 14 }}>
+                <Card title="수정구슬">
+                  <ImageField slug={saved.slug} label="수정구슬" name="crystal-ball" title="수정구슬 (AI 리딩 로더)" value={draft.theme.assets.crystalBall} onChange={(v) => patchAsset('crystalBall', v)} thumbW={56} thumbH={56} thumbRadius={9999} hint="3장 리딩을 만드는 동안 뜨는 구슬이에요. 없으면 내장 SVG 구슬을 써요." />
+                </Card>
+                <Card title="이벤트 설정">
+                  <p style={{ margin: '0 0 13px', fontSize: 11, color: '#8a8a8a', lineHeight: 1.6 }}>
+                    {plan.allowSpread
+                      ? '3장을 고르면 카드들을 순서대로 이어 읽는 AI 종합이 붙어요. 1장은 AI 를 안 씁니다.'
+                      : `${plan.label} 플랜은 전부 1장이에요 — 3장 스프레드(AI 종합)는 스탠다드부터입니다.`}
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+                    {CATEGORIES.map((c) => {
+                      const counts = Object.keys(c.spreads).map(Number)
+                      if (counts.length < 2) return null
+                      const allowed = plan.allowSpread ? counts : counts.filter((n) => n === 1)
+                      const current = plan.allowSpread ? (draft.event[c.id]?.cardCount ?? c.defaultCount) : 1
                       return (
-                        <div
-                          key={f.key}
-                          onMouseEnter={() => setHighlight(f.part)}
-                          onFocusCapture={() => setHighlight(f.part)}
-                          onMouseLeave={() => setHighlight(null)}
-                        >
-                          {f.alpha ? (
-                            <AlphaColor
-                              label={f.label}
-                              value={draft.theme.colors[key]}
-                              hint={f.hint}
-                              onChange={(v) => patchColor(key, v)}
-                            />
-                          ) : (
-                            <div className="field">
-                              <span className="field__label">{f.label}</span>
-                              <div className="color-field">
-                                <input
-                                  type="color"
-                                  value={hexOf(draft.theme.colors[key])}
-                                  aria-label={`${f.label} 고르기`}
-                                  onChange={(e) => patchColor(key, e.target.value)}
-                                />
-                                <input
-                                  className="input"
-                                  value={draft.theme.colors[key]}
-                                  onChange={(e) => patchColor(key, e.target.value)}
-                                />
-                              </div>
-                            </div>
-                          )}
+                        <div key={c.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                          <span style={{ fontSize: 12.5, color: '#505050' }}>{c.label} 뽑는 수</span>
+                          <select
+                            disabled={!plan.allowSpread}
+                            value={current}
+                            onChange={(e) => patchEvent(c.id, { cardCount: Number(e.target.value) })}
+                            style={{ ...CSS.select, width: 'auto', height: 30 }}
+                          >
+                            {allowed.map((n) => (
+                              <option key={n} value={n}>{n}장</option>
+                            ))}
+                          </select>
                         </div>
                       )
                     })}
-                    {(g.extras ?? []).map((x) => (
-                      <LuckydrawExtra
-                        key={x}
-                        kind={x}
-                        draft={draft}
-                        slug={saved.slug}
-                        patchSlot={patchSlot}
-                        patchShape={patchShape}
-                        patchAsset={patchAsset}
-                      />
-                    ))}
                   </div>
-                </section>
-              ))}
+                </Card>
+              </div>
 
-            {/**
-             * 롤링페이퍼 전용 — 벽 문구·방문자가 고를 카드 색·스티커·벽 배경.
-             * 색·형태는 위 테마 패널이 이미 정한다 (롤페는 타로처럼 테마를 그대로 쓴다).
-             */}
-            {rolling && (
-              <section className="admin-section">
-                <h2 className="t-title-s admin-section__title">
-                  <MessageSquare size={15} strokeWidth={2} aria-hidden="true" />
-                  롤링페이퍼
-                </h2>
-                <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                  방문자가 포스트잇으로 메시지를 남기면 벽에 쌓여요. 남긴 즉시 벽에 보이고,
-                  부적절한 건 주최자가 숨겨요. 아래 색·글꼴은 롤페 전용이에요 (위 테마와 별개).
+              <Card title="플랜">
+                <p style={{ margin: '0 0 15px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
+                  이 슬롯에 적용할 플랜이에요. AI 한도가 여기서 나와요 — 한도를 넘으면 AI 종합만 빠지고 카드별 해석으로 계속 돌아가요 (앱이 멈추지는 않아요).
                 </p>
-
-                {/* 문구 */}
-                <div className="form-grid">
-                  <div className="field">
-                    <span className="field__label">벽 제목</span>
-                    <input
-                      className="input"
-                      value={rd.wallTitle}
-                      onChange={(e) => patchRolling({ wallTitle: e.target.value })}
-                    />
-                    <label
-                      className="field__hint"
-                      style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={rd.showTitle}
-                        onChange={(e) => patchRolling({ showTitle: e.target.checked })}
-                      />
-                      벽에 제목 보이기
-                    </label>
-                  </div>
-                  <div className="field">
-                    <span className="field__label">벽 부제</span>
-                    <input
-                      className="input"
-                      value={rd.wallSubtitle}
-                      onChange={(e) => patchRolling({ wallSubtitle: e.target.value })}
-                    />
-                    <label
-                      className="field__hint"
-                      style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={rd.showSubtitle}
-                        onChange={(e) => patchRolling({ showSubtitle: e.target.checked })}
-                      />
-                      벽에 부제 보이기
-                    </label>
-                  </div>
-                  <div className="field">
-                    <span className="field__label">입력 안내</span>
-                    <input
-                      className="input"
-                      value={rd.prompt}
-                      onChange={(e) => patchRolling({ prompt: e.target.value })}
-                    />
-                    <span className="field__hint">작성 화면 메시지칸에 흐리게 뜨는 문구예요.</span>
-                  </div>
-                  <div className="field">
-                    <span className="field__label">남기기 버튼</span>
-                    <input
-                      className="input"
-                      value={rd.postLabel}
-                      onChange={(e) => patchRolling({ postLabel: e.target.value })}
-                    />
-                  </div>
-                  <div className="field">
-                    <span className="field__label">기본 글꼴</span>
-                    <select
-                      className="select"
-                      value={rd.font}
-                      onChange={(e) => patchRolling({ font: e.target.value as FontId })}
-                    >
-                      {Object.entries(WEBFONTS).map(([id, f]) => (
-                        <option key={id} value={id}>
-                          {f.label}
-                        </option>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,190px),1fr))', gap: 14 }}>
+                  <Field label="플랜">
+                    <select data-plan value={plan.id} onChange={(e) => changePlan(e.target.value as PlanId)} style={CSS.select}>
+                      {PLANS.map((p) => (
+                        <option key={p.id} value={p.id}>{p.label}</option>
                       ))}
                     </select>
-                    <span className="field__hint">제목·UI 글꼴이에요. 쪽지 글씨체는 방문자가 골라요.</span>
-                  </div>
+                  </Field>
+                  <Field
+                    label="AI 리딩 한도 (회)"
+                    hint={plan.allowSpread ? `${plan.label} 기본 ${plan.readingLimit.toLocaleString()}회` : `${plan.label} 플랜은 전부 1장이라 AI 리딩이 없어요.`}
+                  >
+                    <input data-limit-reading type="number" min={0} step={100} value={limits.reading} disabled={!plan.allowSpread} onChange={(e) => patchLimit('reading', Number(e.target.value))} style={CSS.input} />
+                  </Field>
+                  <Field label="답변 AI 생성 한도 (회)" hint={`재생성 포함. ${plan.label} 기본 ${plan.answerGenLimit}회`}>
+                    <input data-limit-gen type="number" min={0} value={limits.answerGen} onChange={(e) => patchLimit('answerGen', Number(e.target.value))} style={CSS.input} />
+                  </Field>
                 </div>
-
-                {/* 색 */}
-                <div className="form-grid">
-                  {(
-                    [
-                      ['headText', '글자색', '제목·헤더'],
-                      ['subText', '서브 글자색', '부제·안내'],
-                      ['noteBody', '포스트잇 본문색'],
-                      ['noteName', '이름색'],
-                      ['boardBg', '벽 배경색', '배경 이미지가 없을 때'],
-                      ['buttonColor', '버튼색', '남기기·보내기'],
-                    ] as [
-                      'headText' | 'subText' | 'noteBody' | 'noteName' | 'boardBg' | 'buttonColor',
-                      string,
-                      string?,
-                    ][]
-                  ).map(([key, label, hint]) => (
-                    <div key={key} className="color-item">
-                      <span className="color-item__text">
-                        <label className="field__label" htmlFor={`rp-${key}`}>
-                          {label}
-                        </label>
-                        {hint && <span className="field__hint">{hint}</span>}
-                      </span>
-                      <div className="color-field color-field--hex">
-                        <input
-                          type="color"
-                          value={rd[key]}
-                          aria-label={`${label} 고르기`}
-                          onChange={(e) => patchRolling({ [key]: e.target.value } as Partial<typeof rd>)}
-                        />
-                        <input
-                          id={`rp-${key}`}
-                          className="input"
-                          value={rd[key]}
-                          onChange={(e) => patchRolling({ [key]: e.target.value } as Partial<typeof rd>)}
-                        />
-                      </div>
+                <div data-plan-facts style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee', display: 'flex', flexDirection: 'column', gap: 9 }}>
+                  {planFacts.map((p) => (
+                    <div key={p.label} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 12, color: '#8a8a8a' }}>{p.label}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: '#121212', textAlign: 'right' }}>{p.value}</span>
                     </div>
                   ))}
                 </div>
+              </Card>
+            </>
+          )}
 
-                {/* 종이색 팔레트 */}
-                <div className="field" style={{ marginTop: 'var(--space-lg)' }}>
-                  <span className="field__label">포스트잇 종이색</span>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-md)', alignItems: 'center' }}>
-                    {rd.papers.map((c, i) => (
-                      <div key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                        <input
-                          type="color"
-                          value={c}
-                          aria-label={`종이색 ${i + 1}`}
-                          style={{
-                            width: 40,
-                            height: 40,
-                            padding: 0,
-                            border: '1px solid var(--color-border)',
-                            borderRadius: 'var(--radius-sm)',
-                            cursor: 'pointer',
-                          }}
-                          onChange={(e) =>
-                            patchRolling({ papers: rd.papers.map((p, j) => (j === i ? e.target.value : p)) })
-                          }
-                        />
+          {/* ══ 럭키드로우 서비스 설정 ══ */}
+          {luckydraw && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,290px),1fr))', gap: 14 }}>
+              {LUCKYDRAW_GROUPS.map((g, i) => (
+                <div key={g.title} style={{ ...CSS.card, ...(i === 0 ? { gridColumn: '1 / -1' } : null) }}>
+                  <div style={CSS.head}>{g.title}</div>
+                  <div style={CSS.body}>
+                    {g.hint && <p style={{ margin: '0 0 15px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>{g.hint}</p>}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,220px),1fr))', gap: 14 }}>
+                      {(g.colors ?? []).map((f) => {
+                        const key = f.key as keyof ThemeColors
+                        return (
+                          <div
+                            key={f.key}
+                            onMouseEnter={() => setHighlight(f.part)}
+                            onFocusCapture={() => setHighlight(f.part)}
+                            onMouseLeave={() => setHighlight(null)}
+                          >
+                            {f.alpha ? (
+                              <AlphaColor label={f.label} value={draft.theme.colors[key]} hint={f.hint} onChange={(v) => patchColor(key, v)} />
+                            ) : (
+                              <SwatchColor label={f.label} hint={f.hint} value={draft.theme.colors[key]} onChange={(v) => patchColor(key, v)} />
+                            )}
+                          </div>
+                        )
+                      })}
+                      {(g.extras ?? []).map((x) => (
+                        <LuckydrawExtra key={x} kind={x} draft={draft} slug={saved.slug} patchSlot={patchSlot} patchShape={patchShape} patchAsset={patchAsset} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ══ 롤링페이퍼 서비스 설정 ══ */}
+          {rolling && (
+            <>
+              <Card title="롤링페이퍼">
+                <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
+                  방문자가 포스트잇으로 메시지를 남기면 벽에 쌓여요. 남긴 즉시 벽에 보이고, 부적절한 건 주최자가 숨겨요. 아래 색·글꼴은 롤페 전용이에요 (위 테마와 별개).
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
+                  <div style={CSS.fieldCol}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
+                      <span style={CSS.label}>벽 제목</span>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#8a8a8a', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                        <input type="checkbox" checked={rd.showTitle} onChange={(e) => patchRolling({ showTitle: e.target.checked })} style={{ width: 14, height: 14, accentColor: '#816bff', cursor: 'pointer' }} />
+                        벽에 보이기
+                      </label>
+                    </div>
+                    <input value={rd.wallTitle} onChange={(e) => patchRolling({ wallTitle: e.target.value })} style={CSS.input} />
+                  </div>
+                  <div style={CSS.fieldCol}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
+                      <span style={CSS.label}>벽 부제</span>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#8a8a8a', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                        <input type="checkbox" checked={rd.showSubtitle} onChange={(e) => patchRolling({ showSubtitle: e.target.checked })} style={{ width: 14, height: 14, accentColor: '#816bff', cursor: 'pointer' }} />
+                        벽에 보이기
+                      </label>
+                    </div>
+                    <input value={rd.wallSubtitle} onChange={(e) => patchRolling({ wallSubtitle: e.target.value })} style={CSS.input} />
+                  </div>
+                  <Field label="입력 안내" hint="작성 화면 메시지칸에 흐리게 뜨는 문구예요.">
+                    <input value={rd.prompt} onChange={(e) => patchRolling({ prompt: e.target.value })} style={CSS.input} />
+                  </Field>
+                  <Field label="남기기 버튼">
+                    <input value={rd.postLabel} onChange={(e) => patchRolling({ postLabel: e.target.value })} style={CSS.input} />
+                  </Field>
+                </div>
+                <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 16 }}>
+                  <Field label="기본 글꼴" hint="제목·UI 글꼴이에요. 쪽지 글씨체는 방문자가 골라요.">
+                    <select value={rd.font} onChange={(e) => patchRolling({ font: e.target.value as FontId })} style={CSS.select}>
+                      {Object.entries(WEBFONTS).map(([id, f]) => (
+                        <option key={id} value={id}>{f.label}</option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label="글씨체 예시 텍스트" hint="작성 화면 글씨체 고르기에 이 문구로 미리보기가 떠요 (폰트명 대신).">
+                    <input value={rd.fontSample} onChange={(e) => patchRolling({ fontSample: e.target.value })} style={CSS.input} />
+                  </Field>
+                </div>
+                <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,250px),1fr))', gap: '12px 24px' }}>
+                  {(
+                    [
+                      ['headText', '글자색', '제목 · 헤더'],
+                      ['subText', '서브 글자색', '부제 · 안내'],
+                      ['noteBody', '포스트잇 본문색'],
+                      ['noteName', '이름색'],
+                      ['boardBg', '벽 배경색', '배경 이미지가 없을 때'],
+                      ['buttonColor', '버튼색', '남기기 · 보내기'],
+                    ] as ['headText' | 'subText' | 'noteBody' | 'noteName' | 'boardBg' | 'buttonColor', string, string?][]
+                  ).map(([key, label, hint]) => (
+                    <SwatchColor key={key} label={label} hint={hint} value={rd[key]} onChange={(v) => patchRolling({ [key]: v } as Partial<typeof rd>)} />
+                  ))}
+                </div>
+                <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee' }}>
+                  <div style={{ ...CSS.label, marginBottom: 9 }}>포스트잇 종이색</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                    {rd.papers.map((c, idx) => (
+                      <div key={idx} style={{ width: 42, height: 42, borderRadius: 4, background: c, border: '1px solid rgba(0,0,0,.09)', position: 'relative' }}>
+                        <label style={{ position: 'absolute', inset: 0, cursor: 'pointer' }}>
+                          <input type="color" value={c} aria-label={`종이색 ${idx + 1}`} onChange={(e) => patchRolling({ papers: rd.papers.map((p, j) => (j === idx ? e.target.value : p)) })} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, border: 'none', padding: 0, cursor: 'pointer' }} />
+                        </label>
                         <button
                           type="button"
-                          className="btn btn--slight btn--sm"
-                          aria-label={`종이색 ${i + 1} 빼기`}
-                          onClick={() => patchRolling({ papers: rd.papers.filter((_, j) => j !== i) })}
+                          aria-label={`종이색 ${idx + 1} 빼기`}
+                          onClick={() => patchRolling({ papers: rd.papers.filter((_, j) => j !== idx) })}
+                          style={{ position: 'absolute', top: -6, right: -6, width: 17, height: 17, borderRadius: 9999, background: '#fff', border: '1px solid #dddddd', color: '#8a8a8a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontSize: 11, lineHeight: 1 }}
                         >
                           ×
                         </button>
@@ -1380,692 +1584,188 @@ export function SlotEditor() {
                     ))}
                     <button
                       type="button"
-                      className="btn btn--slight btn--sm"
                       onClick={() => patchRolling({ papers: [...rd.papers, '#f4efe2'] })}
+                      style={{ width: 42, height: 42, borderRadius: 4, border: '1px dashed #dddddd', background: '#f7f7f7', color: '#8a8a8a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, lineHeight: 1 }}
                     >
-                      + 색 추가
+                      +
                     </button>
                   </div>
-                  <span className="field__hint">방문자가 쪽지마다 고르는 색이에요. 파스텔 여러 색이 벽을 알록달록하게 해요.</span>
+                  <div style={{ fontSize: 11, color: '#8a8a8a', marginTop: 8 }}>방문자가 쪽지마다 고르는 색이에요. 파스텔 여러 색이 벽을 알록달록하게 해요.</div>
                 </div>
-
-                {/* 이미지 */}
-                <div className="form-grid">
-                  <ImageField
-                    slug={saved.slug}
-                    label="로고"
-                    name="rolling-logo"
-                    value={rd.logo || null}
-                    onChange={(v) => patchRolling({ logo: v ?? '' })}
-                    hint="벽 헤더에 떠요. 없으면 제목 텍스트가 나와요."
-                  />
-                  <ImageField
-                    slug={saved.slug}
-                    label="벽 배경 이미지"
-                    name="rolling-wallbg"
-                    value={rd.wallBg || null}
-                    onChange={(v) => patchRolling({ wallBg: v ?? '' })}
-                    hint="비우면 벽 배경색을 써요. 화면을 꽉 채워요."
-                  />
-                  <StickerField
-                    slug={saved.slug}
-                    label="스티커"
-                    value={rd.stickers}
-                    onChange={(next) => patchRolling({ stickers: next })}
-                    hint="방문자가 쪽지에 붙일 수 있어요. 주최자에게 받은 이미지를 올려 주세요."
-                  />
-                </div>
-              </section>
-            )}
-
-            {/* 웹앱 아이콘 — 모든 서비스 공통. "홈 화면에 추가" 하면 이 아이콘·행사명으로 앱이 된다 */}
-            <section className="admin-section" style={{ order: 5, gridColumn: 'span 1' }}>
-              <h2 className="t-title-s admin-section__title">
-                <Smartphone size={15} strokeWidth={2} aria-hidden="true" />
-                웹앱 아이콘
-              </h2>
-              <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                방문자가 브라우저에서 "홈 화면에 추가" 하면 이 아이콘과 행사명으로 앱처럼 열려요.
-                정사각형 PNG 를 권장해요 (512×512).
-              </p>
-              <div className="form-grid">
-                <ImageField
-                  slug={saved.slug}
-                  label="앱 아이콘"
-                  name="app-icon"
-                  value={draft.theme.assets.appIcon}
-                  onChange={(v) => patchAsset('appIcon', v)}
-                  hint="없으면 홈 화면 아이콘이 기본으로 떠요."
-                />
-              </div>
-            </section>
-
-            {/* 테마 색 · 형태 — 시안대로 한 카드에 색 그리드 + radius 슬라이더 (럭드는 자기 색 카드가 따로) */}
-            {!luckydraw && (
-            <section className="admin-section" style={{ order: 6 }}>
-              <h2 className="t-title-s admin-section__title">
-                <Palette size={15} strokeWidth={2} aria-hidden="true" />
-                테마 색 · 형태
-              </h2>
-              {(() => {
-                const colorKeys = COLOR_GROUPS.filter((g) =>
-                  g.services.includes(getSlotService(draft))
-                ).flatMap((g) => g.keys)
-                if (colorKeys.length === 0) return null
-                return (
-                  <div className="form-grid" style={{ marginBottom: 'var(--space-lg)' }}>
-                    {colorKeys.map((key) => (
-                      <div key={key} className="color-item">
-                        <span className="color-item__text">
-                          <label className="field__label" htmlFor={`c-${key}`}>
-                            {COLOR_LABELS[key]}
-                          </label>
-                        </span>
-                        <div className="color-field color-field--hex">
-                          <input
-                            type="color"
-                            value={draft.theme.colors[key]}
-                            onChange={(e) => patchColor(key, e.target.value)}
-                            aria-label={`${COLOR_LABELS[key]} 색 고르기`}
-                          />
-                          <input
-                            id={`c-${key}`}
-                            className="input"
-                            value={draft.theme.colors[key]}
-                            onChange={(e) => patchColor(key, e.target.value)}
-                          />
+                <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,230px),1fr))', gap: 16 }}>
+                  <div style={CSS.fieldCol}>
+                    <span style={{ ...CSS.label, minHeight: 19, display: 'flex', alignItems: 'center' }}>로고</span>
+                    <ImageField slug={saved.slug} label="로고" name="rolling-logo" value={rd.logo || null} onChange={(v) => patchRolling({ logo: v ?? '' })} hint="벽 헤더에 떠요. 없으면 제목 텍스트가 나와요." />
+                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
+                      <div style={{ ...CSS.fieldCol, flex: 1, minWidth: 130 }}>
+                        <span style={CSS.label}>위치</span>
+                        <div role="radiogroup" aria-label="로고 위치" style={{ display: 'inline-flex', background: '#f7f7f7', border: '1px solid #eeeeee', borderRadius: 9999, padding: 3, gap: 2 }}>
+                          {(['left', 'center', 'right'] as const).map((a) => {
+                            const on = rd.logoAlign === a
+                            return (
+                              <button
+                                key={a}
+                                type="button"
+                                role="radio"
+                                aria-checked={on}
+                                onClick={() => patchRolling({ logoAlign: a })}
+                                style={{ flex: 1, height: 28, padding: '0 12px', border: 'none', borderRadius: 9999, fontSize: 12, fontWeight: 700, cursor: 'pointer', background: on ? '#fff' : 'transparent', color: on ? '#121212' : '#8a8a8a' }}
+                              >
+                                {a === 'left' ? '왼쪽' : a === 'center' ? '가운데' : '오른쪽'}
+                              </button>
+                            )
+                          })}
                         </div>
                       </div>
-                    ))}
+                      <label style={{ ...CSS.fieldCol, width: 110 }}>
+                        <span style={CSS.label}>위 여백 (px)</span>
+                        <input type="number" min={0} max={200} value={rd.logoMarginTop} onChange={(e) => patchRolling({ logoMarginTop: Math.max(0, Number(e.target.value) || 0) })} style={CSS.input} />
+                      </label>
+                    </div>
+                  </div>
+                  <div style={CSS.fieldCol}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
+                      <span style={CSS.label}>벽 배경 이미지</span>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#8a8a8a', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                        <input type="checkbox" checked={rd.wallBgRepeat} onChange={(e) => patchRolling({ wallBgRepeat: e.target.checked })} style={{ width: 14, height: 14, accentColor: '#816bff', cursor: 'pointer' }} />
+                        패턴 반복
+                      </label>
+                    </div>
+                    <ImageField slug={saved.slug} label="벽 배경 이미지" name="rolling-wallbg" value={rd.wallBg || null} onChange={(v) => patchRolling({ wallBg: v ?? '' })} hint="비우면 벽 배경색을 써요. 끄면 화면을 꽉 채워요." />
+                  </div>
+                </div>
+                <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee' }}>
+                  <div style={{ ...CSS.label, marginBottom: 9 }}>스티커</div>
+                  <StickerField slug={saved.slug} label="스티커" value={rd.stickers} onChange={(next) => patchRolling({ stickers: next })} hint="방문자가 쪽지에 붙일 수 있어요. 주최자에게 받은 이미지를 올려 주세요." />
+                </div>
+              </Card>
+
+              {/* 롤페는 미세 요소(radiusSm)를 쓰는 데가 없어 뺀다 — 버튼·토스트, 카드·타일만 */}
+              <Card title="테마 색 · 형태">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,200px),1fr))', gap: 14 }}>
+                  {(['radiusMd', 'radiusLg'] as (keyof ThemeShape)[]).map((k) => (
+                    <RadiusSlider key={k} label={SHAPE_LABELS[k]} value={draft.theme.shape[k]} max={40} onChange={(n) => patchShape(k, n)} />
+                  ))}
+                </div>
+              </Card>
+            </>
+          )}
+
+          {/* 대비 검사 */}
+          <div style={CSS.card}>
+            <div style={CSS.head}>대비 검사</div>
+            <div style={{ padding: '8px 18px 14px' }}>
+              {contrast.map(({ label, ratio, level }) => {
+                const pill = contrastPill(level)
+                return (
+                  <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '9px 0', borderBottom: '1px solid #eeeeee', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 12, color: '#505050' }}>{label}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700 }}>{ratio === null ? '색 오류' : `${ratio.toFixed(2)} : 1`}</span>
+                      {ratio !== null && (
+                        <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 9999, background: pill.bg, color: pill.fg, whiteSpace: 'nowrap' }}>{pill.text}</span>
+                      )}
+                    </div>
                   </div>
                 )
-              })()}
-              <div className={styles.radiusList}>
-                {(Object.keys(SHAPE_LABELS) as (keyof ThemeShape)[]).map((key) => (
-                  <div key={key} className={styles.radiusRow}>
-                    <span className={styles.radiusLabel}>{SHAPE_LABELS[key]}</span>
-                    <input
-                      type="range"
-                      min={0}
-                      max={28}
-                      className={styles.radiusSlider}
-                      value={draft.theme.shape[key]}
-                      aria-label={SHAPE_LABELS[key]}
-                      onChange={(e) => patchShape(key, Number(e.target.value))}
-                    />
-                    <input
-                      id={`s-${key}`}
-                      className={styles.radiusNum}
-                      type="number"
-                      min={0}
-                      max={40}
-                      value={draft.theme.shape[key]}
-                      onChange={(e) => patchShape(key, Number(e.target.value))}
-                    />
-                    <span className={styles.radiusUnit}>px</span>
-                    <span
-                      className={styles.radiusPreview}
-                      style={{ borderRadius: draft.theme.shape[key] }}
-                      aria-hidden="true"
-                    />
-                  </div>
-                ))}
-              </div>
-            </section>
-            )}
-
-            {/**
-             * 럭키드로우는 '배경' 카드가 이미지를 받고(로고·카드 이미지는 애초에 없다),
-             * 롤링페이퍼는 위 '롤링페이퍼' 카드가 벽 배경·스티커를 받는다 — 그래서 둘 다 여기선 뺀다.
-             */}
-            {!luckydraw && !rolling && (
-            <section className="admin-section">
-              <h2 className="t-title-s admin-section__title">
-                <ImageIcon size={15} strokeWidth={2} aria-hidden="true" />
-                이미지
-              </h2>
-              {/* 이미지가 어디로 가는지는 저장소가 정한다 — 화면이 거짓말하면 안 된다 */}
-              <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                {hasSupabase ? (
-                  <>올리는 즉시 이미지가 올라가요.</>
-                ) : (
-                  <>
-                    업로드하면 파일이 바로 <code>public/slots/{saved.slug}/</code> 에 저장돼요 (그
-                    폴더를 커밋하면 배포에 함께 올라갑니다).
-                  </>
-                )}{' '}
-                다만 슬롯이 그 이미지를 쓰게 하려면 저장하기를 눌러야 해요. 앱에서는 전부 배경
-                이미지로 깔립니다 — 모바일에서 길게 눌러 저장되지 않게.
-              </p>
-              <div className="form-grid">
-                {/**
-                 * 로고는 **타로 전용**이다 — 럭키드로우 화면엔 로고 자리가 없다
-                 * (원본 base-template 도 배경 이미지 하나만 받았다).
-                 */}
-                {!luckydraw && (
-                <ImageField
-                  slug={saved.slug}
-                  label="로고"
-                  name="logo"
-                  value={draft.theme.assets.logo}
-                  onChange={(v) => patchAsset('logo', v)}
-                  hint="없으면 이벤트명 텍스트가 나와요."
-                />
-                )}
-                {!luckydraw && (
-                <>
-                <div className="field">
-                  <label className="field__label" htmlFor="a-logoalt">
-                    로고 대체 텍스트
-                  </label>
-                  <input
-                    id="a-logoalt"
-                    className="input"
-                    value={draft.theme.assets.logoAlt}
-                    onChange={(e) => patchAsset('logoAlt', e.target.value)}
-                  />
-                </div>
-                <div className="field">
-                  <label className="field__label" htmlFor="a-logoh">
-                    로고 높이 (px)
-                  </label>
-                  <input
-                    id="a-logoh"
-                    className="input"
-                    type="number"
-                    min={16}
-                    max={80}
-                    value={draft.theme.assets.logoHeight}
-                    onChange={(e) => patchAsset('logoHeight', Number(e.target.value))}
-                  />
-                </div>
-                </>
-                )}
-                <ImageField
-                  slug={saved.slug}
-                  label={luckydraw ? '배경 이미지' : '배경 패턴'}
-                  name="background"
-                  value={draft.theme.assets.backgroundPattern}
-                  onChange={(v) =>
-                    /**
-                     * 럭키드로우는 배경이 **패턴이 아니라 사진**이다 — 화면을 꽉 채우는 한 장.
-                     * 그래서 올리는 순간 cover·안 반복·불투명 1 로 못박는다.
-                     * 원본 빌더도 파일 하나만 받았다: 사진을 올리는 사람에게 CSS
-                     * background-size 를 물어볼 이유가 없다.
-                     */
-                    luckydraw
-                      ? patchSlot((prev) => ({
-                          theme: {
-                            ...prev.theme,
-                            assets: {
-                              ...prev.theme.assets,
-                              backgroundPattern: v,
-                              backgroundPatternSize: 'cover',
-                              backgroundPatternRepeat: 'no-repeat',
-                              backgroundPatternOpacity: 1,
-                            },
-                          },
-                        }))
-                      : patchAsset('backgroundPattern', v)
-                  }
-                  hint={luckydraw ? '화면을 꽉 채워요. 박스가 얹힐 자리를 비워둔 사진이 좋아요.' : undefined}
-                />
-                {/* 패턴 세부(크기·반복·불투명도)는 타로 전용 — 사진 배경엔 물어볼 게 없다 */}
-                {!luckydraw && (
-                <>
-                <div className="field">
-                  <label className="field__label" htmlFor="a-bgo">
-                    배경 패턴 불투명도 (0~1)
-                  </label>
-                  <input
-                    id="a-bgo"
-                    className="input"
-                    type="number"
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={draft.theme.assets.backgroundPatternOpacity}
-                    onChange={(e) =>
-                      patchAsset('backgroundPatternOpacity', Number(e.target.value))
-                    }
-                  />
-                  <span className="field__hint">카드를 가리지 않게 낮게.</span>
-                </div>
-                <div className="field">
-                  <label className="field__label" htmlFor="a-bgs">
-                    배경 패턴 크기
-                  </label>
-                  <input
-                    id="a-bgs"
-                    className="input"
-                    value={draft.theme.assets.backgroundPatternSize}
-                    onChange={(e) => patchAsset('backgroundPatternSize', e.target.value)}
-                  />
-                  <span className="field__hint">CSS background-size (cover, 200px auto …)</span>
-                </div>
-                <div className="field">
-                  <label className="field__label" htmlFor="a-bgr">
-                    배경 패턴 반복
-                  </label>
-                  <input
-                    id="a-bgr"
-                    className="input"
-                    value={draft.theme.assets.backgroundPatternRepeat}
-                    onChange={(e) => patchAsset('backgroundPatternRepeat', e.target.value)}
-                  />
-                </div>
-                </>
-                )}
-                {/* 카드 뒷면은 아래 전용 카드로 옮겼다 (시안 조합). 수정구슬만 여기 남긴다 */}
-                {!luckydraw && (
-                  <ImageField
-                    slug={saved.slug}
-                    label="수정구슬 (AI 리딩 로더)"
-                    name="crystal-ball"
-                    value={draft.theme.assets.crystalBall}
-                    onChange={(v) => patchAsset('crystalBall', v)}
-                    hint="3장 리딩을 만드는 동안 뜨는 구슬이에요. 없으면 내장 SVG 구슬을 써요."
-                  />
-                )}
-              </div>
-            </section>
-            )}
-
-            {/* 카드 뒷면 — 이미지 + 내장 문양 그라디언트를 한 카드에 조합 (시안) */}
-            {!luckydraw && !rolling && (
-            <section className="admin-section">
-              <h2 className="t-title-s admin-section__title">
-                <ImageIcon size={15} strokeWidth={2} aria-hidden="true" />
-                카드 뒷면
-              </h2>
-              <ImageField
-                slug={saved.slug}
-                label="뒷면 이미지"
-                name="card-back"
-                value={draft.theme.assets.cardBack}
-                onChange={(v) => patchAsset('cardBack', v)}
-                hint="78장 공통으로 쓰여요. 없으면 아래 내장 문양을 써요."
-              />
-              <div
-                aria-hidden="true"
-                style={{ margin: '16px -18px', borderTop: '1px solid var(--color-border)' }}
-              />
-              <p className="field__hint" style={{ marginBottom: 12 }}>
-                뒷면 이미지가 없을 때 쓰는 내장 문양 그라디언트예요.
-              </p>
-              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                <span
-                  aria-hidden="true"
-                  style={{
-                    width: 52,
-                    height: 78,
-                    flexShrink: 0,
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--color-field-border)',
-                    background: `linear-gradient(150deg, ${draft.theme.colors.cardBackFrom}, ${draft.theme.colors.cardBackTo})`,
-                  }}
-                />
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {([['cardBackFrom', '문양 색 1'], ['cardBackTo', '문양 색 2']] as const).map(
-                    ([key, label]) => (
-                      <div key={key} className="color-item">
-                        <span className="field__label">{label}</span>
-                        <div className="color-field color-field--hex">
-                          <input
-                            type="color"
-                            value={draft.theme.colors[key]}
-                            aria-label={`${label} 고르기`}
-                            onChange={(e) => patchColor(key, e.target.value)}
-                          />
-                          <input
-                            className="input"
-                            value={draft.theme.colors[key]}
-                            onChange={(e) => patchColor(key, e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            </section>
-            )}
-
-            {!luckydraw && !rolling && (
-            <section className="admin-section">
-              <div className="admin-section__title">
-                <h2 className="t-title-s">카드 앞면</h2>
-              </div>
-              <div className="field" style={{ maxWidth: 240, marginBottom: 'var(--space-base)' }}>
-                <label className="field__label" htmlFor="card-deck">
-                  사용할 카드 범위
-                </label>
-                <select
-                  id="card-deck"
-                  className="select"
-                  value={getSlotDeck(draft)}
-                  onChange={(e) => patchSlot({ deck: e.target.value as DeckRange })}
-                >
-                  <option value="major">메이저 22장</option>
-                  <option value="full">전체 78장</option>
-                </select>
-                <span className="field__hint">
-                  이 슬롯 전체의 카드 범위예요 — 도감·뽑기·질문 답변칸이 모두 이 값을 따릅니다.
-                  선택한 범위만큼 앞면을 올리면 되고, 안 올린 카드는 이름 텍스트로 나옵니다.
-                </span>
-              </div>
-              <CardUploader
-                slug={saved.slug}
-                deck={getSlotDeck(draft)}
-                ext={draft.theme.assets.cardFrontExt}
-                onExtChange={(ext) => patchAsset('cardFrontExt', ext)}
-                onBaseChange={(base) => patchAsset('cardFrontBase', base)}
-                version={draft.theme.assets.cardFrontVersion ?? null}
-                onVersionChange={(v) => patchAsset('cardFrontVersion', v)}
-              />
-            </section>
-            )}
-
-            {/* 플랜은 AI 한도다 — 럭키드로우·롤링페이퍼는 AI 를 안 쓴다 */}
-            {!luckydraw && !rolling && (
-            <section className="admin-section">
-              <h2 className="t-title-s admin-section__title">플랜</h2>
-              <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                이 슬롯에 적용할 플랜이에요. <b>AI 한도가 여기서 나와요</b> — 한도를 넘으면 AI 종합만
-                빠지고 카드별 해석으로 계속 돌아가요 (앱이 멈추지는 않아요).
-              </p>
-              <div className="form-grid">
-                <div className="field">
-                  <label className="field__label" htmlFor="slot-plan">
-                    플랜
-                  </label>
-                  <select
-                    id="slot-plan"
-                    className="select"
-                    value={plan.id}
-                    onChange={(e) => changePlan(e.target.value as PlanId)}
-                    data-plan
-                  >
-                    {PLANS.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 한도는 플랜 값에서 시작해 **더 줄 수 있다** — 추가 결제를 받았을 때 */}
-                <div className="field">
-                  <label className="field__label" htmlFor="limit-reading">
-                    AI 리딩 한도 (회)
-                  </label>
-                  <input
-                    id="limit-reading"
-                    className="input"
-                    type="number"
-                    min={0}
-                    step={100}
-                    value={limits.reading}
-                    disabled={!plan.allowSpread}
-                    onChange={(e) => patchLimit('reading', Number(e.target.value))}
-                    data-limit-reading
-                  />
-                  <span className="field__hint">
-                    {plan.allowSpread ? (
-                      <>
-                        {plan.label} 기본 {plan.readingLimit.toLocaleString()}회
-                        {limits.reading !== plan.readingLimit && (
-                          <b> · 기본값에서 {(limits.reading - plan.readingLimit).toLocaleString()}회 조정됨</b>
-                        )}
-                      </>
-                    ) : (
-                      `${plan.label} 플랜은 전부 1장이라 AI 리딩이 없어요.`
-                    )}
-                  </span>
-                </div>
-
-                <div className="field">
-                  <label className="field__label" htmlFor="limit-gen">
-                    답변 AI 생성 한도 (회)
-                  </label>
-                  <input
-                    id="limit-gen"
-                    className="input"
-                    type="number"
-                    min={0}
-                    value={limits.answerGen}
-                    onChange={(e) => patchLimit('answerGen', Number(e.target.value))}
-                    data-limit-gen
-                  />
-                  <span className="field__hint">
-                    재생성 포함. {plan.label} 기본 {plan.answerGenLimit}회
-                    {limits.answerGen !== plan.answerGenLimit && (
-                      <b> · 기본값에서 {limits.answerGen - plan.answerGenLimit}회 조정됨</b>
-                    )}
-                  </span>
-                </div>
-              </div>
-
-              <ul className={styles.planFacts} data-plan-facts>
-                <li>
-                  <span>3장 스프레드 (AI 종합 리딩)</span>
-                  <b>{plan.allowSpread ? '가능' : '불가 — 전부 1장'}</b>
-                </li>
-                <li>
-                  <span>질문 답변 AI 생성</span>
-                  <b>
-                    {limits.answerGen === 0
-                      ? '없음 — 주최자가 직접 입력'
-                      : `${limits.answerGen}회 (재생성 포함)`}
-                  </b>
-                </li>
-                <li>
-                  <span>한도를 넘으면</span>
-                  <b>AI 종합만 빠지고 카드별 해석으로 계속</b>
-                </li>
-              </ul>
-            </section>
-            )}
-
-
-            <section className="admin-section" style={{ order: 4, gridColumn: 'span 1' }}>
-              <h2 className="t-title-s admin-section__title">
-                <Calendar size={15} strokeWidth={2} aria-hidden="true" />
-                기간
-              </h2>
-              <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                {/* 지금 상태를 먼저 말한다 — 날짜만 보고 오늘이 그 안인지 세게 하지 않는다 */}
-                지금 이 슬롯은 <b>{periodLabel(draft)}</b> 상태예요. 두 기간 중 하나라도 오늘을 품으면
-                열려요. 대여가 끝나면 <b>주최자도</b> 못 들어옵니다 (최고관리자만 볼 수 있어요).
-              </p>
-
-              {/**
-               * 럭키드로우만 유예가 있다 — 행사가 끝나도 **배송을 보내야** 하기 때문이다
-               * (`0009_slot_lifecycle.sql`). 타로엔 남는 방문자 데이터가 없어서 유예가 없다.
-               * 삭제는 되돌릴 수 없으므로 편집기에서 미리 말해 둔다.
-               */}
-              <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                {getSlotService(draft) === 'luckydraw' ? (
-                  <>
-                    럭키드로우는 대여 종료 <b>+14일</b>까지 배송 정보를 꺼낼 수 있어요. 추첨은 그
-                    전에 닫힙니다.
-                  </>
-                ) : null}{' '}
-                대여 종료 <b>+15일</b>이 지나면 이 슬롯은 주최자 계정·질문·이미지까지{' '}
-                <b>자동으로 삭제</b>돼요. 종료일을 비워 두면 삭제하지 않아요.
-              </p>
-              <PeriodFields
-                period={draft.period}
-                onChange={(period) => patchSlot(() => ({ period }))}
-              />
-              {rangeInvalid(draft) && (
-                <p className="field__error" style={{ marginTop: 'var(--space-sm)' }}>
-                  종료일이 시작일보다 앞서요.
-                </p>
-              )}
-            </section>
-
-            {/**
-             * 계정은 **저장된 슬러그**에 매인다 (slot_admins.slug 가 FK 다) — 초안 슬러그가 아니다.
-             * ready() 가 false 인 어댑터(local)에선 만들 계정이 없으므로 패널을 아예 안 띄운다:
-             * localStorage 로 흉내 내면 "만들었다" 고 해놓고 아무도 로그인하지 못한다.
-             */}
-            {repo.organizers.ready() && (
-              <div style={{ order: 3 }}>
-                <OrganizerPanel slot={saved} slugPending={draft.slug !== saved.slug} />
-              </div>
-            )}
-
-            {/* 카테고리별 뽑기 설정 — 럭키드로우·롤링페이퍼엔 카테고리도 카드도 없다 */}
-            {!luckydraw && !rolling && (
-            <section className="admin-section">
-              <h2 className="t-title-s admin-section__title">이벤트 설정</h2>
-              <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
-                {plan.allowSpread
-                  ? '3장을 고르면 카드들을 순서대로 이어 읽는 AI 종합이 붙어요. 1장은 AI 를 안 씁니다.'
-                  : `${plan.label} 플랜은 전부 1장이에요 — 3장 스프레드(AI 종합)는 스탠다드부터입니다.`}
-              </p>
-              <div className="form-grid">
-                {CATEGORIES.map((c) => {
-                  const counts = Object.keys(c.spreads).map(Number)
-                  if (counts.length < 2) return null
-                  // 3장이 곧 AI 리딩이다 — 플랜이 안 되면 고를 수조차 없어야 한다
-                  const allowed = plan.allowSpread ? counts : counts.filter((n) => n === 1)
-                  const current = plan.allowSpread
-                    ? (draft.event[c.id]?.cardCount ?? c.defaultCount)
-                    : 1
-                  return (
-                    <div key={c.id} className="field">
-                      <label className="field__label" htmlFor={`e-${c.id}`}>
-                        {c.label} 뽑는 수
-                      </label>
-                      <select
-                        disabled={!plan.allowSpread}
-                        id={`e-${c.id}`}
-                        className="select"
-                        value={current}
-                        onChange={(e) => patchEvent(c.id, { cardCount: Number(e.target.value) })}
-                      >
-                        {allowed.map((n) => (
-                          <option key={n} value={n}>
-                            {n}장
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )
-                })}
-              </div>
-            </section>
-            )}
-
+              })}
+            </div>
           </div>
+        </div>
 
-          <div className={styles.previewCol}>
-            <section className="admin-section">
-              <h2 className="t-title-s admin-section__title">대비 검사</h2>
-              <div className={styles.contrast}>
-                {contrast.map(({ label, ratio, level }) => (
-                  <div key={label} className={styles.contrastRow}>
-                    <span className="t-text-xs">{label}</span>
-                    <span className={`t-text-xs ${styles.contrastRatio} ${level ? styles[`level--${level}`] : ''}`}>
-                      {ratio === null
-                        ? '색 오류'
-                        : `${ratio.toFixed(2)} : 1 ${level === 'pass' ? '통과' : level === 'large-only' ? '큰 글자만' : '미달'}`}
-                    </span>
-                  </div>
-                ))}
+        {/* ── 미리보기 컬럼 (시안 프레임 안에 실제 iframe). 크게 누르면 맨 위로(order -1) ── */}
+        <div style={{ order: previewBig ? -1 : 0, position: previewBig ? 'static' : 'sticky', top: 74, width: '100%', maxWidth: previewBig ? undefined : 520, marginInline: 'auto', minWidth: 0 }}>
+          <div style={CSS.card}>
+            <div style={{ padding: '11px 15px', borderBottom: '1px solid #eeeeee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <Eye size={14} strokeWidth={2} color="#505050" aria-hidden="true" />
+                <span style={{ fontSize: 12.5, fontWeight: 700 }}>미리보기</span>
+                {dirty && <span style={{ fontSize: 11, color: '#8a8a8a' }}>· 저장 전 초안</span>}
               </div>
-            </section>
-
-            <section className="admin-section">
-              <div className={styles.previewHead}>
-                <h2 className="t-title-s">미리보기</h2>
-                <div className={styles.previewMeta}>
-                  <span className="t-text-xs t-muted">
-                    {previewDevice.label}
-                    {previewScale < 0.95 && ` · ${Math.round(previewScale * 100)}%`}
-                    {dirty && ' · 저장 전 초안'}
-                  </span>
-                  {getSlotService(draft) === 'luckydraw' && (
-                    <select
-                      className="select"
-                      style={{ width: 'auto', height: 32, padding: '0 28px 0 10px', fontSize: 12 }}
-                      value={ipad}
-                      aria-label="아이패드 해상도"
-                      onChange={(e) => setIpad(e.target.value as 'pro' | 'air' | 'mini')}
-                    >
-                      {IPADS.map((d) => (
-                        <option key={d.id} value={d.id}>
-                          {d.label} ({d.w}×{d.h})
-                        </option>
-                      ))}
-                    </select>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <select
+                  value={luckydraw ? ipad : 'phone'}
+                  onChange={(e) => luckydraw && setIpad(e.target.value as 'pro' | 'air' | 'mini')}
+                  style={{ ...CSS.select, height: 28, padding: '0 28px 0 8px', fontSize: 11.5 }}
+                >
+                  {luckydraw ? (
+                    IPADS.map((d) => (
+                      <option key={d.id} value={d.id}>{d.label} ({d.w}×{d.h})</option>
+                    ))
+                  ) : (
+                    <option value="phone">폰 세로 (390×844)</option>
                   )}
-                  <button
-                    type="button"
-                    className="btn btn--sm btn--ghost"
-                    onClick={() => setPreviewBig((v) => !v)}
-                  >
-                    {previewBig ? '작게' : '크게'}
-                  </button>
-                </div>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !previewBig
+                    setPreviewBig(next)
+                    // 크게로 켜면 어디서 눌렀든 맨 위로 올려 큰 미리보기를 바로 보여준다 (즉시)
+                    if (next) window.scrollTo(0, 0)
+                  }}
+                  style={{ ...CSS.ghostPill, height: 28, padding: '0 11px', fontSize: 11.5 }}
+                >
+                  {previewBig ? '작게' : '크게'}
+                </button>
               </div>
+            </div>
 
-              {/**
-               * 럭키드로우는 화면이 하나뿐이라 **상태를 골라 봐야** 한다 —
-               * 커버 색·커버 문자·하이라이트는 당첨 화면에서만 보이는데, 미리보기에서
-               * 진짜로 뽑을 수는 없다(재고를 태운다). 가짜 결과로 그 순간을 보여준다.
-               */}
-              {getSlotService(draft) === 'luckydraw' && (
-                <div className={styles.previewTabs}>
-                  {(
-                    [
-                      ['draw', '뽑기'],
-                      ['result', '당첨'],
-                      ['summary', '전체 결과'],
-                    ] as const
-                  ).map(([value, label]) => (
+            {luckydraw && (
+              <div style={{ padding: '9px 15px', borderBottom: '1px solid #eeeeee', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {([['draw', '뽑기'], ['result', '당첨'], ['summary', '전체 결과']] as [PreviewState, string][]).map(([value, label]) => {
+                  const on = previewState === value
+                  return (
                     <button
                       key={value}
                       type="button"
-                      className={`btn btn--sm ${previewState === value ? 'btn--slight' : 'btn--ghost'}`}
                       onClick={() => setPreviewState(value)}
+                      style={{ height: 27, padding: '0 12px', border: `1px solid ${on ? '#816bff' : '#dddddd'}`, background: on ? '#f0edff' : '#fff', color: on ? '#816bff' : '#505050', borderRadius: 9999, fontSize: 11.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                     >
                       {label}
                     </button>
-                  ))}
-                </div>
-              )}
-
-              {/**
-               * 실제 앱을 그대로 띄운다 — **미리보기를 따로 구현하지 않는다.**
-               * 원본 빌더는 순수 JS 로 화면을 재현했는데, 그러면 화면을 고칠 때마다 미리보기도
-               * 따로 고쳐야 하고 언젠가 어긋난다. 초안은 postMessage 로 건너간다 (`slot/preview.ts`).
-               */}
-              <div className={styles.previewStage} ref={previewBox}>
-                <div
-                  className={styles.previewViewport}
-                  style={{
-                    width: previewDevice.w * previewScale,
-                    height: previewDevice.h * previewScale,
-                  }}
-                >
-                  <iframe
-                    key={saved.slug}
-                    ref={previewFrame}
-                    className={styles.preview}
-                    src={`/${saved.slug}`}
-                    title="미리보기"
-                    style={{
-                      width: previewDevice.w,
-                      height: previewDevice.h,
-                      transform: `scale(${previewScale})`,
-                    }}
-                  />
-                </div>
+                  )
+                })}
               </div>
-            </section>
+            )}
+
+            {rolling && (
+              <div style={{ padding: '9px 15px', borderBottom: '1px solid #eeeeee', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {([['wall', '벽'], ['write', '작성 화면']] as ['wall' | 'write', string][]).map(([value, label]) => {
+                  const on = rollingView === value
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setRollingView(value)}
+                      style={{ height: 27, padding: '0 12px', border: `1px solid ${on ? '#816bff' : '#dddddd'}`, background: on ? '#f0edff' : '#fff', color: on ? '#816bff' : '#505050', borderRadius: 9999, fontSize: 11.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
+            <div ref={previewBox} style={{ padding: '20px 18px', background: '#f7f7f7', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ width: previewDevice.w * previewScale, height: previewDevice.h * previewScale, overflow: 'hidden', borderRadius: 16, background: '#fff', border: '1px solid #dddddd', flexShrink: 0 }}>
+                <iframe
+                  key={`${saved.slug}${rolling ? `-${rollingView}` : ''}`}
+                  ref={previewFrame}
+                  src={`/${saved.slug}${rolling && rollingView === 'write' ? '/write' : ''}`}
+                  title="미리보기"
+                  style={{ width: previewDevice.w, height: previewDevice.h, border: 0, transformOrigin: 'top left', transform: `scale(${previewScale})`, background: '#fff', display: 'block' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ padding: '11px 15px', borderTop: '1px solid #eeeeee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 11, color: '#8a8a8a' }}>{previewDevice.label} · /{saved.slug}</span>
+              <a href={`/${saved.slug}`} target="_blank" rel="noreferrer" style={{ height: 26, padding: '0 10px', border: '1px solid #dddddd', background: '#fff', borderRadius: 9999, fontSize: 11, fontWeight: 700, color: '#505050', display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap', textDecoration: 'none' }}>
+                <ExternalLink size={11} strokeWidth={2} aria-hidden="true" />
+                새 창
+              </a>
+            </div>
           </div>
         </div>
       </div>

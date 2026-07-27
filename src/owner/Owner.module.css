@@ -9,7 +9,8 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-base);
-  align-items: start;
+  /* 한 줄에 2열로 놓인 카드는 서로 키를 맞춘다 (stretch) — 전체폭 카드는 혼자라 영향 없다 */
+  align-items: stretch;
 }
 @media (min-width: 760px) {
   .formCol {
@@ -244,6 +245,26 @@
   border: 1px solid var(--color-field-border);
 }
 
+/* AlphaColor 투명도 줄 — hex 알약 아래에 라벨·슬라이더·% */
+.alphaRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.alphaLabel {
+  flex-shrink: 0;
+  font-size: 12.5px;
+  color: var(--color-fg-2);
+}
+.alphaPct {
+  flex-shrink: 0;
+  width: 40px;
+  text-align: right;
+  font-size: 11.5px;
+  color: var(--color-fg-3);
+}
+
 /* ── 슬롯 목록 ────────────────────────────────────── */
 
 /* 업로드한 앱 아이콘 썸네일 (시안) — 없으면 .swatch 색 견본 */
@@ -288,6 +309,17 @@
   background: #e6f4ec;
   color: #22694a;
 }
+/* 기간 카드 제목 옆 상태 배지 — 오른쪽으로 밀어 붙인다 */
+.periodState {
+  margin-left: auto;
+  padding: 2.5px 8px;
+  border-radius: 999px;
+  background: var(--color-wash);
+  color: var(--color-text-muted);
+  font-size: 10.5px;
+  font-weight: var(--weight-bold);
+}
+
 /* 강조 섹션 헤더 — "새 슬롯" 만들기 카드 (시안의 보라 헤더) */
 .owner .admin-section__title[data-accent] {
   background: var(--color-wash);
@@ -676,19 +708,29 @@
 
 /* ── 미리보기 ─────────────────────────────────────── */
 
+/* 제목을 한 줄, 상태·컨트롤을 그 아래 한 줄로 — 좁은 미리보기 칸(440px)에서 '크게'가 접히지 않게 */
 .previewHead {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-sm);
   margin-bottom: var(--space-base);
-  flex-wrap: wrap;
 }
 
 .previewMeta {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-sm);
+}
+/* 상태 텍스트는 왼쪽, 컨트롤(해상도·크게)은 오른쪽으로 밀린다 */
+.previewMeta > :first-child {
+  margin-right: auto;
+  min-width: 0;
+}
+.previewMeta > button {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* 럭키드로우는 화면이 하나뿐이라 상태를 골라 본다 (미리보기에선 진짜로 못 뽑는다) */
