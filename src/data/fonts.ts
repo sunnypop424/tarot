@@ -22,6 +22,11 @@ export interface WebFont {
   family?: string
   /** @font-face 로 만드는 폰트의 파일들 */
   faces?: { href: string; weight?: number; format?: string }[]
+  /**
+   * 같은 px 라도 글꼴마다 글자가 커/작게 보인다. 이 배율로 시각 크기를 균일하게 맞춘다
+   * (Pretendard 기준 1.0 — 작게 보이는 글꼴은 >1, 크게 보이는 글꼴은 <1). 없으면 1.
+   */
+  scale?: number
 }
 
 export const WEBFONTS = {
@@ -49,18 +54,21 @@ export const WEBFONTS = {
   // ── 손글씨 (롤링페이퍼 쪽지용 — 방문자가 고른다) ──────────────
   nanumPen: {
     label: '나눔손글씨 펜',
+    scale: 1.2,
     stack: "'Nanum Pen Script', cursive",
     handwriting: true,
     href: 'https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap',
   },
   gaegu: {
     label: '개구',
+    scale: 1.12,
     stack: "'Gaegu', cursive",
     handwriting: true,
     href: 'https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap',
   },
   leeSeoyun: {
     label: '이서윤체',
+    scale: 0.95,
     stack: "'IsYun', cursive",
     handwriting: true,
     family: 'IsYun',
@@ -68,6 +76,7 @@ export const WEBFONTS = {
   },
   gangwonSaeeum: {
     label: '강원교육새음체',
+    scale: 1.15,
     stack: "'GangwonEdu Saeeum', cursive",
     handwriting: true,
     href: 'https://cdn.jsdelivr.net/gh/fonts-archive/GangwonEduSaeeum/subsets/GangwonEduSaeeum-dynamic-subset.css',
@@ -80,6 +89,7 @@ export const WEBFONTS = {
   },
   yoonMinguk: {
     label: '윤초록우산어린이 민국체',
+    scale: 0.85,
     stack: "'YunChorokwoosanEoriniMinguk', cursive",
     handwriting: true,
     family: 'YunChorokwoosanEoriniMinguk',
@@ -87,6 +97,7 @@ export const WEBFONTS = {
   },
   munmakHaeban: {
     label: '문막초 해반체',
+    scale: 0.85,
     stack: "'MunmakchoHaeban', cursive",
     handwriting: true,
     family: 'MunmakchoHaeban',
@@ -94,6 +105,7 @@ export const WEBFONTS = {
   },
   griunDahl: {
     label: '그리운X국한박 다흘체',
+    scale: 0.95,
     stack: "'GeuriunXGukhanbakDaheul', cursive",
     handwriting: true,
     family: 'GeuriunXGukhanbakDaheul',
@@ -101,6 +113,7 @@ export const WEBFONTS = {
   },
   griunTture: {
     label: '그리운X국한박 뚜레체',
+    scale: 1.15,
     stack: "'GeuriunXKukhanbakTture', cursive",
     handwriting: true,
     family: 'GeuriunXKukhanbakTture',
@@ -108,6 +121,7 @@ export const WEBFONTS = {
   },
   griunSarang: {
     label: '그리운X국한박 사랑스러운체',
+    scale: 0.88,
     stack: "'NostalgicGukhanbakLovely', cursive",
     handwriting: true,
     family: 'NostalgicGukhanbakLovely',
@@ -126,6 +140,23 @@ export const HANDWRITING_FONTS = (Object.keys(WEBFONTS) as FontId[]).filter(
 export function fontStack(id: string | undefined): string {
   const f = id ? (WEBFONTS as Record<string, WebFont>)[id] : undefined
   return f?.stack ?? "'Pretendard', system-ui, sans-serif"
+}
+
+/** id → 시각 크기 배율 (글꼴마다 같은 px 라도 커/작게 보여서 균일하게 맞춘다). 없으면 1 */
+export function fontScale(id: string | undefined): number {
+  const f = id ? (WEBFONTS as Record<string, WebFont>)[id] : undefined
+  return f?.scale ?? 1
+}
+
+/**
+ * font-family + 배율 적용 fontSize 를 한 번에. base 는 기준 크기(CSS 길이) — 기본은 1em(상속 크기).
+ * 요소가 자체 font-size 를 가지면 base 를 그 토큰으로 넘겨 정확히 곱한다.
+ */
+export function fontStyle(
+  id: string | undefined,
+  base = '1em'
+): { fontFamily: string; fontSize: string } {
+  return { fontFamily: fontStack(id), fontSize: `calc(${base} * ${fontScale(id)})` }
 }
 
 /**

@@ -4,7 +4,7 @@ import { ArrowLeft, Pencil, Settings } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
 import { rollingDisplay, type RollingDisplay } from '@/data/rolling'
-import { loadWebfont, fontStack, HANDWRITING_FONTS, WEBFONTS } from '@/data/fonts'
+import { loadWebfont, fontStack, fontStyle, HANDWRITING_FONTS, WEBFONTS } from '@/data/fonts'
 import { repo } from '@/lib/repo'
 import { cssUrl } from '@/lib/image'
 import type { RollingMessage } from '@/lib/repo/types'
@@ -238,10 +238,14 @@ function MessageNote({ message, papers }: { message: RollingMessage; papers: str
             aria-hidden="true"
           />
         )}
-        <p className={styles.noteBody} style={{ fontFamily: fontStack(message.font) }}>
+        <p className={styles.noteBody} style={fontStyle(message.font, 'var(--text-s)')}>
           {message.body}
         </p>
-        {message.nickname && <div className={styles.noteName}>— {message.nickname}</div>}
+        {message.nickname && (
+          <div className={styles.noteName} style={fontStyle(message.font, 'var(--text-xs)')}>
+            — {message.nickname}
+          </div>
+        )}
         <span className={styles.dogEar} aria-hidden="true" />
       </div>
     </li>
@@ -326,7 +330,7 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
               onChange={(e) => setBody(e.target.value.slice(0, MAX_BODY))}
               placeholder={display.prompt}
               rows={5}
-              style={{ fontFamily: fontStack(font) }}
+              style={fontStyle(font, 'var(--text-m)')}
             />
             <span className={styles.counter}>
               {body.length} / {MAX_BODY}
@@ -363,7 +367,7 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
                 aria-checked={font === ''}
                 className={styles.fontBtn}
                 data-active={font === ''}
-                style={{ fontFamily: fontStack(display.font) }}
+                style={fontStyle(display.font, 'var(--text-m)')}
                 onClick={() => setFont('')}
                 title="기본 글씨체"
               >
@@ -377,7 +381,7 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
                   aria-checked={font === id}
                   className={styles.fontBtn}
                   data-active={font === id}
-                  style={{ fontFamily: fontStack(id) }}
+                  style={fontStyle(id, 'var(--text-m)')}
                   onClick={() => setFont(id)}
                   title={WEBFONTS[id].label}
                 >
@@ -423,10 +427,14 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
             {sticker && (
               <span className={styles.sticker} style={{ backgroundImage: cssUrl(sticker) }} aria-hidden="true" />
             )}
-            <p className={styles.noteBody} style={{ fontFamily: fontStack(font) }}>
+            <p className={styles.noteBody} style={fontStyle(font, 'var(--text-s)')}>
               {body.trim() || '여기에 메시지가 보여요'}
             </p>
-            {nickname.trim() && <div className={styles.noteName}>— {nickname.trim()}</div>}
+            {nickname.trim() && (
+              <div className={styles.noteName} style={fontStyle(font, 'var(--text-xs)')}>
+                — {nickname.trim()}
+              </div>
+            )}
             <span className={styles.dogEar} aria-hidden="true" />
           </div>
         </div>
