@@ -11,6 +11,8 @@ import {
   LogOut,
   BarChart3,
   GraduationCap,
+  Sparkles,
+  Layers,
   ScanLine,
   Dices,
   Stamp,
@@ -69,6 +71,11 @@ const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
   quiz: [
     { to: 'quiz', label: '모의고사', icon: GraduationCap },
     { to: 'stats', label: '통계', icon: BarChart3 },
+  ],
+  photocard: [
+    { to: 'photocard', label: '카드', icon: Layers },
+    // 부스에서 스태프가 쓰는 화면 — 관리 도구가 아니라 현장 도구다 (럭드 '뽑기' 와 같다)
+    { to: 'draw', label: '뽑기', icon: Sparkles },
   ],
 }
 

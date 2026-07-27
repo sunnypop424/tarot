@@ -69,6 +69,9 @@ const StampApp = lazy(() => import('@/stamp/StampApp'))
 /** 최애 모의고사 — 칭호 카드를 캔버스로 그린다 (compose.ts 를 함께 끌고 온다) */
 const QuizApp = lazy(() => import('@/quiz/QuizApp'))
 
+/** 포토카드 뽑기 — 운영 방식 셋이 한 청크에 (src/data/photocard.ts 의 photocardRules) */
+const PhotocardApp = lazy(() => import('@/photocard/PhotocardApp'))
+
 /**
  * 서비스별 방문자 앱 — **`Record` 라 모든 서비스가 필수다.**
  *
@@ -90,6 +93,7 @@ const SERVICE_APPS: Record<ServiceId, ComponentType | null> = {
   poll: PollApp,
   stamp: StampApp,
   quiz: QuizApp,
+  photocard: PhotocardApp,
 }
 
 /**

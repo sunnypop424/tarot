@@ -19,6 +19,7 @@ import { WishCard } from './service/WishCard'
 import { PollCard } from './service/PollCard'
 import { StampCard } from './service/StampCard'
 import { QuizCard } from './service/QuizCard'
+import { PhotocardCard } from './service/PhotocardCard'
 import { PaletteField } from './service/PaletteField'
 import { checkThemeContrast } from './contrast'
 import { repairContrast, type GeneratedTheme } from './aiTheme'
@@ -43,6 +44,7 @@ import { wishDisplay, type WishDisplay } from '@/data/wish'
 import { pollDisplay, type PollDisplay } from '@/data/poll'
 import { stampDisplay, type StampDisplay } from '@/data/stamp'
 import { quizDisplay, type QuizDisplay } from '@/data/quiz'
+import { photocardDisplay, type PhotocardDisplay } from '@/data/photocard'
 import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 import { exportSlots } from './slotsFile'
 
@@ -771,6 +773,9 @@ export function SlotEditor() {
   const quiz = getSlotService(draft) === 'quiz'
   const patchQuiz = (change: Partial<QuizDisplay>) =>
     patchSlot((prev) => ({ quiz: { ...quizDisplay(prev), ...change } }))
+  const photocard = getSlotService(draft) === 'photocard'
+  const patchPhotocard = (change: Partial<PhotocardDisplay>) =>
+    patchSlot((prev) => ({ photocard: { ...photocardDisplay(prev), ...change } }))
 
   const patchColor = (key: keyof ThemeColors, value: string) =>
     patchSlot((prev) => ({
@@ -1433,6 +1438,9 @@ export function SlotEditor() {
 
           {/* ══ 최애 모의고사 설정 ══ (칭호가 여기 있는 이유는 QuizCard.tsx 주석) */}
           {quiz && <QuizCard slot={draft} patch={patchQuiz} />}
+
+          {/* ══ 포토카드 뽑기 설정 ══ (카드 목록이 여기 있는 이유는 PhotocardCard.tsx 주석) */}
+          {photocard && <PhotocardCard slot={draft} patch={patchPhotocard} />}
 
           {/* ══ 롤링페이퍼 서비스 설정 ══ */}
           {rolling && (

@@ -24,6 +24,8 @@ import { Picker } from './reward/Picker'
 import { Entries } from './reward/Entries'
 import { Questions as QuizQuestions } from './quiz/Questions'
 import { Stats as QuizStats } from './quiz/Stats'
+import { Cards as PhotocardCards } from './photocard/Cards'
+import { Draw as PhotocardDraw } from './photocard/Draw'
 import { useAdminAuth } from './useAdminAuth'
 
 /**
@@ -48,6 +50,7 @@ const ADMIN_HOME: Record<ServiceId, string> = {
   poll: 'polls',
   stamp: 'stamp',
   quiz: 'quiz',
+  photocard: 'photocard',
 }
 
 const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
@@ -100,6 +103,16 @@ const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
       <Route path="redeem" element={<Redeem />} />
       <Route path="picker" element={<Picker />} />
       <Route path="entries" element={<Entries />} />
+    </>
+  ),
+  /**
+   * 포토카드는 **스태프가 쓰는 화면(`draw`)이 관리 화면 안에 있다** — 럭키드로우와 같은 자리다.
+   * 실물이 걸리면 뽑기는 항상 스태프 기기에서 일어나기 때문이다.
+   */
+  photocard: (
+    <>
+      <Route path="photocard" element={<PhotocardCards />} />
+      <Route path="draw" element={<PhotocardDraw />} />
     </>
   ),
 }

@@ -8,6 +8,7 @@ import { localLuckydraw } from './luckydraw'
 import { localOrganizers } from './organizers'
 import { localRolling } from './rolling'
 import { localPoll } from './poll'
+import { localPhotocard } from './photocard'
 import { localQuiz } from './quiz'
 import { localRewards } from './rewards'
 import { localStamp } from './stamp'
@@ -193,5 +194,6 @@ export const localRepo: Repo = {
   poll: localPoll,
   stamp: localStamp,
   quiz: localQuiz,
+  photocard: localPhotocard,
   rewards: localRewards,
 }

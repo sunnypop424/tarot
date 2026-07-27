@@ -20,6 +20,7 @@ export const SERVICES = [
   { id: 'poll', label: '실시간 투표', hint: '즉석 투표하고 결과가 그 자리에서 차오른다' },
   { id: 'stamp', label: '방문 스탬프', hint: '현장 암호로 도장을 모으고 다 모으면 선물' },
   { id: 'quiz', label: '최애 모의고사', hint: '문제를 풀고 점수·칭호를 받는다' },
+  { id: 'photocard', label: '포토카드 뽑기', hint: '레어도 가챠 — 저장용·1장 증정·판매' },
 ] as const
 
 export type ServiceId = (typeof SERVICES)[number]['id']

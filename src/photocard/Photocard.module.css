@@ -1,0 +1,696 @@
+/* 포토카드 뽑기 — 시안 "포토카드 뽑기 방문자.dc.html".
+   덱·결과는 어두운 화면(카드가 주인공), 뽑기권·보관함·안내는 슬롯 색. */
+
+.root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--pc-bg);
+  color: var(--pc-head);
+  font-family: var(--pc-font);
+}
+/* 덱·뽑는 중·결과 — 어두운 무대 */
+.dark {
+  background: var(--pc-deckBg);
+  color: #f2f1ee;
+  position: relative;
+  overflow: hidden;
+}
+.glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.phone {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 헤더 ── */
+.head {
+  flex: none;
+  padding: 44px 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.logo {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.logoLight {
+  background-color: color-mix(in srgb, currentColor 9%, transparent);
+}
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+.deckGuide {
+  position: relative;
+  margin: 14px 22px 0;
+  font-size: 13px;
+  color: #93959f;
+  line-height: 1.6;
+  text-align: center;
+  word-break: keep-all;
+}
+
+/* ── 덱 (부채꼴) ── */
+.fanWrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+/* 좌표는 이 상자 기준의 절대값이다 — 상자 자체를 화면 폭에 맞춰 줄인다 */
+/* 카드가 실제로 차지하는 크기 (112×173 + 퍼짐 110 + 아래로 처지는 150) */
+.fan {
+  position: relative;
+  width: 340px;
+  height: 330px;
+  transform: scale(var(--fanScale, 1));
+}
+.card {
+  position: absolute;
+  width: 112px;
+  height: 173px;
+  transform-origin: 50% 90%;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background: none;
+  transition: transform 220ms var(--ease, ease), filter 220ms var(--ease, ease);
+}
+.card:disabled {
+  cursor: default;
+}
+.card:not(:disabled):hover,
+.card:not(:disabled):focus-visible {
+  filter: brightness(1.25);
+}
+.face {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  background:
+    var(--pc-backImage, none) center / cover no-repeat,
+    linear-gradient(
+      155deg,
+      color-mix(in srgb, var(--pc-deckGlow) 84%, #ffffff 16%),
+      color-mix(in srgb, var(--pc-deckBg) 68%, var(--pc-deckGlow) 32%)
+    );
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.2);
+}
+.deckFoot {
+  position: relative;
+  flex: none;
+  padding: 0 20px 24px;
+  text-align: center;
+}
+.deckLeft {
+  font-size: 12px;
+  color: #8b8d98;
+  margin-bottom: 12px;
+}
+.deckHint {
+  font-size: 11px;
+  color: #6f717b;
+}
+.adminRow {
+  margin-top: 14px;
+}
+.adminLink {
+  font-size: 11px;
+  color: #494b56;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.adminLinkLight {
+  color: color-mix(in srgb, var(--pc-sub) 60%, transparent);
+}
+
+/* ── 뽑는 중 ── */
+.drawing {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+}
+.spinCard {
+  position: relative;
+  width: 206px;
+  aspect-ratio: 55 / 85;
+  border-radius: 14px;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--pc-deckGlow) 88%, #ffffff 8%), var(--pc-deckBg));
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  animation: pcFloat 2.6s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.35);
+}
+.shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 70px;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  animation: pcShine 1.6s linear infinite;
+}
+.drawingText {
+  font-size: 15px;
+  font-weight: 800;
+  color: #e6e5e1;
+  animation: pcPulse 1.4s ease-in-out infinite;
+}
+
+/* ── 결과 ── */
+.resultWrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 44px 24px 0;
+  min-height: 0;
+}
+.kicker {
+  font-size: 13px;
+  font-weight: 800;
+  color: #a9abb6;
+  letter-spacing: 0.04em;
+  margin-bottom: 20px;
+}
+/* 시안의 폴라로이드 — 흰 테두리 + 아래 이름표 */
+.polaroid {
+  position: relative;
+  width: min(232px, 62vw);
+  aspect-ratio: 55 / 85;
+  border-radius: 14px;
+  background-color: #dedcd7;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  border: 8px solid #fff;
+}
+.polaroidName {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  padding: 9px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #33332f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.resultName {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #f2f1ee;
+  text-align: center;
+  word-break: keep-all;
+}
+.resultNote {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #8b8d98;
+  text-align: center;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+.resultFoot {
+  position: relative;
+  flex: none;
+  padding: 22px 20px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lightBtn {
+  height: 54px;
+  border: none;
+  border-radius: 13px;
+  background: #f2f1ee;
+  color: #1f1f1f;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.ghostDark {
+  height: 50px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.09);
+  color: #f2f1ee;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.lightBtn:disabled,
+.ghostDark:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.chip {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.09);
+  border-radius: 9999px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #e6e5e1;
+}
+
+/* ── 보관함 ── */
+.lockerTop {
+  flex: none;
+  padding: 38px 18px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.backBtn {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: none;
+  border-radius: 9999px;
+  background: var(--pc-wash);
+  color: var(--pc-head);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.lockerTitle {
+  font-size: 15px;
+  font-weight: 800;
+}
+.lockerCount {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--pc-head);
+  background: var(--pc-wash);
+  border-radius: 9999px;
+  padding: 5px 12px;
+}
+.track {
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--pc-line);
+  overflow: hidden;
+  margin: 14px 20px 0;
+}
+.bar {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--pc-btn);
+  transition: width 320ms var(--ease, ease);
+}
+.grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 11px;
+  align-content: start;
+  min-height: 0;
+}
+@media (min-width: 520px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.cell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 55 / 85;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--pc-wash);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border: 1px solid var(--pc-line);
+  overflow: hidden;
+  color: var(--pc-sub);
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+/* 아직 못 뽑은 칸 — 점선 + 자물쇠 */
+.cell[data-locked] {
+  border-style: dashed;
+  cursor: default;
+  opacity: 0.75;
+}
+.cellName {
+  margin-top: 6px;
+  font-size: 10px;
+  text-align: center;
+  color: var(--pc-sub);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lockerFoot {
+  flex: none;
+  padding: 12px 20px 28px;
+  background: linear-gradient(rgba(0, 0, 0, 0), var(--pc-bg) 30%);
+}
+
+/* ── 뽑기권 (gift) ── */
+.center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 30px;
+  text-align: center;
+  min-height: 0;
+}
+.ticketArt {
+  width: 150px;
+  aspect-ratio: 55 / 85;
+  border-radius: 12px;
+  background: linear-gradient(150deg, var(--pc-wash), var(--pc-line));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pc-sub);
+  box-shadow: 0 16px 40px rgba(20, 20, 20, 0.14);
+  border: 1px solid var(--pc-line);
+}
+.ticketHead {
+  margin-top: 26px;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.4;
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+.ticketBody {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--pc-sub);
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+.note {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  background: var(--pc-wash);
+  border-radius: 12px;
+  padding: 12px 14px;
+  text-align: left;
+  border: 1px solid var(--pc-line);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--pc-sub);
+}
+.noteStrong {
+  background: var(--pc-btn);
+  color: var(--pc-btnFg);
+  border-color: var(--pc-btn);
+}
+.bottom {
+  flex: none;
+  padding: 0 20px 24px;
+}
+.cta {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: 13px;
+  background: var(--pc-btn);
+  color: var(--pc-btnFg);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.cta:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.codeCard {
+  width: 100%;
+  background: var(--pc-wash);
+  border-radius: 18px;
+  padding: 34px 20px 30px;
+  text-align: center;
+  border: 1px solid var(--pc-line);
+}
+.codeLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pc-sub);
+}
+/* 시안은 76px 인데, 4자리라 폭에 맞춰 줄이면 그대로 들어간다 */
+.code {
+  margin-top: 20px;
+  font-size: clamp(52px, 19vw, 76px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.codeRule {
+  margin-top: 22px;
+  height: 1px;
+  background: var(--pc-line);
+}
+.codeGuide {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--pc-sub);
+  line-height: 1.6;
+}
+.waiting {
+  margin-top: 26px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  background: var(--pc-btn);
+  animation: pcPulse 1.5s ease-in-out infinite;
+}
+.waitingText {
+  font-size: 15px;
+  font-weight: 800;
+}
+.ghostBtn {
+  margin-top: 20px;
+  height: 46px;
+  padding: 0 20px;
+  border-radius: 11px;
+  background: var(--pc-wash);
+  color: var(--pc-head);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  border: 1px solid var(--pc-line);
+}
+.stamp {
+  flex: none;
+  padding: 0 20px 30px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--pc-sub);
+}
+
+/* ── 안내 (sale) ── */
+.counterBox {
+  margin-top: 26px;
+  width: 100%;
+  background: var(--pc-wash);
+  border-radius: 16px;
+  padding: 24px 20px;
+  border: 1px solid var(--pc-line);
+}
+.counterTitle {
+  margin-top: 14px;
+  font-size: 18px;
+  font-weight: 800;
+}
+.counterBody {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--pc-sub);
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+.counterHours {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--pc-sub);
+  line-height: 1.7;
+}
+.bigLogo {
+  width: 74px;
+  height: 74px;
+  border-radius: 16px;
+  background-color: var(--pc-wash);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pc-sub);
+}
+.counterHeadline {
+  margin: 22px 0 0;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 30px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--pc-sub);
+  line-height: 1.7;
+}
+.error {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
+@keyframes pcFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes pcShine {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+@keyframes pcPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* 뽑힌 카드가 등장하는 순간 — 시안엔 없지만 뒤집힘 없이 그냥 뜨면 심심하다 */
+@keyframes pcReveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94) rotate(-2deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.polaroid {
+  animation: pcReveal 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinCard,
+  .shine,
+  .drawingText,
+  .dot,
+  .polaroid {
+    animation: none;
+  }
+}

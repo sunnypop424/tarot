@@ -636,6 +636,100 @@ export interface QuizRepo {
   ): Promise<void>
 }
 
+/** 카드 한 장 (주최자용 — 방문자에게는 이 목록이 통째로 안 간다) */
+export interface Photocard {
+  id: string
+  name: string
+  /** 1~5. **이게 곧 가중치다** — 재고가 아니다 (0026 주석) */
+  rarity: number
+  image: string
+  /** null = 무제한 */
+  remaining: number | null
+  /** 한 묶음에서 이 카드가 차지할 최대 비율 (N연차용) */
+  batchCapRatio: number | null
+  order: number
+}
+
+export interface PhotocardSettings {
+  mode: 'save' | 'gift' | 'sale'
+  drawsPerVisitor: number
+  batchCount: number
+  batchCapEnabled: boolean
+  allowSave: boolean
+  closed: boolean
+  /** **기본 켬** — 재고를 안 깎고 로그만 남긴다 */
+  rehearsal: boolean
+}
+
+/** 뽑힌 카드 한 장 */
+export interface PhotocardDrawn {
+  cardId: string
+  name: string
+  image: string
+  rarity: number
+}
+
+export interface PhotocardTicket {
+  code: string
+  status: 'open' | 'drawn'
+  cardName: string | null
+  cardImage: string | null
+  issuedAt: string
+}
+
+export interface PhotocardMine {
+  used: number
+  left: number
+  /** 전체 종류 수 */
+  kinds: number
+  /** 내가 모은 종류 수 */
+  got: number
+}
+
+export interface PhotocardReportRow {
+  cardId: string | null
+  name: string
+  /** 주최자 화면 썸네일 — 이름만으로는 어느 카드인지 못 알아본다 */
+  image: string
+  rarity: number
+  drawn: number
+  remaining: number | null
+}
+
+/**
+ * 포토카드 뽑기 (아홉 번째 서비스).
+ *
+ * **`ready()` 가 false 다** — 재고 차감과 뽑기권 소각이 서버여야 의미가 있다.
+ *
+ * **뽑는 함수가 셋이다.** 실행 주체가 모드마다 달라서다(방문자 / 스태프 / 스태프) —
+ * 하나로 합치면 `gift` 슬롯에 방문자용 경로를 때려 실물을 공짜로 확정할 수 있다.
+ */
+export interface PhotocardRepo {
+  ready(): boolean
+  /** 주최자·최고관리자 */
+  listCards(slug: string): Promise<Photocard[]>
+  saveCard(slug: string, card: Photocard): Promise<void>
+  removeCard(slug: string, id: string): Promise<void>
+  settings(slug: string): Promise<PhotocardSettings>
+  saveSettings(slug: string, s: PhotocardSettings): Promise<void>
+  report(slug: string): Promise<PhotocardReportRow[]>
+
+  /** anon — `save` 모드 전용. 다른 모드에서는 서버가 거절한다 */
+  drawSelf(slug: string, subject: string): Promise<PhotocardDrawn>
+  mine(slug: string, subject: string): Promise<PhotocardMine>
+
+  /** anon — `gift`. **재발급이 아니라 재조회다** (이미 있으면 그걸 준다) */
+  issueTicket(slug: string, subject: string): Promise<PhotocardTicket>
+  ticket(slug: string, code: string): Promise<PhotocardTicket | null>
+
+  /** 스태프 — `gift`. 뽑기권 번호로 뽑고 소각한다 */
+  drawByTicket(slug: string, code: string): Promise<PhotocardDrawn>
+  /** 스태프 — `sale` N연차 */
+  drawBatch(slug: string, count: number): Promise<PhotocardDrawn[]>
+  /** 스태프 화면의 "오늘 발급/소각" — 이상하면 눈에 띄어야 한다 */
+  ticketStats(slug: string): Promise<{ issued: number; drawn: number }>
+}
+
 /** 응모 추첨의 후보/결과 한 줄 — 주최자만 본다 (준-PII) */
 export interface RewardEntry {
   rewardId: string
@@ -682,5 +776,6 @@ export interface Repo {
   poll: PollRepo
   stamp: StampRepo
   quiz: QuizRepo
+  photocard: PhotocardRepo
   rewards: RewardsRepo
 }

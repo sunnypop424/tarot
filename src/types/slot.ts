@@ -7,6 +7,7 @@ import type { WishDisplay } from '@/data/wish'
 import type { PollDisplay } from '@/data/poll'
 import type { StampDisplay } from '@/data/stamp'
 import type { QuizDisplay } from '@/data/quiz'
+import type { PhotocardDisplay } from '@/data/photocard'
 import type { ServiceId } from '@/data/services'
 import type { PlanId } from '@/data/plans'
 
@@ -144,4 +145,9 @@ export interface Slot {
    * 문항·정답·커트라인은 **주최자**가 만든다 (`quiz_questions`·`quiz_settings`).
    */
   quiz?: Partial<QuizDisplay>
+  /**
+   * 포토카드 뽑기 서비스의 **겉모습** — 최고관리자만 정한다 (`src/data/photocard.ts`).
+   * 카드 목록·모드·재고는 **주최자**가 정한다 (`photocards`·`photocard_settings`).
+   */
+  photocard?: Partial<PhotocardDisplay>
 }
