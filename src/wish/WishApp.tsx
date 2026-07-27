@@ -107,6 +107,7 @@ function scatter(items: RollingMessage[], canopyW: number, canopyH: number): Pla
      * 세로:가로 비율은 시안의 106/96·126/116(≈1.09)을 따른다.
      */
     const sw = Math.round(92 + seeded(w.id, 13) * 34)
+    // 높이는 CSS 에서 `height` 로 못박힌다 — 여기 값이 곧 실제 크기여야 겹침 판정이 맞는다
     const size = { w: sw, h: Math.round(sw * 1.09) }
     const half = size.w / 2 + 10
     /**
@@ -136,7 +137,8 @@ function scatter(items: RollingMessage[], canopyW: number, canopyH: number): Pla
     let left = half
     let drop = 14
     let bestCost = Infinity
-    for (let t = 0; t < 40; t++) {
+    // 80번까지 뽑아본다 — 전부 id 에서 파생한 결정적 계산이라 비용이 사실상 없다
+    for (let t = 0; t < 80; t++) {
       const dy = 14 + seeded(w.id, 37 + t * 11) * (maxDrop - 14)
       const margin = size.w / 2 + swingOf(dy)
       const lo = margin
@@ -232,16 +234,6 @@ function Lantern({
   )
 }
 
-/**
- * 폭에 따라 가로로 몇 개나 걸지 — 넓어지면 가지가 퍼진다 (시안 ③④).
- *
- * 모바일에서 3열을 쓰면 등불 하나가 100px 도 못 받아 글씨가 두 줄에서 잘리고, 옆 등불과
- * 빛번짐이 겹쳐 배경이 하얗게 뜬다. **한 등불이 최소 130px 은 받도록** 열 수를 정한다.
- */
-function colsFor(width: number): number {
-  return Math.max(2, Math.min(7, Math.floor(width / 150)))
-}
-
 function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
   const { slug } = slot
   const navigate = useNavigate()
@@ -293,7 +285,6 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
     roRef.current = ro
   }, [])
   useEffect(() => () => roRef.current?.disconnect(), [])
-  const cols = colsFor(canopy.w)
 
   /**
    * **격자가 아니라 흩뿌린다.** 열·행으로 자리를 잡되 그 안에서 좌우로 흔들고 줄 길이를
@@ -316,7 +307,14 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
    * 이렇게 해야 줄이 화면 밖으로 안 나가고(잘려 보인다), 등불마다 붙는 흔들림·빛번짐도
    * 눈에 보이는 것만 돈다. 시안 모바일이 한 화면에 일곱 개다.
    */
-  const perPage = Math.max(3, cols * Math.max(2, Math.round(canopy.h / 170)))
+  /**
+   * 개수를 **면적으로** 정한다. 열·행으로 어림하면 세로가 짧은 기기(카톡 인앱 브라우저처럼
+   * 위아래를 브라우저가 먹는 경우)에서 밀도가 확 올라가고, 그러면 아무리 여러 번 자리를
+   * 뽑아도 안 겹치는 곳이 없어 결국 포개진다. 0.30 은 "화면의 30%만 등불" 이라는 뜻으로,
+   * 시안 모바일(390×약600 에 일곱 개)과 비슷한 여백감이다.
+   */
+  const AVG_LANTERN = 109 * 119
+  const perPage = Math.max(3, Math.floor((canopy.w * canopy.h * 0.3) / AVG_LANTERN))
   const paged = usePaged(list, perPage)
 
   const placed = useMemo(

@@ -213,10 +213,18 @@
   }
 }
 
+/**
+ * **높이를 확정한다 (min-height 가 아니라 height).**
+ *
+ * min-height 였을 땐 글이 길수록 등불이 세로로 늘어났는데, 자리를 잡는 계산(`scatter`)은
+ * `--h` 값만 알고 있어서 **실제보다 짧다고 믿고 배치했다** — 그래서 세로로 겹치는 걸 못 잡고
+ * 등불이 통째로 포개져 글자가 가려졌다. 본문은 이미 두 줄로 자르고 이름도 한 줄이라
+ * 높이를 못박아도 잘리는 글이 없다. 계산 모델과 실제가 같아야 겹침 판정이 의미를 갖는다.
+ */
 .lantern {
   position: relative;
   width: var(--w);
-  min-height: var(--h);
+  height: var(--h);
   border-radius: 16px 16px 22px 22px;
   /* 위에서 아래로 살짝 어두워지는 몸통 + 윗면 하이라이트 = 종이 등불의 입체감 */
   background: linear-gradient(180deg, var(--lantern), rgb(0 0 0 / 0.14)), var(--lantern);
