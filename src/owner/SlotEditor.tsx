@@ -16,6 +16,7 @@ import { hasSupabase } from '@/lib/repo/client'
 import { CSS, Card, Field, Swatch, SwatchColor } from './editorUi'
 import { PhotozoneCard } from './service/PhotozoneCard'
 import { WishCard } from './service/WishCard'
+import { PollCard } from './service/PollCard'
 import { PaletteField } from './service/PaletteField'
 import { checkThemeContrast } from './contrast'
 import { repairContrast, type GeneratedTheme } from './aiTheme'
@@ -37,6 +38,7 @@ import {
 import { rollingDisplay } from '@/data/rolling'
 import { photozoneDisplay, type PhotozoneDisplay } from '@/data/photozone'
 import { wishDisplay, type WishDisplay } from '@/data/wish'
+import { pollDisplay, type PollDisplay } from '@/data/poll'
 import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 import { exportSlots } from './slotsFile'
 
@@ -756,6 +758,9 @@ export function SlotEditor() {
     patchSlot((prev) => ({ photozone: { ...photozoneDisplay(prev), ...change } }))
   const patchWish = (change: Partial<WishDisplay>) =>
     patchSlot((prev) => ({ wish: { ...wishDisplay(prev), ...change } }))
+  const poll = getSlotService(draft) === 'poll'
+  const patchPoll = (change: Partial<PollDisplay>) =>
+    patchSlot((prev) => ({ poll: { ...pollDisplay(prev), ...change } }))
 
   const patchColor = (key: keyof ThemeColors, value: string) =>
     patchSlot((prev) => ({
@@ -1409,6 +1414,9 @@ export function SlotEditor() {
 
           {/* ══ 소원나무 서비스 설정 ══ */}
           {wish && <WishCard slot={draft} patch={patchWish} />}
+
+          {/* ══ 실시간 투표 설정 ══ */}
+          {poll && <PollCard slot={draft} patch={patchPoll} />}
 
           {/* ══ 롤링페이퍼 서비스 설정 ══ */}
           {rolling && (

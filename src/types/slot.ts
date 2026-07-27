@@ -4,6 +4,7 @@ import type { LuckydrawDisplay } from '@/data/luckydraw'
 import type { RollingDisplay } from '@/data/rolling'
 import type { PhotozoneDisplay } from '@/data/photozone'
 import type { WishDisplay } from '@/data/wish'
+import type { PollDisplay } from '@/data/poll'
 import type { ServiceId } from '@/data/services'
 import type { PlanId } from '@/data/plans'
 
@@ -125,4 +126,10 @@ export interface Slot {
    * 겉모습만 이 필드로 갈린다. 그래서 `wish` 전용 repo 도 테이블도 없다.
    */
   wish?: Partial<WishDisplay>
+  /**
+   * 실시간 투표 서비스의 **겉모습** — 최고관리자만 정한다 (`src/data/poll.ts`).
+   * 설문·선택지 같은 운영 데이터는 **주최자**가 만든다 (`poll_polls` 테이블) —
+   * 럭드에서 상품표가 주최자 것인 것과 같은 경계다.
+   */
+  poll?: Partial<PollDisplay>
 }

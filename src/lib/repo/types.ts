@@ -403,6 +403,63 @@ export interface RollingRepo {
   watch(slug: string, onChange: () => void): () => void
 }
 
+/** 설문 하나의 선택지 */
+export interface PollOption {
+  id: string
+  order: number
+  label: string
+  /** 이미지형 설문일 때 (업로드 URL) */
+  image?: string
+  /** 지금까지 받은 표 — **컬럼으로 든다** (0020 주석: 럭드와 반대인 이유) */
+  votes: number
+}
+
+export interface Poll {
+  id: string
+  title: string
+  /** single = 하나만 · multi = 여러 개 */
+  kind: 'single' | 'multi'
+  maxPick: number
+  closed: boolean
+  /** 주최자가 준비 중 — 방문자에게 안 보인다 */
+  hidden: boolean
+  order: number
+  options: PollOption[]
+}
+
+/** 내가 이 설문에 찍은 것 — 남의 선택은 절대 안 온다 (`poll_mine` 이 subject 로만 준다) */
+export interface MyVote {
+  pollId: string
+  optionIds: string[]
+  at: string
+}
+
+/**
+ * 실시간 투표 (여섯 번째 서비스).
+ *
+ * **`ready()` 가 false 다** — 집계 원자성과 여러 기기 실시간이 이 서비스의 값어치 전부라,
+ * localStorage 로 흉내내면 "혼자만의 투표" 가 된다. 럭키드로우와 정확히 같은 논리다
+ * (`LuckydrawRepo` 주석). local 어댑터는 전부 던진다.
+ */
+export interface PollRepo {
+  ready(): boolean
+  /** 방문자 — hidden 제외 */
+  list(slug: string): Promise<Poll[]>
+  /** 주최자 — 준비 중인 것까지 */
+  listAll(slug: string): Promise<Poll[]>
+  savePoll(slug: string, poll: Poll): Promise<void>
+  removePoll(slug: string, id: string): Promise<void>
+  /** 내가 찍은 것들 (기기별 익명 id 로) */
+  mine(slug: string, subject: string): Promise<MyVote[]>
+  /** 투표 — **최신 집계를 함께 돌려준다** (왕복 한 번을 아낀다) */
+  vote(slug: string, pollId: string, optionIds: string[], subject: string): Promise<Poll[]>
+  /**
+   * 집계 실시간. 표 하나마다 이벤트가 오므로 **부르는 쪽이 디바운스해야 한다** —
+   * 초당 수십 표면 그대로 리로드 폭풍이 된다 (롤페·럭드엔 없던 문제).
+   */
+  watch(slug: string, onChange: () => void): () => void
+}
+
 export interface Repo {
   slots: SlotRepo
   questions: QuestionRepo
@@ -412,4 +469,5 @@ export interface Repo {
   ai: AiRepo
   luckydraw: LuckydrawRepo
   rolling: RollingRepo
+  poll: PollRepo
 }

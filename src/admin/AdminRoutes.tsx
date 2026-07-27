@@ -16,6 +16,8 @@ import { Overview } from './luckydraw/Overview'
 import { Shipping } from './luckydraw/Shipping'
 import { Moderation } from './rolling/Moderation'
 import { Guide as PhotozoneGuide } from './photozone/Guide'
+import { Polls } from './poll/Polls'
+import { Live } from './poll/Live'
 import { useAdminAuth } from './useAdminAuth'
 
 /**
@@ -37,6 +39,7 @@ const ADMIN_HOME: Record<ServiceId, string> = {
   rolling: 'messages',
   photozone: 'photozone',
   wish: 'messages',
+  poll: 'polls',
 }
 
 const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
@@ -60,6 +63,12 @@ const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
    * 전용 화면을 만들면 같은 코드가 둘이 되고, 한쪽만 고치는 날이 온다.
    */
   wish: <Route path="messages" element={<Moderation />} />,
+  poll: (
+    <>
+      <Route path="polls" element={<Polls />} />
+      <Route path="live" element={<Live />} />
+    </>
+  ),
 }
 
 /**

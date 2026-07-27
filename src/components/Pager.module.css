@@ -9,7 +9,8 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: var(--space-base) 0;
+  /* 세로가 귀한 화면(소원나무 나무)에서 이 여백이 등불 한 개를 먹는다 — 얇게 */
+  padding: var(--space-sm) 0;
 }
 
 .arrow {

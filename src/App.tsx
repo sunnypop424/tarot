@@ -60,6 +60,9 @@ const PhotozoneApp = lazy(() => import('@/photozone/PhotozoneApp'))
 /** 소원나무 — 롤페와 **데이터는 같고 화면만 다르다** (src/data/wish.ts) */
 const WishApp = lazy(() => import('@/wish/WishApp'))
 
+/** 실시간 투표 — 집계가 실시간으로 흐른다 (별도 청크) */
+const PollApp = lazy(() => import('@/poll/PollApp'))
+
 /**
  * 서비스별 방문자 앱 — **`Record` 라 모든 서비스가 필수다.**
  *
@@ -78,6 +81,7 @@ const SERVICE_APPS: Record<ServiceId, ComponentType | null> = {
   rolling: RollingApp,
   photozone: PhotozoneApp,
   wish: WishApp,
+  poll: PollApp,
 }
 
 /**

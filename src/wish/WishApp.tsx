@@ -118,7 +118,25 @@ interface Placed {
  * 값은 전부 메시지 id 에서 파생한다 — 새로고침해도 자리가 안 바뀌고, 소원이 하나 늘어도
  * 남의 등불이 안 움직인다 (`Math.random()` 을 쓰면 렌더마다 나무가 재배치된다).
  */
+/**
+ * 한 화면에 걸 **목표 개수**와 그에 맞는 **등불 크기**를 함께 정한다.
+ *
+ * 크기를 먼저 정하면(시안의 96~116px) 화면이 짧을 때 개수가 그냥 깎인다 — 카톡 인앱
+ * 브라우저는 위아래를 먹어 가지가 380px 밖에 안 되는데, 그러면 서너 개밖에 안 걸린다.
+ * 반대로 **개수를 먼저 잡고 크기를 역산**하면 어느 기기에서든 비슷한 밀도가 나온다.
+ *
+ * 기준은 시안이다: 390×560 가지에 일곱 개. 넓거나 길면 그만큼 더 건다.
+ * 크기는 78~132px 로 자른다 — 더 작으면 12px 두 줄이 안 들어가고, 더 크면 우스워진다.
+ */
+function planSize(canopyW: number, canopyH: number): { target: number; base: number } {
+  const target = Math.min(26, Math.max(5, Math.round((canopyW / 390) * (canopyH / 520) * 7)))
+  // 화면의 36%(시안 밀도)를 target 개로 나눈 넓이 → 한 등불의 폭 (h = w × 1.09)
+  const base = Math.sqrt((canopyW * canopyH * 0.36) / (target * 1.09))
+  return { target, base: Math.min(Math.max(base, 78), 132) }
+}
+
 function scatter(items: RollingMessage[], canopyW: number, canopyH: number): Placed[] {
+  const { base } = planSize(canopyW, canopyH)
   /**
    * **음수다 — 살짝 겹치는 걸 허용한다.** 시안 모바일도 2·3번 등불이 16px 겹친다.
    * 전혀 안 겹치게 하면 등불 사이가 훤해져 "나무에 걸린" 게 아니라 "칸마다 놓인" 것처럼 보인다.
@@ -134,13 +152,8 @@ function scatter(items: RollingMessage[], canopyW: number, canopyH: number): Pla
      * 높이가 또 달라져서 실제로는 다 달라 보인다. 폭까지 두 값만 쓰면 그 인상이 안 나온다.
      * 세로:가로 비율은 시안의 106/96·126/116(≈1.09)을 따른다.
      */
-    /**
-     * 크기를 **화면 폭에 비례**시킨다. 시안은 390px 폭에 96~116px 이라 폭의 24.6~29.7% 다.
-     * 절대값으로 두면 360px 폰에서 등불이 상대적으로 커져 한 화면에 서너 개밖에 못 건다
-     * (실제로 그랬다). 아주 넓은 화면에서는 커지기만 하면 우스워지므로 위아래로 자른다.
-     */
-    const ratio = 0.246 + seeded(w.id, 13) * 0.051
-    const sw = Math.round(Math.min(Math.max(canopyW * ratio, 84), 132))
+    // 기준 크기에서 ±10% 씩 흩는다 — 시안도 두 종류를 섞어 크기가 제각각으로 보인다
+    const sw = Math.round(base * (0.9 + seeded(w.id, 13) * 0.2))
     // 높이는 CSS 에서 `height` 로 못박힌다 — 여기 값이 곧 실제 크기여야 겹침 판정이 맞는다
     const size = { w: sw, h: Math.round(sw * 1.09) }
     const half = size.w / 2 + 10
@@ -350,12 +363,8 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
    * 뽑아도 안 겹치는 곳이 없어 결국 포개진다. 0.30 은 "화면의 30%만 등불" 이라는 뜻으로,
    * 시안 모바일(390×약600 에 일곱 개)과 비슷한 여백감이다.
    */
-  /**
-   * 0.36 은 **시안의 밀도** 그대로다: 390×600 가지에 96~116px 등불 일곱 개 ≈ 화면의 36%.
-   * 등불 크기도 폭에 비례하므로(`scatter`), 기기가 달라져도 보이는 개수가 비슷하게 유지된다.
-   */
-  const avgW = Math.min(Math.max(canopy.w * 0.271, 84), 132)
-  const perPage = Math.max(3, Math.floor((canopy.w * canopy.h * 0.36) / (avgW * avgW * 1.09)))
+  // 개수와 크기를 함께 정한다 (`planSize`) — 기기가 달라져도 밀도가 비슷하게 유지된다
+  const perPage = planSize(canopy.w, canopy.h).target
   const paged = usePaged(list, perPage)
 
   const placed = useMemo(

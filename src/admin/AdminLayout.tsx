@@ -1,7 +1,9 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   Camera,
+  ClipboardList,
   Lamp,
+  MonitorPlay,
   MessageCircleQuestion,
   ExternalLink,
   LayoutDashboard,
@@ -49,6 +51,11 @@ const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
   photozone: [{ to: 'photozone', label: '포토존', icon: Camera }],
   // 롤페와 같은 화면·같은 경로 — 메뉴 이름만 서비스에 맞춘다
   wish: [{ to: 'messages', label: '소원나무', icon: Lamp }],
+  poll: [
+    { to: 'polls', label: '설문', icon: ClipboardList },
+    // 부스에 세워두는 화면 — 관리 도구가 아니라 손님에게 보여주는 것이다
+    { to: 'live', label: '전광판', icon: MonitorPlay },
+  ],
 }
 
 function navFor(service: ServiceId): NavItem[] {

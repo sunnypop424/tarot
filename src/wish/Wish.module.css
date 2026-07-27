@@ -128,7 +128,24 @@
   position: relative;
   flex: 1;
   margin-top: 6px;
-  min-height: 380px;
+  min-height: 300px;
+}
+
+/**
+ * 세로가 짧은 기기 — 헤더를 붙이고 부제를 접어 **가지에 세로를 몰아준다.**
+ * 카톡·인스타 인앱 브라우저는 위아래로 200px 가까이 먹어서, 여기서 아끼지 않으면
+ * 등불이 서너 개밖에 안 걸린다.
+ */
+@media (max-height: 700px) {
+  .head {
+    padding-top: var(--space-base);
+  }
+  .subtitle {
+    display: none;
+  }
+  .canopy {
+    margin-top: 2px;
+  }
 }
 
 /**
@@ -326,7 +343,7 @@
 /* ── 하단 CTA ── */
 .bottom {
   position: relative;
-  padding: 0 18px 24px;
+  padding: 0 18px 26px;
 }
 .cta {
   width: 100%;
@@ -345,9 +362,21 @@
   cursor: pointer;
   box-shadow: 0 10px 30px rgb(0 0 0 / 0.4);
 }
+/**
+ * **레이아웃에서 뺀다.** 화면이 짧은 기기(카톡 인앱 등)에서는 가지에 남는 세로가 얼마 안 되는데,
+ * 방문자가 거의 안 누르는 링크가 30px 을 차지하면 등불이 한 개 덜 걸린다.
+ * 어차피 "눈에 잘 안 띄게" 두는 링크라 겹쳐 놓아도 방해가 안 된다.
+ */
 .adminRow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
   text-align: center;
-  margin-top: 12px;
+  pointer-events: none;
+}
+.adminRow > * {
+  pointer-events: auto;
 }
 .adminLink {
   display: inline-flex;
