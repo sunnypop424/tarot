@@ -295,11 +295,27 @@ function LuckydrawExtra({
             hint="입력칸·배송 상품 줄 배경"
             onChange={(v) => patchLd({ modalItemBg: v })}
           />
-          <AlphaColor
-            label="테두리색"
-            value={d.modalBorder || draft.theme.colors.border}
-            onChange={(v) => patchLd({ modalBorder: v })}
-          />
+          {!d.modalNoBorder && (
+            <AlphaColor
+              label="테두리색"
+              value={d.modalBorder || draft.theme.colors.border}
+              hint="입력칸·배송 상품 줄·경품 줄 테두리"
+              onChange={(v) => patchLd({ modalBorder: v })}
+            />
+          )}
+          <label
+            className="field"
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+          >
+            <input
+              type="checkbox"
+              checked={d.modalNoBorder}
+              onChange={(e) => patchLd({ modalNoBorder: e.target.checked })}
+            />
+            <span className="field__label" style={{ margin: 0 }}>
+              테두리 없음 (배경색만으로 구분)
+            </span>
+          </label>
         </>
       )
     case 'noBorder':

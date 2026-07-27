@@ -99,6 +99,12 @@ export interface LuckydrawDisplay {
   modalText: string
   modalItemBg: string
   modalBorder: string
+  /**
+   * 모달 테두리를 아예 없앤다 (입력칸·배송 상품 줄·경품 줄의 테두리를 투명하게).
+   * `noBorder`(결과 타일용)와 짝이지만 **모달은 body 로 포털돼 따로 산다** — 그래서 별도 플래그다.
+   * 켜지면 `modalBorder` 색은 무시된다.
+   */
+  modalNoBorder: boolean
 
   /**
    * **타일 테두리를 아예 뺀다.** 결과 타일·요약 줄·수량 칸 같은 상자들의 테두리를
@@ -315,6 +321,7 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   modalText: '',
   modalItemBg: '',
   modalBorder: '',
+  modalNoBorder: false,
   noBorder: false,
   // 비우면 테마 색 / 시안 기본 그림자색으로 폴백
   counterBg: '',
@@ -363,6 +370,7 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
     modalItemBg: saved.modalItemBg ?? DEFAULT_DISPLAY.modalItemBg,
     modalBorder: saved.modalBorder ?? DEFAULT_DISPLAY.modalBorder,
     // false 가 기본이라 ?? 로 살린다 (있는 그대로)
+    modalNoBorder: saved.modalNoBorder ?? DEFAULT_DISPLAY.modalNoBorder,
     noBorder: saved.noBorder ?? DEFAULT_DISPLAY.noBorder,
     counterBg: saved.counterBg ?? DEFAULT_DISPLAY.counterBg,
     counterBorder: saved.counterBorder ?? DEFAULT_DISPLAY.counterBorder,

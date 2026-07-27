@@ -114,7 +114,8 @@ export default function LuckydrawApp() {
     set('--ld-modal-bg', display.modalBg)
     set('--ld-modal-text', display.modalText)
     set('--ld-modal-item', display.modalItemBg)
-    set('--ld-modal-border', display.modalBorder)
+    // 테두리 없음이면 색을 무시하고 투명으로 (비면 CSS 가 테마 border 로 폴백)
+    set('--ld-modal-border', display.modalNoBorder ? 'transparent' : display.modalBorder)
     // 타일 테두리 없애기 — 결과 타일·요약 줄·경품 모달 줄까지 (포털이라 :root 에 실어야 닿는다)
     set('--ld-tile-border', display.noBorder ? 'transparent' : '')
     // 수량 카운터 전용 색 (비우면 CSS 가 테마 색·시안 그림자로 폴백)
@@ -137,6 +138,7 @@ export default function LuckydrawApp() {
     display.modalText,
     display.modalItemBg,
     display.modalBorder,
+    display.modalNoBorder,
     display.noBorder,
     display.counterBg,
     display.counterBorder,
