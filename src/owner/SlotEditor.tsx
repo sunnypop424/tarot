@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Download, Save, Sparkles } from 'lucide-react'
+import { AlertCircle, ArrowLeft, Download, Save, Sparkles } from 'lucide-react'
 
 import defaultThemeJson from '@/data/slot-default.json'
 import { getSlotDeck } from '@/data/slots'
@@ -870,24 +870,68 @@ export function SlotEditor() {
   return (
     // 라이트 — 색을 눈으로 고르는 작업이라 도구는 밝게 고정한다
     <div className="owner">
-      <div className="admin__main">
-        <div className={styles.head}>
-          <div>
-            <Link to="/theme-editor" className={`t-text-xs ${styles.back}`} onClick={guardLeave}>
-              <ArrowLeft size={14} strokeWidth={2} aria-hidden="true" />
-              슬롯 목록
-            </Link>
-            <h1 className="t-title-l">{draft.name}</h1>
-            {/* 저장이 곧 배포인지는 저장소가 정한다 — 화면이 거짓말하면 안 된다 (SlotList 와 같은 기준) */}
-            <p className="t-text-xs t-muted">
-              /{saved.slug} ·{' '}
-              {hasSupabase
-                ? '저장하면 바로 반영돼요 — 방문자가 보는 화면이 곧바로 바뀝니다.'
-                : '저장하면 이 브라우저의 편집분에 반영돼요. 내보낸 slots.json 을 레포에 넣어야 실제로 배포됩니다.'}
-            </p>
+      {/* 시안의 상단 스티키 바 — 뒤로 · 행사명/슬러그 · 저장 상태 · 액션 */}
+      <div className={styles.topbar}>
+        <div className={styles.topbarLeft}>
+          <Link
+            to="/theme-editor"
+            className={styles.backBtn}
+            onClick={guardLeave}
+            aria-label="슬롯 목록"
+          >
+            <ArrowLeft size={15} strokeWidth={2} aria-hidden="true" />
+          </Link>
+          <div style={{ minWidth: 0 }}>
+            <div className={styles.topbarName}>{draft.name}</div>
+            <div className={styles.topbarSlug}>/{saved.slug}</div>
           </div>
         </div>
+        <div className={styles.topbarActions}>
+          {saveError ? (
+            <span className="field__error">{saveError}</span>
+          ) : dirty ? (
+            <span className={styles.dirtyPill}>
+              <AlertCircle size={12} strokeWidth={2.2} aria-hidden="true" />
+              저장 안 됨
+            </span>
+          ) : (
+            <span className="save-state">저장됨</span>
+          )}
+          <a
+            href={`/${saved.slug}/admin`}
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn--sm btn--slight"
+          >
+            주최자 콘솔
+          </a>
+          {dirty && (
+            <button type="button" className="btn btn--sm btn--slight" onClick={handleRevert}>
+              되돌리기
+            </button>
+          )}
+          <button
+            type="button"
+            className="btn btn--sm btn--slight"
+            onClick={() => slots && exportSlots(slots)}
+          >
+            <Download size={16} strokeWidth={2} aria-hidden="true" />
+            {hasSupabase ? '백업' : 'slots.json'}
+          </button>
+          <button
+            type="button"
+            className="btn btn--sm btn--primary"
+            disabled={!dirty}
+            onClick={() => void handleSave()}
+            data-save
+          >
+            <Save size={16} strokeWidth={2} aria-hidden="true" />
+            저장하기
+          </button>
+        </div>
+      </div>
 
+      <div className="admin__main">
         {/* 가로 미리보기는 좁은 칸에 넣으면 글자가 안 읽힌다 — 넓은 화면에선 칸을 키운다 */}
         <div
           className={styles.split}
@@ -929,30 +973,34 @@ export function SlotEditor() {
                   />
                 </div>
                 <div className="field">
-                  <label className="field__label" htmlFor="slot-service">
-                    서비스
-                  </label>
-                  <select
-                    id="slot-service"
-                    className="select"
-                    value={getSlotService(draft)}
-                    onChange={(e) => {
-                      const next = e.target.value as ServiceId
-                      patchSlot({ service: next })
-                      /**
-                       * 럭키드로우로 바꾸면 **중립색을 base-template 값으로 못박는다.**
-                       * 이 색들은 편집기에 없으므로(고를 수 없으므로) 여기서 맞춰두지 않으면
-                       * 다크 테마의 글자색이 밝은 박스 안에 남아 아무것도 안 보인다.
-                       */
-                      if (next === 'luckydraw') applyBase(LUCKYDRAW_NEUTRALS)
-                    }}
-                  >
-                    {SERVICES.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.label}
-                      </option>
-                    ))}
-                  </select>
+                  <span className="field__label">서비스</span>
+                  {/* 세그먼트 토글 (시안) — 고르면 아래 설정 패널이 통째로 바뀐다 */}
+                  <div className={styles.segment} role="radiogroup" aria-label="서비스">
+                    {SERVICES.map((s) => {
+                      const on = getSlotService(draft) === s.id
+                      return (
+                        <button
+                          key={s.id}
+                          type="button"
+                          role="radio"
+                          aria-checked={on}
+                          className={styles.segmentBtn}
+                          data-active={on || undefined}
+                          onClick={() => {
+                            patchSlot({ service: s.id })
+                            /**
+                             * 럭키드로우로 바꾸면 **중립색을 base-template 값으로 못박는다** —
+                             * 이 색들은 편집기에 없어(고를 수 없어) 안 맞춰두면 다크 글자색이
+                             * 밝은 박스 안에 남아 아무것도 안 보인다.
+                             */
+                            if (s.id === 'luckydraw') applyBase(LUCKYDRAW_NEUTRALS)
+                          }}
+                        >
+                          {s.label}
+                        </button>
+                      )
+                    })}
+                  </div>
                   {/* 서비스를 바꾸면 아래 설정 목록 자체가 갈린다 — 그 사실을 여기서 말해준다 */}
                   <span className="field__hint">
                     이 슬롯이 파는 것.{' '}
@@ -1251,11 +1299,14 @@ export function SlotEditor() {
                       string?,
                     ][]
                   ).map(([key, label, hint]) => (
-                    <div key={key} className="field">
-                      <label className="field__label" htmlFor={`rp-${key}`}>
-                        {label}
-                      </label>
-                      <div className="color-field">
+                    <div key={key} className="color-item">
+                      <span className="color-item__text">
+                        <label className="field__label" htmlFor={`rp-${key}`}>
+                          {label}
+                        </label>
+                        {hint && <span className="field__hint">{hint}</span>}
+                      </span>
+                      <div className="color-field color-field--hex">
                         <input
                           type="color"
                           value={rd[key]}
@@ -1269,7 +1320,6 @@ export function SlotEditor() {
                           onChange={(e) => patchRolling({ [key]: e.target.value } as Partial<typeof rd>)}
                         />
                       </div>
-                      {hint && <span className="field__hint">{hint}</span>}
                     </div>
                   ))}
                 </div>
@@ -1377,11 +1427,13 @@ export function SlotEditor() {
                 )}
                 <div className="form-grid">
                   {keys.map((key) => (
-                    <div key={key} className="field">
-                      <label className="field__label" htmlFor={`c-${key}`}>
-                        {COLOR_LABELS[key]}
-                      </label>
-                      <div className="color-field">
+                    <div key={key} className="color-item">
+                      <span className="color-item__text">
+                        <label className="field__label" htmlFor={`c-${key}`}>
+                          {COLOR_LABELS[key]}
+                        </label>
+                      </span>
+                      <div className="color-field color-field--hex">
                         <input
                           type="color"
                           value={draft.theme.colors[key]}
@@ -1814,47 +1866,6 @@ export function SlotEditor() {
             </section>
             )}
 
-            {/* 저장은 편집이 다 끝나는 자리에 — 위에 있으면 뭘 저장하는지 안 보인다 */}
-            <div className={styles.saveBar} data-save-bar>
-              <span
-                className={`save-state ${dirty ? 'save-state--dirty' : ''}`}
-                data-save-state={dirty ? 'dirty' : 'saved'}
-              >
-                {saveError ? (
-                  // 저장이 실패했는데 "저장됨" 이 뜨면 안 된다 — 고친 게 날아간 줄도 모른다
-                  <span className="field__error">{saveError}</span>
-                ) : dirty ? (
-                  '저장하지 않은 수정이 있어요'
-                ) : (
-                  '저장됨'
-                )}
-              </span>
-              <div className={styles.saveBarActions}>
-                {dirty && (
-                  <button type="button" className="btn btn--sm btn--slight" onClick={handleRevert}>
-                    되돌리기
-                  </button>
-                )}
-                <button
-                  type="button"
-                  className="btn btn--sm btn--slight"
-                  onClick={() => slots && exportSlots(slots)}
-                >
-                  <Download size={18} strokeWidth={2} aria-hidden="true" />
-                  {hasSupabase ? '백업 내보내기' : 'slots.json 내보내기'}
-                </button>
-                <button
-                  type="button"
-                  className="btn btn--sm btn--primary"
-                  disabled={!dirty}
-                  onClick={() => void handleSave()}
-                  data-save
-                >
-                  <Save size={18} strokeWidth={2} aria-hidden="true" />
-                  저장하기
-                </button>
-              </div>
-            </div>
           </div>
 
           <div className={styles.previewCol}>

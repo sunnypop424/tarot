@@ -169,7 +169,9 @@ export function SlotList() {
         </div>
 
         <section className="admin-section">
-          <h2 className="t-title-s admin-section__title">새 슬롯</h2>
+          <h2 className="t-title-s admin-section__title" data-accent>
+            새 슬롯
+          </h2>
           <form onSubmit={handleCreate}>
             <div className="form-grid">
               <div className="field">
@@ -279,9 +281,14 @@ export function SlotList() {
                   </span>
 
                   <span className="row-item__grow">
-                    <span className="t-text-m">{s.name}</span>
+                    <span className={styles.slotNameRow}>
+                      <span className="t-text-m">{s.name}</span>
+                      <span className={styles.svcBadge} data-service={getSlotService(s)}>
+                        {serviceLabel(getSlotService(s))}
+                      </span>
+                    </span>
                     <span className={`t-text-xs ${styles.slotMeta}`}>
-                      /{s.slug} · {getPlan(s).label} · {serviceLabel(getSlotService(s))} ·{' '}
+                      /{s.slug} · {getPlan(s).label} ·{' '}
                       {getSlotDeck(s) === 'major' ? '메이저 22장' : '전체 78장'} · {periodLabel(s)}
                     </span>
                     {expired && (
