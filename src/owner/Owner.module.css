@@ -1,5 +1,28 @@
 /* 최고관리자 전용 슬롯 편집기 (목록 + 슬롯 편집) — Supabase 가 설정된 빌드에만 존재한다 */
 
+/**
+ * 슬롯 편집 폼 컬럼 — 섹션을 **그리드 + order** 로 시안 순서·2열로 배치한다.
+ * (JSX 순서를 안 바꾸고 CSS 로 재배치 — 각 섹션이 order·grid-column 을 인라인으로 갖는다.)
+ * 기본값: 전체폭 · order 20(공통 섹션 뒤). 공통 섹션이 낮은 order 로 앞에 온다.
+ */
+.formCol {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-base);
+  align-items: start;
+}
+@media (min-width: 760px) {
+  .formCol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.formCol > * {
+  grid-column: 1 / -1;
+  order: 20;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
 .head {
   display: flex;
   flex-wrap: wrap;

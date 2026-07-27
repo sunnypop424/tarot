@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import {
   AlertCircle,
   ArrowLeft,
+  Calendar,
   Download,
   Image as ImageIcon,
   MessageSquare,
@@ -16,7 +17,7 @@ import {
 
 import defaultThemeJson from '@/data/slot-default.json'
 import { getSlotDeck } from '@/data/slots'
-import { SERVICES, getSlotService, type ServiceId } from '@/data/services'
+import { SERVICES, getSlotService, serviceLabel, type ServiceId } from '@/data/services'
 import { PLANS, getPlan, planById, effectiveLimits, type PlanId } from '@/data/plans'
 import { CATEGORIES } from '@/data/categories'
 import type { DeckRange } from '@/data/cards'
@@ -949,8 +950,8 @@ export function SlotEditor() {
           data-wide-preview={luckydraw || undefined}
           data-preview-big={previewBig || undefined}
         >
-          <div>
-            <section className="admin-section">
+          <div className={styles.formCol}>
+            <section className="admin-section" style={{ order: 1 }}>
               <h2 className="t-title-s admin-section__title">
                 <Settings size={15} strokeWidth={2} aria-hidden="true" />
                 기본
@@ -1029,13 +1030,18 @@ export function SlotEditor() {
               </div>
             </section>
 
+            {/* 공통 설정과 서비스 설정을 가르는 구분선 (시안) — order 로 서비스 카드들 바로 앞에 온다 */}
+            <div className="svc-divider" style={{ order: 10 }}>
+              <span>서비스 설정 · {serviceLabel(getSlotService(draft))}</span>
+            </div>
+
             {/**
              * 색 만들기(AI 생성 + 밝기 프리셋) — **럭키드로우엔 통째로 없다.**
              * 고를 수 있는 색이 넷뿐이라(버튼 2 · 당첨 2) 대표 색에서 한 벌을 만들 것도,
              * 바탕을 밝기 계열로 스왑할 것도 없다. 중립색은 base-template 값으로 붙박이다.
              */}
             {!luckydraw && (
-            <section className="admin-section">
+            <section className="admin-section" style={{ order: 2 }}>
               <h2 className="t-title-s admin-section__title">
                 <Sparkles size={15} strokeWidth={2} aria-hidden="true" />
                 색 만들기
@@ -1220,10 +1226,6 @@ export function SlotEditor() {
              * 색·형태는 위 테마 패널이 이미 정한다 (롤페는 타로처럼 테마를 그대로 쓴다).
              */}
             {rolling && (
-              <>
-              <div className="svc-divider">
-                <span>서비스 설정 · 롤링페이퍼</span>
-              </div>
               <section className="admin-section">
                 <h2 className="t-title-s admin-section__title">
                   <MessageSquare size={15} strokeWidth={2} aria-hidden="true" />
@@ -1419,11 +1421,10 @@ export function SlotEditor() {
                   />
                 </div>
               </section>
-              </>
             )}
 
             {/* 웹앱 아이콘 — 모든 서비스 공통. "홈 화면에 추가" 하면 이 아이콘·행사명으로 앱이 된다 */}
-            <section className="admin-section">
+            <section className="admin-section" style={{ order: 5, gridColumn: 'span 1' }}>
               <h2 className="t-title-s admin-section__title">
                 <Smartphone size={15} strokeWidth={2} aria-hidden="true" />
                 웹앱 아이콘
@@ -1447,7 +1448,7 @@ export function SlotEditor() {
             {COLOR_GROUPS.filter((g) =>
               g.services.includes(getSlotService(draft))
             ).map(({ title, keys, hint }) => (
-              <section key={title} className="admin-section">
+              <section key={title} className="admin-section" style={{ order: 6 }}>
                 <h2 className="t-title-s admin-section__title">
                   <Palette size={15} strokeWidth={2} aria-hidden="true" />
                   {title}
@@ -1487,7 +1488,7 @@ export function SlotEditor() {
 
             {/* 럭키드로우는 박스·버튼 카드 안에서 각각 고친다 — 여기 두면 같은 값이 두 군데 뜬다 */}
             {!luckydraw && (
-            <section className="admin-section">
+            <section className="admin-section" style={{ order: 7 }}>
               <h2 className="t-title-s admin-section__title">
                 <Square size={15} strokeWidth={2} aria-hidden="true" />
                 형태 (radius)
@@ -1868,8 +1869,11 @@ export function SlotEditor() {
             )}
 
 
-            <section className="admin-section">
-              <h2 className="t-title-s admin-section__title">기간</h2>
+            <section className="admin-section" style={{ order: 4, gridColumn: 'span 1' }}>
+              <h2 className="t-title-s admin-section__title">
+                <Calendar size={15} strokeWidth={2} aria-hidden="true" />
+                기간
+              </h2>
               <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
                 {/* 지금 상태를 먼저 말한다 — 날짜만 보고 오늘이 그 안인지 세게 하지 않는다 */}
                 지금 이 슬롯은 <b>{periodLabel(draft)}</b> 상태예요. 두 기간 중 하나라도 오늘을 품으면
@@ -1908,7 +1912,9 @@ export function SlotEditor() {
              * localStorage 로 흉내 내면 "만들었다" 고 해놓고 아무도 로그인하지 못한다.
              */}
             {repo.organizers.ready() && (
-              <OrganizerPanel slot={saved} slugPending={draft.slug !== saved.slug} />
+              <div style={{ order: 3 }}>
+                <OrganizerPanel slot={saved} slugPending={draft.slug !== saved.slug} />
+              </div>
             )}
 
             {/* 카테고리별 뽑기 설정 — 럭키드로우·롤링페이퍼엔 카테고리도 카드도 없다 */}
