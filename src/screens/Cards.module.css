@@ -11,6 +11,13 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-base) var(--space-md);
 }
+/* 넓은 화면(패드·태블릿·PC) — 카드 폭(~110px) 기준으로 열을 자동으로 늘린다 */
+@media (min-width: 720px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: var(--space-lg) var(--space-base);
+  }
+}
 
 /**
  * width:100% 가 없으면 버튼이 라벨 길이에 맞춰 줄어들고, 카드가 그 폭을 따라가

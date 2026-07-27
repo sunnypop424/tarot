@@ -47,6 +47,14 @@
   flex-direction: column;
   gap: var(--space-xl);
 }
+/* 넓은 화면 — 리딩은 순서가 곧 흐름이라 세로로 두되, 읽기 좋은 폭으로 가운데 모은다 */
+@media (min-width: 720px) {
+  .readings {
+    max-width: 620px;
+    margin-inline: auto;
+    width: 100%;
+  }
+}
 
 /* ── 아직 안 뽑은 상태 ────────────────────────────── */
 .empty {
@@ -80,6 +88,14 @@
   flex-direction: column;
   gap: var(--space-sm);
   margin-top: var(--space-lg);
+}
+/* 넓은 화면 — 애정·금전·직업 요약을 가로 3열로 */
+@media (min-width: 720px) {
+  .summaries {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-md);
+  }
 }
 
 .summary {

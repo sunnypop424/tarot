@@ -6,6 +6,19 @@
   gap: var(--space-xl);
   padding-bottom: var(--space-lg);
 }
+/* 넓은 화면 — 답 해석은 읽기 좋은 폭으로 가운데 (과하게 늘어지지 않게) */
+@media (min-width: 720px) {
+  .results {
+    max-width: 620px;
+    margin-inline: auto;
+    width: 100%;
+  }
+  .actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
 
 .result {
   display: flex;

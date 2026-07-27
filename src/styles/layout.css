@@ -62,6 +62,22 @@
   padding: var(--space-lg) var(--layout-pad) 0;
 }
 
+/**
+ * 넓은 화면(패드·태블릿·PC) 대응 — 콘텐츠를 가운데로 모으고 폭을 키운다.
+ * 폰은 그대로 100%. 도감 그리드·리딩 열은 각 화면에서 이 폭을 채운다.
+ */
+@media (min-width: 720px) {
+  .screen {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+}
+@media (min-width: 1080px) {
+  .screen {
+    max-width: 960px;
+  }
+}
+
 .screen__title {
   margin-bottom: var(--space-xs);
 }
@@ -95,6 +111,12 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-md);
+}
+/* 넓은 화면에선 열을 더 — 주제 카드 등이 큼직하게 늘어지지 않게 */
+@media (min-width: 720px) {
+  .grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
 }
 
 /* 가로 스크롤 레일 — 화면 좌우 패딩을 넘어 끝까지 흐르게 */
@@ -130,10 +152,16 @@
   display: flex;
   width: 100%;
   max-width: var(--layout-max);
+  /* 넓은 화면에선 콘텐츠 폭에 맞춰 탭바도 넓힌다 (아래 미디어쿼리) */
   height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   background: var(--color-surface);
   box-shadow: 0 -1px 0 0 var(--color-border);
+}
+@media (min-width: 720px) {
+  .tabbar {
+    max-width: 620px;
+  }
 }
 
 .tabbar__item {
