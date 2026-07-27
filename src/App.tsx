@@ -6,6 +6,7 @@ import { SlotProvider, useSlotState } from '@/slot/SlotProvider'
 import { getSlotService } from '@/data/services'
 import { QuestionsProvider } from '@/lib/questions'
 import { TabBar } from '@/components/TabBar'
+import { TopNav } from '@/components/TopNav'
 import { Home } from '@/screens/Home'
 import { Fortune } from '@/screens/Fortune'
 import { Draw } from '@/screens/Draw'
@@ -78,6 +79,9 @@ function SlotLayout() {
   return (
     <QuestionsProvider>
       <div className="app">
+        {/* 데스크톱: 상단 네비 (모바일에선 CSS 로 숨김) */}
+        <TopNav />
+        {/* 모바일: 헤더 책 아이콘 → 도감 (데스크톱에선 CSS 로 숨김, 상단 네비에 있음) */}
         <header className="app__header">
           <button
             type="button"

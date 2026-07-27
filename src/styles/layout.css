@@ -63,18 +63,86 @@
 }
 
 /**
- * 넓은 화면(패드·태블릿·PC) 대응 — 콘텐츠를 가운데로 모으고 폭을 키운다.
- * 폰은 그대로 100%. 도감 그리드·리딩 열은 각 화면에서 이 폭을 채운다.
+ * 넓은 화면(패드·태블릿·PC) 대응 — **테마 배경은 그대로 풀블리드**로 두고, 콘텐츠 배치만 바꾼다.
+ * 카드 패널로 감싸지 않는다 (몰입형 색감 유지). 가운데로 모으고 폭만 키운다 —
+ * 도감 그리드·주제 그리드·리딩 컬럼은 각 화면에서 이 폭을 채운다.
  */
 @media (min-width: 720px) {
   .screen {
-    max-width: 720px;
+    max-width: 760px;
     margin-inline: auto;
   }
 }
 @media (min-width: 1080px) {
   .screen {
+    max-width: 980px;
+  }
+}
+
+/* ── 데스크톱 상단 네비게이션 (넓은 화면 전용) ── */
+.topnav {
+  display: none;
+}
+@media (min-width: 720px) {
+  .topnav {
+    display: block;
+    flex-shrink: 0;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .topnav__inner {
     max-width: 960px;
+    margin: 0 auto;
+    height: 62px;
+    padding: 0 var(--layout-pad);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+  }
+  .topnav__brand {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+  }
+  .topnav__links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .topnav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--radius-full);
+    color: var(--color-fg-2);
+    font-size: var(--text-s);
+    font-weight: var(--weight-bold);
+    text-decoration: none;
+    transition: background var(--dur-micro) var(--ease), color var(--dur-micro) var(--ease);
+  }
+  .topnav__link:hover {
+    background: var(--color-wash);
+    color: var(--color-fg-1);
+  }
+  .topnav__link.active {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  /* 모바일 전용 요소는 넓은 화면에서 감춘다 (상단 네비로 대신) */
+  .app__header {
+    display: none;
+  }
+  .tabbar {
+    display: none;
+  }
+  /* 하단 탭바가 없으니 스크롤 하단 여백도 뺀다 */
+  .app__scroll {
+    padding-bottom: 0;
   }
 }
 
@@ -158,9 +226,10 @@
   background: var(--color-surface);
   box-shadow: 0 -1px 0 0 var(--color-border);
 }
+/* 넓은 화면 — 하단 탭바 대신 상단 네비를 쓴다 (탭바 기본 정의 뒤라 이 규칙이 이긴다) */
 @media (min-width: 720px) {
   .tabbar {
-    max-width: 620px;
+    display: none;
   }
 }
 
