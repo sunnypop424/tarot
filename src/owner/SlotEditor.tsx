@@ -411,28 +411,29 @@ const COLOR_GROUPS: {
   title: string
   keys: (keyof ThemeColors)[]
   hint?: string
-  /** 타로에서만 쓰이는 색 — 럭키드로우 슬롯에선 안 보인다 */
-  tarotOnly?: boolean
-  /** 럭키드로우에서만 쓰이는 색 — 타로 슬롯에선 안 보인다 */
-  luckydrawOnly?: boolean
+  /**
+   * 이 색 그룹을 보여줄 서비스 — 서비스가 늘면 여기 배열만 손댄다.
+   * 럭키드로우는 중립색이 붙박이라(LUCKYDRAW_NEUTRALS) 어느 그룹에도 안 낀다.
+   * 롤페는 타로 테마 토큰을 그대로 쓰되(배경·표면·CTA·포인트·텍스트), 카드가 없어 뒷면만 뺀다.
+   */
+  services: ServiceId[]
 }[] = [
-  // 럭키드로우는 중립색이 붙박이라(LUCKYDRAW_NEUTRALS) 이 그룹이 통째로 없다
-  { title: '배경 · 표면', keys: ['canvas', 'surface', 'surfaceRaised', 'wash'], tarotOnly: true },
+  { title: '배경 · 표면', keys: ['canvas', 'surface', 'surfaceRaised', 'wash'], services: ['tarot', 'rolling'] },
   {
     title: '인터랙션 (CTA · 활성)',
     keys: ['primary', 'primaryHover', 'onPrimary'],
     hint: '칩 · 보조버튼 글자색은 배경 밝기에 맞춰 자동 계산돼요.',
-    tarotOnly: true,
+    services: ['tarot', 'rolling'],
   },
   {
     title: '포인트 (카드 테두리 · 별 문양)',
     keys: ['accent'],
     hint: '어두운 카드 위 장식 기준으로 고르세요. 표면 위 아이콘·글자에 쓰일 색은 표면 밝기에 맞춰 자동 계산돼요.',
-    tarotOnly: true,
+    services: ['tarot', 'rolling'],
   },
-  { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'], tarotOnly: true },
-  // 럭키드로우엔 카드가 없다 — 그 슬롯에선 이 그룹을 통째로 감춘다
-  { title: '카드 뒷면 (내장 SVG용)', keys: ['cardBackFrom', 'cardBackTo'], tarotOnly: true },
+  { title: '텍스트 · 보더', keys: ['fg1', 'fg2', 'fg3', 'border', 'borderHover'], services: ['tarot', 'rolling'] },
+  // 뒷면은 내장 SVG 카드 전용이라 타로에만 — 롤페엔 카드가 없다
+  { title: '카드 뒷면 (내장 SVG용)', keys: ['cardBackFrom', 'cardBackTo'], services: ['tarot'] },
 ]
 
 // primarySoft·accentSoft 는 자동 파생이라 편집기에 노출하지 않는다 → Partial
@@ -1231,7 +1232,7 @@ export function SlotEditor() {
             )}
 
             {COLOR_GROUPS.filter((g) =>
-              luckydraw ? !g.tarotOnly : !g.luckydrawOnly
+              g.services.includes(getSlotService(draft))
             ).map(({ title, keys, hint }) => (
               <section key={title} className="admin-section">
                 <h2 className="t-title-s admin-section__title">{title}</h2>
