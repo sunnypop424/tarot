@@ -72,7 +72,8 @@ export const PREVIEW_SCREENS: Record<ServiceId, PreviewScreen[]> = {
     { state: 'drawing', label: '뽑는 중' },
     { state: 'result', label: '결과' },
     { state: 'locker', label: '보관함' },
-    { state: 'ticket', label: '뽑기권' },
+    { state: 'ticketIntro', label: '뽑기권 받기' },
+    { state: 'ticket', label: '뽑기권 (발급 후)' },
     { state: 'staff', label: '스태프 화면', path: '/staff' },
   ],
 }

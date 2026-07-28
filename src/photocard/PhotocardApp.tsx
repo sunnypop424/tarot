@@ -49,6 +49,8 @@ export default function PhotocardApp() {
 }
 
 type View = 'deck' | 'drawing' | 'result' | 'locker' | 'ticket'
+/** 미리보기는 뽑기권을 **받기 전/후** 를 따로 고른다 — 화면이 아예 다르다 */
+type PreviewView = View | 'ticketIntro'
 
 /**
  * 편집기 미리보기용 **표본** — 미리보기에서는 진짜로 뽑을 수 없다(재고가 준다).
@@ -97,7 +99,7 @@ function Photocard({ slot }: { slot: Slot }) {
    * (`src/owner/previewScreens.ts`). 미리보기에서 진짜로 뽑을 수는 없다.
    */
   const preview = useLivePreview()
-  const pinned = (preview?.state as View | undefined) ?? null
+  const pinned = (preview?.state as PreviewView | undefined) ?? null
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -110,7 +112,7 @@ function Photocard({ slot }: { slot: Slot }) {
    * 덱·결과·보관함을 보려면 save 여야 한다. 실제 방문자에겐 언제나 주최자 설정이다.
    */
   const rules = pinned
-    ? photocardRules(pinned === 'ticket' ? 'gift' : 'save')
+    ? photocardRules(pinned === 'ticket' || pinned === 'ticketIntro' ? 'gift' : 'save')
     : settings
       ? photocardRules(settings.mode)
       : null
@@ -323,8 +325,8 @@ function Photocard({ slot }: { slot: Slot }) {
         )}
         {at === 'drawing' && (
           <div className={styles.drawing}>
-            <div className={styles.spinCard}>
-              <Sparkles size={34} strokeWidth={1.6} aria-hidden="true" />
+            <div className={styles.spinCard} data-image={display.cardBack ? '' : undefined}>
+              {!display.cardBack && <Sparkles size={34} strokeWidth={1.6} aria-hidden="true" />}
               <div className={styles.shine} aria-hidden="true" />
             </div>
             <div className={styles.drawingText}>카드를 뽑는 중…</div>
@@ -797,8 +799,13 @@ function TicketIntro({
       </header>
 
       <div className={styles.center}>
-        <div className={styles.ticketArt}>
-          <Ticket size={38} strokeWidth={1.6} aria-hidden="true" />
+        {/*
+          * 뽑기권 화면의 카드 그림 — **덱 뒷면을 그대로 쓴다.** 손님이 카운터에서 받게 될
+          * 그 카드의 뒷모습이라, 아이콘보다 이쪽이 "무엇을 받는지" 를 말해준다.
+          * 뒷면을 안 올린 슬롯은 지금처럼 아이콘.
+          */}
+        <div className={styles.ticketArt} data-image={display.cardBack ? '' : undefined}>
+          {!display.cardBack && <Ticket size={38} strokeWidth={1.6} aria-hidden="true" />}
         </div>
         <div className={styles.ticketHead}>{display.ticketHeadline}</div>
         <p className={styles.ticketBody}>{display.ticketGuide}</p>

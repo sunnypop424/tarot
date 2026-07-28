@@ -238,12 +238,25 @@
   justify-content: center;
   color: rgba(255, 255, 255, 0.35);
 }
+/* 뒷면을 올렸으면 뽑는 중에도 그 카드가 돈다 — 반짝임(shine)은 그 위를 그대로 지나간다 */
+.spinCard[data-image] {
+  background:
+    var(--pc-backImage, none) center / cover no-repeat,
+    linear-gradient(150deg, color-mix(in srgb, var(--pc-deckGlow) 88%, #ffffff 8%), var(--pc-deckBg));
+}
+
+/*
+ * 카드를 훑고 지나가는 빛 — **대각선**이다. 세로 띠로 두면 "빛" 이 아니라 화면 결함처럼 보인다.
+ * 기울인 만큼 위아래가 모자라니 카드 밖으로 넉넉히 빼 둔다(`inset` 음수) — 안 그러면
+ * 띠의 양 끝이 카드 안에서 잘려 사선이 뭉툭해진다.
+ */
 .shine {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: -30%;
+  bottom: -30%;
   width: 70px;
   background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: rotate(18deg);
   animation: pcShine 1.6s linear infinite;
 }
 .drawingText {
@@ -497,6 +510,13 @@
   box-shadow: 0 16px 40px rgba(20, 20, 20, 0.14);
   border: 1px solid var(--pc-line);
 }
+/* 뒷면을 올린 슬롯은 그 그림이 카드 자리에 들어간다 (`--pc-backImage` 는 덱과 같은 값) */
+.ticketArt[data-image] {
+  background:
+    var(--pc-backImage, none) center / cover no-repeat,
+    linear-gradient(150deg, var(--pc-wash), var(--pc-line));
+}
+
 .ticketHead {
   margin-top: 26px;
   font-size: 19px;
@@ -712,11 +732,12 @@
   }
 }
 @keyframes pcShine {
+  /* 기울기를 유지한 채 가로지른다 — rotate 를 빼면 애니메이션이 기울기를 덮어써서 다시 세로가 된다 */
   0% {
-    transform: translateX(-120%);
+    transform: translateX(-160%) rotate(18deg);
   }
   100% {
-    transform: translateX(220%);
+    transform: translateX(260%) rotate(18deg);
   }
 }
 @keyframes pcPulse {
