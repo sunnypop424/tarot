@@ -156,7 +156,7 @@ export default function Landing() {
       {/* ── 상단 바 ── */}
       <div className={styles.nav}>
         <div className={styles.navInner}>
-          <span className={styles.brand}>슬롯</span>
+          <span className={styles.brand}>OLUCKY!</span>
           <div className={styles.navLinks}>
             <a className={styles.navLink} href="#services">
               서비스
@@ -575,7 +575,7 @@ export default function Landing() {
 
       <div className={styles.footer}>
         <div className={styles.footerInner}>
-          <span className={styles.brand}>슬롯</span>
+          <span className={styles.brand}>OLUCKY!</span>
           <span className={styles.footerNote}>이벤트 하나에 페이지 하나. 준비는 우리가, 운영은 주최자가.</span>
         </div>
       </div>

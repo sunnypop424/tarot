@@ -106,7 +106,7 @@ export function SlotProvider({ children }: { children: ReactNode }) {
 
   /**
    * 브라우저 탭 제목을 **행사명**으로 — 방문자가 홈 화면에 추가하면 이 이름이 앱 이름이 된다.
-   * index.html 의 정적 '서비스 빌더' 는 슬롯 밖(배포 루트·편집기)에서만 쓰이고,
+   * index.html 의 정적 'OLUCKY!' 는 슬롯 밖(배포 루트·편집기)에서만 쓰이고,
    * 슬롯을 벗어나면 되돌린다 (다른 슬롯의 이름이 남아 있으면 안 된다).
    */
   useEffect(() => {

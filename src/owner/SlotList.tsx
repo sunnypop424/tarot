@@ -298,7 +298,7 @@ export function SlotList() {
           >
             <LayoutGrid size={13} strokeWidth={2.2} color="#fff" aria-hidden="true" />
           </div>
-          <span style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.01em' }}>서비스 빌더</span>
+          <span style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.01em' }}>OLUCKY!</span>
           <span
             style={{ fontSize: 11.5, color: INK3, borderLeft: `1px solid ${BORDER}`, paddingLeft: 9, marginLeft: 2 }}
           >

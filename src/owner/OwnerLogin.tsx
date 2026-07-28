@@ -46,7 +46,7 @@ export function OwnerLogin() {
       <div className={styles.wrap}>
         <form className={styles.card} onSubmit={handleSubmit} data-owner-login>
           <div className={styles.head}>
-            <h1 className="t-title-l">서비스 빌더</h1>
+            <h1 className="t-title-l">OLUCKY!</h1>
             <p className="t-text-xs t-muted">최고관리자 · 슬롯 편집기</p>
           </div>
 

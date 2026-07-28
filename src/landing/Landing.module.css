@@ -135,7 +135,8 @@
 .brand {
   font-size: 17px;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  /* 라틴 브랜드명이라 한글 기준의 음수 자간을 쓰면 글자가 붙는다 */
+  letter-spacing: 0.01em;
   color: var(--fg);
 }
 .navLinks {
