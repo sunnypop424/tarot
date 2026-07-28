@@ -599,7 +599,7 @@ function stableStringify(value: unknown): string {
  * 미리보기 기기 — **어느 서비스든 고를 수 있다.**
  *
  * 예전엔 럭키드로우만 아이패드를 골랐다. 그런데 부스에 세워두는 화면은 럭드만이 아니다 —
- * 포토카드 스태프 기기·투표 전광판도 태블릿이고, 손님 폰으로 여는 화면도 기기마다 다르다.
+ * 포토카드 스태프 기기·투표 스크린도 태블릿이고, 손님 폰으로 여는 화면도 기기마다 다르다.
  * 실제로 쓸 기기로 맞춰 봐야 여백·글자 크기가 어긋나지 않는다.
  */
 const DEVICES = [
@@ -627,7 +627,7 @@ const DEFAULT_DEVICE: Record<ServiceId, DeviceId> = {
   rolling: 'phone',
   wish: 'phone',
   photozone: 'phone',
-  // 전광판이 태블릿이다 (방문자 투표는 폰이라 바꿔 볼 수 있어야 한다)
+  // 스크린이 태블릿이다 (방문자 투표는 폰이라 바꿔 볼 수 있어야 한다)
   poll: 'pad-air',
   stamp: 'phone',
   quiz: 'phone',

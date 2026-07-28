@@ -397,7 +397,7 @@ export interface RollingRepo {
   remove(slug: string, id: string): Promise<void>
   /**
    * 벽 실시간 — 다른 기기·탭이 남기면 그 자리에서 알려준다 (되돌리는 함수를 준다).
-   * 부스 태블릿을 벽 전용으로 띄우면 전광판이 된다. **무엇이 바뀌었는지는 안 본다** —
+   * 부스 태블릿을 벽 전용으로 띄우면 스크린이 된다. **무엇이 바뀌었는지는 안 본다** —
    * 바뀌었다는 신호만 받고 화면이 다시 읽는다 (`LuckydrawRepo.watch` 와 같은 이유).
    */
   watch(slug: string, onChange: () => void): () => void

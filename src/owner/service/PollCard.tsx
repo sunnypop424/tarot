@@ -99,7 +99,7 @@ export function PollCard({
             ['subText', '서브 글자색', '안내 · 표 수'],
             ['bg', '배경색'],
             ['buttonColor', '버튼색', '투표하기'],
-            ['barColor', '막대색', '결과가 차오르는 색 · 전광판도 같이'],
+            ['barColor', '막대색', '결과가 차오르는 색 · 스크린도 같이'],
           ] as ['headText' | 'subText' | 'bg' | 'buttonColor' | 'barColor', string, string?][]
         ).map(([key, label, hint]) => (
           <SwatchColor

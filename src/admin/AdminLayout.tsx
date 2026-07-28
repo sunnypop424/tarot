@@ -37,7 +37,7 @@ interface NavItem {
   to: string
   label: string
   icon: LucideIcon
-  /** 관리 셸 밖으로 나가는 화면 — 새 탭으로 연다 (스태프 기기·전광판 같은 현장 화면) */
+  /** 관리 셸 밖으로 나가는 화면 — 새 탭으로 연다 (스태프 기기·스크린 같은 현장 화면) */
   external?: boolean
 }
 
@@ -79,7 +79,7 @@ const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
   poll: [
     { to: 'polls', label: '설문', icon: ClipboardList },
     // 부스에 세워두는 화면 — 관리 도구가 아니라 손님에게 보여주는 것이다
-    { to: 'live', label: '전광판', icon: MonitorPlay },
+    { to: 'live', label: '스크린', icon: MonitorPlay },
   ],
   // 보상 메뉴(수령확인·추첨·응모자)는 여기 없다 — 아래 REWARD_NAV 가 설정값으로 붙인다
   stamp: [{ to: 'stamp', label: '스탬프', icon: Stamp }],

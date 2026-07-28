@@ -229,7 +229,7 @@ const SHORTCUTS: Record<ServiceId, Shortcut[]> = {
   photozone: [{ to: 'photozone', label: '안내' }],
   poll: [
     { to: 'polls', label: '설문 관리' },
-    { to: 'live', label: '전광판', external: false },
+    { to: 'live', label: '스크린', external: false },
   ],
   stamp: [
     { to: 'stamp', label: '스탬프 설정' },

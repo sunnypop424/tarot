@@ -58,7 +58,7 @@ export const SERVICE_FORM: Record<ServiceId, { name: string; lines: string[] }> 
   rolling: {
     name: '롤링페이퍼',
     lines: [
-      '벽(전광판) 사용 여부와 기기:',
+      '벽(스크린) 사용 여부와 기기:',
       '쪽지 색·글씨체 희망:',
       '스티커 이미지 (있다면 오픈채팅으로 전달):',
       '공개 전 검수 여부 (켜면 승인한 쪽지만 벽에 붙습니다):',
@@ -71,7 +71,7 @@ export const SERVICE_FORM: Record<ServiceId, { name: string; lines: string[] }> 
       '등불 색 희망:',
       '매다는 장식 이미지 (있다면 오픈채팅으로 전달):',
       '공개 전 검수 여부:',
-      '전광판 사용 여부와 기기:',
+      '스크린 사용 여부와 기기:',
     ],
   },
   photozone: {
@@ -102,7 +102,7 @@ export const SERVICE_FORM: Record<ServiceId, { name: string; lines: string[] }> 
       '결과 공개 방식 (실시간 / 투표 후 / 마감 후):',
       '득표 수 표시 여부:',
       '결과 모양 (막대 / 하트):',
-      '현황 화면(전광판) 사용 여부와 기기:',
+      '현황 화면(스크린) 사용 여부와 기기:',
       '※ 문항과 보기는 운영 전 관리자 페이지에서 직접 등록해 주시면 됩니다.',
     ],
   },

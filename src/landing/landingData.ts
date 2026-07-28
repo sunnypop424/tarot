@@ -17,7 +17,7 @@ export interface DemoDevice {
 export const DEVICES = {
   phone: { label: '방문자 폰', w: 390, h: 844, radius: 42 },
   tablet: { label: '스태프 태블릿', w: 1194, h: 834, radius: 26 },
-  board: { label: '현장 전광판', w: 1194, h: 834, radius: 22 },
+  board: { label: '현장 스크린', w: 1194, h: 834, radius: 22 },
   screen: { label: '상영 화면', w: 1280, h: 720, radius: 12 },
 } satisfies Record<string, DemoDevice>
 
@@ -58,7 +58,7 @@ export interface LandingService {
  *
  * **여러 기기를 쓰는 서비스는 화면을 여러 개 든다:**
  *  · 영상회 — 손님 폰 + 상영 화면(투명 오버레이)
- *  · 롤페·소원나무 — 전광판(벽·나무) + 손님 폰(작성)
+ *  · 롤페·소원나무 — 스크린(벽·나무) + 손님 폰(작성)
  * 나머지는 화면 하나다. 스태프 화면(포토카드·스탬프·모의고사)은 **로그인 뒤에 있어** 못 싣는다 —
  * 랜딩에 걸면 손님이 잠긴 화면을 본다.
  */
@@ -98,7 +98,7 @@ export const SERVICES: LandingService[] = [
     key: 'rolling',
     name: '롤링페이퍼',
     desc: '방문자가 응원 메시지를 남기면 벽에 붙습니다.',
-    deviceNote: '전광판 + 방문자 폰',
+    deviceNote: '스크린 + 방문자 폰',
     group: 1,
     screens: [
       { label: '벽', device: 'board', variants: [{ label: '벽', path: '/demo-rolling' }] },
@@ -109,7 +109,7 @@ export const SERVICES: LandingService[] = [
     key: 'wish',
     name: '소원 나무',
     desc: '소원을 적어 등불로 매답니다. 밤하늘 버전 롤링페이퍼.',
-    deviceNote: '전광판 + 방문자 폰',
+    deviceNote: '스크린 + 방문자 폰',
     group: 1,
     screens: [
       { label: '나무', device: 'board', variants: [{ label: '나무', path: '/demo-wish' }] },
@@ -148,7 +148,7 @@ export const SERVICES: LandingService[] = [
     key: 'poll',
     name: '실시간 투표',
     desc: '즉석 투표. 결과가 그 자리에서 차오릅니다.',
-    deviceNote: '방문자 폰 · 전광판',
+    deviceNote: '방문자 폰 · 스크린',
     group: 2,
     screens: [{ label: '방문자', device: 'phone', variants: [{ label: '방문자', path: '/demo-poll' }] }],
   },
@@ -179,7 +179,7 @@ export const GROUPS = [
 export const HERO_FACTS = [
   { k: '설치', v: '앱 없이 브라우저에서' },
   { k: '주소', v: '행사 하나에 하나' },
-  { k: '기기', v: '폰 · 태블릿 · 전광판' },
+  { k: '기기', v: '폰 · 태블릿 · 스크린' },
   { k: '기간', v: '행사 기간 동안만' },
 ]
 
