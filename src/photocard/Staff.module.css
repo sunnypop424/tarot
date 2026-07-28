@@ -95,13 +95,9 @@
   align-items: center;
   justify-content: center;
   gap: 18px;
-  /*
-   * **단색이다** — 럭드와 같은 결로 맞춘다.
-   * 방사형 그라데이션을 깔았더니 같은 화면 안에서 왼쪽만 다른 세계처럼 보였고, 슬롯이 고른
-   * 색이 세 겹(deckBg·deckGlow·deep)으로 섞여 실제로 무슨 색인지 알 수 없었다.
-   * 카드가 주인공이니 배경은 조용해야 한다.
-   */
+  /* 손님 폰의 덱 화면과 같은 빛번짐 — 두 화면이 한 이벤트로 보여야 한다 */
   background: var(--pc-deckBg);
+  background-image: radial-gradient(90% 60% at 50% 45%, var(--pc-deckGlow) 0%, var(--pc-deckBg) 62%, var(--pc-deckDeep) 100%);
   padding: 34px 24px;
   min-height: 320px;
   position: relative;

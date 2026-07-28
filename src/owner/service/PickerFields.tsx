@@ -45,7 +45,12 @@ export function PickerFields({
               min={0}
               max={40}
               value={value.radius ?? 16}
-              onChange={(e) => set({ radius: Math.min(40, Math.max(0, Number(e.target.value) || 0)) })}
+              /*
+               * **상한은 손을 뗄 때만 건다.** 타이핑 중에 걸면 "16" 뒤에 한 자를 더 치는 순간
+               * 162 가 되어 40 으로 튀고, 화면엔 "고쳐지지 않는다" 로 보인다.
+               */
+              onChange={(e) => set({ radius: Math.max(0, Number(e.target.value) || 0) })}
+              onBlur={(e) => set({ radius: Math.min(40, Math.max(0, Number(e.target.value) || 0)) })}
               style={{ ...CSS.input, flex: 1, minWidth: 0 }}
               aria-label="모서리 둥글기"
               data-picker-radius

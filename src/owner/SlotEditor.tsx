@@ -368,7 +368,9 @@ function LuckydrawExtra({
               min={0}
               max={40}
               value={p.radius ?? 16}
-              onChange={(e) => setPicker({ radius: Math.min(40, Math.max(0, Number(e.target.value) || 0)) })}
+              /* 상한은 손을 뗄 때만 — 타이핑 중에 걸면 자릿수가 늘 때마다 40 으로 튄다 */
+              onChange={(e) => setPicker({ radius: Math.max(0, Number(e.target.value) || 0) })}
+              onBlur={(e) => setPicker({ radius: Math.min(40, Math.max(0, Number(e.target.value) || 0)) })}
               data-picker-radius
             />
             <span className="field__hint">0 이면 각진 사각형이에요 (px).</span>
