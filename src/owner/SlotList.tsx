@@ -242,8 +242,29 @@ export function SlotList() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q || !slots) return slots ?? []
-    return slots.filter((s) => s.name.toLowerCase().includes(q) || s.slug.toLowerCase().includes(q))
+    return slots.filter(
+      (s) =>
+        s.name.toLowerCase().includes(q) ||
+        s.slug.toLowerCase().includes(q) ||
+        (s.group ?? '').toLowerCase().includes(q)
+    )
   }, [slots, query])
+
+  /**
+   * 묶음별로 갈라 놓는다 — **한 행사가 슬롯 여러 개를 쓴다**(포토카드 + 스탬프 + 모의고사).
+   * 묶음이 없는 슬롯은 맨 아래 한 덩어리로 (묶음을 안 쓰는 사람에겐 지금과 똑같이 보인다).
+   */
+  const groups = useMemo(() => {
+    const map = new Map<string, Slot[]>()
+    for (const s of filtered) {
+      const key = s.group?.trim() || ''
+      const list = map.get(key)
+      if (list) list.push(s)
+      else map.set(key, [s])
+    }
+    return [...map.entries()]
+      .sort((a, b) => (a[0] === '' ? 1 : b[0] === '' ? -1 : a[0].localeCompare(b[0], 'ko')))
+  }, [filtered])
 
   return (
     <div className="owner" style={{ minHeight: '100vh', background: '#f7f7f7', color: INK }}>
@@ -522,7 +543,26 @@ export function SlotList() {
           </div>
         ) : (
           <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 8, overflow: 'hidden' }} data-slot-list>
-            {filtered.map((s) => {
+            {groups.map(([groupName, rows]) => (
+              <div key={groupName || '__none'} data-group={groupName || undefined}>
+                {/* 묶음이 하나도 없으면 제목 줄을 아예 안 그린다 — 안 쓰는 사람에겐 예전 그대로 */}
+                {groups.length > 1 && (
+                  <div
+                    style={{
+                      padding: '9px 16px',
+                      background: '#fafafa',
+                      borderBottom: `1px solid ${BORDER}`,
+                      fontSize: 11.5,
+                      fontWeight: 700,
+                      color: groupName ? INK2 : INK3,
+                      letterSpacing: '0.01em',
+                    }}
+                  >
+                    {groupName || '묶음 없음'}
+                    <span style={{ color: INK3, fontWeight: 500 }}> · {rows.length}</span>
+                  </div>
+                )}
+                {rows.map((s) => {
               const svc = SVC[getSlotService(s)]
               const st = slotStatus(s)
               const expired = isSlotExpired(s)
@@ -616,7 +656,9 @@ export function SlotList() {
                   </div>
                 </div>
               )
-            })}
+                })}
+              </div>
+            ))}
           </div>
         )}
       </div>

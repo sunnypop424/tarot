@@ -31,8 +31,18 @@ import type {
  * 이 파일을 전부 지워도 남의 슬롯은 못 읽는다.
  */
 
-/** slots 테이블 행 ↔ Slot. 컬럼 이름이 곧 필드 이름이라 매핑이 얇다 */
-type SlotRow = Slot
+/**
+ * slots 테이블 행 ↔ Slot. 컬럼 이름이 곧 필드 이름이라 매핑이 얇다 —
+ * **딱 하나만 다르다:** 묶음은 DB 에서 `group_name` 이다 (`group` 은 SQL 예약어라 인용부호
+ * 없이 못 쓴다). 그 한 칸만 아래 `toSlot`·`slotRow` 가 옮긴다.
+ */
+type SlotRow = Omit<Slot, 'group'> & { group_name?: string | null }
+
+/** 행 → Slot (묶음 이름만 옮긴다) */
+function toSlot(row: SlotRow): Slot {
+  const { group_name, ...rest } = row
+  return group_name ? { ...(rest as Slot), group: group_name } : (rest as Slot)
+}
 
 /**
  * slots 테이블 컬럼 — **읽기 목록과 저장 행이 이 배열 하나에서 나온다.**
@@ -46,6 +56,8 @@ type SlotRow = Slot
  */
 const SLOT_FIELDS = [
   'slug', 'name', 'service', 'plan', 'limits', 'deck', 'period',
+  // DB 컬럼은 group_name 이다 — `group` 은 SQL 예약어라 인용부호 없이 못 쓴다 (0028)
+  'group_name',
   'theme', 'event', 'luckydraw', 'rolling', 'photozone', 'wish', 'poll', 'stamp', 'quiz', 'photocard',
 ] as const
 
@@ -81,6 +93,11 @@ const SLOT_DEFAULTS: Partial<Record<(typeof SLOT_FIELDS)[number], unknown>> = {
 function slotRow(slot: Slot): Record<string, unknown> {
   const out: Record<string, unknown> = {}
   for (const f of SLOT_FIELDS) {
+    // 묶음만 이름이 다르다 (group ↔ group_name). 빈 문자열은 "묶음 없음" 이라 null 로 눕힌다
+    if (f === 'group_name') {
+      out[f] = slot.group?.trim() || null
+      continue
+    }
     const v = (slot as unknown as Record<string, unknown>)[f]
     out[f] = v ?? SLOT_DEFAULTS[f]
   }
@@ -103,7 +120,7 @@ const slots: SlotRepo = {
       .select(SLOT_COLUMNS)
       .order('created_at')
     if (error) throw new Error(error.message)
-    return data as unknown as SlotRow[]
+    return (data as unknown as SlotRow[]).map(toSlot)
   },
 
   async get(slug) {
@@ -115,7 +132,8 @@ const slots: SlotRepo = {
         .maybeSingle()
       if (error) throw new Error(error.message)
       // 없는 슬러그면 폴백도 안 본다 — DB 가 답했고 답은 "없다" 다
-      return (data as unknown as SlotRow | null) ?? null
+      const row = data as unknown as SlotRow | null
+      return row ? toSlot(row) : null
     } catch {
       // DB 를 못 불렀다 — 번들에 있으면 그걸로라도 연다 (색이 조금 옛것일 수 있다)
       return seedSlot(slug)

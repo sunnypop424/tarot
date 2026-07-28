@@ -218,7 +218,12 @@ try {
     for (const kept of ['본문 폰트', '상단 여백', '커버 문자', '남은 수량 배지', '둥글기']) {
       check(`럭키드로우: '${kept}' 칸이 있다`, body.includes(kept))
     }
-    check('럭키드로우: 미리보기가 아이패드 가로다', body.includes('아이패드 가로'))
+    /**
+     * 기기는 이제 **모든 서비스가 고른다** — 럭드는 기본이 아이패드 가로여야 한다.
+     * 글자로 찾지 않고 고른 값(select)으로 본다: 라벨은 문구라 바뀐다.
+     */
+    const device = await page.$eval('[data-preview-device]', (el) => el.value)
+    check('럭키드로우: 미리보기 기본이 아이패드 가로다', device.startsWith('pad-'), device)
     check('럭키드로우: 상태 토글이 있다', body.includes('뽑기') && body.includes('전체 결과'))
 
     // 다 지워버리는 것도 틀린 것이다 — 슬롯·기간·형태는 서비스와 무관하게 필요하다

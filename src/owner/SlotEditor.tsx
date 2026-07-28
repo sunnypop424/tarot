@@ -1249,6 +1249,25 @@ export function SlotEditor() {
                 <Field label="이벤트명">
                   <input value={draft.name} onChange={(e) => patchSlot({ name: e.target.value })} style={CSS.input} />
                 </Field>
+                {/*
+                  * 묶음 — **한 행사가 슬롯 여러 개를 쓴다** (포토카드 + 스탬프 + 모의고사).
+                  * 목록에서만 쓰는 정리용 이름이라 권한과 무관하다. 이미 쓴 이름은 골라 쓴다.
+                  */}
+                <Field label="묶음 (선택)" hint="같은 행사의 슬롯끼리 목록에서 묶여요. 손님에겐 안 보입니다.">
+                  <input
+                    value={draft.group ?? ''}
+                    onChange={(e) => patchSlot({ group: e.target.value })}
+                    list="slot-groups"
+                    placeholder="예: 디노 생일카페 2026"
+                    style={CSS.input}
+                    data-group
+                  />
+                  <datalist id="slot-groups">
+                    {[...new Set((slots ?? []).map((x) => x.group).filter(Boolean))].map((g) => (
+                      <option key={g} value={g} />
+                    ))}
+                  </datalist>
+                </Field>
               </div>
               <div>
                 <div style={{ ...CSS.label, marginBottom: 7 }}>서비스</div>
