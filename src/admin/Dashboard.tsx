@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, ArrowUpRight, Download, ExternalLink, Info } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import { getSlotService, SERVICES } from '@/data/services'
@@ -26,6 +25,8 @@ import type { Slot } from '@/types/slot'
 interface Stat {
   label: string
   value: string
+  /** 숫자 뒤에 붙는 단위 (개·명·장…) */
+  unit?: string
   /** 숫자 아래 한 줄 — 뭘 센 건지 */
   note?: string
   /** 눈에 띄어야 하는 값 (재고 소진 임박 등) */
@@ -35,6 +36,7 @@ interface Stat {
 interface Shortcut {
   to: string
   label: string
+  desc: string
   /** 관리 셸 밖 화면 — 새 탭 */
   external?: boolean
 }
@@ -85,117 +87,175 @@ export function Dashboard() {
   }, [load])
 
   const period = periodLine(slot)
+  const serviceName = SERVICES.find((s) => s.id === service)?.label ?? service
 
   return (
     <>
-      <header className="admin__head">
-        <div>
-          <h1 className="t-title-s">오늘 현황</h1>
-          <p className="t-text-xs t-muted">
-            {SERVICES.find((s) => s.id === service)?.label ?? service} · /{slot.slug}
-          </p>
+      <header className="ad-head">
+        <div className="ad-head__row">
+          <h1 className="ad-head__title">대시보드</h1>
+          <span className="ad-head__count">{serviceName}</span>
         </div>
-        <div className="dash__periodBox">
-          <span className="dash__period" data-state={period.state}>
-            {period.text}
-          </span>
-        </div>
+        <p className="ad-head__desc">
+          오늘 이 행사에서 무엇이 얼마나 돌고 있는지 한눈에 봅니다.
+        </p>
       </header>
 
-      {error && (
-        <div className="admin-banner admin-banner--warn">
-          <AlertTriangle size={16} aria-hidden="true" />
-          <span>{error}</span>
+      <div className="ad-stack">
+        <div className="ad-card ad-card--tight" style={{ display: 'flex', alignItems: 'center', gap: 11, flexWrap: 'wrap' }}>
+          <span className="ad-state" data-tone={period.tone}>
+            <span className="ad-state__dot" aria-hidden="true" />
+            {period.badge}
+          </span>
+          <span className="ad-sub">{period.detail}</span>
         </div>
-      )}
 
-      <section className="dash__grid" data-stats>
-        {stats === null
-          ? [0, 1, 2, 3].map((i) => <div key={i} className="dash__card" aria-busy="true" style={{ minHeight: 96 }} />)
-          : stats.map((s) => (
-              <div key={s.label} className="dash__card" data-warn={s.warn || undefined}>
-                <div className="dash__label">{s.label}</div>
-                <div className="dash__value">{s.value}</div>
-                {s.note && <div className="dash__note">{s.note}</div>}
+        {error && (
+          <div className="ad-banner ad-banner--err ad-banner--pad">
+            <div className="ad-banner__title">현황을 읽지 못했어요</div>
+            <div className="ad-banner__body">{error}</div>
+          </div>
+        )}
+
+        {stats === null && (
+          <div className="ad-stats ad-stats--4">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="ad-skel" style={{ height: 96 }} />
+            ))}
+          </div>
+        )}
+
+        {stats && stats.length > 0 && (
+          <div
+            className={`ad-stats ${stats.length >= 4 ? 'ad-stats--4' : stats.length === 2 ? 'ad-stats--2' : ''}`}
+            data-stats
+          >
+            {stats.map((s) => (
+              <div key={s.label} className="ad-stat" data-hot={s.warn || undefined}>
+                <div className="ad-stat__label">{s.label}</div>
+                <div className="ad-stat__row">
+                  <span className="ad-stat__value tnum">{s.value}</span>
+                  {s.unit && <span className="ad-stat__unit">{s.unit}</span>}
+                </div>
+                {s.note && <div className="ad-stat__sub">{s.note}</div>}
               </div>
             ))}
-      </section>
-
-      {stats?.length === 0 && !error && (
-        <div className="admin-banner admin-banner--info">
-          <Info size={16} aria-hidden="true" />
-          <span>이 서비스는 서버에 쌓이는 기록이 없어요 — 아래 메뉴에서 설정만 확인하시면 됩니다.</span>
-        </div>
-      )}
-
-      {bars && bars.length > 0 && (
-        <section className="dash__section" data-stock>
-          <h2 className="dash__sectionTitle">재고 소진</h2>
-          <div className="dash__bars">
-            {bars.map((b) => {
-              const pct = b.total > 0 ? Math.round((b.left / b.total) * 100) : 0
-              return (
-                <div key={b.name} className="dash__bar" data-low={b.left === 0 ? 'out' : pct <= 20 ? 'soon' : undefined}>
-                  <div className="dash__barTop">
-                    <span className="dash__barName">{b.name}</span>
-                    <span className="dash__barNum">
-                      {b.left} / {b.total}
-                    </span>
-                  </div>
-                  <div className="dash__barTrack">
-                    {/* 남은 비율을 그린다 — "얼마나 빠졌나" 보다 "얼마나 남았나" 가 현장의 질문이다 */}
-                    <span className="dash__barFill" style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              )
-            })}
           </div>
-          <p className="dash__note" style={{ marginTop: 8 }}>
-            남은 비율이에요. <b>20% 아래면 주황</b>, 다 나가면 회색으로 바뀝니다.
-          </p>
-        </section>
-      )}
+        )}
 
-      <section className="dash__section">
-        <h2 className="dash__sectionTitle">바로 가기</h2>
-        <div className="dash__links">
-          {SHORTCUTS[service].map((s) =>
-            s.external ? (
-              <a
-                key={s.to}
-                className="dash__link"
-                href={`/${slot.slug}/${s.to}`}
-                target="_blank"
-                rel="noreferrer"
+        <div className="ad-split">
+          <div className="ad-stack">
+            {bars && bars.length > 0 && (
+              <div className="ad-card" data-stock>
+                <div className="ad-card__title">품목별 남은 비율</div>
+                <div className="ad-bars">
+                  {bars.map((b) => {
+                    const pct = b.total > 0 ? Math.round((b.left / b.total) * 100) : 0
+                    const tone = b.left === 0 ? 'out' : pct < 20 ? 'low' : undefined
+                    return (
+                      <div key={b.name} className="ad-bar" data-tone={tone}>
+                        <div className="ad-bar__top">
+                          <span className="ad-bar__name">{b.name}</span>
+                          <span className="ad-bar__num tnum">
+                            {b.left} / {b.total}
+                          </span>
+                        </div>
+                        <div className="ad-bar__track">
+                          {/* 남은 비율을 그린다 — "얼마나 빠졌나" 보다 "얼마나 남았나" 가 현장의 질문이다 */}
+                          <span className="ad-bar__fill" style={{ ['--ad-pct' as string]: `${pct}%` }} />
+                        </div>
+                        {tone && (
+                          <div className="ad-bar__note">
+                            {tone === 'out' ? '소진됐어요' : '20% 아래로 남았어요'}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="ad-card">
+              <div className="ad-card__title">바로 가기</div>
+              <div className="ad-shortcuts">
+                {SHORTCUTS[service].concat(COMMON_SHORTCUTS).map((s) =>
+                  s.external ? (
+                    <a
+                      key={s.to}
+                      className="ad-shortcut"
+                      href={`/${slot.slug}${s.to ? `/${s.to}` : ''}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <div className="ad-card__titleRow">
+                        <span className="ad-shortcut__name">{s.label}</span>
+                        <span className="ad-shortcut__tag">새 탭 ↗</span>
+                      </div>
+                      <div className="ad-shortcut__desc">{s.desc}</div>
+                    </a>
+                  ) : (
+                    <Link key={s.to} className="ad-shortcut" to={`/${slot.slug}/admin/${s.to}`}>
+                      <div className="ad-card__titleRow">
+                        <span className="ad-shortcut__name">{s.label}</span>
+                      </div>
+                      <div className="ad-shortcut__desc">{s.desc}</div>
+                    </Link>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="ad-stack">
+            <div className="ad-card">
+              <div className="ad-card__title">행사 기간</div>
+              <span className="ad-state" data-tone={period.tone}>
+                <span className="ad-state__dot" aria-hidden="true" />
+                {period.badge}
+              </span>
+              <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div className="ad-kv">
+                  <span>기간</span>
+                  <span className="tnum">{periodLabel(slot)}</span>
+                </div>
+                {period.left !== null && (
+                  <div className="ad-kv">
+                    <span>남은 일수</span>
+                    <span className="tnum">{period.left}일</span>
+                  </div>
+                )}
+                <div className="ad-kv">
+                  <span>자료 보관</span>
+                  <span>종료 후 14일</span>
+                </div>
+              </div>
+              <div className="ad-hr" />
+              <p className="ad-fine">
+                종료되면 방문자 주소는 종료 안내로 바뀌고, 보관 기간이 지나면 자료가 파기돼요.
+              </p>
+            </div>
+
+            <div className="ad-card">
+              <div className="ad-card__title">행사 자료 내보내기</div>
+              <p className="ad-card__desc">
+                CSV 여러 개로 떨어져요 · 개인정보가 든 파일이 섞여 있어요 · 종료 +14일이 지나면
+                꺼낼 수 없어요
+              </p>
+              <button
+                type="button"
+                className="ad-btn ad-btn--soft ad-btn--xl ad-btn--block"
+                style={{ marginTop: 14 }}
+                onClick={() => void exportAll()}
+                disabled={saving}
+                data-export
               >
-                {s.label}
-                <ExternalLink size={14} strokeWidth={2} aria-hidden="true" />
-              </a>
-            ) : (
-              <Link key={s.to} className="dash__link" to={`/${slot.slug}/admin/${s.to}`}>
-                {s.label}
-                <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
-              </Link>
-            )
-          )}
-          <Link className="dash__link" to={`/${slot.slug}/admin/qr`}>
-            QR 만들기
-            <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
-          </Link>
-          <a className="dash__link" href={`/${slot.slug}`} target="_blank" rel="noreferrer">
-            내 페이지 보기
-            <ExternalLink size={14} strokeWidth={2} aria-hidden="true" />
-          </a>
-          <button type="button" className="dash__link" onClick={() => void exportAll()} disabled={saving} data-export>
-            {saving ? '모으는 중…' : '행사 자료 내보내기'}
-            <Download size={14} strokeWidth={2} aria-hidden="true" />
-          </button>
+                {saving ? '모으는 중…' : '내보내기'}
+              </button>
+            </div>
+          </div>
         </div>
-        <p className="dash__note" style={{ marginTop: 8 }}>
-          기록을 CSV 여러 개로 받아요 (응모자·배송처럼 <b>개인정보가 든 파일</b>이 섞여 있으니 관리에 주의해 주세요).
-          <b> 종료 +14일이 지나면 못 꺼냅니다.</b>
-        </p>
-      </section>
+      </div>
     </>
   )
 }
@@ -204,54 +264,77 @@ export function Dashboard() {
  * 기간 한 줄 — **판정은 이미 있는 것을 쓴다** (`owner/period.ts` · `data/slots.ts`).
  * 여기서 날짜 비교를 다시 짜면 편집기와 관리 화면이 서로 다른 날 "열렸다" 고 말하게 된다.
  */
-function periodLine(slot: Slot): { text: string; state: 'open' | 'soon' | 'closed' } {
+function periodLine(slot: Slot): {
+  badge: string
+  detail: string
+  tone: 'key' | 'warn' | 'mute'
+  left: number | null
+} {
   const status = slotStatus(slot)
   const end = slot.period?.rent?.end ?? slot.period?.test?.end ?? null
-  if (status === 'expired') return { text: '기간이 끝났어요', state: 'closed' }
-  if (status === 'upcoming') return { text: `${periodLabel(slot)}`, state: 'soon' }
-  if (status === 'unlimited') return { text: '기간 제한 없음', state: 'open' }
-  if (end) {
-    const days = Math.ceil((new Date(`${end}T23:59:59+09:00`).getTime() - Date.now()) / 86400000)
+  const days =
+    end !== null
+      ? Math.max(0, Math.ceil((new Date(`${end}T23:59:59+09:00`).getTime() - Date.now()) / 86400000))
+      : null
+
+  if (status === 'expired')
+    return { badge: '종료', detail: '기간이 끝났어요 · 자료는 종료 +14일까지 꺼낼 수 있어요', tone: 'mute', left: null }
+  if (status === 'upcoming')
+    return { badge: '시작 전', detail: `${periodLabel(slot)} 에 열려요`, tone: 'warn', left: days }
+  if (status === 'unlimited')
+    return { badge: '진행 중', detail: '기간 제한 없음', tone: 'key', left: null }
+  return {
+    badge: '진행 중',
     // 마지막 사흘은 남은 날을 말한다 — 그때부터는 날짜보다 "며칠 남았나" 가 급하다
-    if (days <= 3) return { text: `종료까지 ${Math.max(0, days)}일`, state: 'soon' }
+    detail:
+      days !== null && days <= 3
+        ? `${periodLabel(slot)} · 종료까지 ${days}일 · 자료는 종료 +14일까지 꺼낼 수 있어요`
+        : `${periodLabel(slot)} · 자료는 종료 +14일까지 꺼낼 수 있어요`,
+    tone: days !== null && days <= 3 ? 'warn' : 'key',
+    left: days,
   }
-  return { text: periodLabel(slot), state: 'open' }
 }
 
 const SHORTCUTS: Record<ServiceId, Shortcut[]> = {
-  tarot: [{ to: 'questions', label: '질문 관리' }],
+  tarot: [{ to: 'questions', label: '질문 관리', desc: '질문과 답변을 고쳐요' }],
   luckydraw: [
-    { to: 'overview', label: '상품·운영' },
-    { to: 'shipping', label: '배송 정보' },
+    { to: 'overview', label: '상품 · 운영', desc: '재고와 운영 방식을 봐요' },
+    { to: 'shipping', label: '배송 정보', desc: '당첨자 주소를 확인해요' },
   ],
-  rolling: [{ to: 'messages', label: '쪽지 검수' }],
-  wish: [{ to: 'messages', label: '소원 검수' }],
-  photozone: [{ to: 'photozone', label: '안내' }],
+  rolling: [{ to: 'messages', label: '쪽지 검수', desc: '남긴 쪽지를 검수해요' }],
+  wish: [{ to: 'messages', label: '소원 검수', desc: '걸린 소원을 검수해요' }],
+  photozone: [{ to: 'photozone', label: '포토존 안내', desc: '이 서비스의 안내를 봐요' }],
   poll: [
-    { to: 'polls', label: '설문 관리' },
-    { to: 'live', label: '스크린', external: false },
+    { to: 'polls', label: '설문 관리', desc: '설문과 선택지를 고쳐요' },
+    { to: 'live', label: '스크린', desc: '부스에 세워둘 화면을 봐요' },
   ],
   stamp: [
-    { to: 'stamp', label: '스탬프 설정' },
-    { to: 'redeem', label: '수령 확인' },
-    { to: 'entries', label: '응모자' },
+    { to: 'stamp', label: '스탬프 설정', desc: '현장 암호를 새로 만들거나 고쳐요' },
+    { to: 'redeem', label: '수령 확인', desc: '코드를 입력해 실물 전달을 처리해요' },
+    { to: 'entries', label: '응모자', desc: '응모한 분들의 명단을 봐요' },
   ],
   quiz: [
-    { to: 'quiz', label: '문항 관리' },
-    { to: 'stats', label: '통계' },
-    { to: 'redeem', label: '수령 확인' },
+    { to: 'quiz', label: '문항 관리', desc: '문항과 운영 방식을 고쳐요' },
+    { to: 'stats', label: '통계', desc: '정답률을 보고 다시 채점해요' },
+    { to: 'redeem', label: '수령 확인', desc: '교환권을 처리해요' },
   ],
   cheer: [
-    { to: 'cheer', label: '상영 설정' },
-    { to: 'messages', label: '한마디 검수' },
-    { to: 'overlay', label: '오버레이 열기', external: true },
+    { to: 'cheer', label: '상영 설정', desc: '화면에 몇 개씩 띄울지 정해요' },
+    { to: 'messages', label: '한마디 검수', desc: '받은 한마디를 검수해요' },
+    { to: 'overlay', label: '오버레이 열기', desc: '상영 화면을 새 탭으로 열어요', external: true },
   ],
   photocard: [
-    { to: 'photocard', label: '카드 관리' },
-    { to: 'tickets', label: '뽑기권' },
-    { to: 'staff', label: '스태프 화면', external: true },
+    { to: 'photocard', label: '카드 관리', desc: '레어도와 재고를 고쳐요' },
+    { to: 'tickets', label: '뽑기권', desc: '발급된 번호를 봐요' },
+    { to: 'staff', label: '스태프 화면', desc: '부스 기기용 화면을 새 탭으로 열어요', external: true },
   ],
 }
+
+/** 서비스와 무관하게 늘 붙는 두 장 */
+const COMMON_SHORTCUTS: Shortcut[] = [
+  { to: 'qr', label: 'QR 만들기', desc: '붙일 QR을 내려받아요' },
+  { to: '', label: '내 페이지 보기', desc: '손님에게 보이는 화면을 확인해요', external: true },
+]
 
 const n = (v: number) => v.toLocaleString('ko-KR')
 
@@ -263,8 +346,8 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
   async tarot(slug) {
     const [all, open] = await Promise.all([repo.questions.listAll(slug), repo.questions.list(slug)])
     return [
-      { label: '질문', value: n(all.length), note: '등록된 질문 수' },
-      { label: '공개', value: n(open.length), note: '방문자에게 보이는 질문' },
+      { label: '질문', value: n(all.length), unit: '개', note: '등록된 질문 수' },
+      { label: '공개', value: n(open.length), unit: '개', note: '방문자에게 보이는 질문' },
     ]
   },
   async luckydraw(slug) {
@@ -274,18 +357,24 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
     const today = rows.reduce((a, r) => a + r.consumedToday, 0)
     const total = rows.reduce((a, r) => a + r.consumedTotal, 0)
     return [
-      { label: '오늘 나간 경품', value: n(today), note: '리허설분은 빠져요' },
-      { label: '전체 나간 경품', value: n(total) },
-      { label: '남은 재고', value: n(left), note: `상품 ${rows.length}종`, warn: left > 0 && left <= 10 },
+      { label: '오늘 나간 경품', value: n(today), unit: '개', note: '리허설분은 빼고 셌어요' },
+      { label: '전체 나간 경품', value: n(total), unit: '개' },
+      {
+        label: '남은 재고',
+        value: n(left),
+        unit: '개',
+        note: `상품 ${rows.length}종`,
+        warn: left > 0 && left <= 10,
+      },
     ]
   },
   async rolling(slug) {
     const all = await repo.rolling.listAll(slug)
-    return messageStats(all)
+    return messageStats(all, '쪽지')
   },
   async wish(slug) {
     const all = await repo.rolling.listAll(slug)
-    return messageStats(all)
+    return messageStats(all, '소원')
   },
   // 서버에 쌓이는 게 없다 — 사진은 손님 폰에서 합성되고 올라오지 않는다
   async photozone() {
@@ -297,8 +386,8 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
     const votes = polls.reduce((a, p) => a + p.options.reduce((b, o) => b + o.votes, 0), 0)
     const open = polls.filter((p) => !p.closed && !p.hidden).length
     return [
-      { label: '진행 중 설문', value: n(open), note: `전체 ${polls.length}개` },
-      { label: '받은 표', value: n(votes) },
+      { label: '진행 중 설문', value: n(open), unit: '개', note: `전체 ${polls.length}개` },
+      { label: '받은 표', value: n(votes), unit: '표' },
     ]
   },
   async stamp(slug) {
@@ -310,9 +399,15 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
     const stamped = report.reduce((a, r) => a + r.count, 0)
     const unredeemed = issued.filter((r) => r.kind === 'guaranteed' && !r.redeemedAt).length
     return [
-      { label: '찍힌 도장', value: n(stamped), note: `칸 ${report.length}개 합계` },
-      { label: '판을 채운 사람', value: n(issued.length), note: '교환권이 나간 수' },
-      { label: '아직 안 받아간 선물', value: n(unredeemed), warn: unredeemed > 0 },
+      { label: '찍힌 도장', value: n(stamped), unit: '개', note: `칸 ${report.length}개 합계` },
+      { label: '판을 채운 사람', value: n(issued.length), unit: '명', note: '교환권이 나간 수' },
+      {
+        label: '아직 안 받아간 선물',
+        value: n(unredeemed),
+        unit: '건',
+        note: unredeemed > 0 ? '카운터에서 확인해 주세요' : undefined,
+        warn: unredeemed > 0,
+      },
     ]
   },
   async quiz(slug) {
@@ -323,14 +418,22 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
     ])
     const unredeemed = issued.filter((r) => r.kind === 'guaranteed' && !r.redeemedAt).length
     return [
-      { label: '응시', value: n(stats.attempts) },
-      { label: '평균 점수', value: stats.attempts ? `${Math.round(stats.avg)}점` : '—' },
-      { label: '나간 교환권', value: n(issued.length) },
-      { label: '아직 안 받아감', value: n(unredeemed), warn: unredeemed > 0 },
+      { label: '응시', value: n(stats.attempts), unit: '명' },
+      { label: '평균 점수', value: stats.attempts ? `${Math.round(stats.avg)}` : '—', unit: stats.attempts ? '점' : '' },
+      { label: '나간 교환권', value: n(issued.length), unit: '건' },
+      {
+        label: '아직 안 받아감',
+        value: n(unredeemed),
+        unit: '건',
+        note: unredeemed > 0 ? '카운터에서 확인해 주세요' : undefined,
+        warn: unredeemed > 0,
+      },
     ]
   },
   // 한마디는 롤페 테이블에 산다 — 세는 코드도 같다
-  cheer: messageCollect,
+  async cheer(slug) {
+    return messageStats(await repo.rolling.listAll(slug), '한마디')
+  },
   async photocard(slug) {
     if (!repo.photocard.ready()) return []
     const [rows, tickets] = await Promise.all([
@@ -344,28 +447,25 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
     const soldOut = limited.filter((r) => (r.remaining ?? 0) === 0).length
     const open = tickets.filter((t) => t.status === 'open').length
     return [
-      { label: '나간 카드', value: n(drawn), note: `카드 ${rows.length}종` },
+      { label: '나간 카드', value: n(drawn), unit: '장', note: `카드 ${rows.length}종` },
       {
         label: '남은 한정 재고',
         value: limited.length ? n(left) : '무제한',
+        unit: limited.length ? '장' : '',
         note: limited.length ? `한정 ${limited.length}종 · 소진 ${soldOut}종` : '재고를 정한 카드가 없어요',
         warn: limited.length > 0 && left <= 10,
       },
-      { label: '아직 안 쓴 뽑기권', value: n(open), note: `발급 ${tickets.length}장` },
+      { label: '아직 안 쓴 뽑기권', value: n(open), unit: '장', note: `발급 ${tickets.length}장` },
     ]
   },
 }
 
-async function messageCollect(slug: string): Promise<Stat[]> {
-  return messageStats(await repo.rolling.listAll(slug))
-}
-
-function messageStats(all: { hidden?: boolean; createdAt: string }[]): Stat[] {
+function messageStats(all: { hidden?: boolean; createdAt: string }[], unit: string): Stat[] {
   const today = new Date().toISOString().slice(0, 10)
   return [
-    { label: '남긴 글', value: n(all.filter((m) => !m.hidden).length), note: '숨긴 것 제외' },
-    { label: '오늘', value: n(all.filter((m) => m.createdAt.slice(0, 10) === today).length) },
-    { label: '숨김', value: n(all.filter((m) => m.hidden).length) },
+    { label: `남긴 ${unit}`, value: n(all.filter((m) => !m.hidden).length), unit: '개', note: '숨김 제외' },
+    { label: '오늘', value: n(all.filter((m) => m.createdAt.slice(0, 10) === today).length), unit: '개' },
+    { label: '숨김', value: n(all.filter((m) => m.hidden).length), unit: '개' },
   ]
 }
 

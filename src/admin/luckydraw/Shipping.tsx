@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Download, Info, Trash2, Truck } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import { SearchBox } from '../SearchBox'
 import type { ShippingEntry } from '@/lib/repo'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
-import styles from './Luckydraw.module.css'
 
 /** CSV 한 칸 — 쉼표·따옴표·줄바꿈이 들어가면 깨지므로 감싸고 따옴표는 두 번 쓴다 */
 function cell(value: string): string {
@@ -68,9 +66,9 @@ export function Shipping() {
      * 이 데이터는 다른 어디에도 사본이 없다 (방문자도 자기가 넣은 걸 못 읽는다).
      */
     const ok = await confirmAction({
-      title: `배송 정보 ${list.length}건을 모두 삭제할까요?`,
-      desc: '삭제하면 되돌릴 수 없어요. 필요하면 먼저 CSV로 내려받아 두세요.',
-      okLabel: '전체 삭제',
+      title: `배송 정보 ${list.length}건을 전부 지울까요?`,
+      desc: '다른 곳에 사본이 없어요. 손님도 자기가 넣은 내용을 다시 볼 수 없습니다. 먼저 CSV로 내려받으셨나요?',
+      okLabel: '전부 지우기',
       danger: true,
     })
     if (!ok) return
@@ -78,7 +76,7 @@ export function Shipping() {
     try {
       await repo.luckydraw.clearShipping(slug)
       await load()
-      toast('배송 정보를 모두 삭제했어요')
+      toast('배송 정보를 모두 지웠어요')
     } finally {
       setBusy(false)
     }
@@ -96,87 +94,125 @@ export function Shipping() {
       )
     : list
 
-  return (
-    <div>
-      <header className="admin__head">
-        <div>
-          <h1 className="t-title-l">배송 정보</h1>
-          <p className="t-text-xs t-muted">
-            {list.length}건 · 배송이 끝나면 <b>반드시 지워주세요.</b> 남겨둘 이유가 없는 개인정보예요.
-          </p>
-        </div>
+  const tableVars = {
+    ['--ad-tcols' as string]: '92px 132px minmax(0,1fr) 168px 96px',
+    ['--ad-tmin' as string]: '700px',
+  }
 
-        <div className={styles.headActions}>
-          <button type="button" className="btn btn--ghost" disabled={!list.length} onClick={download}>
-            <Download size={16} aria-hidden="true" /> CSV 내려받기
-          </button>
-          <button
-            type="button"
-            className="btn btn--ghost"
-            disabled={!list.length || busy}
-            onClick={() => void clearAll()}
-          >
-            <Trash2 size={16} aria-hidden="true" /> 전체 삭제
-          </button>
+  return (
+    <>
+      <header className="ad-head">
+        <div className="ad-head__row">
+          <h1 className="ad-head__title">배송 정보</h1>
+          <span className="ad-head__count tnum">배송 {list.length}건</span>
         </div>
+        <p className="ad-head__desc">
+          당첨자가 직접 남긴 배송지입니다. 손님 개인정보가 나오는 유일한 화면이에요.
+        </p>
       </header>
 
-      {/**
-       * 슬롯이 사라질 때 이 데이터도 같이 사라진다는 걸 미리 말해 둔다 —
-       * 마감 +15일 자동 삭제(`0009_slot_lifecycle.sql`)를 모르면 어느 날 통째로 없어진 걸 보게 된다.
-       */}
-      <div className="admin-banner admin-banner--info">
-        <Info size={16} aria-hidden="true" />
-        <span>
-          개인정보 보호를 위해 <b>마감 +14일까지만</b> 열람할 수 있어요.{' '}
-          <b>+15일이 지나면 자동으로 삭제</b>됩니다.
-        </span>
-      </div>
+      <div className="ad-stack">
+        {/**
+         * 슬롯이 사라질 때 이 데이터도 같이 사라진다는 걸 미리 말해 둔다 —
+         * 마감 +15일 자동 삭제(`0009_slot_lifecycle.sql`)를 모르면 어느 날 통째로 없어진 걸 보게 된다.
+         */}
+        <div className="ad-banner ad-banner--warn ad-banner--pad">
+          <div className="ad-banner__title">배송이 끝나면 반드시 지워 주세요</div>
+          <div className="ad-banner__body">
+            이름·연락처·주소가 그대로 들어 있는 화면이에요. 마감 +14일까지만 열람할 수 있고, +15일이
+            지나면 저절로 지워집니다.
+          </div>
+        </div>
 
-      {list.length === 0 ? (
-        <div className="admin-empty">
-          <Truck size={44} strokeWidth={1.6} aria-hidden="true" />
-          <div className="admin-empty__title">아직 제출된 배송 정보가 없어요.</div>
+        <div className="ad-card">
+          <div className="ad-card__head">
+            <div className="ad-card__titleRow">
+              <span className="ad-card__title">배송 정보</span>
+              <span className="ad-card__num tnum">
+                {shown.length} / {list.length}건
+              </span>
+            </div>
+            <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>
+              <SearchBox value={query} onChange={setQuery} placeholder="이름·연락처·주소로 찾기" />
+              <button
+                type="button"
+                className="ad-btn ad-btn--line ad-btn--md"
+                disabled={!list.length}
+                onClick={download}
+              >
+                CSV 내려받기
+              </button>
+            </div>
+          </div>
+
+          {list.length === 0 ? (
+            <div className="ad-empty">
+              <div className="ad-empty__title">아직 배송 정보를 낸 사람이 없어요</div>
+              <div className="ad-empty__sub">
+                배송이 필요한 상품에 당첨된 손님이 주소를 넣으면 여기에 쌓여요.
+              </div>
+            </div>
+          ) : shown.length === 0 ? (
+            <div className="ad-empty ad-empty--sm">
+              <div className="ad-empty__title">찾는 배송 정보가 없어요</div>
+              <div className="ad-empty__sub">검색어를 지우고 다시 찾아보세요.</div>
+            </div>
+          ) : (
+            <>
+              <div className="ad-table" style={tableVars}>
+                <div className="ad-table__inner">
+                  <div className="ad-table__head">
+                    <span>이름</span>
+                    <span>연락처</span>
+                    <span>주소</span>
+                    <span>당첨 상품</span>
+                    <span>제출</span>
+                  </div>
+                  {shown.map((e) => (
+                    <div key={e.id} className="ad-table__row">
+                      <span className="ad-cell--b">{e.name}</span>
+                      <span className="ad-cell tnum">{e.phone}</span>
+                      <span className="ad-cell ad-cell--wrap">{e.address}</span>
+                      <span className="ad-cell ad-cell--wrap">
+                        {e.prizes.map((p) => `${p.rank}등 ${p.name} ${p.count}개`).join(', ')}
+                      </span>
+                      <span className="ad-cell--mute tnum">
+                        {new Date(e.createdAt).toLocaleDateString('ko-KR')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  marginTop: 20,
+                  paddingTop: 20,
+                  borderTop: '1px solid var(--ad-line)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div className="ad-sub" style={{ maxWidth: '38em' }}>
+                  지우면 되돌릴 수 없어요. 다른 곳에 사본이 없고, 손님도 자기가 넣은 내용을 다시 볼 수
+                  없습니다.
+                </div>
+                <button
+                  type="button"
+                  className="ad-btn ad-btn--danger ad-btn--lg"
+                  disabled={busy}
+                  onClick={() => void clearAll()}
+                >
+                  전체 지우기
+                </button>
+              </div>
+            </>
+          )}
         </div>
-      ) : (
-        <>
-        <SearchBox
-          value={query}
-          onChange={setQuery}
-          placeholder="이름 · 연락처 · 주소 · 상품"
-          found={shown.length}
-          total={list.length}
-        />
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>이름</th>
-                <th>연락처</th>
-                <th className={styles.colName}>주소</th>
-                <th>상품</th>
-                <th>제출</th>
-              </tr>
-            </thead>
-            <tbody>
-              {shown.map((e) => (
-                <tr key={e.id}>
-                  <td>{e.name}</td>
-                  <td className={styles.nowrap}>{e.phone}</td>
-                  <td>{e.address}</td>
-                  <td className={styles.nowrap}>
-                    {e.prizes.map((p) => `${p.rank}등 ${p.name} ${p.count}개`).join(', ')}
-                  </td>
-                  <td className={styles.nowrap}>
-                    {new Date(e.createdAt).toLocaleDateString('ko-KR')}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        </>
-      )}
-    </div>
+      </div>
+    </>
   )
 }

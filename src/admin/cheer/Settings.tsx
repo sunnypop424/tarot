@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ExternalLink, Info, MonitorPlay, SlidersHorizontal } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import { RATIOS } from '@/data/cheer'
@@ -20,14 +19,44 @@ import { toast } from '../AdminFeedback'
  */
 
 /** 칸마다 붙는 안내 — 표는 docs/서비스-영상회-응원.md 와 같은 내용이다 */
-const GUIDE = {
-  bubbles: '6~8개가 가장 보기 좋아요. 10개면 영상이 가려질 수 있어요.',
-  ratio: '가운데를 이 비율만큼 비워 둡니다 — 영상이 뜨는 자리예요.',
-  interval: '말풍선마다 이 값의 ±30% 로 흩어져 하나씩 바뀝니다 (한꺼번에 안 바뀌어요).',
-  showName: '끄면 한마디만 떠요. 익명으로 받는 행사에 쓰세요.',
-  perPerson: '3개면 대부분 만족하고, 10개면 한 사람 글이 화면을 채웁니다.',
-  maxLength: '40자가 말풍선에 예쁘게 들어가요. 60자는 글씨가 작아집니다.',
-}
+const FIELDS = [
+  {
+    k: 'bubbles' as const,
+    label: '한 화면에 몇 개',
+    unit: '개',
+    range: '1–10',
+    min: 1,
+    max: 10,
+    hint: '6~8개가 가장 보기 좋아요. 10개면 영상이 가려질 수 있어요.',
+  },
+  {
+    k: 'intervalSec' as const,
+    label: '교체 간격',
+    unit: '초',
+    range: '3–15',
+    min: 3,
+    max: 15,
+    hint: '말풍선마다 이 값의 ±30% 로 흩어져 하나씩 바뀝니다 (한꺼번에 안 바뀌어요).',
+  },
+  {
+    k: 'perPerson' as const,
+    label: '1인 입력 수',
+    unit: '개',
+    range: '1–10',
+    min: 1,
+    max: 10,
+    hint: '3개면 대부분 만족하고, 10개면 한 사람 글이 화면을 채웁니다.',
+  },
+  {
+    k: 'maxLength' as const,
+    label: '글자 수',
+    unit: '자',
+    range: '10–60',
+    min: 10,
+    max: 60,
+    hint: '40자가 말풍선에 예쁘게 들어가요. 60자는 글씨가 작아집니다.',
+  },
+]
 
 export function Settings() {
   const slot = useSlot()
@@ -60,133 +89,146 @@ export function Settings() {
 
   if (!s) return null
 
-  const num = (
-    label: string,
-    key: 'bubbles' | 'intervalSec' | 'perPerson' | 'maxLength',
-    min: number,
-    max: number,
-    hint: string,
-    unit: string
-  ) => (
-    <label className="field">
-      <span className="field__label">{label}</span>
-      <div className="range-row">
-        <input
-          type="range"
-          min={min}
-          max={max}
-          value={s[key]}
-          onChange={(e) => void patch({ [key]: Number(e.target.value) } as Partial<CheerSettings>)}
-          className="range"
-          aria-label={label}
-          data-cheer={key}
-        />
-        <span className="range-row__value">
-          {s[key]}
-          {unit}
-        </span>
-      </div>
-      <span className="field__hint">{hint}</span>
-    </label>
-  )
-
   return (
     <>
-      <header className="admin__head">
-        <div>
-          <h1 className="t-title-s">영상회 응원</h1>
-          <p className="t-text-xs t-muted">
-            손님이 남긴 한마디가 상영 화면에 뜹니다. <b>검수는 '한마디' 메뉴</b>에서 하세요.
-          </p>
-        </div>
-        <div className="admin-actions" style={{ marginTop: 0 }}>
-          <a
-            className="btn btn--outline btn--sm"
-            href={`/${slug}/overlay`}
-            target="_blank"
-            rel="noreferrer"
-            data-open-overlay
-          >
-            <MonitorPlay size={15} strokeWidth={2} aria-hidden="true" />
-            오버레이 열기
-            <ExternalLink size={12} strokeWidth={2} aria-hidden="true" />
-          </a>
-          <a className="btn btn--outline btn--sm" href={`/${slug}/credits`} target="_blank" rel="noreferrer">
-            엔딩크레딧
-            <ExternalLink size={12} strokeWidth={2} aria-hidden="true" />
-          </a>
-        </div>
-      </header>
-
-      <div className="admin-banner admin-banner--info">
-        <Info size={16} aria-hidden="true" />
-        <span>
-          <b>오버레이는 배경이 투명해요.</b> OBS·프리즘의 '브라우저 소스' 로 주소를 넣으면 영상 위에
-          그대로 얹힙니다. 프로젝터로 쏘실 거면 창을 전체화면으로 띄워 영상 위에 겹쳐 두세요.
-          <br />
-          상영 중에도 이 화면의 값을 바꿀 수 있어요 — 바꾸면 상영 화면이 그 자리에서 따라갑니다.
-        </span>
-      </div>
-
-      <section className="admin-section">
-        <h2 className="admin-section__title">
-          <SlidersHorizontal size={15} strokeWidth={2} aria-hidden="true" />
-          상영 설정
-        </h2>
-        <div className="form-grid">
-        {num('한 화면에 몇 개', 'bubbles', 1, 10, GUIDE.bubbles, '개')}
-        {num('교체 간격', 'intervalSec', 3, 15, GUIDE.interval, '초')}
-        {num('1인 입력 수', 'perPerson', 1, 10, GUIDE.perPerson, '개')}
-        {num('글자 수', 'maxLength', 10, 60, GUIDE.maxLength, '자')}
-
-        <label className="field">
-          <span className="field__label">영상 비율</span>
-          <select
-            className="select"
-            value={s.ratio}
-            onChange={(e) => void patch({ ratio: e.target.value })}
-            data-cheer-ratio
-          >
-            {RATIOS.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
-          <span className="field__hint">{GUIDE.ratio}</span>
-        </label>
-
-        <div className="field">
-          <span className="field__label">이름 표시</span>
-          <label className="check">
-            <input
-              type="checkbox"
-              checked={s.showName}
-              onChange={(e) => void patch({ showName: e.target.checked })}
-              data-cheer-showname
-            />
-            이름을 같이 띄워요
-          </label>
-          <span className="field__hint">{GUIDE.showName}</span>
-        </div>
-
-        <div className="field">
-          <span className="field__label">마감</span>
-          <label className="check">
-            <input
-              type="checkbox"
-              checked={s.closed}
-              onChange={(e) => void patch({ closed: e.target.checked })}
-              data-cheer-closed
-            />
-            지금은 한마디를 안 받아요
-          </label>
-          <span className="field__hint">
-            이미 받은 한마디는 그대로 상영돼요 — 새로 받는 것만 막습니다.
+      <header className="ad-head">
+        <div className="ad-head__row">
+          <h1 className="ad-head__title">상영 설정</h1>
+          <span className="ad-head__count tnum">
+            한 화면 {s.bubbles}개 · {s.intervalSec}초
           </span>
         </div>
+        <p className="ad-head__desc">
+          상영 중에 바꿔도 그 자리에서 반영돼요. 고치면 바로 저장됩니다.
+        </p>
+      </header>
+
+      <div className="ad-stack">
+        <div>
+          <span className="ad-note">
+            고치면 바로 저장돼요 · 상영 중에 바꿔도 그 자리에서 반영됩니다
+          </span>
         </div>
-      </section>
+
+        <div className="ad-card ad-card--form">
+          <div className="ad-card__title">말풍선</div>
+          <div className="ad-formgrid">
+            {FIELDS.map((f) => (
+              <div key={f.k}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 7 }}>
+                  <span className="ad-field__label" style={{ marginBottom: 0 }}>
+                    {f.label}
+                  </span>
+                  <span className="ad-range">{f.range}</span>
+                </div>
+                <div className="ad-inline" style={{ marginTop: 7 }}>
+                  <input
+                    className="ad-input ad-input--num"
+                    inputMode="numeric"
+                    value={s[f.k]}
+                    aria-label={f.label}
+                    data-cheer={f.k}
+                    onChange={(e) => {
+                      const v = Number(e.target.value.replace(/[^0-9]/g, ''))
+                      if (!v) return
+                      void patch({ [f.k]: Math.min(f.max, Math.max(f.min, v)) } as Partial<CheerSettings>)
+                    }}
+                  />
+                  <span className="ad-unit">{f.unit}</span>
+                </div>
+                <p className="ad-field__hint">{f.hint}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="ad-card ad-card--form">
+          <div className="ad-card__title">영상 비율</div>
+          <div className="ad-choices">
+            {RATIOS.map((r) => (
+              <button
+                key={r}
+                type="button"
+                className="ad-choice ad-choice--sm"
+                data-on={s.ratio === r || undefined}
+                disabled={busy}
+                onClick={() => void patch({ ratio: r })}
+                data-cheer-ratio
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+          <p className="ad-field__hint">가운데를 이 비율만큼 비워 둡니다 — 영상이 뜨는 자리예요.</p>
+
+          <div style={{ marginTop: 6 }}>
+            <div className="ad-switchrow">
+              <div className="ad-switchrow__text">
+                <div className="ad-switchrow__name">이름 표시</div>
+                <div className="ad-switchrow__hint">
+                  말풍선에 닉네임을 같이 띄워요. 끄면 한마디만 떠요.
+                </div>
+              </div>
+              <button
+                type="button"
+                className="ad-switch"
+                data-on={s.showName || undefined}
+                aria-label="이름 표시"
+                disabled={busy}
+                onClick={() => void patch({ showName: !s.showName })}
+                data-cheer-showname
+              />
+            </div>
+            <div className="ad-switchrow">
+              <div className="ad-switchrow__text">
+                <div className="ad-switchrow__name">마감</div>
+                <div className="ad-switchrow__hint">
+                  이미 받은 한마디는 그대로 상영되고, 새로 받는 것만 막혀요.
+                </div>
+              </div>
+              <button
+                type="button"
+                className="ad-switch"
+                data-on={s.closed || undefined}
+                aria-label="마감"
+                disabled={busy}
+                onClick={() => void patch({ closed: !s.closed })}
+                data-cheer-closed
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="ad-card ad-card--form">
+          <div className="ad-card__title">상영 화면 열기</div>
+          <p className="ad-card__desc">
+            오버레이는 배경이 투명해요. OBS·프리즘의 브라우저 소스로 얹거나, 전체화면으로 영상 위에
+            겹쳐 주세요.
+          </p>
+          <div className="ad-btnrow" style={{ marginTop: 16 }}>
+            <a
+              className="ad-btn ad-btn--primary ad-btn--xl"
+              href={`/${slug}/overlay`}
+              target="_blank"
+              rel="noreferrer"
+              data-open-overlay
+            >
+              오버레이 열기 ↗
+            </a>
+            <a
+              className="ad-btn ad-btn--line ad-btn--xl"
+              href={`/${slug}/credits`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              엔딩크레딧 열기 ↗
+            </a>
+          </div>
+          <p className="ad-sub" style={{ marginTop: 16 }}>
+            검수는 왼쪽 ‘한마디’ 메뉴에서 합니다.
+          </p>
+        </div>
+      </div>
     </>
   )
 }

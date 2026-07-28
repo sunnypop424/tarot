@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Copy, KeyRound, TriangleAlert, UserMinus, UserPlus } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import type { Organizer } from '@/lib/repo/types'
@@ -46,17 +45,25 @@ export function Staff() {
     void load()
   }, [load])
 
+  const head = (
+    <header className="ad-head">
+      <div className="ad-head__row">
+        <h1 className="ad-head__title">스태프 계정</h1>
+        {list && list.length > 0 && <span className="ad-head__count tnum">계정 {list.length}개</span>}
+      </div>
+      <p className="ad-head__desc">현장에서 이 도구를 쓸 계정을 사람마다 따로 만듭니다.</p>
+    </header>
+  )
+
   if (!repo.organizers.ready()) {
     return (
       <>
-        <header className="admin__head">
-          <div>
-            <h1 className="t-title-s">스태프 계정</h1>
+        {head}
+        <div className="ad-card">
+          <div className="ad-empty">
+            <div className="ad-empty__title">지금 빌드에서는 계정을 만들 수 없어요</div>
+            <div className="ad-empty__sub">백엔드가 연결된 배포에서만 동작해요.</div>
           </div>
-        </header>
-        <div className="admin-empty">
-          <div className="admin-empty__title">지금 빌드에서는 계정을 만들 수 없어요</div>
-          <div className="t-text-s t-muted">백엔드가 연결된 배포에서만 동작해요.</div>
         </div>
       </>
     )
@@ -95,6 +102,7 @@ export function Staff() {
         title: `${o.email} 의 비밀번호를 새로 만들까요?`,
         desc: '지금 쓰던 비밀번호는 바로 못 쓰게 돼요. 새 비밀번호는 이 화면에 한 번만 보입니다.',
         okLabel: '재발급',
+        danger: true,
       }))
     )
       return
@@ -113,7 +121,7 @@ export function Staff() {
     if (
       !(await confirmAction({
         title: `${o.email} 을 이 이벤트에서 뺄까요?`,
-        desc: '이 이벤트 관리 화면에 못 들어오게 됩니다. 다른 이벤트가 없으면 계정째 지워져요.',
+        desc: '이 이벤트 관리 화면에 못 들어오게 됩니다. 이 계정이 남긴 처리 기록은 그대로 남아요.',
         okLabel: '빼기',
         danger: true,
       }))
@@ -133,117 +141,155 @@ export function Staff() {
 
   return (
     <>
-      <header className="admin__head">
-        <div>
-          <h1 className="t-title-s">스태프 계정</h1>
-          <p className="t-text-xs t-muted">
-            이 이벤트 관리 화면에 들어올 사람을 더해요. <b>이 이벤트에만</b> 권한이 생깁니다.
-          </p>
+      {head}
+
+      <div className="ad-stack">
+        <div className="ad-banner ad-banner--info ad-banner--pad">
+          <div className="ad-banner__title">계정은 사람마다 따로 만들어 주세요</div>
+          <div className="ad-banner__body">
+            누가 어떤 처리를 했는지 기록에 남아요. 하나를 돌려 쓰면 문제가 생겼을 때 확인할 수
+            없습니다.
+          </div>
         </div>
-      </header>
 
-      <div className="admin-banner admin-banner--info">
-        <TriangleAlert size={16} aria-hidden="true" />
-        <span>
-          계정을 나눠 주세요 — <b>한 계정을 여럿이 돌려 쓰면 누가 처리했는지 알 수 없습니다.</b>
-          교환권 수령처럼 되돌릴 수 없는 일을 다루는 화면이 있어요.
-        </span>
-      </div>
-
-      <form onSubmit={(e) => void add(e)} className="admin-toolbar">
-        <input
-          className="input input--title"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="staff@example.com"
-          aria-label="스태프 이메일"
-          data-staff-email
-        />
-        <button type="submit" className="btn btn--primary" disabled={busy} data-staff-add>
-          <UserPlus size={15} strokeWidth={2} aria-hidden="true" />
-          계정 만들기
-        </button>
-      </form>
-
-      {error && (
-        <div className="admin-banner admin-banner--err">
-          <TriangleAlert size={16} aria-hidden="true" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {temp && (
-        <div className="admin-banner admin-banner--warn" data-temp-password>
-          <KeyRound size={16} aria-hidden="true" />
-          <span>
-            <b>{temp.email}</b> 의 임시 비밀번호예요 — <b>이 화면을 벗어나면 다시 못 봅니다.</b>
-            <br />
-            <code className="admin-code">{temp.password}</code>{' '}
+        <form className="ad-card ad-card--form" onSubmit={(e) => void add(e)}>
+          <div className="ad-card__title ad-card__title--lg" style={{ marginBottom: 16 }}>
+            스태프 계정 만들기
+          </div>
+          <div className="ad-inline">
+            <input
+              className="ad-input ad-input--grow"
+              style={{ height: 52, minWidth: 220 }}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="staff@example.com"
+              aria-label="스태프 이메일"
+              data-staff-email
+            />
             <button
-              type="button"
-              className="btn btn--outline btn--sm"
-              onClick={() => {
-                void navigator.clipboard.writeText(temp.password).then(
-                  () => toast('복사했어요'),
-                  () => toast('복사하지 못했어요')
-                )
-              }}
+              type="submit"
+              className="ad-btn ad-btn--primary"
+              style={{ height: 52, padding: '0 22px', fontSize: 15 }}
+              disabled={busy}
+              data-staff-add
             >
-              <Copy size={13} strokeWidth={2} aria-hidden="true" />
-              복사
+              계정 만들기
             </button>
-            <br />
-            받은 분은 로그인 뒤 <b>'내 계정'</b> 에서 자기 비밀번호로 바꿔 주세요.
-          </span>
-        </div>
-      )}
+          </div>
 
-      {list === null ? null : list.length === 0 ? (
-        <div className="admin-empty">
-          <div className="admin-empty__title">아직 계정이 없어요</div>
-          <div className="t-text-s t-muted">위에 이메일을 넣으면 계정과 임시 비밀번호가 만들어져요.</div>
-        </div>
-      ) : (
-        <div className="row-list" data-staff-list>
-          {list.map((o) => {
-            const me = user?.email?.toLowerCase() === o.email.toLowerCase()
-            return (
-              <div key={o.userId} className="row-item">
-                <div className="row-item__grow">
-                  <div className="row-item__name">
-                    {o.email}
-                    {me && <span className="row-item__me">나</span>}
-                  </div>
-                  <div className="row-item__sub">{new Date(o.createdAt).toLocaleDateString('ko-KR')} 부터</div>
-                </div>
+          {error && (
+            <div className="ad-field__hint ad-field__hint--bad" style={{ marginTop: 12 }}>
+              {error}
+            </div>
+          )}
+
+          {temp && (
+            <div
+              className="ad-card ad-card--key"
+              style={{ marginTop: 16, background: 'var(--ad-key-wash-2)' }}
+              data-temp-password
+            >
+              <div className="ad-card__title">임시 비밀번호가 만들어졌어요</div>
+              <div className="ad-banner__body" style={{ color: 'var(--ad-bad)', fontWeight: 700 }}>
+                {temp.email} · 이 화면을 벗어나면 다시 볼 수 없어요. 지금 복사해서 전달해 주세요.
+              </div>
+              <div className="ad-inline" style={{ marginTop: 14 }}>
+                <span className="ad-secret tnum">{temp.password}</span>
                 <button
                   type="button"
-                  className="btn btn--quiet btn--sm"
-                  disabled={busy}
-                  onClick={() => void reset(o)}
+                  className="ad-btn ad-btn--primary ad-btn--xl"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(temp.password).then(
+                      () => toast('복사했어요'),
+                      () => toast('복사하지 못했어요')
+                    )
+                  }}
                 >
-                  <KeyRound size={13} strokeWidth={2} aria-hidden="true" />
-                  비밀번호 재발급
+                  복사
                 </button>
-                {/* 자기 자신은 못 뺀다 — 스스로 잠기면 아무도 못 들어온다 (서버도 같이 막는다) */}
-                {!me && (
-                  <button
-                    type="button"
-                    className="btn btn--danger btn--sm"
-                    disabled={busy}
-                    onClick={() => void remove(o)}
-                    data-staff-remove
-                  >
-                    <UserMinus size={13} strokeWidth={2} aria-hidden="true" />
-                    빼기
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className="ad-btn ad-btn--line ad-btn--xl"
+                  onClick={() => setTemp(null)}
+                >
+                  확인했어요
+                </button>
               </div>
-            )
-          })}
+              <p className="ad-fine" style={{ marginTop: 12 }}>
+                받은 분은 로그인 뒤 ‘내 계정’ 에서 자기 비밀번호로 바꿔 주세요.
+              </p>
+            </div>
+          )}
+        </form>
+
+        <div className="ad-card">
+          <div className="ad-card__head">
+            <div className="ad-card__titleRow">
+              <span className="ad-card__title">계정</span>
+              <span className="ad-card__num tnum">{list?.length ?? 0}개</span>
+            </div>
+          </div>
+
+          {list === null ? (
+            <div className="ad-skels">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="ad-skel ad-skel--row" />
+              ))}
+            </div>
+          ) : list.length === 0 ? (
+            <div className="ad-empty">
+              <div className="ad-empty__title">아직 계정이 없어요</div>
+              <div className="ad-empty__sub">
+                위에 이메일을 넣으면 계정과 임시 비밀번호가 만들어져요.
+              </div>
+            </div>
+          ) : (
+            <div className="ad-rows" data-staff-list>
+              {list.map((o) => {
+                const me = user?.email?.toLowerCase() === o.email.toLowerCase()
+                return (
+                  <div key={o.userId} className="ad-row">
+                    <div style={{ minWidth: 180, flex: 1 }}>
+                      <div className="ad-card__titleRow">
+                        <span style={{ fontSize: 14, fontWeight: 700 }}>{o.email}</span>
+                        {me && (
+                          <span className="ad-tag ad-tag--sm" data-tone="on">
+                            나
+                          </span>
+                        )}
+                      </div>
+                      <div className="ad-fine tnum" style={{ marginTop: 4 }}>
+                        {new Date(o.createdAt).toLocaleDateString('ko-KR')} 부터
+                      </div>
+                    </div>
+                    <div className="ad-btnrow">
+                      <button
+                        type="button"
+                        className="ad-btn ad-btn--line ad-btn--sm"
+                        disabled={busy}
+                        onClick={() => void reset(o)}
+                      >
+                        비밀번호 재발급
+                      </button>
+                      {/* 자기 자신은 못 뺀다 — 스스로 잠기면 아무도 못 들어온다 (서버도 같이 막는다) */}
+                      <button
+                        type="button"
+                        className="ad-btn ad-btn--danger ad-btn--sm"
+                        disabled={busy || me}
+                        onClick={() => void remove(o)}
+                        data-staff-remove
+                      >
+                        {me ? '나는 뺄 수 없어요' : '빼기'}
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </>
   )
 }

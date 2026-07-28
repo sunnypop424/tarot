@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Download, Info, Link as LinkIcon, QrCode } from 'lucide-react'
 import qrcode from 'qrcode-generator'
 
 import { getSlotService } from '@/data/services'
@@ -23,9 +22,9 @@ import { toast } from './AdminFeedback'
 
 /** 인쇄용 — 한 모듈을 몇 픽셀로 그릴지. 8px 이면 A4 에 붙일 만한 크기가 나온다 */
 const SCALES = [
-  { id: 'sm', px: 6, label: '작게' },
-  { id: 'md', px: 10, label: '보통' },
-  { id: 'lg', px: 16, label: '크게 (인쇄용)' },
+  { id: 'sm', px: 6, label: '작게', note: '스티커·명함 크기' },
+  { id: 'md', px: 10, label: '보통', note: 'A5 안내판 정도' },
+  { id: 'lg', px: 16, label: '크게 (인쇄용)', note: 'A4 포스터에 붙일 크기' },
 ] as const
 
 /** 조용한 여백 — QR 규격이 4모듈을 요구한다. 이걸 줄이면 인식률이 떨어진다 */
@@ -92,97 +91,111 @@ export function Qr() {
     }
   }
 
+  const TARGETS = [
+    { id: 'visitor', name: '손님용 주소', hint: '포스터·테이블에 붙이는 QR' },
+    { id: 'admin', name: '스태프·관리용 주소', hint: '카운터 기기에서만 쓰는 QR' },
+  ] as const
+
   return (
     <>
-      <header className="admin__head">
-        <div>
-          <h1 className="t-title-s">QR 만들기</h1>
-          <p className="t-text-xs t-muted">인쇄해서 카페에 붙이면 손님이 이 주소로 들어와요.</p>
+      <header className="ad-head">
+        <div className="ad-head__row">
+          <h1 className="ad-head__title">QR 만들기</h1>
         </div>
+        <p className="ad-head__desc">현장에 붙일 QR을 만들어 내려받습니다.</p>
       </header>
 
-      <div className="admin-split">
-        <section className="admin-section">
-          <h2 className="admin-section__title">
-            <QrCode size={15} strokeWidth={2} aria-hidden="true" />
-            주소와 크기
-          </h2>
-          <div className="field">
-            <span className="field__label">어느 주소</span>
-            <div className="pill-group">
-              {(
-                [
-                  ['visitor', '손님용', `/${slot.slug}`],
-                  ['admin', '스태프·관리용', `/${slot.slug}/admin`],
-                ] as const
-              ).map(([id, label, path]) => (
+      <div className="ad-split">
+        <div className="ad-stack">
+          <div className="ad-card ad-card--form">
+            <div className="ad-card__title">어떤 주소의 QR인가요</div>
+            <div className="ad-checks">
+              {TARGETS.map((t) => (
                 <button
-                  key={id}
+                  key={t.id}
                   type="button"
-                  onClick={() => setTarget(id)}
-                  data-qr-target={id}
-                  className="pill"
-                  data-on={target === id || undefined}
-                  title={path}
+                  className="ad-radio"
+                  data-on={target === t.id || undefined}
+                  data-qr-target={t.id}
+                  onClick={() => setTarget(t.id)}
                 >
-                  {label}
+                  <span className="ad-radio__dot" aria-hidden="true" />
+                  <span>
+                    <span className="ad-check__name">{t.name}</span>
+                    <span className="ad-check__hint">{t.hint}</span>
+                  </span>
                 </button>
               ))}
             </div>
-            <span className="field__hint">
-              손님용은 벽에, 스태프·관리용은 카운터 안쪽에 붙이세요 — <b>같이 붙이면 손님이 관리 화면으로 들어옵니다.</b>
-            </span>
-          </div>
 
-          <div className="field">
-            <span className="field__label">크기</span>
-            <div className="pill-group">
+            <div className="ad-hr" />
+
+            <div className="ad-card__title">인쇄 크기</div>
+            <div className="ad-choices">
               {SCALES.map((s) => (
                 <button
                   key={s.id}
                   type="button"
-                  onClick={() => setScale(s.id)}
-                  className="pill"
+                  className="ad-choice"
                   data-on={scale === s.id || undefined}
+                  onClick={() => setScale(s.id)}
                 >
                   {s.label}
                 </button>
               ))}
             </div>
-          </div>
 
-          <div className="field">
-            <span className="field__label">주소</span>
-            <div className="admin-inline-form">
-              <code className="admin-url" data-qr-url>
+            <div className="ad-hr" />
+
+            <div className="ad-card__title">주소</div>
+            <div className="ad-inline">
+              <code className="ad-url" data-qr-url>
                 {url}
               </code>
-              <button type="button" className="btn btn--outline btn--sm" onClick={() => void copy()}>
-                <LinkIcon size={14} strokeWidth={2} aria-hidden="true" />
+              <button type="button" className="ad-btn ad-btn--line ad-btn--xl" onClick={() => void copy()}>
                 복사
               </button>
             </div>
           </div>
 
-          <div className="admin-banner admin-banner--info" style={{ marginBottom: 0, marginTop: 16 }}>
-            <Info size={16} aria-hidden="true" />
-            <span>
-              인쇄 전에 <b>폰으로 한 번 찍어 보세요.</b> 종이·조명에 따라 인식률이 달라져요.
-              A4 에 붙이실 거면 '크게' 를 받으시고, 가로 5cm 아래로는 줄이지 마세요.
-              {service === 'photocard' && ' 스태프 기기는 QR 대신 주소를 직접 열어 로그인해 두시는 게 편해요.'}
-            </span>
+          <div className="ad-card">
+            <div className="ad-card__title">인쇄 전에 확인해 주세요</div>
+            <div className="ad-bullets">
+              <div className="ad-bullet">
+                인쇄 전에 화면의 QR을 폰으로 한 번 찍어 주소가 맞는지 확인해 주세요.
+              </div>
+              <div className="ad-bullet">가로 5cm보다 작게 인쇄하면 잘 안 읽혀요.</div>
+              <div className="ad-bullet">
+                손님용과 스태프·관리용을 같이 붙이면 손님이 관리 화면으로 들어옵니다.
+              </div>
+              {service === 'photocard' && (
+                <div className="ad-bullet">
+                  스태프 기기는 QR 대신 주소를 직접 열어 로그인해 두시는 게 편해요.
+                </div>
+              )}
+            </div>
           </div>
-        </section>
+        </div>
 
-        <section className="admin-section admin-qr">
-          <h2 className="admin-section__title">미리보기</h2>
-          {/* QR 은 캔버스다 — `<img>` 를 쓰지 않는다 (이 레포의 규칙) */}
-          <canvas ref={canvasRef} data-qr-canvas className="admin-qr__canvas" aria-label="QR 코드" role="img" />
-          <button type="button" className="btn btn--primary" onClick={save} data-qr-save>
-            <Download size={15} strokeWidth={2} aria-hidden="true" />
-            PNG 로 저장
+        <div className="ad-card ad-card--form ad-qr">
+          <div className="ad-card__title">미리보기</div>
+          <div className="ad-qr__box">
+            {/* QR 은 캔버스다 — `<img>` 를 쓰지 않는다 (이 레포의 규칙) */}
+            <canvas ref={canvasRef} data-qr-canvas className="ad-qr__canvas" aria-label="QR 코드" role="img" />
+          </div>
+          <p className="ad-fine" style={{ marginTop: 14 }}>
+            {SCALES.find((s) => s.id === scale)?.note} · 실제 QR은 내려받은 PNG에 들어 있어요
+          </p>
+          <button
+            type="button"
+            className="ad-btn ad-btn--primary ad-btn--xl ad-btn--block"
+            style={{ marginTop: 16 }}
+            onClick={save}
+            data-qr-save
+          >
+            PNG 내려받기
           </button>
-        </section>
+        </div>
       </div>
     </>
   )

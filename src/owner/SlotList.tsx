@@ -470,33 +470,42 @@ export function SlotList() {
                 </select>
               </label>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 16, marginTop: 16, alignItems: 'end' }}>
+            {/*
+              * 버튼을 `alignItems:'end'` 로 붙이면 기간 필드의 **힌트 줄 아래**에 서서 날짜 칸과
+              * 밑선이 어긋난다. 위에서부터 맞추고, 라벨 자리만큼 빈 줄을 둬 입력칸과 나란히 세운다.
+              */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 16, marginTop: 16, alignItems: 'start' }}>
               <PeriodFields period={period} onChange={setPeriod} disabled={busy} />
-              <button
-                type="submit"
-                disabled={busy || !slots}
-                style={{
-                  height: 38,
-                  border: 'none',
-                  borderRadius: 4,
-                  background: PURPLE,
-                  color: '#fff',
-                  fontSize: 13.5,
-                  fontWeight: 650,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 7,
-                  padding: '0 18px',
-                  opacity: busy || !slots ? 0.6 : 1,
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = PURPLE_HOVER)}
-                onMouseLeave={(e) => (e.currentTarget.style.background = PURPLE)}
-              >
-                <Plus size={15} strokeWidth={2.2} aria-hidden="true" />
-                만들기
-              </button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <span style={labelStyle} aria-hidden="true">
+                  &nbsp;
+                </span>
+                <button
+                  type="submit"
+                  disabled={busy || !slots}
+                  style={{
+                    height: 38,
+                    border: 'none',
+                    borderRadius: 4,
+                    background: PURPLE,
+                    color: '#fff',
+                    fontSize: 13.5,
+                    fontWeight: 650,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 7,
+                    padding: '0 18px',
+                    opacity: busy || !slots ? 0.6 : 1,
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = PURPLE_HOVER)}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = PURPLE)}
+                >
+                  <Plus size={15} strokeWidth={2.2} aria-hidden="true" />
+                  만들기
+                </button>
+              </div>
             </div>
             {error && (
               <p className="field__error" style={{ margin: '10px 0 0', fontSize: 12, color: '#cc3b39' }}>

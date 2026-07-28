@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Copy, Download, Dices, Undo2 } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import type { RewardEntry } from '@/lib/repo/types'
@@ -39,12 +38,30 @@ export function Picker() {
     void load()
   }, [load])
 
+  const head = (
+    <header className="ad-head">
+      <div className="ad-head__row">
+        <h1 className="ad-head__title">추첨</h1>
+        {list && (
+          <span className="ad-head__count tnum">
+            응모자 {list.length}명 · 남은 후보 {list.filter((e) => !e.won).length}명
+          </span>
+        )}
+      </div>
+      <p className="ad-head__desc">응모자 중에서 당첨자를 뽑고, 회차별로 관리합니다.</p>
+    </header>
+  )
+
   if (!repo.rewards.ready()) {
     return (
-      <div className="admin-empty">
-        <Dices size={44} strokeWidth={1.6} aria-hidden="true" />
-        <div className="admin-empty__title">지금 빌드에서는 추첨을 쓸 수 없어요</div>
-      </div>
+      <>
+        {head}
+        <div className="ad-card">
+          <div className="ad-empty">
+            <div className="ad-empty__title">지금 빌드에서는 추첨을 쓸 수 없어요</div>
+          </div>
+        </div>
+      </>
     )
   }
   if (!list) return null
@@ -55,24 +72,23 @@ export function Picker() {
   const rounds = [...new Set(winners.map((w) => w.pickedRound).filter((r): r is number => r !== null))].sort(
     (a, b) => b - a
   )
+  const canDraw = pool.length > 0
+  const picking = Math.min(Math.max(1, count), Math.max(1, pool.length))
 
   const copyText = (rows: RewardEntry[]) =>
     rows.map((r) => (r.handle ? `${r.nickname} (@${r.handle.replace(/^@/, '')})` : r.nickname)).join('\n')
 
   async function draw() {
-    if (busy || pool.length === 0) return
-    const n = Math.min(count, pool.length)
-    if (
-      !(await confirmAction({
-        title: `${n}명을 뽑을까요?`,
-        desc: '뽑힌 사람은 다음 추첨 후보에서 빠져요. 잘못 뽑으면 되돌리기로 그 회차만 취소할 수 있어요.',
-        okLabel: '추첨',
-      }))
-    )
-      return
+    if (busy || !canDraw) return
+    const ok = await confirmAction({
+      title: `지금 ${picking}명을 뽑을까요?`,
+      desc: `남은 후보 ${pool.length}명 중에서 ${picking}명을 뽑습니다. 뽑힌 사람은 후보에서 빠지고, 회차 단위로만 되돌릴 수 있어요.`,
+      okLabel: `${picking}명 뽑기`,
+    })
+    if (!ok) return
     setBusy(true)
     try {
-      const result = await repo.rewards.pick(slug, source, n, method)
+      const result = await repo.rewards.pick(slug, source, picking, method)
       setPicked(result)
       await load()
       toast(`${result.length}명을 뽑았어요`)
@@ -83,16 +99,14 @@ export function Picker() {
     }
   }
 
-  async function undo(round: number) {
-    if (
-      !(await confirmAction({
-        title: `${round}회차를 되돌릴까요?`,
-        desc: '그 회차에 뽑힌 사람이 다시 후보로 돌아가요.',
-        okLabel: '되돌리기',
-        danger: true,
-      }))
-    )
-      return
+  async function undo(round: number, names: string[]) {
+    const ok = await confirmAction({
+      title: `${round}회차를 되돌릴까요?`,
+      desc: `이 회차에서 뽑힌 ${names.length}명이 다시 후보로 돌아갑니다. 이미 안내를 보냈다면 혼선이 생길 수 있어요.`,
+      okLabel: '되돌리기',
+      danger: true,
+    })
+    if (!ok) return
     setBusy(true)
     try {
       const n = await repo.rewards.unpick(slug, source, round)
@@ -130,140 +144,235 @@ export function Picker() {
     URL.revokeObjectURL(url)
   }
 
-  return (
-    <div>
-      <header className="admin__head">
-        <div>
-          <h1 className="t-title-l">추첨</h1>
-          <p className="t-text-xs t-muted">
-            응모자 {list.length}명 · 남은 후보 {pool.length}명 · 당첨 {winners.length}명
-          </p>
-        </div>
-      </header>
+  async function copy(rows: RewardEntry[], msg: string) {
+    try {
+      await navigator.clipboard.writeText(copyText(rows))
+      toast(msg)
+    } catch {
+      toast('복사하지 못했어요')
+    }
+  }
 
-      <section className="admin-section admin-section--do admin-section--narrow" data-picker>
-        <h2 className="admin-section__title">
-          <Dices size={15} strokeWidth={2} aria-hidden="true" />
-          응모자 중에서 뽑기
-        </h2>
-        <div className="admin-inline-form">
-          <label className="field field--xs">
-            <span className="field__label">인원</span>
-            <input
-              className="input"
-              type="number"
-              min={1}
-              max={Math.max(1, pool.length)}
-              value={count}
-              onChange={(e) => setCount(Math.max(1, Number(e.target.value) || 1))}
-              data-pick-count
-            />
-          </label>
-          {hasScore && (
-            <label className="field field--sm">
-              <span className="field__label">방식</span>
-              <select
-                className="select"
-                value={method}
-                onChange={(e) => setMethod(e.target.value as 'random' | 'score')}
-              >
-                <option value="random">랜덤</option>
-                <option value="score">점수순</option>
-              </select>
-            </label>
-          )}
+  return (
+    <>
+      {head}
+
+      <div className="ad-stack">
+        <div className="ad-stats">
+          {[
+            { label: '응모자', value: list.length },
+            { label: '남은 후보', value: pool.length },
+            { label: '당첨자', value: winners.length },
+          ].map((k) => (
+            <div key={k.label} className="ad-stat">
+              <div className="ad-stat__label">{k.label}</div>
+              <div className="ad-stat__row">
+                <span className="ad-stat__value tnum">{k.value}</span>
+                <span className="ad-stat__unit">명</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="ad-card ad-card--form" data-picker>
+          <div className="ad-card__title ad-card__title--lg">추첨하기</div>
+          <p className="ad-card__desc">
+            뽑은 결과는 되돌릴 수 있지만, 회차 단위로만 되돌려요. 후보가 남아 있지 않으면 추첨할 수
+            없어요.
+          </p>
+
+          <div className="ad-drawform">
+            <div>
+              <span className="ad-field__label">뽑을 인원</span>
+              <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>
+                <button
+                  type="button"
+                  className="ad-step"
+                  aria-label="한 명 줄이기"
+                  onClick={() => setCount((c) => Math.max(1, c - 1))}
+                >
+                  −
+                </button>
+                <input
+                  className="ad-input ad-input--center"
+                  style={{ height: 48, fontSize: 20, fontWeight: 700, flex: 1, minWidth: 60 }}
+                  inputMode="numeric"
+                  value={count}
+                  aria-label="뽑을 인원"
+                  onChange={(e) => setCount(Math.max(1, Number(e.target.value.replace(/[^0-9]/g, '')) || 1))}
+                  data-pick-count
+                />
+                <button
+                  type="button"
+                  className="ad-step"
+                  aria-label="한 명 늘리기"
+                  onClick={() => setCount((c) => Math.min(50, c + 1))}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            {hasScore && (
+              <div>
+                <span className="ad-field__label">방식</span>
+                <div className="ad-seg">
+                  {(
+                    [
+                      ['random', '무작위'],
+                      ['score', '점수순'],
+                    ] as const
+                  ).map(([m, label]) => (
+                    <button
+                      key={m}
+                      type="button"
+                      className="ad-seg__btn"
+                      data-on={method === m || undefined}
+                      onClick={() => setMethod(m)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <p className="ad-field__hint">
+                  {method === 'random'
+                    ? '남은 후보 중에서 무작위로 뽑아요.'
+                    : '점수가 높은 순으로 뽑고, 커트라인 동점자 안에서만 무작위로 갈려요 — 정원은 정확히 맞습니다.'}
+                </p>
+              </div>
+            )}
+          </div>
+
           <button
             type="button"
-            className="btn btn--primary"
-            disabled={busy || pool.length === 0}
+            className="ad-btn ad-btn--primary ad-btn--hero ad-btn--block"
+            style={{ marginTop: 20 }}
+            disabled={busy || !canDraw}
             onClick={() => void draw()}
             data-pick-go
           >
-            <Dices size={15} aria-hidden="true" />
-            추첨하기
+            {canDraw ? `${picking}명 추첨하기` : '남은 후보가 없어요'}
           </button>
+          {!canDraw && (
+            <p className="ad-fine" style={{ marginTop: 12 }}>
+              뽑을 후보가 없어요. 응모를 낸 사람만 후보가 됩니다.
+            </p>
+          )}
         </div>
-        {method === 'score' && (
-          <p className="admin-note" style={{ margin: '12px 0 0' }}>
-            점수가 높은 순으로 뽑고, <b>커트라인 동점자 안에서만 무작위</b>로 갈려요 — 정원은 정확히 맞습니다.
-          </p>
-        )}
-        {pool.length === 0 && (
-          <p className="admin-note" style={{ margin: '12px 0 0' }}>
-            뽑을 후보가 없어요. 응모를 낸 사람만 후보가 됩니다.
-          </p>
-        )}
-      </section>
 
-      {picked && picked.length > 0 && (
-        <section className="admin-section" data-picked>
-          <h2 className="admin-section__title">
-            이번 회차 당첨 {picked.length}명
-            <span className="admin-section__actions">
-              <button
-                type="button"
-                className="btn btn--primary btn--sm"
-                onClick={async () => {
-                  await navigator.clipboard.writeText(copyText(picked))
-                  toast('트위터에 붙여넣으세요')
-                }}
-              >
-                <Copy size={14} aria-hidden="true" />
-                트위터용 복사
-              </button>
-              <button type="button" className="btn btn--outline btn--sm" onClick={() => downloadCsv(picked, '당첨자')}>
-                <Download size={14} aria-hidden="true" />
-                CSV
-              </button>
-            </span>
-          </h2>
-          <ol className="admin-oList">
-            {picked.map((w) => (
-              <li key={w.rewardId} className="t-text-m">
-                {w.nickname}
-                {w.handle && <span className="t-muted"> @{w.handle.replace(/^@/, '')}</span>}
-                {w.score !== null && <span className="t-muted"> · {w.score}점</span>}
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
-
-      {rounds.length > 0 && (
-        <section className="admin-section">
-          <h2 className="admin-section__title">지난 회차</h2>
-          <div className="row-list">
-            {rounds.map((r) => {
-              const rows = winners.filter((w) => w.pickedRound === r)
-              return (
-                <div key={r} className="row-item">
-                  <span className="row-item__grow t-text-m">
-                    {r}회차 · {rows.length}명
-                    <span className="t-muted t-text-xs"> — {rows.map((x) => x.nickname).join(', ')}</span>
+        {picked && picked.length > 0 && (
+          <div className="ad-card ad-card--key" data-picked>
+            <div className="ad-card__head">
+              <div className="ad-card__titleRow">
+                <span className="ad-card__title">방금 뽑힌 {picked.length}명</span>
+                {picked[0]?.pickedRound !== null && (
+                  <span className="ad-tag ad-tag--sm" data-tone="on">
+                    {picked[0]?.pickedRound}회차
                   </span>
-                  <div className="row-actions">
-                    <button
-                      type="button"
-                      className="btn btn--quiet btn--sm"
-                      onClick={async () => {
-                        await navigator.clipboard.writeText(copyText(rows))
-                        toast('복사했어요')
+                )}
+              </div>
+              <div className="ad-btnrow">
+                <button
+                  type="button"
+                  className="ad-btn ad-btn--primary ad-btn--lg"
+                  onClick={() => void copy(picked, '트위터에 붙여넣으세요')}
+                >
+                  트위터용 텍스트 복사
+                </button>
+                <button
+                  type="button"
+                  className="ad-btn ad-btn--line ad-btn--lg"
+                  onClick={() => downloadCsv(picked, '당첨자')}
+                >
+                  CSV
+                </button>
+              </div>
+            </div>
+            <div className="ad-chips">
+              {picked.map((w) => (
+                <span key={w.rewardId} className="ad-chip">
+                  {w.nickname}
+                  {w.score !== null && (
+                    <span style={{ color: 'var(--ad-ink-3)', marginLeft: 5 }}> {w.score}점</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="ad-card">
+          <div className="ad-card__head">
+            <div className="ad-card__titleRow">
+              <span className="ad-card__title">지난 회차</span>
+              <span className="ad-card__num tnum">{rounds.length}회</span>
+            </div>
+          </div>
+
+          {rounds.length === 0 ? (
+            <div className="ad-empty ad-empty--sm">
+              <div className="ad-empty__title">아직 추첨한 회차가 없어요</div>
+              <div className="ad-empty__sub">
+                위에서 인원과 방식을 정하고 추첨하면 회차가 여기에 쌓여요.
+              </div>
+            </div>
+          ) : (
+            <div className="ad-rows">
+              {rounds.map((r) => {
+                const rows = winners.filter((w) => w.pickedRound === r)
+                return (
+                  <div key={r} className="ad-row" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 12,
+                        flexWrap: 'wrap',
                       }}
                     >
-                      <Copy size={13} aria-hidden="true" />
-                      복사
-                    </button>
-                    <button type="button" className="btn btn--quiet btn--sm" disabled={busy} onClick={() => void undo(r)}>
-                      <Undo2 size={13} aria-hidden="true" />
-                      되돌리기
-                    </button>
+                      <div className="ad-card__titleRow">
+                        <span style={{ fontSize: 14, fontWeight: 700 }}>{r}회차</span>
+                        <span className="ad-card__num tnum">{rows.length}명</span>
+                      </div>
+                      <div className="ad-btnrow">
+                        <button
+                          type="button"
+                          className="ad-btn ad-btn--line ad-btn--xs"
+                          onClick={() => void copy(rows, '복사했어요')}
+                        >
+                          복사
+                        </button>
+                        <button
+                          type="button"
+                          className="ad-btn ad-btn--line ad-btn--xs"
+                          onClick={() => downloadCsv(rows, `${r}회차`)}
+                        >
+                          CSV
+                        </button>
+                        <button
+                          type="button"
+                          className="ad-btn ad-btn--danger ad-btn--xs"
+                          disabled={busy}
+                          onClick={() => void undo(r, rows.map((x) => x.nickname))}
+                        >
+                          이 회차 되돌리기
+                        </button>
+                      </div>
+                    </div>
+                    <div className="ad-chips ad-chips--tight" style={{ marginTop: 12 }}>
+                      {rows.map((w) => (
+                        <span key={w.rewardId} className="ad-chip ad-chip--plain">
+                          {w.nickname}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
-        </section>
-      )}
-    </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   )
 }

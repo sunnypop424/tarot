@@ -263,14 +263,19 @@ function Bubble({
     )
   if (shape === 'banner')
     return (
+      /**
+       * 제비꼬리는 **두 겹**이다 — 바깥이 테두리 색, 안이 말풍선 색.
+       * `border` + `clip-path` 로는 잘려 나간 쪽(꼬리)에 선이 안 남는다 (clip 이 테두리째 자른다).
+       */
       <div className={styles.banner} style={style}>
-        {message.body}
+        <span className={styles.bannerBody}>{message.body}</span>
       </div>
     )
   if (shape === 'burst')
     return (
+      // 별도 리본과 같은 두 겹 — 바깥이 테두리 색, 안이 별 색 (clip-path 는 border 를 잘라낸다)
       <div className={styles.burst} style={style}>
-        {message.body}
+        <span className={styles.burstBody}>{message.body}</span>
       </div>
     )
   if (shape === 'plaque')

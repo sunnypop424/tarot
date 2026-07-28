@@ -197,7 +197,8 @@ try {
 
   const nav = await page.evaluate(() => document.body.innerText)
   const seen = `URL ${page.url().replace(BASE, '')} · 본문 "${nav.replace(/\s+/g, ' ').slice(0, 90)}"`
-  check('관리 메뉴가 럭키드로우용이다', nav.includes('상품과 수량') && nav.includes('운영 설정'), seen)
+  // 메뉴 이름은 '상품 · 운영' 한 장이다 (예전 '상품과 수량' + '운영 설정' 두 장을 합쳤다)
+  check('관리 메뉴가 럭키드로우용이다', nav.includes('상품 · 운영'), seen)
   // 화면이 비어도 통과하는 부정 단언이라 위 검사가 통과할 때만 의미가 있다
   check('질문 타로 메뉴가 안 뜬다', !nav.includes('질문 타로'))
   check('배송 정보 메뉴가 있다', nav.includes('배송 정보'), seen)
@@ -217,7 +218,7 @@ try {
       await Promise.all([solo.click('button[type="submit"]'), wait(2500)])
 
       const body = await solo.evaluate(() => document.body.innerText)
-      check('최고관리자도 주최자 화면에 들어간다', body.includes('상품과 수량'), body.slice(0, 60))
+      check('최고관리자도 주최자 화면에 들어간다', body.includes('상품 · 운영'), body.slice(0, 60))
       // 남의 데이터를 자기 것인 줄 알고 고치면 안 된다
       check('최고관리자로 보는 중임을 알린다', Boolean(await solo.$('[data-owner-view]')))
     } finally {

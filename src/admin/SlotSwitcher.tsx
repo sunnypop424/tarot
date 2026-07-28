@@ -37,7 +37,7 @@ export function SlotSwitcher({ current, slugs }: { current: string; slugs: strin
 
   return (
     <nav className={styles.switcher} aria-label="내 슬롯">
-      <p className="t-text-xs t-muted">내 슬롯</p>
+      <p className={styles.title}>내 행사</p>
       {slots.map((s) => (
         <a
           key={s.slug}
@@ -47,7 +47,7 @@ export function SlotSwitcher({ current, slugs }: { current: string; slugs: strin
           data-current={s.slug === current || undefined}
         >
           <span className={styles.name}>{s.name}</span>
-          <span className="t-text-xs t-muted">{serviceLabel(getSlotService(s))}</span>
+          <span className={styles.svc}>{serviceLabel(getSlotService(s))}</span>
         </a>
       ))}
     </nav>

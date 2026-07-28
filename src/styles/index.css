@@ -5,7 +5,8 @@
  *   base       → 문서 기본값 + 타이포그래피 스케일 클래스
  *   layout     → 앱 셸, 화면 골격, 탭바
  *   components → 공통 컴포넌트 클래스 (.btn, .tile, .chip …)
- *   admin      → 관리 화면 전용 (.admin, .field, .input …) — 사용자 앱과 격리
+ *   admin      → 슬롯 편집기·로그인 (.owner, .field, .input …) — 사용자 앱과 격리
+ *   organizer  → 주최자 운영도구 (.ad-*) — 편집기와 클래스를 나눠 쓰지 않는다
  *
  * 화면별 스타일은 *.module.css 로 만들고 여기서 임포트하지 않는다.
  */
@@ -16,3 +17,4 @@
 @import './layout.css';
 @import './components.css';
 @import './admin.css';
+@import './organizer.css';

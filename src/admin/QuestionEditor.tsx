@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Check, ChevronLeft, Sparkles, TriangleAlert } from 'lucide-react'
 
 import { getDeck, type DeckRange } from '@/data/cards'
 import { repo } from '@/lib/repo'
 import type { GeneratedAnswer } from '@/lib/repo'
 import { getSlotDeck } from '@/data/slots'
 import { getPlan } from '@/data/plans'
-import { CrystalBall } from '@/components/CrystalBall'
 import { useSlot } from '@/slot/SlotProvider'
 import type { Aspect, Card, Orientation } from '@/types/card'
 import { QUESTION_CARD_COUNT, type Question, type QuestionAnswers } from '@/types/question'
-import styles from './QuestionEditor.module.css'
+import { confirmAction, toast } from './AdminFeedback'
 
 const ASPECTS: { value: Aspect; label: string }[] = [
   { value: 'general', label: '종합' },
@@ -136,20 +134,31 @@ export function QuestionEditor() {
   }, [draft, cards, slug])
 
   if (draft === null) {
-    return <p className="t-body t-muted">질문을 찾을 수 없어요.</p>
+    return <p className="ad-sub">질문을 찾을 수 없어요.</p>
   }
 
   const error = validate(draft, effDeck)
 
   /** 검수 끝 — 여기서 비로소 answers 에 들어간다 (patch 가 곧 저장이다) */
-  const applyPending = () => {
+  const applyPending = async () => {
     if (!pending) return
+    const ok = await confirmAction({
+      title: '생성한 답변을 저장할까요?',
+      desc:
+        overwrites > 0
+          ? `이미 써 두신 답변 ${overwrites}장이 덮어써집니다.`
+          : '검수한 내용 그대로 방문자에게 나갑니다.',
+      okLabel: '저장',
+      danger: overwrites > 0,
+    })
+    if (!ok) return
     const merged: QuestionAnswers = { ...draft.answers }
     for (const [cardId, answer] of Object.entries(pending)) {
       merged[cardId] = { ...merged[cardId], ...answer }
     }
     patch({ answers: merged })
     setPending(null)
+    toast('저장했어요')
   }
 
   const pendingCount = pending ? Object.keys(pending).length : 0
@@ -163,212 +172,203 @@ export function QuestionEditor() {
 
   return (
     <>
-      <button
-        type="button"
-        className={styles.back}
-        onClick={() => navigate(`/${slug}/admin/questions`)}
-      >
-        <ChevronLeft size={20} strokeWidth={2} aria-hidden="true" />
-        질문 목록
-      </button>
+      <header className="ad-head">
+        <button
+          type="button"
+          className="ad-head__back"
+          onClick={() => navigate(`/${slug}/admin/questions`)}
+        >
+          ‹ 질문 목록
+        </button>
+        <div className="ad-head__row">
+          <h1 className="ad-head__title">질문 편집</h1>
+        </div>
+        <p className="ad-head__desc">
+          고치는 즉시 저장돼요. 저장을 잊어 날리는 편이 더 나쁘니까요.
+        </p>
+      </header>
 
-      <div className={styles.editorHead}>
-        <h1 className="t-title-l">질문 편집</h1>
-        <span className={styles.autoSaveChip} data-saving={saving || undefined}>
-          <Check size={13} strokeWidth={2.6} aria-hidden="true" />
-          {saving ? '저장 중…' : '자동 저장'}
-        </span>
-      </div>
-      <p className={styles.editorSub}>
-        답변은 고치는 즉시 저장돼요. 저장을 잊어 내용을 날리는 일이 없게요.
-      </p>
+      <div className="ad-stack">
+        <div>
+          <span className="ad-note">
+            {saving ? '저장 중…' : '자동 저장'} · 저장을 잊어 날리는 편이 더 나빠서 즉시 저장해요
+          </span>
+        </div>
 
-      <section className="admin-section">
-        <h2 className={`t-title-s admin-section__title`}>질문</h2>
-        <div className="field">
-          <label className="field__label" htmlFor="q-text">
-            방문자에게 보이는 질문
+        <div className="ad-card ad-card--form">
+          <label className="ad-card__title" htmlFor="q-text">
+            질문
           </label>
           <input
             id="q-text"
-            className="input"
+            className="ad-input ad-input--lg"
             value={draft.question}
-            placeholder="예: 지금 이직해도 괜찮을까요?"
+            placeholder="방문자에게 보일 문구"
             onChange={(e) => patch({ question: e.target.value })}
           />
-        </div>
-
-        <label className="check" style={{ marginTop: 'var(--space-md)' }}>
-          <input
-            type="checkbox"
-            checked={draft.published}
-            onChange={(e) => patch({ published: e.target.checked })}
-          />
-          <span className="t-text-s">공개 — 끄면 방문자에게 보이지 않아요</span>
-        </label>
-      </section>
-
-      <section className="admin-section">
-        <h2 className="t-title-s admin-section__title">뽑기 설정</h2>
-        {/* 뽑는 수(항상 1장)·카드 범위·역방향 확률(50%)은 주최자가 고르지 않는다.
-            범위는 슬롯 설정이라 최고관리자만 바꾼다 — 여긴 결과만 알려준다 */}
-        <p className="admin-note">
-          이 슬롯은 <b>{effDeck === 'major' ? '메이저 22장' : '전체 78장'}</b>을 써요. 카드를 한 장
-          뽑고, 역방향은 50% 로 나와요. 카드 범위는 슬롯 설정이라 여기서는 못 바꿔요.
-        </p>
-
-        <div className="form-grid">
-          <div className="field">
-            <label className="field__label" htmlFor="q-spread">
-              펼치는 카드 수
-            </label>
-            <input
-              id="q-spread"
-              className="input"
-              type="number"
-              min={QUESTION_CARD_COUNT + 2}
-              max={cards.length}
-              value={draft.spreadCount ?? ''}
-              placeholder={`비우면 ${cards.length}장 전부`}
-              onChange={(e) =>
-                patch({ spreadCount: e.target.value === '' ? null : Number(e.target.value) })
-              }
-            />
-            <span className="field__hint">
-              최소 {QUESTION_CARD_COUNT + 2}장 · <b>최대 {cards.length}장</b> (이 슬롯의 카드 범위).
-              비우면 {cards.length}장을 전부 펼쳐요.
+          <button
+            type="button"
+            className="ad-checkbare"
+            style={{ marginTop: 14 }}
+            onClick={() => patch({ published: !draft.published })}
+          >
+            <span className="ad-check__box" data-on={draft.published || undefined}>
+              {draft.published ? '✓' : ''}
             </span>
-          </div>
-
-          <div className="field">
-            <label className="field__label" htmlFor="q-aspect">
-              답변 미입력 시 사용할 의미
-            </label>
-            <select
-              id="q-aspect"
-              className="select"
-              value={draft.fallbackAspect}
-              onChange={(e) => patch({ fallbackAspect: e.target.value as Aspect })}
-            >
-              {ASPECTS.map(({ value, label }) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-            <span className="field__hint">안 채운 카드는 이 관점의 카드 의미가 나가요.</span>
-          </div>
+            <span className="ad-checkbare__label">손님에게 공개</span>
+          </button>
         </div>
 
-        {/* 확률은 못 고른다 — 쓸지 말지만 (REVERSED_RATE, src/lib/deck.ts) */}
-        <label className="check" style={{ marginTop: 'var(--space-md)' }}>
-          <input
-            type="checkbox"
-            checked={draft.allowReversed}
-            onChange={(e) => patch({ allowReversed: e.target.checked })}
-          />
-          <span className="t-text-s">
-            역방향 사용 — 켜면 절반은 역방향으로 나와요 (답변도 두 배로 써야 해요)
-          </span>
-        </label>
-
-        {error && <p className="field__error" style={{ marginTop: 'var(--space-md)' }}>{error}</p>}
-      </section>
-
-      <section className="admin-section">
-        <div className={styles.answerHead}>
-          <div>
-            <h2 className="t-title-s">카드별 답변</h2>
-            <p className="t-text-xs t-muted">
-              안 채워도 괜찮아요 — 비운 카드는 카드 본래 의미가 나갑니다.
-            </p>
-          </div>
-          {/* 플랜에 AI 생성이 없으면 버튼 자체를 안 보여준다 — 눌러도 안 되는 버튼은 잡음이다 */}
-          {plan.answerGenLimit > 0 && (
-            <button
-              type="button"
-              className="btn btn--sm btn--slight"
-              disabled={!canGenerate || gen !== null || !draft.question.trim()}
-              onClick={() => void generate()}
-              data-generate
-            >
-              <Sparkles size={18} strokeWidth={2} aria-hidden="true" />
-              AI로 전체 생성
-            </button>
-          )}
-        </div>
-
-        {plan.answerGenLimit === 0 ? (
-          <p className="admin-note">
-            {plan.label} 플랜은 답변을 <b>직접 입력</b>해요. AI 일괄 생성은 라이트 플랜부터예요.
+        <div className="ad-card ad-card--form">
+          <div className="ad-card__title">뽑기 설정</div>
+          {/* 뽑는 수(항상 1장)·카드 범위·역방향 확률(50%)은 주최자가 고르지 않는다.
+              범위는 슬롯 설정이라 최고관리자만 바꾼다 — 여긴 결과만 알려준다 */}
+          <p className="ad-card__desc">
+            이 슬롯의 카드 범위({effDeck === 'major' ? '메이저 22장' : '전체 78장'})는 여기서 바꿀 수
+            없어요 · 한 장 뽑고 역방향 50%로 나옵니다.
           </p>
-        ) : (
-          !aiReady && (
-            <p className="admin-note">
-              AI 가 아직 연결되지 않았어요 — 연결되면 이 버튼으로 {cards.length}장을 한 번에 만들어
-              검수할 수 있어요.
-            </p>
-          )
-        )}
 
-        {gen && (
-          <CrystalBall label={`카드를 읽고 있어요 · ${gen.done} / ${gen.total}장`} />
-        )}
-
-        {genError && (
-          <p className="field__error" style={{ marginBottom: 'var(--space-base)' }}>
-            {genError}
-          </p>
-        )}
-
-        {/* 검수 바 — 저장을 누르기 전까지 방문자에겐 아무것도 안 나간다 */}
-        {pending && (
-          <div className={styles.review} data-review>
-            <div className={styles.reviewText}>
-              <p className="t-text-s">
-                <b>{pendingCount}장 생성됨</b> — 읽어보고 고친 다음 저장하세요.
-              </p>
-              {overwrites > 0 && (
-                <p className={`t-text-xs ${styles.reviewWarn}`}>
-                  <TriangleAlert size={14} strokeWidth={2} aria-hidden="true" />
-                  이미 쓰신 답변 {overwrites}장이 덮어써져요.
-                </p>
-              )}
+          <div style={{ marginTop: 18 }}>
+            <span className="ad-field__label">펼치는 카드 수</span>
+            <div className="ad-inline">
+              <input
+                className="ad-input ad-input--num"
+                inputMode="numeric"
+                value={draft.spreadCount ?? ''}
+                placeholder="전부"
+                onChange={(e) => {
+                  const v = e.target.value.replace(/[^0-9]/g, '')
+                  patch({ spreadCount: v === '' ? null : Number(v) })
+                }}
+              />
+              <span className="ad-range">
+                {QUESTION_CARD_COUNT + 2}–{cards.length} · 비우면 {cards.length}장을 전부 펼쳐요
+              </span>
             </div>
-            <div className={styles.reviewActions}>
+            {error && <div className="ad-field__hint ad-field__hint--bad">{error}</div>}
+          </div>
+
+          <div style={{ marginTop: 18 }}>
+            <span className="ad-field__label">답변을 안 채웠을 때 쓸 관점</span>
+            <div className="ad-choices">
+              {ASPECTS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  className="ad-choice ad-choice--sm"
+                  data-on={draft.fallbackAspect === value || undefined}
+                  onClick={() => patch({ fallbackAspect: value })}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 확률은 못 고른다 — 쓸지 말지만 (REVERSED_RATE, src/lib/deck.ts) */}
+          <button
+            type="button"
+            className="ad-checkbare"
+            style={{ marginTop: 18, alignItems: 'flex-start' }}
+            onClick={() => patch({ allowReversed: !draft.allowReversed })}
+          >
+            <span className="ad-check__box" data-on={draft.allowReversed || undefined}>
+              {draft.allowReversed ? '✓' : ''}
+            </span>
+            <span>
+              <span className="ad-check__name">역방향 사용</span>
+              <span className="ad-check__hint">켜면 카드마다 답변을 두 배로 써야 해요.</span>
+            </span>
+          </button>
+        </div>
+
+        <div className="ad-card ad-card--form">
+          <div className="ad-card__head">
+            <div className="ad-card__title">카드별 답변</div>
+            {/* 플랜에 AI 생성이 없으면 버튼 자체를 안 보여준다 — 눌러도 안 되는 버튼은 잡음이다 */}
+            {plan.answerGenLimit > 0 && (
               <button
                 type="button"
-                className="btn btn--sm btn--slight"
-                onClick={() => setPending(null)}
+                className="ad-btn ad-btn--soft ad-btn--md"
+                disabled={!canGenerate || gen !== null || !draft.question.trim()}
+                onClick={() => void generate()}
+                data-generate
               >
-                버리기
+                {gen ? `${gen.done} / ${gen.total}장째 만드는 중…` : 'AI로 전체 생성'}
               </button>
-              <button type="button" className="btn btn--sm btn--primary" onClick={applyPending} data-apply>
-                저장
-              </button>
-            </div>
+            )}
           </div>
-        )}
 
-        <div>
-          {cards.map((card) => (
-            <AnswerRow
-              key={card.id}
-              card={card}
-              question={draft}
-              pending={pending?.[card.id]}
-              onChange={setAnswer}
-              onChangePending={(orientation, text) =>
-                setPending((prev) =>
-                  prev
-                    ? { ...prev, [card.id]: { ...prev[card.id], [orientation]: text } }
-                    : prev
-                )
-              }
-            />
-          ))}
+          {plan.answerGenLimit === 0 ? (
+            <p className="ad-sub" style={{ marginBottom: 14 }}>
+              {plan.label} 플랜은 답변을 <b>직접 입력</b>해요. AI 일괄 생성은 라이트 플랜부터예요.
+            </p>
+          ) : (
+            !aiReady && (
+              <p className="ad-sub" style={{ marginBottom: 14 }}>
+                AI 가 아직 연결되지 않았어요 — 연결되면 이 버튼으로 {cards.length}장을 한 번에 만들어
+                검수할 수 있어요.
+              </p>
+            )
+          )}
+
+          {genError && (
+            <div className="ad-field__hint ad-field__hint--bad" style={{ marginBottom: 14 }}>
+              {genError}
+            </div>
+          )}
+
+          {/* 검수 바 — 저장을 누르기 전까지 방문자에겐 아무것도 안 나간다 */}
+          {pending && (
+            <div className="ad-card ad-card--key" style={{ marginBottom: 14 }} data-review>
+              <div className="ad-card__title">{pendingCount}장 생성됐어요 · 아직 저장 전이에요</div>
+              {overwrites > 0 && (
+                <div
+                  className="ad-banner__body"
+                  style={{ color: 'var(--ad-bad)', fontWeight: 700 }}
+                >
+                  이미 써 두신 답변 {overwrites}장이 덮어써집니다. 아래 표시된 줄에서 그 자리에서 고칠
+                  수 있어요.
+                </div>
+              )}
+              <div className="ad-btnrow" style={{ marginTop: 14 }}>
+                <button type="button" className="ad-btn ad-btn--primary ad-btn--lg" onClick={() => void applyPending()} data-apply>
+                  저장
+                </button>
+                <button
+                  type="button"
+                  className="ad-btn ad-btn--line ad-btn--lg"
+                  onClick={() => {
+                    setPending(null)
+                    toast('생성한 답변을 버렸어요')
+                  }}
+                >
+                  버리기
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="ad-rows">
+            {cards.map((card) => (
+              <AnswerRow
+                key={card.id}
+                card={card}
+                question={draft}
+                pending={pending?.[card.id]}
+                onChange={setAnswer}
+                onChangePending={(orientation, text) =>
+                  setPending((prev) =>
+                    prev
+                      ? { ...prev, [card.id]: { ...prev[card.id], [orientation]: text } }
+                      : prev
+                  )
+                }
+              />
+            ))}
+          </div>
         </div>
-      </section>
+      </div>
     </>
   )
 }
@@ -400,27 +400,23 @@ function AnswerRow({
     pending ? onChangePending(orientation, text) : onChange(card.id, orientation, text)
 
   return (
-    <div className={styles.answerRow} data-answer-row data-pending={pending ? '' : undefined}>
-      <button
-        type="button"
-        className={styles.answerToggle}
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-      >
-        <span className={`t-text-m ${styles.answerName}`}>{card.name}</span>
+    // `data-pending` 은 검수 중인 줄 표시다 (verify-ai 가 이걸로 줄을 짚는다)
+    <div className="ad-fold" data-answer-row data-pending={pending ? '' : undefined}>
+      <button type="button" className="ad-fold__head" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+        <span className="ad-fold__name">{card.name}</span>
         {pending ? (
-          <span className={`${styles.badge} ${styles['badge--pending']}`}>검수 중</span>
+          <span className="ad-tag ad-tag--sm" data-tone="on">
+            검수 중
+          </span>
         ) : (
-          <span
-            className={`${styles.badge} ${filled > 0 ? styles['badge--written'] : styles['badge--fallback']}`}
-          >
+          <span className="ad-tag ad-tag--sm" data-tone={filled === 0 ? undefined : filled < total ? 'warn' : 'on'}>
             {filled === 0 ? '폴백 사용 중' : `${filled}/${total} 입력됨`}
           </span>
         )}
       </button>
 
       {open && (
-        <div className={styles.answerBody}>
+        <div className="ad-fold__body">
           <AnswerField
             label="정방향"
             meaning={card.upright[question.fallbackAspect]}
@@ -466,15 +462,19 @@ function AnswerField({
   onChange: (text: string) => void
 }) {
   return (
-    <div className="field">
-      <span className="field__label">{label}</span>
-      <p className={`t-text-xs ${styles.answerMeaning}`}>비우면 이 문장이 나가요: {meaning}</p>
+    <div>
+      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ad-ink-2)', marginBottom: 6 }}>
+        {label}
+      </div>
       <textarea
-        className="textarea"
+        className="ad-textarea"
         value={value}
-        placeholder="이 카드가 나왔을 때 보여줄 답변을 적어주세요."
+        placeholder={`이 카드가 ${label}으로 나왔을 때 보여줄 문장`}
         onChange={(e) => onChange(e.target.value)}
       />
+      <div className="ad-fine" style={{ marginTop: 5 }}>
+        비우면: {meaning}
+      </div>
     </div>
   )
 }

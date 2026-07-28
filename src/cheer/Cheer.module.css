@@ -227,6 +227,11 @@
 .plaque {
   --line: var(--ch-bubble-border);
   --lw: var(--ch-bubble-border-w);
+  /**
+   * 이름 글자 크기는 **모양과 무관하게 하나**다. 모양마다 13·14·20px 로 제각각이라
+   * 같은 사람 이름이 옆 말풍선에서 다른 크기로 떠 있었다 — 이름은 이름이지 장식이 아니다.
+   */
+  --ch-name: 16px;
   font-weight: 800;
   font-size: 20px;
   line-height: 1.35;
@@ -256,14 +261,21 @@
   color: var(--ch-paper);
   border-right: var(--lw) solid var(--line);
   white-space: nowrap;
+  font-size: var(--ch-name);
 }
 .chipBody {
   padding: 8px 16px;
 }
 
-/* ② 색으로 꽉 찬 바 */
+/*
+ * ② 색으로 꽉 찬 바.
+ * **가로 flex 다** — inline-block 이면 이름표와 본문이 글꼴 베이스라인으로 맞아서,
+ * 글자 크기가 다른 이름표가 아래로 처져 보인다 (상자 가운데가 아니라 글자 밑선이 맞는다).
+ */
 .solidBar {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 9px 18px;
   border: var(--lw) solid var(--line);
   border-radius: 9999px;
@@ -272,12 +284,12 @@
 }
 .solidName {
   display: inline-block;
-  margin-right: 8px;
+  flex-shrink: 0;
   padding: 2px 8px;
   border-radius: 9999px;
   background: color-mix(in srgb, var(--ch-paper) 85%, transparent);
   color: var(--ch-ink);
-  font-size: 14px;
+  font-size: var(--ch-name);
 }
 
 /* ③ 둥근 말풍선 + 꼬리 */
@@ -290,41 +302,97 @@
   background: var(--bubble);
   color: var(--ch-paper);
 }
+/*
+ * 꼬리는 **45° 로 돌린 네모** 한 장이다. 삼각형 두 장을 겹치면 겹친 만큼 선이 두꺼워져
+ * 꼬리 끝이 뭉툭해진다 — 이 방식은 선 두께가 본체와 정확히 같은 `--lw` 다.
+ * 본체 위로 그려지므로 겹치는 자리의 아래 선을 덮어, 꼬리와 본체가 한 덩어리로 이어진다.
+ */
 .bubble::after {
   content: '';
   position: absolute;
-  left: 22px;
-  bottom: calc(var(--lw) * -1 - 10px);
-  border: 10px solid transparent;
-  border-top-color: var(--bubble);
+  left: 24px;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  background: var(--bubble);
+  border-right: var(--lw) solid var(--line);
+  border-bottom: var(--lw) solid var(--line);
+  transform: translateY(50%) rotate(45deg);
 }
 .bubbleName {
   display: block;
   margin-bottom: 2px;
-  font-size: 13px;
+  font-size: var(--ch-name);
   opacity: 0.85;
 }
 
-/* ④ 리본/현수막 — 양 끝이 제비꼬리 */
+/*
+ * ④ 리본/현수막 — 양 끝이 제비꼬리.
+ *
+ * **테두리를 `border` 로 못 그린다.** `clip-path` 는 테두리까지 같이 잘라서, 깎여 들어간
+ * 꼬리 쪽 두 변에는 선이 남지 않는다(다른 네 변만 선이 보여 반쪽짜리로 보인다).
+ * 그래서 **바깥 판을 테두리 색으로 깔고, 안쪽 판을 말풍선 색으로 겹친다** — 같은 모양을
+ * 두 번 잘라 겹치면 모든 변에 같은 두께의 선이 생긴다.
+ */
 .banner {
+  position: relative;
   display: inline-block;
+  /**
+   * 위아래 선은 다른 모양과 같은 두께로 두고 **양옆만** 두껍게 한다 —
+   * 제비꼬리가 깎여 들어가는 쪽이라 얇으면 꼬리 끝에서 선이 사라진 것처럼 보인다.
+   */
+  padding: var(--lw) calc(var(--lw) * 2);
+  background: var(--line);
+  color: var(--ch-paper);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 50%, 100% 100%, 0 100%, 16px 50%);
+}
+.bannerBody {
+  display: block;
   padding: 10px 26px;
   background: var(--bubble);
-  color: var(--ch-paper);
-  border: var(--lw) solid var(--line);
-  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 50%, 100% 100%, 0 100%, 14px 50%);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 13px) 50%, 100% 100%, 0 100%, 13px 50%);
 }
 
-/* ⑤ 별 폭발 — 짧은 감탄사만 (긴 글은 후보에서 빠진다) */
+/*
+ * ⑤ 별 폭발 — 짧은 감탄사만 (긴 글은 후보에서 빠진다).
+ * 리본과 같은 두 겹 구조다 — `clip-path` 는 `border` 를 통째로 잘라내서 선이 남지 않는다.
+ */
 .burst {
   display: grid;
   place-items: center;
   min-width: 150px;
   min-height: 150px;
-  padding: 34px;
+  /* 별은 끝이 뾰족해 선이 얇으면 꼭짓점에서 사라진다 — 두 배로 준다 */
+  padding: calc(var(--lw) * 2);
   text-align: center;
-  background: var(--bubble);
+  background: var(--line);
   color: var(--ch-paper);
+  clip-path: polygon(
+    50% 0%,
+    61% 26%,
+    89% 12%,
+    80% 42%,
+    100% 50%,
+    80% 58%,
+    89% 88%,
+    61% 74%,
+    50% 100%,
+    39% 74%,
+    11% 88%,
+    20% 58%,
+    0% 50%,
+    20% 42%,
+    11% 12%,
+    39% 26%
+  );
+}
+.burstBody {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 34px;
+  background: var(--bubble);
   clip-path: polygon(
     50% 0%,
     61% 26%,
@@ -346,11 +414,18 @@
 }
 
 /* ⑥ 명패 — 모서리를 깎고 위에 작은 이름표 */
+/*
+ * 이름표는 명패에 **붙어 있다.** 4px 를 띄웠더니 둘이 따로 노는 물건으로 보였다 —
+ * 사이를 0 으로 두고 선 두께만큼 겹쳐, 맞닿는 자리가 테두리 한 줄이 되게 한다.
+ */
 .plaque {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 0;
+}
+.plaqueName + .plaqueBody {
+  margin-top: calc(var(--lw) * -1);
 }
 .plaqueName {
   padding: 3px 12px;
@@ -358,7 +433,7 @@
   border-radius: 6px 6px 0 0;
   background: var(--line);
   color: var(--ch-paper);
-  font-size: 13px;
+  font-size: var(--ch-name);
 }
 .plaqueBody {
   padding: 10px 18px;

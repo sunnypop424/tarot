@@ -1,5 +1,3 @@
-import { Camera, ExternalLink } from 'lucide-react'
-
 import { photozoneDisplay } from '@/data/photozone'
 import { useSlot } from '@/slot/SlotProvider'
 
@@ -16,42 +14,51 @@ import { useSlot } from '@/slot/SlotProvider'
 export function Guide() {
   const slot = useSlot()
   const display = photozoneDisplay(slot)
-  const siteUrl = `/${slot.slug}`
 
   return (
-    <div>
-      <header className="admin__head">
-        <div>
-          <h1 className="t-title-l">포토존</h1>
-          <p className="t-text-xs t-muted">
-            프레임 {display.frames.length}개 · 이 서비스는 따로 설정하실 게 없어요.
-          </p>
+    <>
+      <header className="ad-head">
+        <div className="ad-head__row">
+          <h1 className="ad-head__title">포토존</h1>
+          <span className="ad-head__count tnum">프레임 {display.frames.length}종</span>
         </div>
+        <p className="ad-head__desc">따로 설정할 것이 없는 서비스예요.</p>
       </header>
 
-      <div className="admin-empty">
-        <Camera size={44} strokeWidth={1.6} aria-hidden="true" />
-        <div className="admin-empty__title">관리할 데이터가 없는 서비스예요</div>
-        <div className="t-text-s t-muted" style={{ maxWidth: 460, margin: '0 auto', lineHeight: 1.7 }}>
-          <p style={{ margin: '0 0 10px' }}>
-            손님이 찍은 사진은 <b>손님 폰에서 바로 합성되고, 저희 서버에 저장되지 않아요.</b> 그래서
-            주최자님이 보시거나 지우실 사진도 없습니다.
+      <div style={{ maxWidth: 680 }}>
+        <div className="ad-card" style={{ padding: 26 }}>
+          <div className="ad-card__title ad-card__title--lg">
+            프레임 {display.frames.length}종이 올라가 있어요
+          </div>
+          <p className="ad-card__desc">
+            따로 설정할 것이 없는 서비스예요. 손님은 프레임을 골라 사진을 찍고 저장하면 끝입니다.
           </p>
-          <p style={{ margin: 0 }}>
-            프레임을 바꾸거나 더하시려면 담당자에게 말씀해 주세요. 손님 화면에서 바로 반영됩니다.
+
+          <div className="ad-banner ad-banner--info ad-banner--pad" style={{ marginTop: 20 }}>
+            <div className="ad-banner__title">손님 사진은 서버에 저장되지 않아요</div>
+            <div className="ad-banner__body">
+              합성은 손님 폰 안에서 끝나고, 결과 이미지도 그 기기에만 남습니다. 그래서 주최자가 볼
+              사진도, 지울 사진도 없어요. 손님이 물어보면 이대로 답해 주시면 됩니다.
+            </div>
+          </div>
+
+          <p className="ad-sub" style={{ marginTop: 16 }}>
+            프레임을 바꾸고 싶으면 담당자에게 말씀해 주세요. 원본 이미지를 보내 주시면 교체해
+            드립니다.
           </p>
+
+          <a
+            className="ad-btn ad-btn--line ad-btn--xl"
+            style={{ marginTop: 20 }}
+            href={`/${slot.slug}`}
+            target="_blank"
+            rel="noreferrer"
+            data-visit
+          >
+            내 페이지 보기 ↗
+          </a>
         </div>
-        <a
-          className="btn btn--ghost"
-          href={siteUrl}
-          target="_blank"
-          rel="noreferrer"
-          style={{ marginTop: 18 }}
-          data-visit
-        >
-          <ExternalLink size={16} strokeWidth={2} aria-hidden="true" />내 페이지 보기
-        </a>
       </div>
-    </div>
+    </>
   )
 }

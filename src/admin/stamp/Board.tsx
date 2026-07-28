@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Eye, EyeOff, RefreshCw, SlidersHorizontal, Stamp } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import type { StampSettings } from '@/lib/repo/types'
@@ -32,12 +31,28 @@ export function Board() {
     void load()
   }, [load])
 
+  const head = (count: number) => (
+    <header className="ad-head">
+      <div className="ad-head__row">
+        <h1 className="ad-head__title">스탬프</h1>
+        <span className="ad-head__count tnum">칸 {count}개</span>
+      </div>
+      <p className="ad-head__desc">
+        각 칸의 현장 암호와 운영 방식을 정합니다. 칸 구성은 담당자가 만들어 드려요.
+      </p>
+    </header>
+  )
+
   if (!repo.stamp.ready()) {
     return (
-      <div className="admin-empty">
-        <Stamp size={44} strokeWidth={1.6} aria-hidden="true" />
-        <div className="admin-empty__title">지금 빌드에서는 스탬프를 쓸 수 없어요</div>
-      </div>
+      <>
+        {head(0)}
+        <div className="ad-card">
+          <div className="ad-empty">
+            <div className="ad-empty__title">지금 빌드에서는 스탬프를 쓸 수 없어요</div>
+          </div>
+        </div>
+      </>
     )
   }
   if (!settings) return null
@@ -59,174 +74,222 @@ export function Board() {
     return Array.from({ length: 4 }, () => A[Math.floor(Math.random() * A.length)]).join('')
   }
 
-  return (
-    <div>
-      <header className="admin__head">
-        <div>
-          <h1 className="t-title-l">스탬프</h1>
-          <p className="t-text-xs t-muted">
-            칸 {display.stamps.length}개 · 각 칸의 암호를 현장에 붙여 두세요. 손님이 그 암호를 입력하면 도장이 찍혀요.
-          </p>
-        </div>
-      </header>
-
-      {display.stamps.length === 0 ? (
-        <div className="admin-empty">
-          <Stamp size={44} strokeWidth={1.6} aria-hidden="true" />
-          <div className="admin-empty__title">아직 스탬프 칸이 없어요</div>
-          <div className="t-text-s t-muted">칸 구성은 담당자가 정합니다 — 필요하시면 말씀해 주세요.</div>
-        </div>
-      ) : (
-        <section className="admin-section" data-stamp-panel>
-          <h2 className="admin-section__title">
-            <Stamp size={15} strokeWidth={2} aria-hidden="true" />
-            현장 암호
-            <span className="admin-section__actions">
-              <button type="button" className="btn btn--quiet btn--sm" onClick={() => setShown((v) => !v)}>
-                {shown ? <EyeOff size={14} aria-hidden="true" /> : <Eye size={14} aria-hidden="true" />}
-                {shown ? '가리기' : '보기'}
-              </button>
-            </span>
-          </h2>
-          <p className="admin-note">
-            암호가 새면 <b>새로 만들기</b>로 바꾸세요. 바꾸면 예전 암호는 바로 안 먹습니다.
-          </p>
-
-          <div className="row-list" data-stamp-codes>
-            {display.stamps.map((c, i) => (
-              <div key={c.id} className="row-item">
-                <span className="t-text-s t-muted" style={{ width: 18 }}>{i + 1}</span>
-                <span className="row-item__grow t-text-m" style={{ fontWeight: 600 }}>{c.name}</span>
-                <div className="field field--sm">
-                  <input
-                    className="input input--code"
-                    type={shown ? 'text' : 'password'}
-                    value={codes[c.id] ?? ''}
-                    maxLength={8}
-                    aria-label={`${c.name} 암호`}
-                    onChange={(e) => setCodes({ ...codes, [c.id]: e.target.value.toUpperCase() })}
-                    onBlur={() => codes[c.id] && void repo.stamp.saveCode(slug, c.id, codes[c.id])}
-                  />
-                </div>
-                <button
-                  type="button"
-                  className="btn btn--quiet btn--sm"
-                  onClick={async () => {
-                    const code = makeCode()
-                    setCodes({ ...codes, [c.id]: code })
-                    await repo.stamp.saveCode(slug, c.id, code)
-                    setShown(true)
-                    toast('새 암호를 만들었어요')
-                  }}
-                >
-                  <RefreshCw size={14} aria-hidden="true" />
-                  새로 만들기
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <section className="admin-section">
-        <h2 className="admin-section__title">
-          <SlidersHorizontal size={15} strokeWidth={2} aria-hidden="true" />
-          운영 설정
-        </h2>
-        <div className="form-grid">
-          <label className="field">
-            <span className="field__label">다 모으면</span>
-            <select
-              className="select"
-              value={settings.rewardMode}
-              disabled={busy}
-              onChange={(e) => void save({ ...settings, rewardMode: e.target.value as StampSettings['rewardMode'] })}
-              data-reward-mode
-            >
-              <option value="none">보상 없음 (축하 화면만)</option>
-              <option value="guaranteed">확정 선물 (교환권 발급)</option>
-              <option value="raffle">응모 (나중에 추첨)</option>
-            </select>
-            <span className="field__hint">
-              확정이면 손님 폰에 교환코드가 뜨고, 스태프가 '수령 확인' 에서 처리합니다.
-            </span>
-          </label>
-
-          <label className="field">
-            <span className="field__label">선물 이름</span>
-            <input
-              className="input"
-              value={settings.rewardLabel}
-              disabled={busy || settings.rewardMode === 'none'}
-              onChange={(e) => setSettings({ ...settings, rewardLabel: e.target.value })}
-              onBlur={() => void save(settings)}
-            />
-          </label>
-
-          <label className="field">
-            <span className="field__label">날짜별 참여</span>
-            <select
-              className="select"
-              value={settings.dailyReset ? 'on' : 'off'}
-              disabled={busy}
-              onChange={(e) => void save({ ...settings, dailyReset: e.target.value === 'on' })}
-            >
-              <option value="off">한 번만 (계속 모아요)</option>
-              <option value="on">매일 새로 (자정에 초기화)</option>
-            </select>
-            <span className="field__hint">
-              매일 새로면 하루 안에 다 모아야 해요. 여러 카페를 도는 랠리면 '한 번만' 이 맞습니다.
-            </span>
-          </label>
-
-          <label className="field">
-            <span className="field__label">마감</span>
-            <select
-              className="select"
-              value={settings.closed ? 'on' : 'off'}
-              disabled={busy}
-              onChange={(e) => void save({ ...settings, closed: e.target.value === 'on' })}
-            >
-              <option value="off">진행 중</option>
-              <option value="on">마감 (도장을 못 찍어요)</option>
-            </select>
-          </label>
-        </div>
-
-        {settings.rewardMode === 'raffle' && (
-          <div className="admin-subsection">
-            <div className="admin-subsection__title">응모 때 받을 정보</div>
-            <p className="admin-note">
-              <b>안 켠 항목은 받지 않습니다</b> — 쓰지 않을 개인정보를 모아두지 않는 게 안전해요.
-              닉네임은 항상 받습니다.
-            </p>
-            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-              {(
-                [
-                  ['handle', '트위터 아이디'],
-                  ['contact', '연락처'],
-                  ['address', '주소 (배송할 때만)'],
-                ] as ['handle' | 'contact' | 'address', string][]
-              ).map(([key, label]) => (
-                <label key={key} className="check">
-                  <input
-                    type="checkbox"
-                    checked={settings.entryFields[key]}
-                    disabled={busy}
-                    onChange={(e) =>
-                      void save({
-                        ...settings,
-                        entryFields: { ...settings.entryFields, [key]: e.target.checked },
-                      })
-                    }
-                  />
-                  {label}
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
-      </section>
+  const choice = <T extends string>(
+    label: string,
+    hint: string,
+    value: T,
+    options: { v: T; n: string }[],
+    onPick: (v: T) => void,
+    locked?: string
+  ) => (
+    <div style={locked ? { opacity: 0.55 } : undefined}>
+      <div className="ad-card__titleRow">
+        <span className="ad-card__title">{label}</span>
+        {locked && <span className="ad-tag ad-tag--sm">지금은 바꿀 수 없어요</span>}
+      </div>
+      {hint && <p className="ad-card__desc">{hint}</p>}
+      <div className="ad-choices" style={{ marginTop: 12 }}>
+        {options.map((o) => (
+          <button
+            key={o.v}
+            type="button"
+            className="ad-choice"
+            data-on={value === o.v || undefined}
+            disabled={busy}
+            onClick={() => (locked ? toast(locked) : onPick(o.v))}
+          >
+            {o.n}
+          </button>
+        ))}
+      </div>
     </div>
+  )
+
+  return (
+    <>
+      {head(display.stamps.length)}
+
+      <div className="ad-stack">
+        <div className="ad-banner ad-banner--info ad-banner--pad">
+          <div className="ad-banner__title">이 목록의 규칙</div>
+          <div className="ad-banner__body">
+            암호를 비워 두면 그 칸은 방문자에게 잠긴 채로 보여요. 암호가 새면 새로 만들기로 바꾸세요 —
+            바꾸면 예전 암호는 바로 안 먹습니다. 칸 이름과 순서는 담당자가 정합니다.
+          </div>
+        </div>
+
+        <div className="ad-card" data-stamp-panel>
+          <div className="ad-card__head">
+            <div className="ad-card__titleRow">
+              <span className="ad-card__title">현장 암호</span>
+              <span className="ad-card__num tnum">칸 {display.stamps.length}개</span>
+            </div>
+            <button
+              type="button"
+              className="ad-btn ad-btn--line ad-btn--sm"
+              onClick={() => setShown((v) => !v)}
+            >
+              {shown ? '가리기' : '보기'}
+            </button>
+          </div>
+
+          {display.stamps.length === 0 ? (
+            <div className="ad-empty">
+              <div className="ad-empty__title">아직 스탬프 칸이 없어요</div>
+              <div className="ad-empty__sub">
+                칸 구성은 담당자가 정합니다 — 필요하시면 말씀해 주세요.
+              </div>
+            </div>
+          ) : (
+            <div className="ad-rows" data-stamp-codes>
+              {display.stamps.map((c, i) => {
+                const code = codes[c.id] ?? ''
+                return (
+                  <div key={c.id} className="ad-row" data-off={code.trim() ? undefined : true}>
+                    <span className="ad-row__no ad-row__no--line tnum">{i + 1}</span>
+                    <span style={{ flex: 1, minWidth: 140, fontSize: 14, fontWeight: 700 }}>
+                      {c.name}
+                    </span>
+                    <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>
+                      <input
+                        className="ad-input ad-input--sm ad-input--code"
+                        style={{ width: 110 }}
+                        type={shown ? 'text' : 'password'}
+                        value={code}
+                        maxLength={8}
+                        placeholder="현장 암호"
+                        aria-label={`${c.name} 암호`}
+                        onChange={(e) => setCodes({ ...codes, [c.id]: e.target.value.toUpperCase() })}
+                        onBlur={() => code && void repo.stamp.saveCode(slug, c.id, code)}
+                      />
+                      <button
+                        type="button"
+                        className="ad-btn ad-btn--line ad-btn--sm"
+                        onClick={async () => {
+                          const next = makeCode()
+                          setCodes({ ...codes, [c.id]: next })
+                          await repo.stamp.saveCode(slug, c.id, next)
+                          setShown(true)
+                          toast('새 암호를 만들었어요')
+                        }}
+                      >
+                        새로 만들기
+                      </button>
+                    </div>
+                    {!code.trim() && (
+                      <span className="ad-tag ad-tag--sm" data-tone="warn">
+                        암호 없음 · 방문자에게 잠긴 칸이에요
+                      </span>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <span className="ad-note">바꾸면 바로 저장돼요 · 저장 버튼이 없습니다</span>
+        </div>
+
+        <div className="ad-card ad-card--form">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+            {choice(
+              '다 모으면',
+              '응모로 정하면 응모 때 받을 정보를 고를 수 있어요.',
+              settings.rewardMode,
+              [
+                { v: 'none' as const, n: '보상 없음 (축하 화면만)' },
+                { v: 'guaranteed' as const, n: '확정 선물 (교환권 발급)' },
+                { v: 'raffle' as const, n: '응모 (나중에 추첨)' },
+              ],
+              (v) => void save({ ...settings, rewardMode: v })
+            )}
+
+            {settings.rewardMode !== 'none' && (
+              <div>
+                <div className="ad-card__title">선물 이름</div>
+                <input
+                  className="ad-input"
+                  style={{ marginTop: 12 }}
+                  value={settings.rewardLabel}
+                  placeholder="예: 아크릴 스탠드"
+                  disabled={busy}
+                  onChange={(e) => setSettings({ ...settings, rewardLabel: e.target.value })}
+                  onBlur={() => void save(settings)}
+                />
+                <p className="ad-field__hint">
+                  확정이면 손님 폰에 교환코드가 뜨고, 스태프가 ‘수령 확인’ 에서 처리합니다.
+                </p>
+              </div>
+            )}
+
+            {choice(
+              '날짜별 참여',
+              '매일 새로면 하루 안에 다 모아야 해요. 여러 카페를 도는 랠리면 ‘한 번만’ 이 맞습니다.',
+              settings.dailyReset ? 'on' : 'off',
+              [
+                { v: 'off' as const, n: '한 번만 (계속 모아요)' },
+                { v: 'on' as const, n: '매일 새로 (자정에 초기화)' },
+              ],
+              (v) => void save({ ...settings, dailyReset: v === 'on' })
+            )}
+
+            {choice(
+              '마감',
+              '',
+              settings.closed ? 'on' : 'off',
+              [
+                { v: 'off' as const, n: '진행 중' },
+                { v: 'on' as const, n: '마감 (도장을 못 찍어요)' },
+              ],
+              (v) => void save({ ...settings, closed: v === 'on' })
+            )}
+
+            {settings.rewardMode === 'raffle' && (
+              <div className="ad-subset">
+                <div className="ad-subset__title">응모 때 받을 정보</div>
+                <div className="ad-checks">
+                  {(
+                    [
+                      ['handle', '트위터 아이디', '당첨 안내용 · 선택'],
+                      ['contact', '연락처', '꼭 필요할 때만 받아 주세요'],
+                      ['address', '주소', '배송이 필요한 선물일 때만'],
+                    ] as ['handle' | 'contact' | 'address', string, string][]
+                  ).map(([key, label, hint]) => {
+                    const on = settings.entryFields[key]
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        className="ad-check"
+                        data-on={on || undefined}
+                        disabled={busy}
+                        onClick={() =>
+                          void save({
+                            ...settings,
+                            entryFields: { ...settings.entryFields, [key]: !on },
+                          })
+                        }
+                      >
+                        <span className="ad-check__box">{on ? '✓' : ''}</span>
+                        <span>
+                          <span className="ad-check__name">{label}</span>
+                          <span className="ad-check__hint">{hint}</span>
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+                <p className="ad-fine" style={{ marginTop: 12 }}>
+                  안 켠 항목은 아예 받지 않아요 — 쓰지 않을 개인정보를 모아두지 않는 게 안전합니다.
+                  닉네임은 항상 받습니다.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
   )
 }

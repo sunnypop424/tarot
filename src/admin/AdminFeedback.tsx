@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-import styles from './AdminFeedback.module.css'
-
 /**
  * 관리자 공용 피드백 — **토스트**(즉시 저장 알림)와 **확인 모달**(되돌리기 어려운 동작).
  *
@@ -70,22 +68,24 @@ export function AdminFeedbackHost() {
   return createPortal(
     <div className="admin-portal">
       {req && (
-        <div className={styles.backdrop} onClick={() => close(false)}>
+        <div className="ad-scrim-modal" onClick={() => close(false)}>
           <div
-            className={styles.modal}
+            className="ad-modal"
             role="dialog"
             aria-modal="true"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className={styles.title}>{req.title}</div>
-            {req.desc && <div className={styles.desc}>{req.desc}</div>}
-            <div className={styles.actions}>
-              <button type="button" className="btn btn--ghost" onClick={() => close(false)}>
+            <div className="ad-modal__title">{req.title}</div>
+            {req.desc && <div className="ad-modal__desc">{req.desc}</div>}
+            {/* 되돌릴 수 없는 동작은 그 사실을 따로 세워 말한다 — 설명 속에 묻히면 안 읽힌다 */}
+            {req.danger && <div className="ad-modal__warn">되돌릴 수 없어요</div>}
+            <div className="ad-modal__actions">
+              <button type="button" className="ad-btn ad-btn--line" onClick={() => close(false)}>
                 취소
               </button>
               <button
                 type="button"
-                className={`btn ${req.danger ? styles.danger : 'btn--primary'}`}
+                className={`ad-btn ${req.danger ? 'ad-btn--kill' : 'ad-btn--primary'}`}
                 onClick={() => close(true)}
               >
                 {req.okLabel ?? '확인'}
@@ -95,7 +95,7 @@ export function AdminFeedbackHost() {
         </div>
       )}
       {message && (
-        <div className={styles.toast} role="status">
+        <div className="ad-toast" role="status">
           {message}
         </div>
       )}

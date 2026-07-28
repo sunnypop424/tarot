@@ -1,29 +1,5 @@
+import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import {
-  Camera,
-  ClipboardList,
-  Lamp,
-  MonitorPlay,
-  QrCode,
-  MessageCircleQuestion,
-  ExternalLink,
-  LayoutDashboard,
-  LogOut,
-  BarChart3,
-  GraduationCap,
-  Sparkles,
-  Layers,
-  Ticket as TicketIcon,
-  ScanLine,
-  Dices,
-  Gift,
-  Stamp,
-  StickyNote,
-  Truck,
-  Users,
-  UserCog,
-} from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
 
 import { hasSupabase } from '@/lib/repo/client'
 import { getSlotService, serviceLabel } from '@/data/services'
@@ -36,7 +12,6 @@ import { useAdminAuth } from './useAdminAuth'
 interface NavItem {
   to: string
   label: string
-  icon: LucideIcon
   /** 관리 셸 밖으로 나가는 화면 — 새 탭으로 연다 (스태프 기기·스크린 같은 현장 화면) */
   external?: boolean
 }
@@ -67,40 +42,41 @@ interface NavGroup {
  * 경로는 `AdminRoutes` 의 `ADMIN_ROUTES` 와 짝이 맞아야 한다 — 한쪽만 고치면 빈 화면이 열린다.
  */
 const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
-  tarot: [{ to: 'questions', label: '질문 타로', icon: MessageCircleQuestion }],
+  tarot: [{ to: 'questions', label: '질문 타로' }],
   luckydraw: [
-    { to: 'overview', label: '상품 · 운영', icon: Gift },
-    { to: 'shipping', label: '배송 정보', icon: Truck },
+    { to: 'overview', label: '상품 · 운영' },
+    { to: 'shipping', label: '배송 정보' },
   ],
-  rolling: [{ to: 'messages', label: '롤링페이퍼', icon: StickyNote }],
-  photozone: [{ to: 'photozone', label: '포토존', icon: Camera }],
+  rolling: [{ to: 'messages', label: '롤링페이퍼' }],
+  photozone: [{ to: 'photozone', label: '포토존' }],
   // 롤페와 같은 화면·같은 경로 — 메뉴 이름만 서비스에 맞춘다
-  wish: [{ to: 'messages', label: '소원나무', icon: Lamp }],
+  wish: [{ to: 'messages', label: '소원나무' }],
   poll: [
-    { to: 'polls', label: '설문', icon: ClipboardList },
+    { to: 'polls', label: '설문' },
     // 부스에 세워두는 화면 — 관리 도구가 아니라 손님에게 보여주는 것이다
-    { to: 'live', label: '스크린', icon: MonitorPlay },
+    { to: 'live', label: '스크린' },
   ],
   // 보상 메뉴(수령확인·추첨·응모자)는 여기 없다 — 아래 REWARD_NAV 가 설정값으로 붙인다
-  stamp: [{ to: 'stamp', label: '스탬프', icon: Stamp }],
+  stamp: [{ to: 'stamp', label: '스탬프' }],
   quiz: [
-    { to: 'quiz', label: '모의고사', icon: GraduationCap },
-    { to: 'stats', label: '통계', icon: BarChart3 },
+    { to: 'quiz', label: '모의고사' },
+    { to: 'stats', label: '통계' },
   ],
   cheer: [
-    { to: 'cheer', label: '상영 설정', icon: MonitorPlay },
-    { to: 'messages', label: '한마디', icon: MessageCircleQuestion },
-    // 상영 화면 — 관리 셸 밖이라 새 탭으로 (노트북에서 띄워 영상 위에 얹는다)
-    { to: 'overlay', label: '오버레이', icon: Sparkles, external: true },
+    { to: 'cheer', label: '상영 설정' },
+    { to: 'messages', label: '한마디' },
+    // 상영 화면 둘 다 관리 셸 밖이라 새 탭으로 (노트북에서 띄워 영상 위에 얹는다)
+    { to: 'overlay', label: '오버레이', external: true },
+    { to: 'credits', label: '엔딩크레딧', external: true },
   ],
   photocard: [
-    { to: 'photocard', label: '카드', icon: Layers },
-    { to: 'tickets', label: '뽑기권', icon: TicketIcon },
+    { to: 'photocard', label: '카드' },
+    { to: 'tickets', label: '뽑기권' },
     /*
      * 부스에서 스태프가 쓰는 화면 — **관리 셸 밖**이라 새 탭으로 연다.
      * 태블릿을 카운터에 세워두면 손님이 같이 보는 화면이라 슬롯 색을 쓴다.
      */
-    { to: 'staff', label: '스태프 화면', icon: Sparkles, external: true },
+    { to: 'staff', label: '스태프 화면', external: true },
   ],
 }
 
@@ -116,9 +92,9 @@ const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
  * 나쁘다** — 기록은 설정보다 오래 산다.
  */
 const REWARD_NAV: NavItem[] = [
-  { to: 'redeem', label: '수령 확인', icon: ScanLine },
-  { to: 'entries', label: '응모자', icon: Users },
-  { to: 'picker', label: '추첨', icon: Dices },
+  { to: 'redeem', label: '수령 확인' },
+  { to: 'entries', label: '응모자' },
+  { to: 'picker', label: '추첨' },
 ]
 
 /** 보상 인프라(0019)를 쓰는 서비스 — 포토카드는 자기 뽑기권 목록을 따로 쓴다 */
@@ -134,9 +110,9 @@ function useNav(service: ServiceId): NavGroup[] {
     {
       title: '현황',
       items: [
-        { to: '', label: '대시보드', icon: LayoutDashboard },
+        { to: '', label: '대시보드' },
         // 인쇄물 준비가 주최자의 첫 번째 일이다 — 서비스와 무관하게 늘 있다
-        { to: 'qr', label: 'QR 만들기', icon: QrCode },
+        { to: 'qr', label: 'QR 만들기' },
       ],
     },
     // 묶음 제목이 곧 이 슬롯이 파는 서비스다 — 슬롯을 오갈 때 여기가 바뀐다
@@ -147,9 +123,9 @@ function useNav(service: ServiceId): NavGroup[] {
           {
             title: '계정',
             items: [
-              { to: 'account', label: '내 계정', icon: UserCog },
+              { to: 'account', label: '내 계정' },
               // 부스에 사람이 여럿이면 계정을 나눠야 한다 (한 계정을 돌려 쓰면 기록이 섞인다)
-              { to: 'staff-accounts', label: '스태프 계정', icon: Users },
+              { to: 'staff-accounts', label: '스태프 계정' },
             ],
           },
         ]
@@ -161,7 +137,10 @@ export function AdminLayout() {
   const slot = useSlot()
   const navigate = useNavigate()
   const { user, signOut } = useAdminAuth(slot.slug)
-  const GROUPS = useNav(getSlotService(slot))
+  const service = getSlotService(slot)
+  const GROUPS = useNav(service)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [proxyShown, setProxyShown] = useState(true)
 
   /**
    * 로그아웃하면 **바로** 나간다.
@@ -173,86 +152,153 @@ export function AdminLayout() {
     navigate(`/${slot.slug}/admin/login`, { replace: true })
   }
 
+  /** 최고관리자가 남의 슬롯을 대신 보고 있는가 — 고치면 그 고객 화면이 그 자리에서 바뀐다 */
+  const proxy = Boolean(user?.owner && !user.slugs.includes(slot.slug))
+
+  const menu = (
+    <>
+      {GROUPS.map((group) => (
+        <div className="ad-nav__group" key={group.title}>
+          <p className="ad-nav__title">{group.title}</p>
+          <div className="ad-nav__items">
+            {group.items.map(({ to, label, external }) =>
+              external ? (
+                // 관리 셸 밖 화면 — 새 탭으로 연다 (부스 기기를 따로 띄워두고 쓴다)
+                <a
+                  key={to}
+                  className="ad-nav__link"
+                  href={`/${slot.slug}/${to}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <span>{label}</span>
+                  <span className="ad-nav__badge ad-nav__badge--ext">새 탭 ↗</span>
+                </a>
+              ) : (
+                // 절대 경로로 — 상대 경로는 현재 URL 에 누적돼 /questions/questions… 로 늘어난다
+                // 지금 화면 표시는 NavLink 가 붙이는 aria-current 로 (CSS 가 그걸 본다)
+                <NavLink
+                  key={to}
+                  to={`/${slot.slug}/admin${to ? `/${to}` : ''}`}
+                  end={to === ''}
+                  className="ad-nav__link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span>{label}</span>
+                </NavLink>
+              )
+            )}
+          </div>
+        </div>
+      ))}
+      <div className="ad-nav__sep" />
+      <a className="ad-nav__visit" href={`/${slot.slug}`} target="_blank" rel="noreferrer">
+        방문자 페이지 열기 ↗
+      </a>
+    </>
+  )
+
   return (
     <div className="admin">
-      <div className="admin__shell">
-        <aside className="admin__side">
-          <div className="admin__brand">
-            <p className="t-text-l">{slot.name}</p>
-            <p className="t-text-xs t-muted">/{slot.slug} · 관리</p>
-          </div>
-
-          {/* 슬롯이 하나뿐인 주최자에겐 아무것도 안 그린다 */}
-          {user && <SlotSwitcher current={slot.slug} slugs={user.slugs} />}
-
-          <nav className="admin__nav" aria-label="관리 메뉴">
-            {GROUPS.map((group) => (
-              <div className="admin__navgroup" key={group.title}>
-                <p className="admin__navtitle">{group.title}</p>
-                {group.items.map(({ to, label, icon: Icon, external }) =>
-                  external ? (
-                    // 관리 셸 밖 화면 — 새 탭으로 연다 (부스 기기를 따로 띄워두고 쓴다)
-                    <a
-                      key={to}
-                      className="admin__navlink"
-                      href={`/${slot.slug}/${to}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <Icon size={18} strokeWidth={2} aria-hidden="true" />
-                      {label}
-                      <ExternalLink size={13} strokeWidth={2} aria-hidden="true" style={{ marginLeft: 'auto', opacity: 0.5 }} />
-                    </a>
-                  ) : (
-                    // 절대 경로로 — 상대 경로는 현재 URL 에 누적돼 /questions/questions… 로 늘어난다
-                    <NavLink
-                      key={to}
-                      to={`/${slot.slug}/admin${to ? `/${to}` : ''}`}
-                      end={to === ''}
-                      className="admin__navlink"
-                    >
-                      <Icon size={18} strokeWidth={2} aria-hidden="true" />
-                      {label}
-                    </NavLink>
-                  )
-                )}
-              </div>
-            ))}
-            <div className="admin__navgroup">
-              <p className="admin__navtitle">이벤트</p>
-              <a className="admin__navlink" href={`/${slot.slug}`} target="_blank" rel="noreferrer">
-                <ExternalLink size={18} strokeWidth={2} aria-hidden="true" />
-                내 페이지 보기
-              </a>
-            </div>
-          </nav>
-
-          <div style={{ marginTop: 'auto' }}>
-            {/**
-             * **최고관리자로 들어와 있으면 그렇다고 말한다.**
-             * 남의 이벤트 데이터를 자기 것인 줄 알고 고치면 안 된다 — 여기 뜨는 상품·질문은
-             * 고객의 것이고, 고치면 그 고객 화면이 그 자리에서 바뀐다.
-             */}
-            {user?.owner && !user.slugs.includes(slot.slug) && (
-              <p className="t-text-xs" style={{ color: 'var(--color-accent)' }} data-owner-view>
-                최고관리자로 보는 중이에요 — 고치면 고객 화면에 바로 반영돼요.
-              </p>
-            )}
-            {user && <p className="t-text-xs t-muted">{user.email}</p>}
+      <header className="ad-top">
+        <div className="ad-top__bar">
+          <div className="ad-top__left">
             <button
               type="button"
-              className="admin__navlink"
+              className="ad-menubtn"
+              onClick={() => setMenuOpen(true)}
+              aria-label="메뉴 열기"
+            >
+              ☰
+            </button>
+            <div style={{ minWidth: 0 }}>
+              <div className="ad-top__name">
+                <span>{slot.name}</span>
+                <span className="ad-svc">{serviceLabel(service)}</span>
+              </div>
+              <div className="ad-top__slug">
+                /<b>{slot.slug}</b> · 관리
+              </div>
+            </div>
+          </div>
+
+          <div className="ad-top__right">
+            {user && (
+              <div className="ad-top__who">
+                <div className="ad-top__whoMail">{user.email}</div>
+                <div className="ad-top__whoRole">{user.owner ? '최고관리자' : '주최자'}</div>
+              </div>
+            )}
+            <button
+              type="button"
+              className="ad-btn ad-btn--line ad-btn--sm"
               onClick={() => void handleSignOut()}
-              style={{ width: '100%' }}
               data-signout
             >
-              <LogOut size={20} strokeWidth={2} aria-hidden="true" />
               로그아웃
             </button>
           </div>
+        </div>
+
+        {/**
+         * **최고관리자로 들어와 있으면 그렇다고 말한다.**
+         * 남의 이벤트 데이터를 자기 것인 줄 알고 고치면 안 된다 — 여기 뜨는 상품·질문은
+         * 고객의 것이고, 고치면 그 고객 화면이 그 자리에서 바뀐다.
+         */}
+        {proxy && proxyShown && (
+          <div className="ad-proxy" data-owner-view>
+            <span className="ad-proxy__dot" aria-hidden="true" />
+            <span className="ad-proxy__text">
+              최고관리자로 이 슬롯을 대신 보고 있어요. 고치면 고객 화면에 바로 반영돼요.
+            </span>
+            <button
+              type="button"
+              className="ad-proxy__close"
+              onClick={() => setProxyShown(false)}
+              aria-label="닫기"
+            >
+              ×
+            </button>
+          </div>
+        )}
+      </header>
+
+      {menuOpen && (
+        <>
+          <button
+            type="button"
+            className="ad-scrim"
+            aria-label="메뉴 닫기"
+            onClick={() => setMenuOpen(false)}
+          />
+          <div className="ad-drawer">
+            <div className="ad-drawer__head">
+              <span>메뉴</span>
+              <button
+                type="button"
+                className="ad-drawer__close"
+                onClick={() => setMenuOpen(false)}
+                aria-label="메뉴 닫기"
+              >
+                ×
+              </button>
+            </div>
+            {/* 슬롯이 하나뿐인 주최자에겐 아무것도 안 그린다 */}
+            {user && <SlotSwitcher current={slot.slug} slugs={user.slugs} />}
+            <nav aria-label="관리 메뉴">{menu}</nav>
+          </div>
+        </>
+      )}
+
+      <div className="ad-body">
+        <aside className="ad-side">
+          <nav className="ad-nav" aria-label="관리 메뉴">
+            {menu}
+          </nav>
+          {user && <SlotSwitcher current={slot.slug} slugs={user.slugs} />}
         </aside>
 
-        <main className="admin__main">
+        <main className="ad-main">
           <Outlet />
         </main>
       </div>

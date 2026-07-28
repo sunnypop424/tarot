@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
-import { BarChart3, RefreshCw } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import type { QuizStat } from '@/lib/repo/types'
 import { useSlot } from '@/slot/SlotProvider'
-import { toast } from '../AdminFeedback'
-import styles from './Quiz.module.css'
+import { confirmAction, toast } from '../AdminFeedback'
 
 /**
  * 문항별 정답률 — **주관식 오답 처리가 불만의 주된 원천**이라, 정답률이 유난히 낮은 문항을
@@ -28,12 +26,28 @@ export function Stats() {
     void load()
   }, [load])
 
+  const head = (
+    <header className="ad-head">
+      <div className="ad-head__row">
+        <h1 className="ad-head__title">통계</h1>
+        {data && <span className="ad-head__count tnum">응시 {data.attempts}명</span>}
+      </div>
+      <p className="ad-head__desc">
+        어느 문항이 어려웠는지 보고, 인정할 답을 더한 뒤 다시 채점합니다.
+      </p>
+    </header>
+  )
+
   if (!repo.quiz.ready()) {
     return (
-      <div className="admin-empty">
-        <BarChart3 size={44} strokeWidth={1.6} aria-hidden="true" />
-        <div className="admin-empty__title">지금 빌드에서는 통계를 쓸 수 없어요</div>
-      </div>
+      <>
+        {head}
+        <div className="ad-card">
+          <div className="ad-empty">
+            <div className="ad-empty__title">지금 빌드에서는 통계를 쓸 수 없어요</div>
+          </div>
+        </div>
+      </>
     )
   }
   if (!data) return null
@@ -42,91 +56,100 @@ export function Stats() {
     .filter((q) => q.tried > 0)
     .sort((a, b) => a.correct / a.tried - b.correct / b.tried)[0]
 
-  return (
-    <div>
-      <header className="admin__head">
-        <div>
-          <h1 className="t-title-l">통계</h1>
-          <p className="t-text-xs t-muted">응시한 분들의 문항별 정답률이에요.</p>
-        </div>
-        <button
-          type="button"
-          className="btn btn--outline btn--sm"
-          disabled={busy || data.attempts === 0}
-          onClick={async () => {
-            setBusy(true)
-            try {
-              const n = await repo.quiz.regrade(slug)
-              await load()
-              toast(n > 0 ? `${n}명의 점수를 다시 매겼어요` : '바뀐 점수가 없어요')
-            } catch (e) {
-              toast(e instanceof Error ? e.message : '다시 채점하지 못했어요')
-            } finally {
-              setBusy(false)
-            }
-          }}
-          data-regrade
-        >
-          <RefreshCw size={15} aria-hidden="true" />
-          다시 채점
-        </button>
-      </header>
+  async function rescore() {
+    const ok = await confirmAction({
+      title: '다시 채점할까요?',
+      desc: '이미 응시한 분들의 점수도 함께 고쳐집니다. 인정할 답을 더한 뒤에 눌러 주세요.',
+      okLabel: '다시 채점',
+    })
+    if (!ok) return
+    setBusy(true)
+    try {
+      const n = await repo.quiz.regrade(slug)
+      await load()
+      toast(n > 0 ? `${n}명의 점수를 다시 매겼어요` : '바뀐 점수가 없어요')
+    } catch (e) {
+      toast(e instanceof Error ? e.message : '다시 채점하지 못했어요')
+    } finally {
+      setBusy(false)
+    }
+  }
 
-      <div className={styles.kpis}>
-        <div className={styles.kpi}>
-          <div className={styles.kpiLabel}>응시</div>
-          <div className={styles.kpiValue}>{data.attempts}명</div>
-        </div>
-        <div className={styles.kpi}>
-          <div className={styles.kpiLabel}>평균</div>
-          <div className={styles.kpiValue}>{data.avg}%</div>
-        </div>
-        {hardest && (
-          <div className={styles.kpi}>
-            <div className={styles.kpiLabel}>가장 어려운 문항</div>
-            <div className="t-text-s" style={{ marginTop: 5, fontWeight: 700, lineHeight: 1.4 }}>
-              {hardest.body}
+  return (
+    <>
+      {head}
+
+      <div className="ad-stack">
+        <div className="ad-stats">
+          <div className="ad-stat">
+            <div className="ad-stat__label">응시</div>
+            <div className="ad-stat__row">
+              <span className="ad-stat__value tnum">{data.attempts}</span>
+              <span className="ad-stat__unit">명</span>
             </div>
           </div>
-        )}
-      </div>
-
-      <p className="admin-note" style={{ margin: '0 0 14px' }}>
-        정답률이 유난히 낮은 <b>주관식</b>은 표현 차이 때문일 때가 많아요. 문항 편집에서 인정할 답을
-        더한 뒤 <b>다시 채점</b>을 누르면 이미 응시하신 분들의 점수도 같이 고쳐집니다.
-      </p>
-
-      {data.questions.length === 0 ? (
-        <div className="admin-empty">
-          <BarChart3 size={44} strokeWidth={1.6} aria-hidden="true" />
-          <div className="admin-empty__title">아직 문항이 없어요</div>
+          <div className="ad-stat">
+            <div className="ad-stat__label">평균</div>
+            <div className="ad-stat__row">
+              <span className="ad-stat__value tnum">{data.attempts ? data.avg : '—'}</span>
+              {data.attempts > 0 && <span className="ad-stat__unit">%</span>}
+            </div>
+          </div>
+          <div className="ad-stat">
+            <div className="ad-stat__label">가장 어려운 문항</div>
+            <div style={{ fontSize: 15, fontWeight: 700, marginTop: 10, lineHeight: 1.5 }}>
+              {hardest ? hardest.body : '아직 없어요'}
+            </div>
+          </div>
         </div>
-      ) : (
-        <div className={styles.list} data-stats>
-          {data.questions.map((q, i) => {
-            const pct = q.tried ? Math.round((q.correct / q.tried) * 100) : 0
-            return (
-              <div key={q.questionId} className={styles.row}>
-                <div className={styles.rowNum}>{i + 1}</div>
-                <div className={styles.rowMain}>
-                  <div className={styles.rowBody}>{q.body}</div>
-                  <div className={styles.statBar}>
-                    <div className={styles.statFill} style={{ width: `${pct}%` }} />
-                  </div>
-                  <div className={styles.rowMeta}>
-                    <span>
-                      정답률 <b>{pct}%</b>
-                    </span>
-                    <span>
+
+        <div className="ad-card">
+          <div className="ad-card__head" style={{ marginBottom: 16 }}>
+            <span className="ad-card__title">문항별 정답률</span>
+            <button
+              type="button"
+              className="ad-btn ad-btn--soft ad-btn--md"
+              disabled={busy || data.attempts === 0}
+              onClick={() => void rescore()}
+              data-regrade
+            >
+              다시 채점
+            </button>
+          </div>
+          <p className="ad-sub" style={{ marginBottom: 18 }}>
+            정답률이 낮은 주관식은 표현 차이일 때가 많아요. 인정할 답을 더한 뒤 다시 채점하면 이미
+            응시하신 분들의 점수도 함께 고쳐집니다.
+          </p>
+
+          {data.questions.length === 0 ? (
+            <div className="ad-empty">
+              <div className="ad-empty__title">아직 문항이 없어요</div>
+            </div>
+          ) : (
+            <div className="ad-bars" style={{ gap: 16 }} data-stats>
+              {data.questions.map((q, i) => {
+                const pct = q.tried ? Math.round((q.correct / q.tried) * 100) : 0
+                return (
+                  <div key={q.questionId} className="ad-bar" data-tone={pct < 50 ? 'low' : undefined}>
+                    <div className="ad-bar__top">
+                      <span className="ad-bar__name">
+                        {i + 1}. {q.body}
+                      </span>
+                      <span className="ad-bar__num tnum">{pct}%</span>
+                    </div>
+                    <div className="ad-bar__track">
+                      <span className="ad-bar__fill" style={{ ['--ad-pct' as string]: `${pct}%` }} />
+                    </div>
+                    <div className="ad-fine tnum" style={{ marginTop: 5 }}>
                       {q.correct} / {q.tried}명
-                    </span>
+                    </div>
                   </div>
-                </div>
-              </div>
-            )
-          })}
+                )
+              })}
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   )
 }

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ExternalLink, Image as ImageIcon, Ticket, Trash2 } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import { SearchBox } from '../SearchBox'
@@ -8,7 +7,6 @@ import type { PhotocardSettings, PhotocardTicketRow } from '@/lib/repo/types'
 import { cssUrl } from '@/lib/image'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
-import styles from './Photocard.module.css'
 
 /** CSV 한 칸 — 쉼표·따옴표·줄바꿈이 들어가면 깨지므로 감싸고 따옴표는 두 번 쓴다 */
 const cell = (v: string) => `"${String(v ?? '').replaceAll('"', '""')}"`
@@ -48,34 +46,31 @@ export function Tickets() {
     void load()
   }, [load])
 
+  const head = (extra?: string) => (
+    <header className="ad-head">
+      <div className="ad-head__row">
+        <h1 className="ad-head__title">뽑기권</h1>
+        {extra && <span className="ad-head__count tnum">{extra}</span>}
+      </div>
+      <p className="ad-head__desc">발급된 번호와 뽑힌 카드를 봅니다.</p>
+    </header>
+  )
+
   if (!repo.photocard.ready()) {
     return (
-      <div className="admin-empty">
-        <Ticket size={44} strokeWidth={1.6} aria-hidden="true" />
-        <div className="admin-empty__title">지금 빌드에서는 뽑기권을 쓸 수 없어요</div>
-      </div>
+      <>
+        {head()}
+        <div className="ad-card">
+          <div className="ad-empty">
+            <div className="ad-empty__title">지금 빌드에서는 뽑기권을 쓸 수 없어요</div>
+          </div>
+        </div>
+      </>
     )
   }
   if (!rows || !settings) return null
 
-  if (!photocardRules(settings.mode).usesTicket) {
-    return (
-      <div>
-        <header className="admin__head">
-          <div>
-            <h1 className="t-title-l">뽑기권</h1>
-          </div>
-        </header>
-        <div className="admin-empty">
-          <Ticket size={44} strokeWidth={1.6} aria-hidden="true" />
-          <div className="admin-empty__title">이 이벤트는 뽑기권을 쓰지 않아요</div>
-          <div className="t-text-s t-muted">
-            '1장 증정' 방식에서만 손님이 뽑기권을 받습니다. 방식은 '카드' 화면에서 바꿀 수 있어요.
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const usesTicket = photocardRules(settings.mode).usesTicket
 
   /** 번호·카드 이름으로 찾는다 (손님이 번호를 보여주면 그걸로 바로 짚는다) */
   const q = query.trim().toLowerCase()
@@ -87,23 +82,21 @@ export function Tickets() {
   const open = rows.length - drawn.length
 
   async function remove(row: PhotocardTicketRow) {
-    if (
-      !(await confirmAction({
-        title: `${row.code} 번호를 지울까요?`,
-        desc:
-          row.status === 'drawn'
-            ? '이미 뽑은 번호예요. 지우면 그 손님이 뽑기권을 새로 받아 한 번 더 뽑을 수 있게 됩니다. 뽑은 기록과 재고는 그대로예요.'
-            : '지우면 그 손님이 뽑기권을 새로 받을 수 있어요.',
-        okLabel: '삭제',
-        danger: true,
-      }))
-    )
-      return
+    const ok = await confirmAction({
+      title: '이 번호를 지울까요?',
+      desc:
+        row.status === 'drawn'
+          ? `${row.code} 는 이미 ${row.cardName || '카드'} 를 뽑은 번호예요. 지우면 그 손님이 한 번 더 뽑게 됩니다. 뽑은 기록과 재고는 그대로예요.`
+          : `${row.code} 를 지웁니다. 손님이 이 번호로는 뽑을 수 없게 돼요.`,
+      okLabel: '지우기',
+      danger: true,
+    })
+    if (!ok) return
     setBusy(true)
     try {
       await repo.photocard.removeTicket(slug, row.code)
       await load()
-      toast('지웠어요')
+      toast('번호를 지웠어요')
     } catch (e) {
       toast(e instanceof Error ? e.message : '지우지 못했어요')
     } finally {
@@ -136,109 +129,144 @@ export function Tickets() {
     URL.revokeObjectURL(url)
   }
 
+  const tableVars = {
+    ['--ad-tcols' as string]: '92px 44px minmax(0,1fr) 96px 96px 60px',
+    ['--ad-tmin' as string]: '600px',
+  }
+
   return (
-    <div>
-      <header className="admin__head">
-        <div>
-          <h1 className="t-title-l">뽑기권</h1>
-          <p className="t-text-xs t-muted">
-            발급 {rows.length}장 · 뽑음 {drawn.length}장 · 대기 {open}장
-          </p>
-        </div>
-        <div className="admin-actions" style={{ marginTop: 0 }}>
-          <a
-            className="btn btn--outline btn--sm"
-            href={`/${slug}/staff`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <ExternalLink size={15} aria-hidden="true" />
-            스태프 화면
-          </a>
-          {rows.length > 0 && (
-            <button type="button" className="btn btn--outline btn--sm" onClick={download}>
-              CSV
-            </button>
-          )}
-        </div>
-      </header>
+    <>
+      {head(`발급 ${rows.length}장 · 뽑음 ${drawn.length}장`)}
 
-      <p className="admin-note" style={{ margin: '0 0 14px' }}>
-        <b>발급 수가 손님 수보다 훨씬 많으면</b> 브라우저 기록을 지우고 다시 받은 경우일 수 있어요.
-        번호를 지우면 그 손님이 새로 받을 수 있게 됩니다 — 잘못 발급했거나 손님이 못 받았을 때
-        쓰세요.
-      </p>
+      <div className="ad-stack">
+        {!usesTicket && (
+          <div className="ad-banner ad-banner--mute ad-banner--pad" style={{ fontWeight: 400 }}>
+            <div className="ad-banner__title">이 운영 방식에서는 뽑기권을 쓰지 않아요</div>
+            <div className="ad-banner__body">
+              저장용은 손님이 자기 폰에서 바로 뽑아요. 아래 목록은 예전에 발급된 기록입니다.
+            </div>
+          </div>
+        )}
 
-      {rows.length === 0 ? (
-        <div className="admin-empty">
-          <Ticket size={44} strokeWidth={1.6} aria-hidden="true" />
-          <div className="admin-empty__title">아직 발급된 뽑기권이 없어요</div>
-          <div className="t-text-s t-muted">손님이 이벤트 페이지에서 '뽑기권 받기' 를 누르면 여기 나와요.</div>
-        </div>
-      ) : (
-        <>
-        <SearchBox
-          value={query}
-          onChange={setQuery}
-          placeholder="번호 · 카드 이름"
-          found={shown.length}
-          total={rows.length}
-        />
-        <div className={styles.list} data-tickets>
-          {shown.map((r) => (
-            <div key={r.code} className={styles.row} data-out={r.status === 'drawn' || undefined}>
-              <div className={styles.ticketCode}>{r.code}</div>
-              {r.status === 'drawn' ? (
-                <>
-                  {/* 썸네일도 background-image — 관리 화면도 예외가 아니다 (CLAUDE.md) */}
-                  <div
-                    className={styles.thumb}
-                    style={r.cardImage ? { backgroundImage: cssUrl(r.cardImage) } : undefined}
-                    role={r.cardImage ? 'img' : undefined}
-                    aria-label={r.cardName ?? undefined}
-                  >
-                    {!r.cardImage && <ImageIcon size={16} strokeWidth={1.7} aria-hidden="true" />}
-                  </div>
-                  <div className={styles.rowMain}>
-                    <div className={styles.rowTop}>
-                      <span className="t-text-m" style={{ fontWeight: 700 }}>{r.cardName || '(이름 없음)'}</span>
-                      {r.rarity && <span className={styles.tag}>{RARITY_LABEL[r.rarity] ?? r.rarity}</span>}
-                    </div>
-                    <div className={styles.rowMeta}>
-                      <span>발급 {when(r.issuedAt)}</span>
-                      {r.drawnAt && (
-                        <>
-                          <span>·</span>
-                          <span>뽑음 {when(r.drawnAt)}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className={styles.rowMain}>
-                  <div className={styles.rowTop}>
-                    <span className={styles.tag}>아직 안 뽑음</span>
-                  </div>
-                  <div className={styles.rowMeta}>
-                    <span>발급 {when(r.issuedAt)}</span>
-                  </div>
-                </div>
-              )}
-              <button
-                type="button"
-                className="btn btn--danger btn--sm btn--iconOnly"
-                disabled={busy}
-                onClick={() => void remove(r)}
-                aria-label={`${r.code} 삭제`}
-              >
-                <Trash2 size={14} aria-hidden="true" />
-              </button>
+        <div className="ad-stats">
+          {[
+            { label: '발급', value: rows.length },
+            { label: '뽑음', value: drawn.length },
+            { label: '대기', value: open },
+          ].map((k) => (
+            <div key={k.label} className="ad-stat">
+              <div className="ad-stat__label">{k.label}</div>
+              <div className="ad-stat__row">
+                <span className="ad-stat__value tnum">{k.value}</span>
+                <span className="ad-stat__unit">장</span>
+              </div>
             </div>
           ))}
         </div>
-        </>
-      )}
-    </div>
+
+        <div className="ad-card">
+          <div className="ad-card__head" style={{ marginBottom: 12 }}>
+            <div className="ad-card__titleRow">
+              <span className="ad-card__title">발급 목록</span>
+              <span className="ad-card__num tnum">
+                {shown.length} / {rows.length}건
+              </span>
+            </div>
+            <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>
+              <SearchBox value={query} onChange={setQuery} placeholder="번호·카드 이름으로 찾기" />
+              <button
+                type="button"
+                className="ad-btn ad-btn--line ad-btn--md"
+                disabled={!rows.length}
+                onClick={download}
+              >
+                CSV
+              </button>
+              <a
+                className="ad-btn ad-btn--soft ad-btn--md"
+                href={`/${slug}/staff`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                스태프 화면 ↗
+              </a>
+            </div>
+          </div>
+          <p className="ad-fine" style={{ marginBottom: 14 }}>
+            발급 수가 손님 수보다 훨씬 많다면, 브라우저 기록을 지우고 다시 받은 경우예요. 번호를
+            지우면 그 손님이 새로 받을 수 있게 됩니다.
+          </p>
+
+          {rows.length === 0 ? (
+            <div className="ad-empty">
+              <div className="ad-empty__title">아직 발급된 뽑기권이 없어요</div>
+              <div className="ad-empty__sub">
+                손님이 이벤트 페이지에서 ‘뽑기권 받기’ 를 누르면 여기 나와요.
+              </div>
+            </div>
+          ) : shown.length === 0 ? (
+            <div className="ad-empty ad-empty--sm">
+              <div className="ad-empty__title">찾는 번호가 없어요</div>
+              <div className="ad-empty__sub">검색어를 지우고 다시 찾아보세요.</div>
+            </div>
+          ) : (
+            <div className="ad-table" style={tableVars}>
+              <div className="ad-table__inner" data-tickets>
+                <div className="ad-table__head">
+                  <span>번호</span>
+                  <span />
+                  <span>뽑은 카드</span>
+                  <span>발급</span>
+                  <span>뽑음</span>
+                  <span />
+                </div>
+                {shown.map((r) => (
+                  <div key={r.code} className="ad-table__row ad-table__row--tight">
+                    <span className="ad-cell--code tnum" style={{ fontSize: 15, letterSpacing: '.06em' }}>
+                      {r.code}
+                    </span>
+                    {r.status === 'drawn' ? (
+                      <div
+                        className="ad-thumb"
+                        style={r.cardImage ? { backgroundImage: cssUrl(r.cardImage) } : undefined}
+                        role={r.cardImage ? 'img' : undefined}
+                        aria-label={r.cardName ?? undefined}
+                      />
+                    ) : (
+                      <span />
+                    )}
+                    <div style={{ minWidth: 0 }}>
+                      {r.status === 'drawn' ? (
+                        <>
+                          <div className="ad-cell--b">{r.cardName || '(이름 없음)'}</div>
+                          {r.rarity && (
+                            <div className="ad-fine" style={{ marginTop: 3 }}>
+                              {RARITY_LABEL[r.rarity] ?? r.rarity}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <span className="ad-tag">아직 안 뽑음</span>
+                      )}
+                    </div>
+                    <span className="ad-cell--mute tnum">{when(r.issuedAt)}</span>
+                    <span className="ad-cell--mute tnum">{r.drawnAt ? when(r.drawnAt) : '—'}</span>
+                    <button
+                      type="button"
+                      className="ad-x"
+                      disabled={busy}
+                      aria-label={`${r.code} 삭제`}
+                      onClick={() => void remove(r)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   )
 }

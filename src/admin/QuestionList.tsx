@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Trash2, ChevronRight, MessageCircleQuestion } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import { REVERSED_RATE } from '@/lib/deck'
@@ -53,112 +52,125 @@ export function QuestionList() {
   async function handleTogglePublish(q: Question) {
     await repo.questions.save(slug, { ...q, published: !q.published })
     await load()
-    toast('공개 설정을 저장했어요')
+    toast('저장했어요')
   }
 
   async function handleRemove(q: Question) {
     const ok = await confirmAction({
-      title: `"${q.question || '(제목 없음)'}" 질문을 삭제할까요?`,
-      desc: '삭제하면 이 질문과 답변이 사라져요. 되돌릴 수 없어요.',
-      okLabel: '삭제',
+      title: '이 질문을 지울까요?',
+      desc: `“${q.question.trim() || '제목 없음'}” 과 여기에 적어 둔 답변이 모두 사라집니다.`,
+      okLabel: '지우기',
       danger: true,
     })
     if (!ok) return
     await repo.questions.remove(slug, q.id)
     await load()
-    toast('질문을 삭제했어요')
+    toast('질문을 지웠어요')
   }
+
+  const total = questions?.length ?? 0
+  const open = questions?.filter((q) => q.published).length ?? 0
 
   return (
     <>
-      <div className="admin__head">
-        <div>
-          <h1 className="t-title-l">질문 타로</h1>
-          <p className="t-text-xs t-muted">
-            방문자가 고를 질문과, 카드가 나왔을 때 보여줄 답변을 관리해요.
-          </p>
-        </div>
-        <button type="button" className="btn btn--sm btn--primary" onClick={() => void handleAdd()}>
-          <Plus size={18} strokeWidth={2} aria-hidden="true" />
-          질문 추가
-        </button>
-      </div>
-
-      {questions && questions.length > 0 && (
-        <div className="stat-row">
-          <div className="stat-tile">
-            <span className="stat-label">총 질문</span>
-            <span className="stat-value">
-              {questions.length}
-              <span className="stat-unit">개</span>
+      <header className="ad-head">
+        <div className="ad-head__row">
+          <h1 className="ad-head__title">질문 타로</h1>
+          {questions && (
+            <span className="ad-head__count tnum">
+              전체 {total} · 공개 {open}
             </span>
-            <span className="stat-sub">방문자에게 보이는 질문 목록</span>
-          </div>
-          <div className="stat-tile">
-            <span className="stat-label">공개 질문</span>
-            <span className="stat-value">
-              {questions.filter((q) => q.published).length}
-              <span className="stat-unit">개</span>
-            </span>
-            <span className="stat-sub">체크된 질문만 노출돼요</span>
-          </div>
+          )}
         </div>
-      )}
+        <p className="ad-head__desc">
+          방문자가 고를 질문과, 카드가 나왔을 때 보여줄 답변을 관리합니다.
+        </p>
+      </header>
 
-      {questions === null ? (
-        <div className="row-list" aria-busy="true">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="skeleton" style={{ height: 64 }} />
-          ))}
+      <div className="ad-card">
+        <div className="ad-card__head">
+          <div className="ad-card__titleRow">
+            <span className="ad-card__title">질문</span>
+            <span className="ad-card__num tnum">
+              전체 {total} · 공개 {open}
+            </span>
+          </div>
+          <button type="button" className="ad-btn ad-btn--soft ad-btn--sm" onClick={() => void handleAdd()}>
+            + 질문 추가
+          </button>
         </div>
-      ) : questions.length === 0 ? (
-        <div className="admin-empty">
-          <MessageCircleQuestion size={44} strokeWidth={1.6} aria-hidden="true" />
-          <div className="admin-empty__title">아직 질문이 없어요.</div>
-          <div className="admin-empty__sub">위에서 추가해 보세요.</div>
-        </div>
-      ) : (
-        <ul className="row-list">
-          {questions.map((q) => (
-            <li key={q.id} className="row-item">
-              <label className="check">
-                <input
-                  type="checkbox"
-                  checked={q.published}
-                  onChange={() => void handleTogglePublish(q)}
+
+        {questions === null ? (
+          <div className="ad-skels">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="ad-skel ad-skel--row" />
+            ))}
+          </div>
+        ) : questions.length === 0 ? (
+          <div className="ad-empty">
+            <div className="ad-empty__title">아직 질문이 없어요</div>
+            <div className="ad-empty__sub">
+              질문을 만들면 방문자가 그 중 하나를 골라 카드를 뽑게 돼요.
+            </div>
+            <button
+              type="button"
+              className="ad-btn ad-btn--primary ad-btn--lg"
+              style={{ marginTop: 16 }}
+              onClick={() => void handleAdd()}
+            >
+              + 첫 질문 만들기
+            </button>
+          </div>
+        ) : (
+          <div className="ad-rows">
+            {questions.map((q) => (
+              <div key={q.id} className="ad-row">
+                <button
+                  type="button"
+                  className="ad-check__box"
+                  data-on={q.published || undefined}
                   aria-label={`${q.question || '제목 없음'} 공개`}
-                />
-                <span className="t-text-xs t-muted">공개</span>
-              </label>
+                  style={{
+                    cursor: 'pointer',
+                    background: q.published ? 'var(--ad-key)' : 'var(--ad-surface)',
+                    borderColor: q.published ? 'var(--ad-key)' : 'var(--ad-line-2)',
+                  }}
+                  onClick={() => void handleTogglePublish(q)}
+                >
+                  {q.published ? '✓' : ''}
+                </button>
 
-              <button
-                type="button"
-                className="row-item__grow"
-                style={{ textAlign: 'left' }}
-                onClick={() => navigate(`/${slug}/admin/questions/${q.id}`)}
-              >
-                <span className="t-text-m">{q.question || '(제목 없음)'}</span>
-                <br />
-                {/* 장수는 안 쓴다 — 질문 타로는 전부 한 장이라 줄마다 "1장"이 붙으면 잡음이다 */}
-                <span className="t-text-xs t-muted">
-                  {majorOnly || q.deck === 'major' ? '메이저 22장' : '전체 78장'} ·{' '}
-                  {answeredCount(q)}개 답변 입력됨
-                </span>
-              </button>
+                <button
+                  type="button"
+                  className="ad-row__grow"
+                  onClick={() => navigate(`/${slug}/admin/questions/${q.id}`)}
+                >
+                  <div className="ad-row__title" data-empty={q.question.trim() ? undefined : true}>
+                    {q.question.trim() || '(제목 없음)'}
+                  </div>
+                  {/* 장수는 안 쓴다 — 질문 타로는 전부 한 장이라 줄마다 "1장"이 붙으면 잡음이다 */}
+                  <div className="ad-row__meta">
+                    {majorOnly || q.deck === 'major' ? '메이저 22장' : '전체 78장'} ·{' '}
+                    {answeredCount(q)}개 답변 입력됨
+                    {!q.published && (
+                      <span className="ad-tag ad-tag--sm">비공개</span>
+                    )}
+                  </div>
+                </button>
 
-              <button
-                type="button"
-                className="btn-icon"
-                aria-label="삭제"
-                onClick={() => void handleRemove(q)}
-              >
-                <Trash2 size={18} strokeWidth={2} aria-hidden="true" />
-              </button>
-              <ChevronRight size={18} strokeWidth={2} className="icon-muted" aria-hidden="true" />
-            </li>
-          ))}
-        </ul>
-      )}
+                <button
+                  type="button"
+                  className="ad-x"
+                  aria-label="삭제"
+                  onClick={() => void handleRemove(q)}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </>
   )
 }
