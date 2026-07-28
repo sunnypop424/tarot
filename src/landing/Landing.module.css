@@ -1,0 +1,1031 @@
+/*
+ * 배포 루트(`/`) 랜딩 — **슬롯 밖 화면이다.**
+ *
+ * 그래서 슬롯 테마 토큰을 안 쓴다: 여기 색은 이벤트가 아니라 **제품의 것**이다
+ * (편집기 `.owner`·관리 `.admin` 과 같은 판단). hex 가 이 파일에 있는 건 그 예외다 —
+ * `tokens.css` 는 슬롯 색이라 여기에 섞으면 랜딩이 마지막에 연 슬롯 색을 따라간다.
+ *
+ * 다크 모드는 기기 설정을 따른다 (`prefers-color-scheme`). 랜딩은 브랜드 화면이라
+ * 라이트/다크 둘 다 자기 색이 있어야 한다.
+ */
+
+.root {
+  --bg: #ffffff;
+  --bg-soft: #f7f6f8;
+  --fg: #131316;
+  --fg-mid: #5c5c66;
+  --fg-dim: #8b8b95;
+  --line: #eceaef;
+  --line-strong: #dedbe3;
+  --card: #ffffff;
+  --accent: #816bff;
+  --accent-soft: #f2efff;
+  --shadow: 0 1px 2px rgb(19 19 22 / 0.05);
+
+  background: var(--bg);
+  color: var(--fg);
+  overflow-x: hidden;
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  .root {
+    --bg: #0f0f13;
+    --bg-soft: #15151b;
+    --fg: #f4f3f7;
+    --fg-mid: #a8a7b4;
+    --fg-dim: #7c7b88;
+    --line: #232330;
+    --line-strong: #2e2e3d;
+    --card: #16161d;
+    --accent: #9c8bff;
+    --accent-soft: #1d1a2e;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+  }
+}
+
+/*
+ * **본문 링크만** 보라색이다. 버튼처럼 생긴 링크(CTA·탭·카드)는 자기 색이 있는데,
+ * `.root a` 가 클래스 하나짜리 규칙(`.ctaDark`)보다 셀렉터가 강해서 **글자색을 덮어썼다** —
+ * 어두운 알약 위 글자가 흰색이 아니라 보라색으로 나왔다. 클래스 없는 링크에만 건다.
+ */
+.root a:not([class]) {
+  color: var(--accent);
+  text-decoration: none;
+}
+.root a:not([class]):hover {
+  color: var(--fg);
+}
+.root a {
+  text-decoration: none;
+}
+.root :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.root button {
+  font-family: inherit;
+}
+
+/* 스크롤 등장 — 움직임에 민감한 분들에겐 끈다 */
+.rv {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.rv[data-in] {
+  animation: slUp 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes slUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv {
+    opacity: 1;
+    transform: none;
+  }
+  .rv[data-in] {
+    animation: none;
+  }
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 22px;
+}
+
+/* ── 상단 바 ── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.navInner {
+  max-width: 1180px;
+  margin: 0 auto;
+  height: 62px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.brand {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.navLink {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg-mid);
+  padding: 9px 12px;
+  border-radius: 9999px;
+}
+.navCta {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 9999px;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 700;
+}
+.navCta:hover {
+  color: var(--bg);
+  opacity: 0.85;
+}
+
+/* ── 히어로 ── */
+.hero {
+  position: relative;
+  overflow: hidden;
+}
+.heroGlow {
+  position: absolute;
+  top: -380px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1100px;
+  height: 760px;
+  background: radial-gradient(closest-side, rgb(129 107 255 / 0.16), rgb(129 107 255 / 0));
+  pointer-events: none;
+}
+.heroGrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(to right, var(--line) 1px, transparent 1px);
+  background-size: calc(100% / 6) 100%;
+  opacity: 0.6;
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.9), transparent 78%);
+  -webkit-mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.9), transparent 78%);
+}
+.heroInner {
+  position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(84px, 15vw, 180px) 22px clamp(72px, 11vw, 140px);
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 9999px;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--fg-mid);
+}
+.h1 {
+  margin: 26px 0 0;
+  font-size: clamp(38px, 7.2vw, 76px);
+  line-height: 1.14;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+  max-width: 16em;
+  text-wrap: balance;
+}
+.h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+.lead {
+  margin: 26px 0 0;
+  font-size: clamp(15px, 1.7vw, 19px);
+  line-height: 1.72;
+  color: var(--fg-mid);
+  max-width: 30em;
+  text-wrap: pretty;
+}
+.ctaRow {
+  margin-top: 38px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ctaDark,
+.ctaGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 54px;
+  padding: 0 28px;
+  border-radius: 9999px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.ctaDark {
+  background: var(--fg);
+  color: var(--bg);
+}
+.ctaDark:hover {
+  color: var(--bg);
+  opacity: 0.85;
+}
+.ctaGhost {
+  border: 1px solid var(--line-strong);
+  color: var(--fg);
+}
+
+.facts {
+  margin-top: clamp(48px, 7vw, 84px);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.fact {
+  background: var(--bg);
+  padding: 22px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.factK {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--fg-dim);
+}
+.factV {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+@media (max-width: 899px) {
+  .facts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 519px) {
+  .facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── 공통 섹션 ── */
+.section {
+  border-top: 1px solid var(--line);
+}
+.sectionSoft {
+  background: var(--bg-soft);
+}
+.sectionInner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(64px, 9vw, 116px) 22px;
+}
+.eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+.h2 {
+  margin: 0;
+  font-size: clamp(26px, 3.6vw, 40px);
+  line-height: 1.24;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+}
+.sub {
+  margin: 16px 0 0;
+  font-size: 16px;
+  line-height: 1.72;
+  color: var(--fg-mid);
+}
+.head {
+  max-width: 34em;
+}
+
+/* ── 서비스 ── */
+.groups {
+  margin-top: clamp(40px, 6vw, 72px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(36px, 5vw, 64px);
+}
+.groupHead {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line-strong);
+}
+.groupName {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--fg);
+}
+.groupHint {
+  font-size: 13px;
+  color: var(--fg-dim);
+}
+.cards {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+  gap: 12px;
+}
+.card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.cardNo {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--fg-dim);
+}
+.cardName {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.cardDesc {
+  margin: 7px 0 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--fg-mid);
+  text-wrap: pretty;
+}
+.cardFoot {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: var(--line-strong);
+}
+.cardDevice {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg-dim);
+}
+.cardLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.custom {
+  margin-top: clamp(36px, 5vw, 60px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  justify-content: space-between;
+  background: var(--card);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 24px 26px;
+  box-shadow: var(--shadow);
+}
+.customTitle {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.customBody {
+  margin: 7px 0 0;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--fg-mid);
+  text-wrap: pretty;
+}
+.customCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 9999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  flex: none;
+}
+.customCta:hover {
+  color: #fff;
+  opacity: 0.9;
+}
+
+/* ── 체험 ── */
+.demoGrid {
+  margin-top: clamp(36px, 5vw, 60px);
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: clamp(28px, 4vw, 56px);
+  /* 서비스 목록과 미리보기를 **세로 가운데**로 — 목록이 짧아 위로 붙으면 따로 노는 것처럼 보인다 */
+  align-items: center;
+}
+@media (max-width: 899px) {
+  .demoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+.tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+@media (max-width: 899px) {
+  .tabs {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-size: 14.5px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--fg-mid);
+  border: 1px solid transparent;
+}
+@media (max-width: 899px) {
+  .tab {
+    width: auto;
+  }
+}
+.tab[data-on] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-soft);
+  font-weight: 800;
+}
+.tabDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  flex: none;
+  background: var(--line-strong);
+}
+.tab[data-on] .tabDot {
+  background: var(--accent);
+}
+.tabDevice {
+  margin-left: auto;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--fg-dim);
+}
+.tab[data-on] .tabDevice {
+  color: var(--accent);
+}
+
+.demoMain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+}
+.demoTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+.demoName {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.demoChip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--line-strong);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--fg-mid);
+}
+.demoNote {
+  width: 100%;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--fg-mid);
+}
+
+/* 화면 고르기 — **기기가 여럿인 서비스**에서만 뜬다 (좁은 화면에선 하나씩 본다) */
+.screenPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+.screenBtn {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--fg-mid);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.screenBtn[data-on] {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--accent);
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  padding: clamp(20px, 3vw, 40px);
+  border-radius: 14px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  /*
+   * **높이를 고정한다.** 기기마다 비율이 달라 높이를 내용에 맡기면 탭을 옮길 때마다
+   * 페이지가 통째로 튄다 — 그게 이 섹션에서 제일 거슬리는 움직임이다.
+   */
+  height: 640px;
+  overflow: hidden;
+}
+@media (max-width: 599px) {
+  .stage {
+    height: 560px;
+  }
+}
+.device {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+/*
+ * 기기 발치(라벨 + 갈래 버튼). **버튼이 한 기기에만 붙어도 모든 기둥이 같은 높이여야**
+ * 기기들이 나란히 선다 — 안 그러면 버튼 없는 쪽이 아래로 내려앉는다.
+ */
+.deviceFoot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.deviceFoot[data-reserve] {
+  min-height: 58px; /* 라벨 16 + gap 10 + 버튼 32 */
+}
+.deviceLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg-dim);
+}
+.mockOuter {
+  position: relative;
+  flex: none;
+}
+.mockScale {
+  transform-origin: top left;
+}
+.mockShell {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 24px 70px rgb(19 19 22 / 0.16);
+  overflow: hidden;
+}
+/* 투명 배경 화면(상영 오버레이)은 뒤에 어두운 판을 깔아야 보인다 */
+.mockShell[data-transparent] {
+  background: repeating-linear-gradient(135deg, #22222a 0 18px, #1c1c23 18px 36px);
+}
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--fg-dim);
+  text-align: center;
+  padding: 0 40px;
+}
+.frame {
+  position: relative;
+  border: 0;
+  display: block;
+  background: transparent;
+}
+
+.demoFoot {
+  text-align: center;
+  max-width: 30em;
+}
+.demoFootText {
+  font-size: 13px;
+  color: var(--fg-dim);
+  line-height: 1.7;
+}
+.demoFootLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* ── 진행 ── */
+.steps {
+  position: relative;
+  margin-top: clamp(44px, 6vw, 72px);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+.stepRail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 19px;
+  height: 1px;
+  background: var(--line-strong);
+}
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.stepNode {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: var(--card);
+  color: var(--fg);
+  border: 1px solid var(--line-strong);
+  font-size: 13px;
+  font-weight: 800;
+  flex: none;
+}
+.step:first-child .stepNode {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.stepName {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+.stepDesc {
+  margin: 9px 0 0;
+  font-size: 14.5px;
+  line-height: 1.72;
+  color: var(--fg-mid);
+  text-wrap: pretty;
+}
+.stepMeta {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg-mid);
+}
+@media (max-width: 999px) {
+  .steps {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .stepRail {
+    left: 19px;
+    right: auto;
+    top: 20px;
+    bottom: 20px;
+    width: 1px;
+    height: auto;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    column-gap: 18px;
+    padding-bottom: 34px;
+  }
+}
+
+/* ── 역할 ── */
+.roles {
+  margin-top: clamp(36px, 5vw, 56px);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 14px;
+  align-items: stretch;
+}
+@media (max-width: 899px) {
+  .roles {
+    grid-template-columns: 1fr;
+  }
+}
+.roleCard {
+  border-radius: 10px;
+  padding: 32px 28px 34px;
+  display: flex;
+  flex-direction: column;
+}
+.roleOurs {
+  background: var(--fg);
+  color: var(--bg);
+}
+.roleTheirs {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+}
+.roleTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+}
+.roleTitle {
+  margin-top: 14px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.roleList {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+}
+.roleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+}
+.roleOurs .roleRow + .roleRow {
+  border-top: 1px solid rgb(255 255 255 / 0.14);
+}
+.roleTheirs .roleRow + .roleRow {
+  border-top: 1px solid var(--line);
+}
+.roleNo {
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.5;
+  width: 20px;
+  flex: none;
+}
+.roleText {
+  flex: 1;
+  font-size: 15.5px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+.roleDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.roleDividerChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--fg-dim);
+}
+
+/* ── FAQ ── */
+.faqGrid {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(64px, 9vw, 116px) 22px;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: clamp(28px, 4vw, 64px);
+  align-items: start;
+}
+@media (max-width: 899px) {
+  .faqGrid {
+    grid-template-columns: 1fr;
+  }
+}
+.faqList {
+  border-top: 1px solid var(--line-strong);
+}
+.faqRow {
+  border-bottom: 1px solid var(--line-strong);
+}
+/*
+ * 열린 줄 — **눈에 보이게** 표시한다. 시안은 `--card` 만 깔았는데 라이트에서 그 색이
+ * 섹션 배경(`--bg-soft`)과 거의 같아 "안 바뀐다" 로 보였다. 왼쪽에 강조선을 같이 둔다.
+ */
+.faqRow[data-open] {
+  background: var(--card);
+  border-radius: 8px 8px 0 0;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.faqRow[data-open] .faqBtn {
+  padding-left: 12px;
+}
+.faqRow[data-open] .faqA {
+  padding-left: 48px;
+}
+.faqBtn {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 22px 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--fg);
+}
+.faqNo {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--fg-dim);
+  width: 24px;
+  flex: none;
+  padding-top: 4px;
+}
+.faqRow[data-open] .faqNo {
+  color: var(--accent);
+}
+.faqQ {
+  flex: 1;
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+.faqIcon {
+  display: inline-flex;
+  color: var(--fg-dim);
+  flex: none;
+  transition: transform 0.2s ease;
+}
+.faqRow[data-open] .faqIcon {
+  color: var(--accent);
+  transform: rotate(45deg);
+}
+.faqA {
+  margin: 0;
+  padding: 0 44px 26px 40px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--fg-mid);
+  text-wrap: pretty;
+}
+
+/* ── 문의 · 푸터 ── */
+.contact {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(80px, 12vw, 150px) 22px;
+  text-align: center;
+}
+.contactTitle {
+  margin: 0 auto;
+  max-width: 15em;
+  font-size: clamp(28px, 4.6vw, 52px);
+  line-height: 1.2;
+  letter-spacing: -0.032em;
+  font-weight: 800;
+  text-wrap: balance;
+}
+.contactBody {
+  margin: 22px auto 0;
+  max-width: 26em;
+  font-size: 16px;
+  line-height: 1.72;
+  color: var(--fg-mid);
+}
+.contactRow {
+  margin-top: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.footer {
+  border-top: 1px solid var(--line);
+  background: var(--bg-soft);
+}
+.footerInner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 34px 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+.footerNote {
+  font-size: 12.5px;
+  color: var(--fg-dim);
+}

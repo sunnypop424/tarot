@@ -83,6 +83,9 @@ const CheerApp = lazy(() => import('@/cheer/CheerApp'))
  */
 const StaffApp = lazy(() => import('@/staff/StaffApp'))
 
+/** 배포 루트 랜딩 — 슬롯 밖 화면이라 슬롯 테마를 안 쓴다 (편집기·관리와 같은 판단) */
+const Landing = lazy(() => import('@/landing/Landing'))
+
 /**
  * 서비스별 방문자 앱 — **`Record` 라 모든 서비스가 필수다.**
  *
@@ -158,8 +161,11 @@ export function App() {
     <BrowserRouter>
       <Suspense fallback={null}>
         <Routes>
-          {/* 배포 루트에는 아무 이벤트도 없다 — 슬러그로만 들어온다 */}
-          <Route index element={<NotFound />} />
+          {/*
+            * 배포 루트는 **랜딩**이다 — 파는 물건을 소개하고 체험 슬롯으로 보낸다.
+            * **슬롯 목록은 여기 없다** (CLAUDE.md): 뜨는 주소는 전부 `/demo-*` 체험 슬롯이다.
+            */}
+          <Route index element={<Landing />} />
 
           {OwnerRoutes && <Route path="theme-editor/*" element={<OwnerRoutes />} />}
 

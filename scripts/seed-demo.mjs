@@ -92,6 +92,11 @@ const SLOTS = {
   stamp: { name: '체험 · 방문 스탬프' },
   quiz: { name: '체험 · 최애 모의고사' },
   photocard: { name: '체험 · 포토카드 뽑기' },
+  /**
+   * 판매 방식 체험 — **스태프가 뽑는 화면**을 보여주려면 슬롯이 하나 더 필요하다
+   * (한 슬롯은 저장용이거나 판매거나 둘 중 하나다). 랜딩이 `/staff` 를 띄운다.
+   */
+  'photocard-sale': { name: '체험 · 포토카드 (판매)', service: 'photocard' },
   cheer: { name: '체험 · 영상회 응원' },
 }
 
@@ -109,13 +114,15 @@ const MESSAGES = [
   ['', '오늘 정말 즐거웠어요'],
 ]
 
-for (const service of targets) {
-  const slug = `demo-${service}`
-  const meta = SLOTS[service]
+for (const key of targets) {
+  const slug = `demo-${key}`
+  const meta = SLOTS[key]
   if (!meta) {
-    console.error(`모르는 서비스: ${service}`)
+    console.error(`모르는 서비스: ${key}`)
     continue
   }
+  /** 키가 곧 서비스는 아니다 — 같은 서비스를 방식만 달리해 두 슬롯으로 두기도 한다 */
+  const service = meta.service ?? key
 
   // 슬롯 (있으면 덮어쓴다 — 설정만 바꾸고 데이터는 아래에서 다시 채운다)
   const up = await rest('slots', {
@@ -180,11 +187,28 @@ for (const service of targets) {
 
   if (service === 'rolling' || service === 'wish' || service === 'cheer') {
     await rest(`rolling_messages?slug=eq.${slug}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } })
+    /**
+     * **색을 돌려 가며 넣는다.** 색을 비우면 화면이 팔레트의 첫 색으로 그려서 벽이든 나무든
+     * 전부 한 가지 색이 된다 — 체험에서 제일 먼저 눈에 띄는 게 그 단조로움이다.
+     * (영상회는 말풍선 색을 상영 화면이 무작위로 고르므로 색을 안 쓴다.)
+     */
+    const palette =
+      service === 'wish'
+        ? ['#efe8cd', '#e9d3c4', '#d8dfd0', '#dcd4e6', '#e4dcc2', '#dfe3ea']
+        : ['#f4efe2', '#eef1e6', '#eceff4', '#f4ecec', '#f1ecf4', '#e9f0ef']
+    const fonts = ['pretendard', 'gaegu', 'nanumPen']
     await rest('rolling_messages', {
       method: 'POST',
       headers: { Prefer: 'return=minimal' },
       body: JSON.stringify(
-        MESSAGES.map(([nickname, body]) => ({ slug, nickname, body, color: '', font: '', hidden: false }))
+        MESSAGES.map(([nickname, body], i) => ({
+          slug,
+          nickname,
+          body,
+          color: service === 'cheer' ? '' : palette[i % palette.length],
+          font: service === 'cheer' ? '' : fonts[i % fonts.length],
+          hidden: false,
+        }))
       ),
     })
   }
@@ -289,7 +313,12 @@ for (const service of targets) {
     await rest('photocard_settings', {
       method: 'POST',
       headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
-      body: JSON.stringify({ slug, mode: 'save', draws_per_visitor: 3, rehearsal: false, closed: false, allow_save: true }),
+      body: JSON.stringify(
+        key === 'photocard-sale'
+          ? // 판매 — 스태프가 N연차를 뽑는다 (랜딩이 `/staff` 를 띄운다)
+            { slug, mode: 'sale', batch_count: 10, rehearsal: false, closed: false, allow_save: false }
+          : { slug, mode: 'save', draws_per_visitor: 3, rehearsal: false, closed: false, allow_save: true }
+      ),
     })
   }
 

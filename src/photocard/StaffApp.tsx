@@ -78,8 +78,8 @@ function Staff({ slot }: { slot: Slot }) {
   }, [slug])
 
   useEffect(() => {
-    if (status === 'in') void load()
-  }, [load, status])
+    if (status === 'in' || slot.demo) void load()
+  }, [load, status, slot.demo])
 
   /**
    * 색·형태는 **슬롯 테마 토큰을 그대로 쓴다** (럭드와 같다).
@@ -136,9 +136,14 @@ function Staff({ slot }: { slot: Slot }) {
     )
   }
 
-  if (status === 'checking') return shell(<div className={styles.center} aria-busy="true" />)
+  if (status === 'checking' && !slot.demo) return shell(<div className={styles.center} aria-busy="true" />)
 
-  if (status === 'out') {
+  /**
+   * **체험 슬롯은 로그인을 안 묻는다** (0032). 랜딩에서 이 화면을 보여주려면 열려 있어야 하고,
+   * 계정을 만들어 공개할 수는 없다(그 계정으로 다른 걸 만지게 된다).
+   * 뽑기 자체의 판정은 서버가 한다 — 화면을 열어주는 것과 뽑게 해주는 것은 다른 문이다.
+   */
+  if (status === 'out' && !slot.demo) {
     return shell(
       <div className={styles.center}>
         <Lock size={32} strokeWidth={1.6} aria-hidden="true" />
@@ -302,6 +307,14 @@ function Staff({ slot }: { slot: Slot }) {
             </div>
           ) : (
             <div className={styles.controls}>
+              {slot.demo && (
+                <div className={styles.banner} data-demo>
+                  <Info size={17} strokeWidth={2} aria-hidden="true" />
+                  <span>
+                    <b>체험용 화면이에요.</b> 실제로는 스태프가 로그인한 기기에서만 열립니다.
+                  </span>
+                </div>
+              )}
               {!online && (
                 <div className={styles.banner} data-offline>
                   <WifiOff size={17} strokeWidth={2} aria-hidden="true" />

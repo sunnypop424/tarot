@@ -80,6 +80,28 @@ export function Stage({
   return <Overlay display={display} settings={settings} messages={messages} vars={vars} />
 }
 
+/**
+ * **문서 배경을 투명하게 만든다.**
+ *
+ * `body` 는 앱 공통으로 `--color-canvas` 를 칠한다(base.css). 오버레이 컴포넌트만 투명하게
+ * 두면 화면에는 여전히 슬롯 배경색이 깔리고, OBS 브라우저 소스는 **그 색까지 그대로 얹어**
+ * 영상을 통째로 덮는다 — 투명 오버레이의 존재 이유가 사라진다.
+ */
+function useTransparentDocument(on: boolean) {
+  useEffect(() => {
+    if (!on) return
+    const html = document.documentElement
+    const body = document.body
+    const before = [html.style.background, body.style.background] as const
+    html.style.background = 'transparent'
+    body.style.background = 'transparent'
+    return () => {
+      html.style.background = before[0]
+      body.style.background = before[1]
+    }
+  }, [on])
+}
+
 function Overlay({
   display,
   settings,
@@ -91,6 +113,8 @@ function Overlay({
   messages: RollingMessage[]
   vars: React.CSSProperties
 }) {
+  useTransparentDocument(true)
+
   const count = settings?.bubbles ?? 6
   const ratio = settings?.ratio ?? '16:9'
   const base = (settings?.intervalSec ?? 6) * 1000
