@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Download, Info, Trash2, Truck } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
+import { SearchBox } from '../SearchBox'
 import type { ShippingEntry } from '@/lib/repo'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
@@ -24,6 +25,7 @@ export function Shipping() {
   const slug = slot.slug
 
   const [list, setList] = useState<ShippingEntry[] | null>(null)
+  const [query, setQuery] = useState('')
   const [busy, setBusy] = useState(false)
 
   const load = useCallback(async () => {
@@ -84,6 +86,16 @@ export function Shipping() {
 
   if (!list) return null
 
+  /** 이름·연락처·주소·상품으로 찾는다 (배송 준비하며 한 명을 짚는 자리다) */
+  const q = query.trim().toLowerCase()
+  const shown = q
+    ? list.filter((e) =>
+        [e.name, e.phone, e.address, e.prizes.map((p) => p.name).join(' ')].some((v) =>
+          (v ?? '').toLowerCase().includes(q)
+        )
+      )
+    : list
+
   return (
     <div>
       <header className="admin__head">
@@ -127,6 +139,14 @@ export function Shipping() {
           <div className="admin-empty__title">아직 제출된 배송 정보가 없어요.</div>
         </div>
       ) : (
+        <>
+        <SearchBox
+          value={query}
+          onChange={setQuery}
+          placeholder="이름 · 연락처 · 주소 · 상품"
+          found={shown.length}
+          total={list.length}
+        />
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead>
@@ -139,7 +159,7 @@ export function Shipping() {
               </tr>
             </thead>
             <tbody>
-              {list.map((e) => (
+              {shown.map((e) => (
                 <tr key={e.id}>
                   <td>{e.name}</td>
                   <td className={styles.nowrap}>{e.phone}</td>
@@ -155,6 +175,7 @@ export function Shipping() {
             </tbody>
           </table>
         </div>
+        </>
       )}
     </div>
   )

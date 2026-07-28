@@ -72,6 +72,44 @@ async function isOwner(req: Request): Promise<boolean> {
 }
 
 /**
+ * **주최자도 자기 슬롯의 스태프 계정을 만든다** — 부스에 사람이 여럿이면 한 계정을 돌려 쓰게 되고,
+ * 그건 누가 무엇을 처리했는지 영영 모르게 된다는 뜻이다.
+ *
+ * 열어주는 범위는 **자기 슬롯 하나뿐**이다: `manages_slot(target)` 이 DB 에서 판정하고,
+ * 아래 각 처리는 다시 "그 계정이 이 슬롯 주최자인가" 를 확인한다. 슬롯 삭제(`purge`)와
+ * 만료 청소는 그대로 최고관리자만이다 — 되돌릴 수 없는 일이라 파는 사람의 몫이다.
+ */
+async function managesSlot(req: Request, slug: string): Promise<boolean> {
+  const auth = req.headers.get('authorization')
+  if (!auth?.startsWith('Bearer ') || !slug) return false
+  const client = createClient(SUPABASE_URL, ANON_KEY, {
+    global: { headers: { authorization: auth } },
+  })
+  const { data, error } = await client.rpc('manages_slot', { target: slug })
+  return !error && data === true
+}
+
+/**
+ * 부른 사람의 user_id — 자기 자신을 못 빼게 막을 때 쓴다 (스스로 잠기면 못 들어온다).
+ *
+ * **토큰의 `sub` 를 직접 읽는다.** `client.auth.getUser()` 는 헤더로 넘긴 토큰을 세션으로
+ * 인정하지 않아 `null` 을 돌려줬고, 그러면 "자기 자신인가" 비교가 **늘 거짓**이 되어
+ * 스스로를 빼는 게 그대로 통과했다 (검증에서 200 으로 잡혔다).
+ * 서명 검증은 이미 위에서 `manages_slot` RPC 가 한다 — 여기서는 누구인지만 알면 된다.
+ */
+function callerId(req: Request): string | null {
+  const auth = req.headers.get('authorization')
+  if (!auth?.startsWith('Bearer ')) return null
+  try {
+    const payload = auth.slice(7).split('.')[1]
+    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
+    return (JSON.parse(json).sub as string) ?? null
+  } catch {
+    return null
+  }
+}
+
+/**
  * 이 user_id 가 **주최자인가** — 비밀번호 재설정·삭제 전에 반드시 본다.
  *
  * 이걸 안 보면 최고관리자가 **다른 최고관리자의 비밀번호를 바꾸거나 계정을 지울 수 있다.**
@@ -135,11 +173,13 @@ Deno.serve(async (req) => {
     }
   }
 
-  // 나머지 경로는 최고관리자 없이는 열리지 않는다 — 먼저 막고 본다
-  if (!(await isOwner(req))) return bad(403, '최고관리자만 쓸 수 있어요', origin)
+  const owner = await isOwner(req)
 
   try {
     if (route === 'organizers' && req.method === 'GET') {
+      const slug = url.searchParams.get('slug') ?? ''
+      // 주최자는 **자기 슬롯 목록만** 본다 (남의 슬롯 주최자 이메일이 새면 안 된다)
+      if (!owner && !(await managesSlot(req, slug))) return bad(403, '이 슬롯의 권한이 없어요', origin)
       return await listOrganizers(url, origin)
     }
     if (req.method !== 'POST') return bad(405, 'POST 만 됩니다', origin)
@@ -151,10 +191,37 @@ Deno.serve(async (req) => {
       return bad(400, '본문을 읽지 못했어요', origin)
     }
 
-    if (route === 'organizers') return await createOrganizer(body, origin)
-    if (route === 'password') return await resetPassword(body, origin)
-    if (route === 'revoke') return await revokeOrganizer(body, origin)
-    if (route === 'purge') return await purgeSlot(body, origin)
+    if (route === 'organizers') {
+      const slug = String(body.slug ?? '')
+      if (!owner && !(await managesSlot(req, slug))) return bad(403, '이 슬롯의 권한이 없어요', origin)
+      return await createOrganizer(body, origin)
+    }
+    if (route === 'password') {
+      if (!owner) {
+        // 주최자가 만질 수 있는 건 **자기 슬롯의 계정**뿐이다
+        const target = String(body.userId ?? '')
+        const slugs = await organizerSlugs(target)
+        const allowed = await Promise.all(slugs.map((s) => managesSlot(req, s)))
+        if (!allowed.some(Boolean)) return bad(403, '이 계정의 권한이 없어요', origin)
+      }
+      return await resetPassword(body, origin)
+    }
+    if (route === 'revoke') {
+      if (!owner) {
+        const target = String(body.userId ?? '')
+        /** **자기 자신은 못 뺀다** — 마지막 계정을 스스로 빼면 아무도 못 들어온다 */
+        if (target && target === callerId(req)) return bad(400, '자기 계정은 뺄 수 없어요', origin)
+        const slugs = await organizerSlugs(target)
+        const allowed = await Promise.all(slugs.map((s) => managesSlot(req, s)))
+        if (!allowed.some(Boolean)) return bad(403, '이 계정의 권한이 없어요', origin)
+      }
+      return await revokeOrganizer(body, origin)
+    }
+    // 슬롯 통째 삭제는 **파는 사람의 몫**이다 — 되돌릴 수 없다
+    if (route === 'purge') {
+      if (!owner) return bad(403, '최고관리자만 쓸 수 있어요', origin)
+      return await purgeSlot(body, origin)
+    }
   } catch (e) {
     return bad(500, String(e), origin)
   }

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Download, ShieldAlert, Users } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
+import { SearchBox } from '../SearchBox'
 import type { IssuedReward, RewardEntry } from '@/lib/repo/types'
 import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
@@ -22,6 +23,7 @@ export function Entries() {
   const source = getSlotService(slot)
   const [list, setList] = useState<RewardEntry[] | null>(null)
   const [issued, setIssued] = useState<IssuedReward[]>([])
+  const [query, setQuery] = useState('')
 
   const load = useCallback(async () => {
     const [entries, all] = await Promise.all([
@@ -48,6 +50,14 @@ export function Entries() {
 
   // 응모 자격을 얻은 사람 = raffle 코드를 받은 사람. 그중 폼을 낸 사람이 `list` 다
   const raffle = issued.filter((r) => r.kind === 'raffle')
+
+  /** 닉네임·트위터·연락처·코드로 찾는다 — 줄 서 있는 손님 앞에서 스크롤은 느리다 */
+  const q = query.trim().toLowerCase()
+  const shown = q
+    ? list.filter((e) =>
+        [e.nickname, e.handle ?? '', e.contact ?? '', e.code].some((v) => v.toLowerCase().includes(q))
+      )
+    : list
 
   const cols = {
     handle: list.some((e) => e.handle),
@@ -150,6 +160,14 @@ export function Entries() {
           </div>
         </div>
       ) : (
+        <>
+        <SearchBox
+          value={query}
+          onChange={setQuery}
+          placeholder="닉네임 · 트위터 · 연락처 · 코드"
+          found={shown.length}
+          total={list.length}
+        />
         <div className={styles.tableWrap}>
           <table className={styles.table} data-entries>
             <thead>
@@ -164,7 +182,7 @@ export function Entries() {
               </tr>
             </thead>
             <tbody>
-              {list.map((e) => (
+              {shown.map((e) => (
                 <tr key={e.rewardId}>
                   <td>{e.nickname}</td>
                   {cols.handle && <td>{e.handle ? `@${e.handle.replace(/^@/, '')}` : '—'}</td>}
@@ -185,6 +203,7 @@ export function Entries() {
             </tbody>
           </table>
         </div>
+        </>
       )}
     </div>
   )

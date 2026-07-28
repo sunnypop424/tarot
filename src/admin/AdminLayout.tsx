@@ -4,6 +4,7 @@ import {
   ClipboardList,
   Lamp,
   MonitorPlay,
+  QrCode,
   MessageCircleQuestion,
   ExternalLink,
   LayoutDashboard,
@@ -124,11 +125,29 @@ function rewardNav(service: ServiceId): NavItem[] {
 function useNav(service: ServiceId): NavGroup[] {
   const rewards = rewardNav(service)
   return [
-    { title: '현황', items: [{ to: '', label: '대시보드', icon: LayoutDashboard }] },
+    {
+      title: '현황',
+      items: [
+        { to: '', label: '대시보드', icon: LayoutDashboard },
+        // 인쇄물 준비가 주최자의 첫 번째 일이다 — 서비스와 무관하게 늘 있다
+        { to: 'qr', label: 'QR 만들기', icon: QrCode },
+      ],
+    },
     // 묶음 제목이 곧 이 슬롯이 파는 서비스다 — 슬롯을 오갈 때 여기가 바뀐다
     { title: serviceLabel(service), items: SERVICE_NAV[service] },
     ...(rewards.length ? [{ title: '보상', items: rewards }] : []),
-    ...(hasSupabase ? [{ title: '계정', items: [{ to: 'account', label: '내 계정', icon: UserCog }] }] : []),
+    ...(hasSupabase
+      ? [
+          {
+            title: '계정',
+            items: [
+              { to: 'account', label: '내 계정', icon: UserCog },
+              // 부스에 사람이 여럿이면 계정을 나눠야 한다 (한 계정을 돌려 쓰면 기록이 섞인다)
+              { to: 'staff-accounts', label: '스태프 계정', icon: Users },
+            ],
+          },
+        ]
+      : []),
   ]
 }
 

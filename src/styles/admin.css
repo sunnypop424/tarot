@@ -347,6 +347,67 @@
   border-color: var(--color-border-hover);
 }
 
+/* 재고 소진 막대 — 표보다 훑기 좋다 */
+.dash__bars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 10px 20px;
+}
+.dash__barTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+.dash__barName {
+  font-size: 12px;
+  font-weight: var(--weight-bold);
+  color: var(--color-fg-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dash__barNum {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  color: var(--color-fg-3);
+  font-variant-numeric: tabular-nums;
+}
+.dash__barTrack {
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  overflow: hidden;
+}
+.dash__barFill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+}
+/* 20% 아래는 주황, 다 나가면 회색 — 색만으로도 훑힌다 */
+.dash__bar[data-low='soon'] .dash__barFill {
+  background: #e0a33a;
+}
+.dash__bar[data-low='out'] .dash__barFill {
+  background: var(--color-fg-3);
+}
+.dash__bar[data-low='out'] .dash__barName {
+  color: var(--color-fg-3);
+  text-decoration: line-through;
+}
+
+/* 바로가기 줄에 버튼도 섞인다 (내보내기) — 링크와 같은 알약이어야 한다 */
+button.dash__link {
+  font-family: inherit;
+  cursor: pointer;
+}
+button.dash__link:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
 /* ══ 폼 ════════════════════════════════════════════ */
 
 .field {

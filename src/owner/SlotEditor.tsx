@@ -1259,7 +1259,12 @@ export function SlotEditor() {
                     onChange={(e) => patchSlot({ group: e.target.value })}
                     list="slot-groups"
                     placeholder="예: 디노 생일카페 2026"
-                    style={CSS.input}
+                    /*
+                     * **화살표를 select 와 똑같이 붙인다.** datalist 는 브라우저마다 표시가
+                     * 달라(크롬은 아무 표시도 안 준다) 고를 수 있는 칸인 줄 모른다 —
+                     * 생김새가 같아야 같은 동작을 기대한다. 입력도 되므로 새 이름도 여기서 만든다.
+                     */
+                    style={{ ...CSS.input, ...CSS.select, appearance: 'none' }}
                     data-group
                   />
                   <datalist id="slot-groups">

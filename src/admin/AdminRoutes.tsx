@@ -10,6 +10,8 @@ import { NotFound } from '@/screens/NotFound'
 import { Account } from './Account'
 import { AdminLayout } from './AdminLayout'
 import { Dashboard } from './Dashboard'
+import { Qr } from './Qr'
+import { Staff } from './Staff'
 import { Login } from './Login'
 import { QuestionList } from './QuestionList'
 import { QuestionEditor } from './QuestionEditor'
@@ -133,6 +135,10 @@ export default function AdminRoutes() {
             * 서비스 첫 화면은 `ADMIN_HOME` 이 여전히 들고 있다 — 대시보드의 바로가기가 쓴다.
             */}
           <Route index element={<Dashboard />} />
+          {/* QR 은 서비스와 무관하다 — 주소가 있는 슬롯이면 다 필요하다 */}
+          <Route path="qr" element={<Qr />} />
+          {/* 스태프 계정 — 계정 기능이 있는 빌드에서만 (local 어댑터엔 계정이 없다) */}
+          <Route path="staff-accounts" element={<Staff />} />
           {ADMIN_ROUTES[service]}
           {/* local 어댑터엔 바꿀 비밀번호가 없다 (아무 값이나 통과한다) — 메뉴도 화면도 안 만든다 */}
           {hasSupabase && <Route path="account" element={<Account />} />}

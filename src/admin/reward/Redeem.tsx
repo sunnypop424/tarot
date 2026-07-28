@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { CircleCheck, CircleX, Download, ScanLine, TriangleAlert } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
+import { SearchBox } from '../SearchBox'
 import type { IssuedReward } from '@/lib/repo/types'
 import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
@@ -42,6 +43,7 @@ export function Redeem() {
   const [busy, setBusy] = useState(false)
   const [rows, setRows] = useState<IssuedReward[] | null>(null)
   const [fresh, setFresh] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
   const [result, setResult] = useState<
     | { kind: 'ok'; label: string }
     | { kind: 'already'; label: string; at: string }
@@ -82,6 +84,9 @@ export function Redeem() {
   }
 
   const guaranteed = (rows ?? []).filter((r) => r.kind === 'guaranteed')
+  /** 코드·내용으로 찾는다 — 손님이 보여준 번호를 목록에서 바로 짚는 자리다 */
+  const q = query.trim().toLowerCase()
+  const shown = q ? guaranteed.filter((r) => [r.code, r.label].some((v) => v.toLowerCase().includes(q))) : guaranteed
   const done = guaranteed.filter((r) => r.redeemedAt)
   const left = guaranteed.length - done.length
 
@@ -238,6 +243,14 @@ export function Redeem() {
             </div>
           </div>
         ) : (
+          <>
+          <SearchBox
+            value={query}
+            onChange={setQuery}
+            placeholder="교환코드 · 내용"
+            found={shown.length}
+            total={guaranteed.length}
+          />
           <div className={styles.tableWrap}>
             <table className={styles.table} data-issued-list>
               <thead>
@@ -250,7 +263,7 @@ export function Redeem() {
                 </tr>
               </thead>
               <tbody>
-                {guaranteed.map((r) => (
+                {shown.map((r) => (
                   <tr
                     key={r.code}
                     data-done={r.redeemedAt ? '' : undefined}
@@ -268,6 +281,7 @@ export function Redeem() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </section>
     </div>

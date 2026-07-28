@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { ExternalLink, Image as ImageIcon, Ticket, Trash2 } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
+import { SearchBox } from '../SearchBox'
 import { photocardRules, RARITY_LABEL } from '@/data/photocard'
 import type { PhotocardSettings, PhotocardTicketRow } from '@/lib/repo/types'
 import { cssUrl } from '@/lib/image'
@@ -34,6 +35,7 @@ export function Tickets() {
   const slug = slot.slug
   const [rows, setRows] = useState<PhotocardTicketRow[] | null>(null)
   const [settings, setSettings] = useState<PhotocardSettings | null>(null)
+  const [query, setQuery] = useState('')
   const [busy, setBusy] = useState(false)
 
   const load = useCallback(async () => {
@@ -74,6 +76,12 @@ export function Tickets() {
       </div>
     )
   }
+
+  /** 번호·카드 이름으로 찾는다 (손님이 번호를 보여주면 그걸로 바로 짚는다) */
+  const q = query.trim().toLowerCase()
+  const shown = q
+    ? rows.filter((r) => [r.code, r.cardName ?? ''].some((v) => v.toLowerCase().includes(q)))
+    : rows
 
   const drawn = rows.filter((r) => r.status === 'drawn')
   const open = rows.length - drawn.length
@@ -168,8 +176,16 @@ export function Tickets() {
           <div className="t-text-s t-muted">손님이 이벤트 페이지에서 '뽑기권 받기' 를 누르면 여기 나와요.</div>
         </div>
       ) : (
+        <>
+        <SearchBox
+          value={query}
+          onChange={setQuery}
+          placeholder="번호 · 카드 이름"
+          found={shown.length}
+          total={rows.length}
+        />
         <div className={styles.list} data-tickets>
-          {rows.map((r) => (
+          {shown.map((r) => (
             <div key={r.code} className={styles.row} data-out={r.status === 'drawn' || undefined}>
               <div className={styles.ticketCode}>{r.code}</div>
               {r.status === 'drawn' ? (
@@ -222,6 +238,7 @@ export function Tickets() {
             </div>
           ))}
         </div>
+        </>
       )}
     </div>
   )

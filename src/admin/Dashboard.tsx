@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, ArrowUpRight, ExternalLink, Info } from 'lucide-react'
+import { AlertTriangle, ArrowUpRight, Download, ExternalLink, Info } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import { getSlotService, SERVICES } from '@/data/services'
 import type { ServiceId } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
 import { periodLabel, slotStatus } from '@/owner/period'
+import { collectSheets, downloadSheets, type Sheet } from './exportAll'
+import { toast } from './AdminFeedback'
 import type { Slot } from '@/types/slot'
 
 /**
@@ -42,6 +44,9 @@ export function Dashboard() {
   const service = getSlotService(slot)
   const [stats, setStats] = useState<Stat[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  /** 재고 막대 — 한정 카드/경품이 있을 때만 (없으면 그릴 게 없다) */
+  const [bars, setBars] = useState<StockBar[] | null>(null)
+  const [saving, setSaving] = useState(false)
 
   const load = useCallback(async () => {
     try {
@@ -50,7 +55,30 @@ export function Dashboard() {
       setError(e instanceof Error ? e.message : '현황을 읽지 못했어요')
       setStats([])
     }
+    setBars(await stockBars(service, slot.slug).catch(() => []))
   }, [service, slot.slug])
+
+  /**
+   * 행사 자료 내보내기 — **종료 +14일이 지나면 못 꺼낸다.**
+   * 파일이 여러 개라 받기 전에 몇 개인지 말해 준다 (조용히 여러 개가 떨어지면 놀란다).
+   */
+  async function exportAll() {
+    if (saving) return
+    setSaving(true)
+    try {
+      const sheets: Sheet[] = await collectSheets(slot, service)
+      if (sheets.length === 0) {
+        toast('내보낼 기록이 아직 없어요')
+        return
+      }
+      await downloadSheets(slot.slug, sheets)
+      toast(`${sheets.length}개 파일을 받았어요`)
+    } catch (e) {
+      toast(e instanceof Error ? e.message : '내보내지 못했어요')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   useEffect(() => {
     void load()
@@ -100,6 +128,34 @@ export function Dashboard() {
         </div>
       )}
 
+      {bars && bars.length > 0 && (
+        <section className="dash__section" data-stock>
+          <h2 className="dash__sectionTitle">재고 소진</h2>
+          <div className="dash__bars">
+            {bars.map((b) => {
+              const pct = b.total > 0 ? Math.round((b.left / b.total) * 100) : 0
+              return (
+                <div key={b.name} className="dash__bar" data-low={b.left === 0 ? 'out' : pct <= 20 ? 'soon' : undefined}>
+                  <div className="dash__barTop">
+                    <span className="dash__barName">{b.name}</span>
+                    <span className="dash__barNum">
+                      {b.left} / {b.total}
+                    </span>
+                  </div>
+                  <div className="dash__barTrack">
+                    {/* 남은 비율을 그린다 — "얼마나 빠졌나" 보다 "얼마나 남았나" 가 현장의 질문이다 */}
+                    <span className="dash__barFill" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          <p className="dash__note" style={{ marginTop: 8 }}>
+            남은 비율이에요. <b>20% 아래면 주황</b>, 다 나가면 회색으로 바뀝니다.
+          </p>
+        </section>
+      )}
+
       <section className="dash__section">
         <h2 className="dash__sectionTitle">바로 가기</h2>
         <div className="dash__links">
@@ -122,11 +178,23 @@ export function Dashboard() {
               </Link>
             )
           )}
+          <Link className="dash__link" to={`/${slot.slug}/admin/qr`}>
+            QR 만들기
+            <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
+          </Link>
           <a className="dash__link" href={`/${slot.slug}`} target="_blank" rel="noreferrer">
             내 페이지 보기
             <ExternalLink size={14} strokeWidth={2} aria-hidden="true" />
           </a>
+          <button type="button" className="dash__link" onClick={() => void exportAll()} disabled={saving} data-export>
+            {saving ? '모으는 중…' : '행사 자료 내보내기'}
+            <Download size={14} strokeWidth={2} aria-hidden="true" />
+          </button>
         </div>
+        <p className="dash__note" style={{ marginTop: 8 }}>
+          기록을 CSV 여러 개로 받아요 (응모자·배송처럼 <b>개인정보가 든 파일</b>이 섞여 있으니 관리에 주의해 주세요).
+          <b> 종료 +14일이 지나면 못 꺼냅니다.</b>
+        </p>
       </section>
     </>
   )
@@ -292,4 +360,35 @@ function messageStats(all: { hidden?: boolean; createdAt: string }[]): Stat[] {
 
 function collect(service: ServiceId, slug: string): Promise<Stat[]> {
   return COLLECT[service](slug)
+}
+
+interface StockBar {
+  name: string
+  left: number
+  total: number
+}
+
+/**
+ * 재고 막대 — **한정 수량이 있는 서비스에서만.**
+ *
+ * 지금까지는 다 빠진 뒤에야 알았다(숫자를 표에서 읽어야 했다). 막대는 "어느 카드가 곧 없어지나" 를
+ * 훑는 데 표보다 낫다. `total` 은 **처음 수량이 아니라 나간 것 + 남은 것**이다 —
+ * 주최자가 중간에 재고를 더 넣으면 처음 수량은 의미가 없어진다.
+ */
+async function stockBars(service: ServiceId, slug: string): Promise<StockBar[]> {
+  if (service === 'photocard' && repo.photocard.ready()) {
+    const rows = await repo.photocard.report(slug)
+    return rows
+      .filter((r) => r.remaining !== null)
+      .map((r) => ({ name: r.name, left: r.remaining ?? 0, total: (r.remaining ?? 0) + r.drawn }))
+  }
+  if (service === 'luckydraw' && repo.luckydraw.ready()) {
+    const rows = await repo.luckydraw.report(slug)
+    return rows.map((r) => ({
+      name: `${r.rank}등 ${r.name}`,
+      left: r.remaining,
+      total: r.remaining + r.consumedTotal,
+    }))
+  }
+  return []
 }
