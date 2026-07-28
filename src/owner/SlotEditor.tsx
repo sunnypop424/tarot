@@ -32,6 +32,7 @@ import { periodLabel, rangeLabel, rangeInvalid } from './period'
 import { validateSlug } from './slug'
 import { onPreviewReady, postPreview, type PreviewState } from '@/slot/preview'
 import { PREVIEW_SCREENS } from './previewScreens'
+import { checkReadiness, type ReadyIssue } from './readiness'
 import { BackgroundField, bgRepeatValues } from './service/BackgroundField'
 import {
   LUCKYDRAW_GROUPS,
@@ -593,14 +594,37 @@ function stableStringify(value: unknown): string {
 }
 
 /**
- * 럭키드로우 미리보기용 아이패드 해상도 — 가로 기준. 기본은 가장 큰 프로.
- * 부스마다 세워두는 기기가 달라, 실제로 쓸 기기로 맞춰 봐야 여백·크기가 어긋나지 않는다.
+ * 미리보기 기기 — **어느 서비스든 고를 수 있다.**
+ *
+ * 예전엔 럭키드로우만 아이패드를 골랐다. 그런데 부스에 세워두는 화면은 럭드만이 아니다 —
+ * 포토카드 스태프 기기·투표 전광판도 태블릿이고, 손님 폰으로 여는 화면도 기기마다 다르다.
+ * 실제로 쓸 기기로 맞춰 봐야 여백·글자 크기가 어긋나지 않는다.
  */
-const IPADS = [
-  { id: 'pro', w: 1366, h: 1024, label: '아이패드 프로' },
-  { id: 'air', w: 1180, h: 820, label: '아이패드 에어' },
-  { id: 'mini', w: 1024, h: 768, label: '아이패드 미니' },
+const DEVICES = [
+  { id: 'phone', w: 390, h: 844, label: '폰 세로 (390×844)' },
+  { id: 'phone-l', w: 430, h: 932, label: '큰 폰 세로 (430×932)' },
+  { id: 'pad-mini', w: 1024, h: 768, label: '아이패드 미니 가로' },
+  { id: 'pad-air', w: 1180, h: 820, label: '아이패드 에어 가로' },
+  { id: 'pad-pro', w: 1366, h: 1024, label: '아이패드 프로 가로' },
+  { id: 'pad-port', w: 820, h: 1180, label: '아이패드 세로' },
 ] as const
+
+type DeviceId = (typeof DEVICES)[number]['id']
+
+/** 서비스마다 **실제로 쓰는 기기**가 다르다 — 처음 열 때 그걸로 맞춰 준다 */
+const DEFAULT_DEVICE: Record<ServiceId, DeviceId> = {
+  tarot: 'phone',
+  // 부스에 세워두는 아이패드 가로 (원본 빌더가 그렇게 쓰였다)
+  luckydraw: 'pad-pro',
+  rolling: 'phone',
+  wish: 'phone',
+  photozone: 'phone',
+  // 전광판이 태블릿이다 (방문자 투표는 폰이라 바꿔 볼 수 있어야 한다)
+  poll: 'pad-air',
+  stamp: 'phone',
+  quiz: 'phone',
+  photocard: 'phone',
+}
 
 /**
  * 슬롯 하나의 색·형태·이미지·이벤트 설정 — `/theme-editor/:slug`, **최고관리자 전용**
@@ -627,6 +651,12 @@ export function SlotEditor() {
   const [draft, setDraft] = useState<Slot | undefined>(undefined)
   const [slugError, setSlugError] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
+  /**
+   * 출시 전 점검 — **저장된 슬롯 기준**으로 본다 (`readiness.ts`).
+   * 초안으로 보면 색을 만질 때마다 서버를 훑게 되고, 정작 카드·문항은 초안에 없다
+   * (다른 테이블에 즉시 저장되는 값들이다).
+   */
+  const [issues, setIssues] = useState<ReadyIssue[] | null>(null)
 
   useEffect(() => {
     void repo.slots.list().then(setSlots)
@@ -644,6 +674,15 @@ export function SlotEditor() {
   useEffect(() => {
     void repo.ai.ready().then(setAiReady)
   }, [])
+
+  const runCheck = useCallback(async () => {
+    if (!saved) return
+    setIssues(await checkReadiness(saved))
+  }, [saved])
+
+  useEffect(() => {
+    void runCheck()
+  }, [runCheck])
 
   // 다 읽었거나 다른 슬롯으로 옮겨가면 그 슬롯의 저장된 값으로 초안을 새로 뜬다
   useEffect(() => {
@@ -695,21 +734,12 @@ export function SlotEditor() {
   const [previewState, setPreviewState] = useState<PreviewState>('')
 
   /**
-   * 럭키드로우 미리보기 기기 — 부스에 세워둔 아이패드를 **가로로** 쓴다. 모델마다 해상도가
-   * 달라 골라볼 수 있게 둔다 (기본은 가장 큰 프로).
+   * 미리보기 기기 — **서비스 기본값에서 시작하고 언제든 바꾼다.**
+   * 고른 값은 서비스가 바뀌면(다른 슬롯을 열면) 그 서비스 기본으로 되돌아간다.
    */
-  const [ipad, setIpad] = useState<'pro' | 'air' | 'mini'>('pro')
-  const ipadSize = IPADS.find((d) => d.id === ipad) ?? IPADS[0]
-
-  /**
-   * 미리보기 기기 — **서비스마다 실제로 쓰는 기기가 다르다.**
-   * 타로는 방문자가 자기 폰으로 보고, 럭키드로우는 아이패드를 가로로 쓴다.
-   * 폰 세로로 보여주면 아이패드에서 어떻게 보일지 알 수 없어 미리보기가 제 일을 못 한다.
-   */
-  const previewDevice =
-    draft && getSlotService(draft) === 'luckydraw'
-      ? { w: ipadSize.w, h: ipadSize.h, label: `아이패드 가로 · ${ipadSize.label}` }
-      : { w: 390, h: 844, label: '폰 세로' }
+  const service = draft ? getSlotService(draft) : 'tarot'
+  const [device, setDevice] = useState<DeviceId | null>(null)
+  const previewDevice = DEVICES.find((d) => d.id === (device ?? DEFAULT_DEVICE[service])) ?? DEVICES[0]
 
   /**
    * 편집기 오른쪽 칸은 아이패드보다 좁다 — 줄여서 통째로 보여준다.
@@ -731,6 +761,11 @@ export function SlotEditor() {
     previewScreens.find((x) => x.state === previewState) ?? previewScreens[0] ?? { state: '', label: '' }
   /** 지금 만지는 색이 화면의 **어느 자리**인지 — 미리보기가 그 부분을 깜빡인다 */
   const [highlight, setHighlight] = useState<string | null>(null)
+
+  /** 다른 서비스를 열면 골라둔 기기를 놓는다 — 폰 서비스에 아이패드가 남아 있으면 오해한다 */
+  useEffect(() => {
+    setDevice(null)
+  }, [service])
 
   useEffect(() => {
     const el = previewBox.current
@@ -941,6 +976,16 @@ export function SlotEditor() {
       return
     }
 
+    /**
+     * **막지 않고 되묻는다.** 준비 중인 슬롯을 저장하는 건 정상이다(내일 카드를 올릴 수도 있다).
+     * 다만 손님이 못 쓰는 상태로 배포되는 걸 모르고 넘어가면 안 되니 한 번 묻는다.
+     */
+    const blockers = (issues ?? []).filter((i) => i.level === 'block')
+    if (blockers.length > 0) {
+      const list = blockers.map((b) => `· ${b.text}`).join('\n')
+      if (!confirm(`이대로 열면 손님이 못 쓰는 게 있어요:\n\n${list}\n\n그래도 저장할까요?`)) return
+    }
+
     try {
       /**
        * 슬러그가 바뀌었으면 **옮긴다** — 새로 만들고 옛것을 지우는 게 아니다.
@@ -950,6 +995,8 @@ export function SlotEditor() {
       await repo.slots.save(draft!, saved!.slug)
 
       setSlots(await repo.slots.list())
+      // 저장으로 채워진 게 있을 수 있다 (이벤트명·기간) — 점검을 다시 돌린다
+      void runCheck()
       // 슬러그를 바꿔 저장했으면 주소도 따라가야 한다 — 안 그러면 편집 중인 슬롯을 잃는다
       if (draft!.slug !== saved!.slug) navigate(`/theme-editor/${draft!.slug}`, { replace: true })
     } catch (e) {
@@ -1127,6 +1174,51 @@ export function SlotEditor() {
       >
         {/* ── 폼 컬럼 ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0 }}>
+
+          {/*
+            * 출시 전 점검 — **비어 있으면 손님이 빈 화면을 본다.**
+            * 문제가 없으면 아예 안 그린다 (늘 떠 있는 초록 배너는 곧 안 보이게 된다).
+            */}
+          {issues && issues.length > 0 && (
+            <div style={{ ...CSS.card, borderColor: issues.some((i) => i.level === 'block') ? '#f0c9c8' : '#f0e0b0' }} data-readiness>
+              <div style={{ ...CSS.headFlex, borderColor: '#f2f2f2' }}>
+                <span style={{ fontSize: 13.5, fontWeight: 700 }}>출시 전 점검</span>
+                <button
+                  type="button"
+                  onClick={() => void runCheck()}
+                  style={{ ...CSS.ghostPill, height: 26, padding: '0 10px', fontSize: 11.5 }}
+                >
+                  다시 확인
+                </button>
+              </div>
+              <div style={{ ...CSS.body, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {issues.map((i) => (
+                  <div
+                    key={i.text}
+                    style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, lineHeight: 1.55 }}
+                    data-issue={i.level}
+                  >
+                    <span
+                      style={{
+                        flexShrink: 0,
+                        marginTop: 5,
+                        width: 6,
+                        height: 6,
+                        borderRadius: 9999,
+                        background: i.level === 'block' ? '#e0605e' : '#e0a33a',
+                      }}
+                      aria-hidden="true"
+                    />
+                    <span style={{ color: i.level === 'block' ? '#121212' : '#505050' }}>{i.text}</span>
+                  </div>
+                ))}
+                <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
+                  빨간 점은 <b>이대로 열면 손님이 못 쓰는 것</b>, 노란 점은 확인만 하면 되는 거예요.
+                  저장은 막지 않아요 — 준비 중인 슬롯도 저장해 둘 수 있어야 하니까요.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* 기본 */}
           <div style={CSS.card}>
@@ -1725,17 +1817,17 @@ export function SlotEditor() {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <select
-                  value={luckydraw ? ipad : 'phone'}
-                  onChange={(e) => luckydraw && setIpad(e.target.value as 'pro' | 'air' | 'mini')}
+                  value={previewDevice.id}
+                  onChange={(e) => setDevice(e.target.value as DeviceId)}
                   style={{ ...CSS.select, height: 28, padding: '0 28px 0 8px', fontSize: 11.5 }}
+                  aria-label="미리보기 기기"
+                  data-preview-device
                 >
-                  {luckydraw ? (
-                    IPADS.map((d) => (
-                      <option key={d.id} value={d.id}>{d.label} ({d.w}×{d.h})</option>
-                    ))
-                  ) : (
-                    <option value="phone">폰 세로 (390×844)</option>
-                  )}
+                  {DEVICES.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.label}
+                    </option>
+                  ))}
                 </select>
                 <button
                   type="button"
@@ -1785,7 +1877,10 @@ export function SlotEditor() {
             </div>
 
             <div style={{ padding: '11px 15px', borderTop: '1px solid #eeeeee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 11, color: '#8a8a8a' }}>{previewDevice.label} · /{saved.slug}{previewScreen.path ?? ''}</span>
+              <span style={{ fontSize: 11, color: '#8a8a8a' }}>
+                {previewDevice.w}×{previewDevice.h} · /{saved.slug}
+                {previewScreen.path ?? ''}
+              </span>
               <a href={`/${saved.slug}`} target="_blank" rel="noreferrer" style={{ height: 26, padding: '0 10px', border: '1px solid #dddddd', background: '#fff', borderRadius: 9999, fontSize: 11, fontWeight: 700, color: '#505050', display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap', textDecoration: 'none' }}>
                 <ExternalLink size={11} strokeWidth={2} aria-hidden="true" />
                 새 창

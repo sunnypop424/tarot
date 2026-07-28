@@ -6,6 +6,7 @@ import {
   ExternalLink,
   LayoutGrid,
   LogOut,
+  Copy,
   Plus,
   Search,
   SquarePen,
@@ -145,6 +146,47 @@ export function SlotList() {
       navigate(`/theme-editor/${slug}`)
     } catch (e) {
       setError(e instanceof Error ? e.message : '슬롯을 못 만들었어요')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  /**
+   * 슬롯 복제 — **꾸민 것만 가져온다.**
+   *
+   * 같은 카페의 2차 이벤트를 처음부터 다시 꾸미고 있었다. 색·형태·이미지 주소·서비스 설정은
+   * 그대로 쓰고 싶고, **데이터는 절대 따라오면 안 된다**(질문·카드·응모·기록은 그 행사의 것이다).
+   * 슬롯 행 하나만 복사하는 게 정확히 그 경계다 — 다른 테이블은 slug 로 매여 있어 안 따라온다.
+   *
+   * 이미지는 **주소를 공유한다**(파일을 복사하지 않는다). 원본 슬롯을 지우면 그 이미지도
+   * 지워지므로, 그때는 새 슬롯에서 다시 올려야 한다 — 그 사실을 물어볼 때 같이 말한다.
+   */
+  async function handleDuplicate(source: Slot) {
+    const next = prompt(
+      `'${source.name}' 을 복제합니다.
+색·이미지·서비스 설정만 가져오고 데이터(질문·카드·응모·기록)는 안 따라와요.
+` +
+        `이미지는 원본과 같은 파일을 가리켜요 — 원본을 지우면 새 슬롯에서 다시 올려야 합니다.
+
+새 슬러그를 적어 주세요:`,
+      `${source.slug}-2`
+    )
+    if (!next) return
+    const slugValue = next.trim().toLowerCase()
+    const reason = validateSlug(slugValue, slots ?? [])
+    if (reason) return setError(reason)
+    setBusy(true)
+    try {
+      /** 기간은 안 가져온다 — 2차 이벤트는 날짜가 다르다(그대로면 열리자마자 끝난 슬롯이 된다) */
+      const { period: _period, ...rest } = source
+      await repo.slots.save({
+        ...structuredClone(rest),
+        slug: slugValue,
+        name: `${source.name} (복제)`,
+      })
+      navigate(`/theme-editor/${slugValue}`)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '복제하지 못했어요')
     } finally {
       setBusy(false)
     }
@@ -551,6 +593,16 @@ export function SlotList() {
                     >
                       <SquarePen size={13} strokeWidth={2} aria-hidden="true" />
                       편집
+                    </button>
+                    <button
+                      type="button"
+                      data-slot-duplicate
+                      style={{ ...ghostBtn, fontWeight: 600, color: INK2 }}
+                      disabled={busy}
+                      onClick={() => void handleDuplicate(s)}
+                    >
+                      <Copy size={13} strokeWidth={2} aria-hidden="true" />
+                      복제
                     </button>
                     <button
                       type="button"
