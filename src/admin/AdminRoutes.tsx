@@ -28,6 +28,7 @@ import { Entries } from './reward/Entries'
 import { Questions as QuizQuestions } from './quiz/Questions'
 import { Stats as QuizStats } from './quiz/Stats'
 import { Cards as PhotocardCards } from './photocard/Cards'
+import { Settings as CheerSettings } from './cheer/Settings'
 import { Tickets as PhotocardTickets } from './photocard/Tickets'
 import { useAdminAuth } from './useAdminAuth'
 
@@ -105,6 +106,16 @@ const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
     <>
       <Route path="photocard" element={<PhotocardCards />} />
       <Route path="tickets" element={<PhotocardTickets />} />
+    </>
+  ),
+  /**
+   * 영상회 응원 — 운영 설정은 자기 화면, **검수는 롤페 화면을 그대로 쓴다**
+   * (같은 테이블이라 검수도 같은 일이다 — 소원나무와 같은 판단).
+   */
+  cheer: (
+    <>
+      <Route path="cheer" element={<CheerSettings />} />
+      <Route path="messages" element={<Moderation />} />
     </>
   ),
 }

@@ -11,6 +11,7 @@ import { supabasePoll } from './poll'
 import { supabasePhotocard } from './photocard'
 import { supabaseQuiz } from './quiz'
 import { supabaseRewards } from './rewards'
+import { supabaseCheer } from './cheer'
 import { supabaseStamp } from './stamp'
 import type {
   AdminUser,
@@ -57,8 +58,8 @@ function toSlot(row: SlotRow): Slot {
 const SLOT_FIELDS = [
   'slug', 'name', 'service', 'plan', 'limits', 'deck', 'period',
   // DB 컬럼은 group_name 이다 — `group` 은 SQL 예약어라 인용부호 없이 못 쓴다 (0028)
-  'group_name',
-  'theme', 'event', 'luckydraw', 'rolling', 'photozone', 'wish', 'poll', 'stamp', 'quiz', 'photocard',
+  'group_name', 'demo',
+  'theme', 'event', 'luckydraw', 'rolling', 'photozone', 'wish', 'poll', 'stamp', 'quiz', 'photocard', 'cheer',
 ] as const
 
 /**
@@ -87,6 +88,7 @@ const SLOT_DEFAULTS: Partial<Record<(typeof SLOT_FIELDS)[number], unknown>> = {
   stamp: {},
   quiz: {},
   photocard: {},
+  cheer: {},
 }
 
 /** 저장할 행 — 컬럼 목록에서 뽑아 만든다 (위 주석) */
@@ -337,4 +339,5 @@ export const supabaseRepo: Repo = {
   quiz: supabaseQuiz,
   photocard: supabasePhotocard,
   rewards: supabaseRewards,
+  cheer: supabaseCheer,
 }

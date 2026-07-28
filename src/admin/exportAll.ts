@@ -124,6 +124,8 @@ const SHEETS: Record<ServiceId, (slot: Slot) => Promise<Sheet[]>> = {
   },
   rolling: messageSheets,
   wish: messageSheets,
+  // 영상회 한마디도 같은 테이블이다 (0029) — 내보내는 표도 같다
+  cheer: messageSheets,
   // 서버에 남는 게 없다 — 사진은 손님 폰에서 합성되고 올라오지 않는다
   async photozone() {
     return []

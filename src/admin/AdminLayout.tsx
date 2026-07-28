@@ -87,6 +87,12 @@ const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
     { to: 'quiz', label: '모의고사', icon: GraduationCap },
     { to: 'stats', label: '통계', icon: BarChart3 },
   ],
+  cheer: [
+    { to: 'cheer', label: '상영 설정', icon: MonitorPlay },
+    { to: 'messages', label: '한마디', icon: MessageCircleQuestion },
+    // 상영 화면 — 관리 셸 밖이라 새 탭으로 (노트북에서 띄워 영상 위에 얹는다)
+    { to: 'overlay', label: '오버레이', icon: Sparkles, external: true },
+  ],
   photocard: [
     { to: 'photocard', label: '카드', icon: Layers },
     { to: 'tickets', label: '뽑기권', icon: TicketIcon },

@@ -11,6 +11,7 @@ import { localPoll } from './poll'
 import { localPhotocard } from './photocard'
 import { localQuiz } from './quiz'
 import { localRewards } from './rewards'
+import { localCheer } from './cheer'
 import { localStamp } from './stamp'
 import type {
   AdminUser,
@@ -196,4 +197,5 @@ export const localRepo: Repo = {
   quiz: localQuiz,
   photocard: localPhotocard,
   rewards: localRewards,
+  cheer: localCheer,
 }

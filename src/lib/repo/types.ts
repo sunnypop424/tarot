@@ -849,6 +849,34 @@ export interface RewardsRepo {
   unpick(slug: string, source: string, round: number): Promise<number>
 }
 
+/**
+ * 영상회 응원 운영값 — **주최자가 정한다** (`cheer_settings`).
+ * 겉모습은 최고관리자(`slot.cheer`), 한마디는 롤링페이퍼 테이블에 산다 (0029).
+ */
+export interface CheerSettings {
+  /** 한 화면에 동시에 뜨는 말풍선 수 (1~10) */
+  bubbles: number
+  /** 가운데를 비워 둘 비율 — 영상 자리 ('16:9' 등) */
+  ratio: string
+  /** 교체 간격(초). 말풍선마다 ±30% 로 흩어져 하나씩 바뀐다 */
+  intervalSec: number
+  showName: boolean
+  /** 1인 입력 수 (localStorage 기준 — 완벽히는 못 막는다) */
+  perPerson: number
+  maxLength: number
+  closed: boolean
+}
+
+/**
+ * 영상회 응원 — **운영값만 다룬다.** 한마디 목록·쓰기는 `RollingRepo` 가 한다
+ * (같은 테이블이라 경로가 둘이면 한쪽만 고치는 날이 온다).
+ */
+export interface CheerRepo {
+  ready(): boolean
+  settings(slug: string): Promise<CheerSettings>
+  saveSettings(slug: string, settings: CheerSettings): Promise<void>
+}
+
 export interface Repo {
   slots: SlotRepo
   questions: QuestionRepo
@@ -863,4 +891,5 @@ export interface Repo {
   quiz: QuizRepo
   photocard: PhotocardRepo
   rewards: RewardsRepo
+  cheer: CheerRepo
 }

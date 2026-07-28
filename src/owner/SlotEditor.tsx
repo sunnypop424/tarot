@@ -20,6 +20,7 @@ import { PollCard } from './service/PollCard'
 import { StampCard } from './service/StampCard'
 import { QuizCard } from './service/QuizCard'
 import { PhotocardCard } from './service/PhotocardCard'
+import { CheerCard } from './service/CheerCard'
 import { PaletteField } from './service/PaletteField'
 import { checkThemeContrast } from './contrast'
 import { repairContrast, type GeneratedTheme } from './aiTheme'
@@ -48,6 +49,7 @@ import { pollDisplay, type PollDisplay } from '@/data/poll'
 import { stampDisplay, type StampDisplay } from '@/data/stamp'
 import { quizDisplay, type QuizDisplay } from '@/data/quiz'
 import { photocardDisplay, type PhotocardDisplay } from '@/data/photocard'
+import { cheerDisplay, type CheerDisplay } from '@/data/cheer'
 import { exportSlots } from './slotsFile'
 
 /** radius 슬라이더 (시안) — 라벨 위, [슬라이더 · 숫자칸+px] 아래. 그리드 셀 한 줄 차지. */
@@ -624,6 +626,8 @@ const DEFAULT_DEVICE: Record<ServiceId, DeviceId> = {
   stamp: 'phone',
   quiz: 'phone',
   photocard: 'phone',
+  // 상영 화면(오버레이·엔딩크레딧)이 가로라 기본을 태블릿 가로로 둔다 — 입력 화면은 폰으로 바꿔 본다
+  cheer: 'pad-air',
 }
 
 /**
@@ -875,6 +879,9 @@ export function SlotEditor() {
   const photocard = getSlotService(draft) === 'photocard'
   const patchPhotocard = (change: Partial<PhotocardDisplay>) =>
     patchSlot((prev) => ({ photocard: { ...photocardDisplay(prev), ...change } }))
+
+  const patchCheer = (change: Partial<CheerDisplay>) =>
+    patchSlot((prev) => ({ cheer: { ...cheerDisplay(prev), ...change } }))
 
   const patchColor = (key: keyof ThemeColors, value: string) =>
     patchSlot((prev) => ({
@@ -1666,6 +1673,9 @@ export function SlotEditor() {
           {quiz && <QuizCard slot={draft} patch={patchQuiz} />}
 
           {/* ══ 포토카드 뽑기 설정 ══ (카드 목록이 여기 있는 이유는 PhotocardCard.tsx 주석) */}
+          {/* ══ 영상회 응원 설정 ══ */}
+          {getSlotService(draft) === 'cheer' && <CheerCard slot={draft} patch={patchCheer} />}
+
           {photocard && (
             <PhotocardCard
               slot={draft}

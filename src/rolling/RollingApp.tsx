@@ -305,13 +305,16 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
     if (!canPost) return
     setBusy(true)
     try {
-      await repo.rolling.add(slug, {
-        nickname: nickname.trim(),
-        body: body.trim(),
-        color,
-        font,
-        sticker,
-      })
+      /** **체험용 슬롯은 서버로 안 보낸다** (`slot.demo` — 0030). 공개 주소라 낙서가 남는다 */
+      if (!slot.demo) {
+        await repo.rolling.add(slug, {
+          nickname: nickname.trim(),
+          body: body.trim(),
+          color,
+          font,
+          sticker,
+        })
+      }
       navigate(`/${slug}`)
     } finally {
       setBusy(false)

@@ -8,6 +8,7 @@ import type { PollDisplay } from '@/data/poll'
 import type { StampDisplay } from '@/data/stamp'
 import type { QuizDisplay } from '@/data/quiz'
 import type { PhotocardDisplay } from '@/data/photocard'
+import type { CheerDisplay } from '@/data/cheer'
 import type { ServiceId } from '@/data/services'
 import type { PlanId } from '@/data/plans'
 
@@ -84,6 +85,14 @@ export interface Slot {
    */
   group?: string
   /**
+   * 체험용 슬롯 — **랜딩에서 링크하는 곳** (`0030_demo_slots.sql`).
+   *
+   * 켜지면 화면이 **남에게 보이는 쓰기를 안 보낸다** (쪽지·소원·한마디·투표·배송).
+   * 보낸 척하고 그 기기에만 보여주며 "체험용이라 저장되지 않아요" 라고 적는다.
+   * 서버 정책이 같은 걸 한 번 더 막는다 — 화면을 우회한 호출을 위해서다.
+   */
+  demo?: boolean
+  /**
    * 이 슬롯이 파는 서비스 — 타로는 첫 번째 서비스일 뿐이다 (`src/data/services.ts`).
    * 없으면 'tarot' (getSlotService). 아래 deck·event 는 타로 서비스의 설정이다.
    */
@@ -114,6 +123,12 @@ export interface Slot {
    * 최고관리자만 정한다. 대여 기간이 끝나면 주최자도 못 들어온다.
    */
   period?: SlotPeriod
+  /**
+   * 영상회 응원 **겉모습** — 최고관리자만 정한다 (`src/data/cheer.ts`).
+   * 한마디 자체는 롤링페이퍼 테이블에 산다 (0029) — 소원나무와 같은 방식이다.
+   */
+  cheer?: Partial<CheerDisplay>
+
   theme: Theme
   event: EventConfig
   /**

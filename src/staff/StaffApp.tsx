@@ -34,6 +34,8 @@ const STAFF_KIND: Record<ServiceId, StaffKind> = {
   stamp: 'redeem',
   quiz: 'redeem',
   photocard: 'photocard',
+  // 상영은 스태프가 아니라 노트북이 한다 (`/overlay`) — 기기 앞에서 처리할 일이 없다
+  cheer: null,
 }
 
 export default function StaffApp() {

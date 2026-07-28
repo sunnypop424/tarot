@@ -73,6 +73,10 @@ const BY_SERVICE: Record<ServiceId, (slot: Slot) => Promise<ReadyIssue[]>> = {
   async wish() {
     return []
   },
+  /** 한마디는 손님이 채운다 — 비어 있는 게 정상이다. 상영 설정은 기본값이 이미 쓸 만하다 */
+  async cheer() {
+    return []
+  },
   async photozone(slot) {
     const d = photozoneDisplay(slot)
     return d.frames.length === 0

@@ -58,6 +58,7 @@ const GUIDES: Record<ServiceId, GuideFn> = {
   stamp: stampGuide,
   quiz: quizGuide,
   photocard: photocardGuide,
+  cheer: cheerGuide,
 }
 
 export function buildGuide(slot: Slot, origin: string, email: string, password: string): string {
@@ -847,4 +848,55 @@ function luckydrawGuide(slot: Slot, origin: string, email: string, password: str
   )
 
   return lines.join('\n')
+}
+
+function cheerGuide(slot: Slot, origin: string, email: string, password: string): string {
+  const base = origin.replace(/\/$/, '')
+  const siteUrl = `${base}/${slot.slug}`
+  const adminUrl = `${siteUrl}/admin`
+  const test = periodText(slot.period?.test)
+  const rent = periodText(slot.period?.rent)
+
+  const lines = [
+    `${slot.name} 영상회 응원 안내`,
+    ``,
+    `손님용 주소 (입구에 QR 로 붙이세요)`,
+    siteUrl,
+    ``,
+    `상영 화면 (노트북에서 여세요)`,
+    `${siteUrl}/overlay   ← 영상 위에 얹는 오버레이 (배경이 투명해요)`,
+    `${siteUrl}/credits   ← 상영이 끝나고 올리는 엔딩크레딧`,
+    ``,
+    `관리자 로그인`,
+    adminUrl,
+    ``,
+    `관리자 아이디 / 비밀번호`,
+    `${email} / ${password}`,
+    ``,
+    `─────────────`,
+    ``,
+    `1) 오버레이를 영상 위에 얹는 방법`,
+    `OBS·프리즘 같은 방송 도구를 쓰신다면 '브라우저 소스' 에 위 오버레이 주소를 넣으세요.`,
+    `배경이 투명해서 영상 위에 말풍선만 뜹니다.`,
+    `프로젝터로 바로 쏘신다면, 오버레이 창을 전체화면으로 띄워 영상 위에 겹쳐 두시면 됩니다.`,
+    ``,
+    `2) 상영 중에 조정하실 수 있어요`,
+    `관리자 화면 '상영 설정' 에서 한 화면에 몇 개를 띄울지(1~10개), 몇 초마다 바꿀지,`,
+    `이름을 같이 띄울지, 한 사람이 몇 개까지 남길 수 있는지, 글자 수를 정하실 수 있습니다.`,
+    `바꾸시면 상영 화면이 그 자리에서 따라갑니다 — 다시 열지 않으셔도 돼요.`,
+    ``,
+    `   ※ 6~8개가 가장 보기 좋아요. 10개면 영상이 가려질 수 있습니다.`,
+    ``,
+    `3) 검수 — 큰 화면에 뜨는 자리예요`,
+    `관리자 화면 '한마디' 에서 남긴 글을 보고 숨기실 수 있습니다.`,
+    `숨기시면 다음 교체부터 화면에서 사라져요. **상영 중에도 이 화면을 열어두시길 권합니다.**`,
+    ``,
+    `4) 말풍선은 자리·모양·색이 매번 달라요`,
+    `가운데(영상 자리)는 비우고, 서로 겹치지 않게 가장자리에 하나씩 나타났다 사라집니다.`,
+    `한 바퀴를 다 돌기 전에는 같은 한마디를 다시 띄우지 않아요 — 부족하면 그때부터 반복합니다.`,
+    ``,
+    test ? `테스트 기간 ${test}` : ``,
+    rent ? `대여 기간 ${rent}` : ``,
+  ]
+  return lines.filter((l) => l !== ``).join('\n')
 }

@@ -1,0 +1,418 @@
+/*
+ * 영상회 라이브 응원.
+ *
+ * 화면 셋의 성격이 완전히 다르다:
+ *  · 입력(손님 폰) — 어두운 단색 위 폼 하나
+ *  · 오버레이 — **배경이 투명하다** (영상 위에 얹는다). 그래서 여기엔 배경색이 없다
+ *  · 엔딩크레딧 — 검은 화면에 글자가 올라간다
+ *
+ * 색은 전부 `--ch-*` 로 들어온다 (hex 는 여기 없다 — CLAUDE.md).
+ */
+
+/* ── 손님 폰: 한마디 입력 ───────────────────────── */
+.root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ch-bg);
+  color: var(--ch-head);
+  font-family: var(--ch-font);
+}
+.phone {
+  flex: 1;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 44px 22px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+.subtitle {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ch-sub);
+  word-break: keep-all;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.body {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--ch-sub) 40%, transparent);
+  background: color-mix(in srgb, var(--ch-head) 6%, transparent);
+  color: var(--ch-head);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+}
+.body:focus {
+  border-color: var(--ch-btn);
+}
+.count {
+  margin-top: -6px;
+  text-align: right;
+  font-size: 11.5px;
+  color: var(--ch-sub);
+  font-variant-numeric: tabular-nums;
+}
+.name {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--ch-sub) 40%, transparent);
+  background: color-mix(in srgb, var(--ch-head) 6%, transparent);
+  color: var(--ch-head);
+  font-family: inherit;
+  font-size: 15px;
+  outline: none;
+}
+.name:focus {
+  border-color: var(--ch-btn);
+}
+.send {
+  height: 54px;
+  border: none;
+  border-radius: 14px;
+  background: var(--ch-btn);
+  color: #fff;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+}
+.send:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: #ff8b8b;
+}
+
+.doneBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+}
+.doneMark {
+  width: 66px;
+  height: 66px;
+  border-radius: 9999px;
+  background: var(--ch-btn);
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+.doneText {
+  font-size: 19px;
+  font-weight: 800;
+  word-break: keep-all;
+}
+/* 체험용 안내 — 저장되지 않는다는 사실을 숨기지 않는다 */
+.demoNote {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ch-sub);
+  word-break: keep-all;
+}
+.again {
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--ch-sub) 45%, transparent);
+  background: none;
+  color: var(--ch-sub);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ── 오버레이: 배경이 **투명**하다 ───────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  /*
+   * **배경을 칠하지 않는다.** OBS 브라우저 소스는 이 투명함을 그대로 받아 영상 위에 얹는다.
+   * 여기에 색을 한 번이라도 칠하면 영상이 통째로 가려진다.
+   */
+  background: transparent;
+  font-family: var(--ch-font);
+  overflow: hidden;
+  pointer-events: none;
+}
+.overlayEmpty {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border-radius: 9999px;
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.bubbleWrap {
+  position: absolute;
+  max-width: 30%;
+  transform: rotate(var(--rot, 0deg));
+  animation: chPop 0.28s cubic-bezier(0.2, 1.2, 0.35, 1) both;
+}
+@keyframes chPop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9) rotate(var(--rot, 0deg));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(var(--rot, 0deg));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bubbleWrap {
+    animation: none;
+  }
+}
+
+/*
+ * 말풍선 여섯 — 참고 이미지(예능 자막바)의 문법:
+ * 굵은 외곽선 + 아래로 눌린 그림자(번짐 없음) + 2~3색. 종이 스티커처럼 떠 보인다.
+ */
+.chipBar,
+.solidBar,
+.bubble,
+.banner,
+.burst,
+.plaque {
+  --line: var(--ch-bubble-border);
+  --lw: var(--ch-bubble-border-w);
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.35;
+  /* 기본은 종이색 글자 — 진한 색 판 위에 올라가는 모양이 더 많다 */
+  color: var(--ch-paper);
+  word-break: keep-all;
+  white-space: pre-wrap;
+  filter: drop-shadow(0 4px 0 var(--line));
+}
+
+/* ① 이름 칩 + 흰 본문 바 */
+.chipBar {
+  display: inline-flex;
+  align-items: stretch;
+  border: var(--lw) solid var(--line);
+  border-radius: 9999px;
+  overflow: hidden;
+  /* 종이색 판 + 먹색 글자 (참고 이미지의 '이름 칩 + 흰 본문 바') */
+  background: var(--ch-paper);
+  color: var(--ch-ink);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  background: var(--bubble);
+  color: var(--ch-paper);
+  border-right: var(--lw) solid var(--line);
+  white-space: nowrap;
+}
+.chipBody {
+  padding: 8px 16px;
+}
+
+/* ② 색으로 꽉 찬 바 */
+.solidBar {
+  display: inline-block;
+  padding: 9px 18px;
+  border: var(--lw) solid var(--line);
+  border-radius: 9999px;
+  background: var(--bubble);
+  color: var(--ch-paper);
+}
+.solidName {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--ch-paper) 85%, transparent);
+  color: var(--ch-ink);
+  font-size: 14px;
+}
+
+/* ③ 둥근 말풍선 + 꼬리 */
+.bubble {
+  position: relative;
+  display: inline-block;
+  padding: 12px 18px;
+  border: var(--lw) solid var(--line);
+  border-radius: 18px;
+  background: var(--bubble);
+  color: var(--ch-paper);
+}
+.bubble::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  bottom: calc(var(--lw) * -1 - 10px);
+  border: 10px solid transparent;
+  border-top-color: var(--bubble);
+}
+.bubbleName {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* ④ 리본/현수막 — 양 끝이 제비꼬리 */
+.banner {
+  display: inline-block;
+  padding: 10px 26px;
+  background: var(--bubble);
+  color: var(--ch-paper);
+  border: var(--lw) solid var(--line);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 50%, 100% 100%, 0 100%, 14px 50%);
+}
+
+/* ⑤ 별 폭발 — 짧은 감탄사만 (긴 글은 후보에서 빠진다) */
+.burst {
+  display: grid;
+  place-items: center;
+  min-width: 150px;
+  min-height: 150px;
+  padding: 34px;
+  text-align: center;
+  background: var(--bubble);
+  color: var(--ch-paper);
+  clip-path: polygon(
+    50% 0%,
+    61% 26%,
+    89% 12%,
+    80% 42%,
+    100% 50%,
+    80% 58%,
+    89% 88%,
+    61% 74%,
+    50% 100%,
+    39% 74%,
+    11% 88%,
+    20% 58%,
+    0% 50%,
+    20% 42%,
+    11% 12%,
+    39% 26%
+  );
+}
+
+/* ⑥ 명패 — 모서리를 깎고 위에 작은 이름표 */
+.plaque {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.plaqueName {
+  padding: 3px 12px;
+  border: var(--lw) solid var(--line);
+  border-radius: 6px 6px 0 0;
+  background: var(--line);
+  color: var(--ch-paper);
+  font-size: 13px;
+}
+.plaqueBody {
+  padding: 10px 18px;
+  border: var(--lw) solid var(--line);
+  border-radius: 4px;
+  background: var(--bubble);
+  color: var(--ch-paper);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+
+/* ── 엔딩크레딧 ─────────────────────────────────── */
+.credits {
+  position: fixed;
+  inset: 0;
+  background: var(--ch-credits-bg);
+  color: var(--ch-credits-text);
+  font-family: var(--ch-font);
+  overflow: hidden;
+}
+.creditsRoll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  padding: 0 8vw;
+  text-align: center;
+  animation: chRoll var(--roll, 40s) linear infinite;
+}
+@keyframes chRoll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-200%);
+  }
+}
+.creditsTitle {
+  margin: 0 0 40px;
+  font-size: clamp(28px, 4vw, 54px);
+  font-weight: 800;
+}
+.creditsLine {
+  margin: 0 0 22px;
+  font-size: clamp(18px, 2.2vw, 30px);
+  line-height: 1.5;
+  word-break: keep-all;
+}
+.creditsName {
+  margin-right: 12px;
+  opacity: 0.6;
+  font-weight: 700;
+}
+@media (prefers-reduced-motion: reduce) {
+  .creditsRoll {
+    animation-duration: calc(var(--roll, 40s) * 2);
+  }
+}

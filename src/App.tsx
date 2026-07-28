@@ -72,6 +72,9 @@ const QuizApp = lazy(() => import('@/quiz/QuizApp'))
 /** 포토카드 뽑기 — 운영 방식 셋이 한 청크에 (src/data/photocard.ts 의 photocardRules) */
 const PhotocardApp = lazy(() => import('@/photocard/PhotocardApp'))
 
+/** 영상회 응원 — 입력·오버레이·엔딩크레딧이 한 청크에 (상영 화면은 주소로 가른다) */
+const CheerApp = lazy(() => import('@/cheer/CheerApp'))
+
 /**
  * 스태프 기기 — `/{slug}/staff`. **관리 화면 밖이다**: 부스에 세워두는 기기에 사이드바·
  * 로그아웃이 같이 떠 있으면 손님이 누르고, 손님이 같이 보는 화면이라 슬롯 색을 써야 한다.
@@ -102,6 +105,7 @@ const SERVICE_APPS: Record<ServiceId, ComponentType | null> = {
   stamp: StampApp,
   quiz: QuizApp,
   photocard: PhotocardApp,
+  cheer: CheerApp,
 }
 
 /**

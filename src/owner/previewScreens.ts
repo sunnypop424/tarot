@@ -67,6 +67,11 @@ export const PREVIEW_SCREENS: Record<ServiceId, PreviewScreen[]> = {
     { state: 'reward', label: '교환권' },
     { state: 'entered', label: '응모 완료' },
   ],
+  cheer: [
+    { state: 'write', label: '한마디 입력' },
+    { state: 'overlay', label: '오버레이', path: '/overlay' },
+    { state: 'credits', label: '엔딩크레딧', path: '/credits' },
+  ],
   photocard: [
     { state: 'deck', label: '덱' },
     { state: 'drawing', label: '뽑는 중' },

@@ -241,6 +241,11 @@ const SHORTCUTS: Record<ServiceId, Shortcut[]> = {
     { to: 'stats', label: '통계' },
     { to: 'redeem', label: '수령 확인' },
   ],
+  cheer: [
+    { to: 'cheer', label: '상영 설정' },
+    { to: 'messages', label: '한마디 검수' },
+    { to: 'overlay', label: '오버레이 열기', external: true },
+  ],
   photocard: [
     { to: 'photocard', label: '카드 관리' },
     { to: 'tickets', label: '뽑기권' },
@@ -324,6 +329,8 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
       { label: '아직 안 받아감', value: n(unredeemed), warn: unredeemed > 0 },
     ]
   },
+  // 한마디는 롤페 테이블에 산다 — 세는 코드도 같다
+  cheer: messageCollect,
   async photocard(slug) {
     if (!repo.photocard.ready()) return []
     const [rows, tickets] = await Promise.all([
@@ -347,6 +354,10 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
       { label: '아직 안 쓴 뽑기권', value: n(open), note: `발급 ${tickets.length}장` },
     ]
   },
+}
+
+async function messageCollect(slug: string): Promise<Stat[]> {
+  return messageStats(await repo.rolling.listAll(slug))
 }
 
 function messageStats(all: { hidden?: boolean; createdAt: string }[]): Stat[] {

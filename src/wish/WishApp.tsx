@@ -579,13 +579,16 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
     setBusy(true)
     try {
       // 롤페와 **같은 repo·같은 테이블** — 필드 의미만 소원나무로 읽는다
-      await repo.rolling.add(slug, {
-        nickname: nickname.trim(),
-        body: body.trim(),
-        color,
-        font,
-        sticker: charm,
-      })
+      /** **체험용 슬롯은 서버로 안 보낸다** (`slot.demo` — 0030) */
+      if (!slot.demo) {
+        await repo.rolling.add(slug, {
+          nickname: nickname.trim(),
+          body: body.trim(),
+          color,
+          font,
+          sticker: charm,
+        })
+      }
       navigate(`/${slug}`)
     } finally {
       setBusy(false)

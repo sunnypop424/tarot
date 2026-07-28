@@ -58,6 +58,7 @@ const SVC: Record<ServiceId, { bg: string; fg: string }> = {
   poll: { bg: '#e9eaf3', fg: '#3c4276' },
   stamp: { bg: '#fbeaea', fg: '#8d3540' },
   quiz: { bg: '#eaf1ef', fg: '#2c5f56' },
+  cheer: { bg: '#eef7ff', fg: '#2f6f9e' },
   photocard: { bg: '#efe9f6', fg: '#5a3f83' },
 }
 
