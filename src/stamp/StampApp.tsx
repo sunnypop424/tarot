@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
-import { stampDisplay, type StampDisplay } from '@/data/stamp'
+import { stampDisplay, type StampCell, type StampDisplay } from '@/data/stamp'
 import { fontStack, loadWebfont } from '@/data/fonts'
 import { repo } from '@/lib/repo'
 import { isLight } from '@/lib/color'
@@ -253,7 +253,7 @@ function StampBoard({
   mine,
   fresh,
 }: {
-  cells: { id: string; name: string }[]
+  cells: StampCell[]
   mine: string[]
   fresh: string | null
 }) {
@@ -288,8 +288,17 @@ function StampBoard({
           >
             {fresh === c.id && <span className={styles.ring} aria-hidden="true" />}
             {done ? (
-              <span className={styles.stamp} aria-hidden="true">
-                <Mark size={small ? 34 : big ? 52 : 42} strokeWidth={1.5} />
+              /**
+                * 슬롯이 올린 도장 그림이 있으면 그걸, 없으면 내장 아이콘.
+                * **`background-image` 다** — 슬롯 자산이라 길게 눌러 저장되면 안 된다 (CLAUDE.md).
+                */
+              <span
+                className={styles.stamp}
+                data-image={c.icon ? '' : undefined}
+                style={c.icon ? { backgroundImage: cssUrl(c.icon) } : undefined}
+                aria-hidden="true"
+              >
+                {!c.icon && <Mark size={small ? 34 : big ? 52 : 42} strokeWidth={1.5} />}
               </span>
             ) : (
               <span className={styles.num} aria-hidden="true">
@@ -417,7 +426,7 @@ function Complete({
   onBack,
 }: {
   display: StampDisplay
-  cells: { id: string; name: string }[]
+  cells: StampCell[]
   onBack: () => void
 }) {
   return (

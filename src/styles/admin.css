@@ -20,9 +20,16 @@
  * 것**이라, 어느 슬롯을 열든 늘 같은 라이트 디자인으로 고정한다 — :root 에 주입된 슬롯 테마
  * 토큰을 이 subtree 에서 전부 덮어쓴다. (색·형태·그림자는 여기서도 토큰으로만 참조한다.)
  */
+/*
+ * **`.admin-portal` 이 같은 목록에 있는 이유:** 확인 모달·토스트는 `createPortal` 로
+ * `document.body` 에 붙는다 — `.admin` **밖**이라 이 토큰들을 못 받고 `:root` 의 슬롯 테마를
+ * 그대로 쓴다. 그러면 관리 도구의 모달이 이벤트 색으로 물들고, 슬롯 테마에 빠진 키가 있으면
+ * 버튼 색이 통째로 `undefined` 가 되어 **버튼이 안 보인다**(실제로 그랬다).
+ * 토큰은 여기 한 벌만 두고 셀렉터만 늘린다 — 두 벌이면 한쪽만 고치는 날이 온다.
+ */
 .admin,
-.owner {
-  min-height: 100dvh;
+.owner,
+.admin-portal {
   color-scheme: light;
   /* 입력·버튼은 4px, 카드는 8px (시안 값) */
   --radius-sm: 4px;
@@ -55,7 +62,18 @@
   --color-border-hover: #d9d3ff;
   --color-on-primary: #ffffff;
   --shadow-card: 0 4px 16px rgba(18, 18, 18, 0.06);
+}
+
+/* 셸만 화면을 채운다 — 포털은 내용이 없을 때 자리를 차지하면 안 된다 */
+.admin,
+.owner {
+  min-height: 100dvh;
   background: var(--color-canvas);
+  color: var(--color-fg-1);
+}
+
+/* 포털 컨테이너는 토큰만 나르고 레이아웃엔 영향을 주지 않는다 */
+.admin-portal {
   color: var(--color-fg-1);
 }
 

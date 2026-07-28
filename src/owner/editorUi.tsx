@@ -38,8 +38,10 @@ export const CSS = {
   },
   fieldCol: { display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 },
   ghostPill: {
-    height: 28, padding: '0 10px', border: '1px solid #dddddd', background: '#fff',
+    height: 28, padding: '0 11px', border: '1px solid #dddddd', background: '#fff',
     borderRadius: 9999, fontSize: 11.5, fontWeight: 700, color: '#505050', cursor: 'pointer', whiteSpace: 'nowrap',
+    // 아이콘을 넣는 자리가 대부분이다 — 이게 없으면 아이콘이 위, 글자가 아래로 접힌다
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, flexShrink: 0,
   },
   primaryPill: {
     height: 34, padding: '0 16px', border: 'none', borderRadius: 9999, background: '#816bff',

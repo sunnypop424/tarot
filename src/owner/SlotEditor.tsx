@@ -1019,7 +1019,7 @@ export function SlotEditor() {
             href={`/${saved.slug}/admin`}
             target="_blank"
             rel="noreferrer"
-            style={{ ...CSS.ghostPill, height: 32, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0 12px', fontSize: 12.5, textDecoration: 'none' }}
+            style={{ ...CSS.ghostPill, height: 32, gap: 6, padding: '0 12px', fontSize: 12.5, textDecoration: 'none' }}
           >
             <ExternalLink size={14} strokeWidth={2} aria-hidden="true" />
             주최자 콘솔
@@ -1032,7 +1032,7 @@ export function SlotEditor() {
           <button
             type="button"
             onClick={() => slots && exportSlots(slots)}
-            style={{ ...CSS.ghostPill, height: 32, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0 12px', fontSize: 12.5 }}
+            style={{ ...CSS.ghostPill, height: 32, gap: 6, padding: '0 12px', fontSize: 12.5 }}
           >
             <Download size={14} strokeWidth={2} aria-hidden="true" />
             {hasSupabase ? '백업' : 'slots.json'}

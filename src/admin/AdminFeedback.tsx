@@ -59,8 +59,16 @@ export function AdminFeedbackHost() {
     setReq(null)
   }
 
+  /**
+   * **`.admin-portal` 을 꼭 씌운다.**
+   *
+   * 포털은 `document.body` 로 나가므로 `.admin` 서브트리 **밖**이다 — 그냥 두면 관리 도구의
+   * 모달이 `:root` 의 슬롯 테마 색을 쓰게 되고, 슬롯 테마에 빠진 키가 있으면 버튼 색이
+   * `undefined` 라 **버튼이 아예 안 보인다.** 고정 라이트 토큰을 여기서 다시 받는다
+   * (`src/styles/admin.css`).
+   */
   return createPortal(
-    <>
+    <div className="admin-portal">
       {req && (
         <div className={styles.backdrop} onClick={() => close(false)}>
           <div
@@ -91,7 +99,7 @@ export function AdminFeedbackHost() {
           {message}
         </div>
       )}
-    </>,
+    </div>,
     document.body
   )
 }

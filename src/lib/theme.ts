@@ -1,3 +1,4 @@
+import defaultThemeJson from '@/data/slot-default.json'
 import { cardRadius } from './card'
 import { isLight, readableShade, withAlpha } from './color'
 import type { Theme, ThemeColors, ThemeShape } from '@/types/theme'
@@ -69,19 +70,46 @@ const SHAPE_VARS: Record<keyof ThemeShape, string> = {
   radiusLg: '--radius-lg',
 }
 
+const DEFAULTS = defaultThemeJson as Theme
+
+/**
+ * **없는 키를 기본값으로 채운다 — 이 한 줄이 화면을 지킨다.**
+ *
+ * `setProperty(name, undefined)` 는 조용히 문자열 `"undefined"` 를 넣는다. 그러면 그 토큰을
+ * 쓰는 모든 규칙이 죽고, 배경도 글자도 버튼도 색을 못 받아 **화면이 통째로 안 보인다.**
+ * 던지지도 않고 콘솔에도 안 뜬다 — 개발자도구에서 인라인 스타일을 열어야 비로소 보인다.
+ *
+ * 키가 빌 수 있는 경로는 실제로 여럿이다: 테마에 색을 새로 더하면 그 전에 저장된 슬롯엔
+ * 그 키가 없고, 손으로 넣은 슬롯은 `theme.colors` 가 `{}` 일 수 있다.
+ * 편집기는 이미 같은 방어를 하고 있었는데(`SlotEditor` 의 초안 채우기) **방문자·주최자
+ * 경로에는 없었다** — 방어는 화면을 그리기 직전인 여기 있어야 한다.
+ */
+function filled(theme: Theme): Theme {
+  return {
+    ...DEFAULTS,
+    ...theme,
+    colors: { ...DEFAULTS.colors, ...(theme?.colors ?? {}) },
+    shape: { ...DEFAULTS.shape, ...(theme?.shape ?? {}) },
+  }
+}
+
 /** 문서 루트에 테마를 주입한다 */
-export function applyTheme(theme: Theme): void {
+export function applyTheme(raw: Theme): void {
   const root = document.documentElement
+  const theme = filled(raw)
 
   for (const [key, cssVar] of Object.entries(COLOR_VARS)) {
-    if (cssVar) root.style.setProperty(cssVar, theme.colors[key as keyof ThemeColors])
+    const value = theme.colors[key as keyof ThemeColors]
+    if (cssVar && value) root.style.setProperty(cssVar, value)
   }
 
   // radius 는 40px 까지만 — 편집기 상한과 같다. 옛 저장분에 큰 값(예: 999)이 있어도 박스가
   // 알약처럼 뭉개지지 않게 여기서 한 번 더 막는다.
   const clampRadius = (v: number) => Math.max(0, Math.min(40, v))
   for (const [key, cssVar] of Object.entries(SHAPE_VARS)) {
-    root.style.setProperty(cssVar, `${clampRadius(theme.shape[key as keyof ThemeShape])}px`)
+    // Number.isFinite 로 한 번 더 — 문자열이 들어와 NaNpx 가 나가면 radius 가 통째로 죽는다
+    const v = theme.shape[key as keyof ThemeShape]
+    root.style.setProperty(cssVar, `${clampRadius(Number.isFinite(v) ? v : DEFAULTS.shape[key as keyof ThemeShape])}px`)
   }
 
   /**

@@ -1,10 +1,13 @@
-import { GripVertical, Plus, X } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { GripVertical, Image as ImageIcon, Plus, Upload, X } from 'lucide-react'
 
 import { stampDisplay, type StampCell, type StampDisplay } from '@/data/stamp'
 import { WEBFONTS, type FontId } from '@/data/luckydraw'
+import { cssUrl } from '@/lib/image'
 import type { Slot } from '@/types/slot'
 import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
+import { uploadAsset, deleteAsset, extOf, nameFromUrl } from '../upload'
 
 /** 칸 줄에만 쓰는 작은 아이콘 버튼 — 편집기 공용 CSS 에 없어 여기 둔다 */
 const ICON: React.CSSProperties = {
@@ -39,6 +42,11 @@ export function StampCard({
   patch: (change: Partial<StampDisplay>) => void
 }) {
   const d = stampDisplay(slot)
+  const [busy, setBusy] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  // 칸마다 파일 입력을 두면 DOM 이 칸 수만큼 는다 — 하나를 돌려 쓰고 어느 칸인지만 기억한다
+  const fileRef = useRef<HTMLInputElement>(null)
+  const targetRef = useRef<string | null>(null)
 
   const setCell = (i: number, change: Partial<StampCell>) =>
     patch({ stamps: d.stamps.map((c, n) => (n === i ? { ...c, ...change } : c)) })
@@ -52,7 +60,37 @@ export function StampCard({
       ],
     })
 
-  const removeCell = (i: number) => patch({ stamps: d.stamps.filter((_, n) => n !== i) })
+  const removeCell = (i: number) => {
+    const gone = d.stamps[i]
+    if (gone?.icon) void dropIcon(gone.icon)
+    patch({ stamps: d.stamps.filter((_, n) => n !== i) })
+  }
+
+  /** Storage 에서도 지운다 — 안 지우면 슬롯을 지울 때까지 남는다 */
+  async function dropIcon(url: string) {
+    const file = nameFromUrl(url)
+    if (file) await deleteAsset(slot.slug, `stamp/${file}`).catch(() => {})
+  }
+
+  async function uploadIcon(file: File) {
+    const id = targetRef.current
+    if (!id) return
+    setBusy(id)
+    setError(null)
+    try {
+      const name = `stamp/${crypto.randomUUID().slice(0, 8)}.${extOf(file)}`
+      const url = await uploadAsset(slot.slug, name, file)
+      const prev = d.stamps.find((c) => c.id === id)?.icon
+      patch({ stamps: d.stamps.map((c) => (c.id === id ? { ...c, icon: url } : c)) })
+      if (prev) void dropIcon(prev)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '업로드하지 못했어요')
+    } finally {
+      setBusy(null)
+      targetRef.current = null
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
 
   const move = (i: number, dir: -1 | 1) => {
     const j = i + dir
@@ -108,7 +146,18 @@ export function StampCard({
           <b>이벤트가 시작된 뒤에는 칸을 늘리거나 줄이지 마세요</b> — 이미 다 모은 손님의 판이
           미완성으로 되돌아가요. 이름만 고치는 건 안전합니다.
           {d.stamps.length > 0 && d.stamps.length <= 4 && ' · 4칸 이하는 2줄로, 5칸부터는 3줄로 그려져요.'}
+          <br />
+          칸마다 <b>도장 그림(투명 PNG)</b>을 올릴 수 있어요. 안 올리면 기본 도장 아이콘이
+          들어가고 <b>도장색</b>을 따릅니다 (그림을 올리면 그림의 색이 그대로 나와요).
         </p>
+        {error && <p style={{ margin: '0 0 10px', fontSize: 11.5, color: '#b4443c' }}>{error}</p>}
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/png,image/webp,image/svg+xml"
+          hidden
+          onChange={(e) => e.target.files?.[0] && void uploadIcon(e.target.files[0])}
+        />
 
         {d.stamps.length === 0 ? (
           <div
@@ -149,11 +198,55 @@ export function StampCard({
                 </div>
                 <GripVertical size={14} color="#d4d4dc" aria-hidden="true" />
                 <span style={{ width: 18, fontSize: 11, color: '#a0a0a8', textAlign: 'right' }}>{i + 1}</span>
+                {/* 썸네일도 background-image — 편집기 미리보기도 예외가 아니다 (CLAUDE.md) */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    targetRef.current = c.id
+                    fileRef.current?.click()
+                  }}
+                  disabled={busy === c.id}
+                  title={c.icon ? '도장 그림 바꾸기' : '도장 그림 올리기'}
+                  aria-label={`${c.name} 도장 그림`}
+                  style={{
+                    width: 34,
+                    height: 34,
+                    flexShrink: 0,
+                    display: 'grid',
+                    placeItems: 'center',
+                    border: '1px solid #dddddd',
+                    borderRadius: 4,
+                    background: '#fff',
+                    backgroundImage: c.icon ? cssUrl(c.icon) : undefined,
+                    backgroundSize: '70%',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    color: '#a0a0a8',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                >
+                  {!c.icon && (busy === c.id ? <Upload size={13} /> : <ImageIcon size={13} />)}
+                </button>
+                {c.icon && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void dropIcon(c.icon!)
+                      setCell(i, { icon: undefined })
+                    }}
+                    aria-label={`${c.name} 도장 그림 지우기`}
+                    title="도장 그림 지우기"
+                    style={{ ...ICON, width: 18 }}
+                  >
+                    <X size={11} />
+                  </button>
+                )}
                 <input
                   value={c.name}
                   onChange={(e) => setCell(i, { name: e.target.value })}
                   placeholder="칸 이름 (포토존 참여 · 1번 카페)"
-                  style={{ ...CSS.input, flex: 1 }}
+                  style={{ ...CSS.input, flex: 1, minWidth: 90 }}
                 />
                 <button type="button" onClick={() => removeCell(i)} aria-label="칸 삭제" style={ICON}>
                   <X size={14} />

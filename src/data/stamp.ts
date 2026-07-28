@@ -37,6 +37,13 @@ export interface StampCell {
   id: string
   /** 칸 이름 — "1번 카페", "포토존 참여" */
   name: string
+  /**
+   * 찍힌 도장 그림 (투명 PNG). 없으면 내장 아이콘(도장·별·하트)이 돌아가며 들어간다.
+   *
+   * **`background-image` 로 그린다** — 슬롯 자산이라 길게 눌러 저장되면 안 된다 (CLAUDE.md).
+   * 도장색(`stampColor`)은 이 그림엔 안 먹는다: PNG 의 색이 그대로 나온다.
+   */
+  icon?: string
 }
 
 export const DEFAULT_STAMP: StampDisplay = {
