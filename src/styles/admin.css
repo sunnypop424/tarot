@@ -1357,6 +1357,13 @@ button.dash__link:disabled {
 .admin__main * + .admin-section {
   margin-top: 16px;
 }
+/*
+ * 나란히 놓인 카드(QR: 폼 · 미리보기)는 그 규칙에서 뺀다 — 둘째 칸만 형제를 갖게 돼
+ * **오른쪽 카드만 아래로 내려앉았다.** 격자 간격은 `.admin-split` 의 gap 이 준다.
+ */
+.admin-split > .admin-section {
+  margin: 0;
+}
 
 /* 카드 안의 빈 상태는 판을 또 깔지 않는다 (카드 안 카드가 된다) */
 .admin-section .admin-empty {
