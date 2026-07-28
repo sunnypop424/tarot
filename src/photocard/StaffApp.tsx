@@ -442,19 +442,30 @@ function Staff({ slot }: { slot: Slot }) {
  */
 const DECK = 21
 
+/** 덱 격자 — 3줄 × 7장 */
+const COLS = 7
+const ROWS = DECK / COLS
+
 /**
- * 섞을 때 카드가 흩어지는 방향 — 인덱스에서 만든다.
+ * 섞기용 좌표 — **자기 칸에서 격자 중앙까지의 거리를 칸 수로** 센다.
+ *
+ * CSS 가 이 값에 `100% + 간격` 을 곱해 실제 거리로 바꾼다. 픽셀이 아니라 칸 수로 주는 이유:
+ * 카드 크기가 화면 폭에 따라 변하는데 픽셀로 굳히면 좁은 화면에서 중앙을 지나쳐 버린다.
  *
  * `Math.random()` 을 안 쓰는 이유: 렌더마다 값이 바뀌면 애니메이션 중간에 방향이 튄다.
- * 같은 자리의 카드는 늘 같은 쪽으로 흩어져야 눈이 따라간다.
+ * 같은 자리의 카드는 늘 같은 쪽으로 움직여야 눈이 따라간다.
  */
 function jitter(i: number): React.CSSProperties {
-  const a = (i * 137.5 * Math.PI) / 180
+  const col = i % COLS
+  const row = Math.floor(i / COLS)
+  // 왼쪽 절반은 오른쪽으로, 오른쪽 절반은 왼쪽으로 밀린다 — 두 뭉치가 서로를 지나간다
+  const side = col < (COLS - 1) / 2 ? 1 : -1
   return {
     ['--i' as string]: String(i),
-    ['--dx' as string]: `${Math.round(Math.cos(a) * 34)}px`,
-    ['--dy' as string]: `${Math.round(Math.sin(a) * 26)}px`,
-    ['--dr' as string]: `${Math.round(Math.cos(a * 2) * 12)}deg`,
+    ['--cx' as string]: String(((COLS - 1) / 2 - col).toFixed(2)),
+    ['--cy' as string]: String(((ROWS - 1) / 2 - row).toFixed(2)),
+    ['--dr' as string]: `${(side * (4 + (i % 3) * 2)).toFixed(0)}deg`,
+    ['--rf' as string]: `${side * (10 + (i % 4) * 4)}px`,
   }
 }
 
