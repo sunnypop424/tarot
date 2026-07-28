@@ -90,8 +90,17 @@ function filled(theme: Theme): Theme {
     ...theme,
     colors: { ...DEFAULTS.colors, ...(theme?.colors ?? {}) },
     shape: { ...DEFAULTS.shape, ...(theme?.shape ?? {}) },
+    /**
+     * **자산도 채운다.** 손으로 만든 슬롯(`theme: {}`)에는 `assets` 자체가 없어서,
+     * 그걸 읽는 자리(`applyPwaHead` 의 `assets.appIcon`)가 **앱을 통째로 죽였다** —
+     * 화면이 하얗게 뜨고 이유가 안 보인다. 색·형태만 채우던 걸 여기까지 넓힌다.
+     */
+    assets: { ...DEFAULTS.assets, ...(theme?.assets ?? {}) },
   }
 }
+
+/** 이 파일 밖에서도 "빠진 키 채우기" 가 필요하다 (PWA·미리보기) — 같은 규칙을 두 벌 두지 않는다 */
+export const filledTheme = filled
 
 /** 문서 루트에 테마를 주입한다 */
 export function applyTheme(raw: Theme): void {

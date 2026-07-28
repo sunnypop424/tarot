@@ -16,6 +16,9 @@ const DEFAULTS: CheerSettings = {
   perPerson: 3,
   maxLength: 40,
   closed: false,
+  showState: 'idle',
+  startedAt: null,
+  runtimeSec: 0,
 }
 
 interface Row {
@@ -26,7 +29,13 @@ interface Row {
   per_person: number
   max_length: number
   closed: boolean
+  show_state: CheerSettings['showState']
+  started_at: string | null
+  runtime_sec: number
 }
+
+const COLUMNS =
+  'bubbles, ratio, interval_sec, show_name, per_person, max_length, closed, show_state, started_at, runtime_sec'
 
 const toSettings = (r: Row): CheerSettings => ({
   bubbles: r.bubbles,
@@ -36,6 +45,9 @@ const toSettings = (r: Row): CheerSettings => ({
   perPerson: r.per_person,
   maxLength: r.max_length,
   closed: r.closed,
+  showState: r.show_state ?? 'idle',
+  startedAt: r.started_at,
+  runtimeSec: r.runtime_sec ?? 0,
 })
 
 export const supabaseCheer: CheerRepo = {
@@ -44,7 +56,7 @@ export const supabaseCheer: CheerRepo = {
   async settings(slug) {
     const { data, error } = await (await db())
       .from('cheer_settings')
-      .select('bubbles, ratio, interval_sec, show_name, per_person, max_length, closed')
+      .select(COLUMNS)
       .eq('slug', slug)
       .maybeSingle()
     if (error) throw new Error(error.message)
@@ -65,11 +77,54 @@ export const supabaseCheer: CheerRepo = {
           per_person: s.perPerson,
           max_length: s.maxLength,
           closed: s.closed,
+          runtime_sec: s.runtimeSec,
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'slug' }
       )
     if (error) throw new Error(error.message)
+  },
+
+  async setShow(slug, state) {
+    /**
+     * **`live` 로 갈 때만 시작 시각을 새로 박는다.** `hidden` 에서 돌아올 때도 새로 박으면
+     * 경과 시간이 되감겨 자동 크레딧이 영영 안 온다 — 감추기는 '멈춤' 이 아니라 '가림' 이다.
+     */
+    const now = new Date().toISOString()
+    const patch: Record<string, unknown> = { slug, show_state: state, updated_at: now }
+    if (state === 'live') {
+      const before = await this.settings(slug)
+      if (before.showState !== 'hidden' || !before.startedAt) patch.started_at = now
+    }
+    if (state === 'idle') patch.started_at = null
+
+    const { data, error } = await (await db())
+      .from('cheer_settings')
+      .upsert(patch, { onConflict: 'slug' })
+      .select(COLUMNS)
+      .maybeSingle()
+    if (error) throw new Error(error.message)
+    return data ? toSettings(data as unknown as Row) : { ...DEFAULTS, showState: state }
+  },
+
+  watch(slug, onChange) {
+    let channel: { unsubscribe: () => void } | null = null
+    let cancelled = false
+    void db().then((client) => {
+      if (cancelled) return
+      channel = client
+        .channel(`cheer:${slug}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'cheer_settings', filter: `slug=eq.${slug}` },
+          onChange
+        )
+        .subscribe()
+    })
+    return () => {
+      cancelled = true
+      channel?.unsubscribe()
+    }
   },
 }
 
@@ -85,5 +140,11 @@ export const localCheer: CheerRepo = {
   },
   async saveSettings() {
     /* 저장할 곳이 없다 — 화면은 초안을 그대로 들고 있는다 */
+  },
+  async setShow(_slug, state) {
+    return { ...DEFAULTS, showState: state, startedAt: new Date().toISOString() }
+  },
+  watch() {
+    return () => {}
   },
 }

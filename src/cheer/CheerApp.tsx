@@ -18,8 +18,13 @@ import styles from './Cheer.module.css'
  * 영상회 라이브 응원 — 화면 셋이 한 파일 아래 있다.
  *
  *   `/{slug}`          한마디 입력 (손님 폰)
- *   `/{slug}/overlay`  **배경이 투명한** 상영 오버레이 — OBS 브라우저 소스로 영상 위에 얹는다
- *   `/{slug}/credits`  엔딩크레딧
+ *   `/{slug}/show`     **상영 화면** — 제어판이 시키는 대로 오버레이 ↔ 엔딩크레딧으로 바뀐다
+ *   `/{slug}/overlay`  오버레이만 (고정)
+ *   `/{slug}/credits`  엔딩크레딧만 (고정)
+ *
+ * **`/show` 를 쓰는 게 기본이다.** 오버레이와 크레딧이 다른 주소면 상영 중에 OBS 소스나 창을
+ * 바꿔야 한다 — 한 주소가 상태에 따라 바뀌면 그 손질이 사라진다. 제어는 주최자 폰
+ * (`/{slug}/staff`) 이 하고, 이 화면은 실시간으로 받는다 (0031).
  *
  * **URL 로 가른다** (롤페 `/write` 와 같은 방식). 상영 화면은 노트북에서 주소로 여는 것이고,
  * 손님 폰의 입력과 섞이면 안 되기 때문이다 — 상태로 가르면 새로고침에 사라진다.
@@ -69,10 +74,22 @@ function Cheer({ slot }: { slot: Slot }) {
    * 상영 화면은 **계속 켜져 있다.** 새 한마디가 오면 그 자리에서 받아야 하므로 실시간을 건다
    * (롤페 벽과 같은 규약 — 무엇이 바뀌었는지는 안 보고 다시 읽는다).
    */
-  const showing = pathname.endsWith('/overlay') || pathname.endsWith('/credits')
+  const showing =
+    pathname.endsWith('/overlay') || pathname.endsWith('/credits') || pathname.endsWith('/show')
   useEffect(() => {
     if (!showing) return
-    return repo.rolling.watch(slug, () => void load())
+    const offMessages = repo.rolling.watch(slug, () => void load())
+    const offShow = repo.cheer.watch(slug, () => void load())
+    /**
+     * 실시간이 끊겨도 상영이 멈추면 안 된다 — 5초마다 한 번 더 읽는다.
+     * (행 하나짜리 조회라 부담이 없고, 카페 와이파이에서 실시간은 실제로 끊긴다.)
+     */
+    const poll = window.setInterval(() => void load(), 5000)
+    return () => {
+      offMessages()
+      offShow()
+      clearInterval(poll)
+    }
   }, [showing, slug, load])
 
   const vars = {
@@ -89,35 +106,138 @@ function Cheer({ slot }: { slot: Slot }) {
     ['--ch-credits-text' as string]: display.creditsText,
   }
 
-  const at = preview?.state || (pathname.endsWith('/overlay') ? 'overlay' : pathname.endsWith('/credits') ? 'credits' : 'write')
+  /**
+   * 지금 그릴 화면.
+   *  · `/overlay`·`/credits` — 주소가 곧 화면이다 (고정)
+   *  · `/show` — **제어판이 정한다** (idle/live/hidden/credits)
+   */
+  const at = preview?.state
+    ? preview.state
+    : pathname.endsWith('/overlay')
+      ? 'overlay'
+      : pathname.endsWith('/credits')
+        ? 'credits'
+        : pathname.endsWith('/show')
+          ? showScreen(settings)
+          : 'write'
 
   /** 미리보기에서는 한마디가 없을 수 있다 — 그러면 상영 화면에 아무것도 안 뜬다 */
   const shown = preview && messages.length === 0 ? SAMPLE : messages
 
-  if (at === 'overlay') {
+  /** 상영 전·감춤 — 투명한 빈 화면. OBS 소스를 켜둔 채로 아무것도 안 뜨는 상태다 */
+  if (at === 'idle') return <ShowShell slug={slug} settings={settings} live={showing} vars={vars} />
+
+  if (at === 'overlay' || at === 'credits') {
     return (
-      <Stage
-        kind="overlay"
-        display={display}
-        settings={settings}
-        messages={shown}
-        vars={vars}
-      />
-    )
-  }
-  if (at === 'credits') {
-    return (
-      <Stage
-        kind="credits"
-        display={display}
-        settings={settings}
-        messages={shown}
-        vars={vars}
-      />
+      <ShowShell slug={slug} settings={settings} live={showing} vars={vars}>
+        <Stage kind={at} display={display} settings={settings} messages={shown} vars={vars} />
+      </ShowShell>
     )
   }
 
   return <Write slot={slot} display={display} settings={settings} vars={vars} onSent={() => void load()} />
+}
+
+/**
+ * 상영 화면 껍데기 — **자동 크레딧**과 **단축키**가 여기 산다.
+ *
+ * 자동 크레딧: 영상 길이를 적어둔 슬롯에서, 시작 시각 + 길이가 지나면 10초 카운트다운 뒤
+ * 크레딧으로 넘어간다. **취소할 수 있다** — 무대 인사가 길어지는 날이 있고, 그때 크레딧이
+ * 혼자 올라가면 사고다. (기준은 여전히 '시작' 을 누른 시각이라 오차는 그때 한 번뿐이다.)
+ *
+ * 단축키: 노트북에서 직접 쓸 때를 위한 폴백이다 — 스페이스(감추기 토글) · C(크레딧).
+ * 제어판(폰)이 주 경로고 이건 보험이라, 화면에 크게 안내하지 않는다.
+ */
+function ShowShell({
+  slug,
+  settings,
+  live,
+  vars,
+  children,
+}: {
+  slug: string
+  settings: CheerSettings | null
+  /** `/show` 처럼 제어를 따르는 화면일 때만 자동·단축키가 산다 (고정 주소에선 안 건다) */
+  live: boolean
+  vars: React.CSSProperties
+  children?: React.ReactNode
+}) {
+  const [countdown, setCountdown] = useState<number | null>(null)
+  const [cancelled, setCancelled] = useState(false)
+
+  const state = settings?.showState ?? 'idle'
+  const started = settings?.startedAt ? new Date(settings.startedAt).getTime() : null
+  const runtime = settings?.runtimeSec ?? 0
+
+  /** 영상이 끝날 때가 되면 카운트다운을 시작한다 (한 번만) */
+  useEffect(() => {
+    if (!live || cancelled) return
+    if (state !== 'live' && state !== 'hidden') return
+    if (!started || runtime <= 0) return
+    const tick = () => {
+      const past = (Date.now() - started) / 1000 - runtime
+      if (past >= 0 && countdown === null) setCountdown(10)
+    }
+    const t = window.setInterval(tick, 1000)
+    tick()
+    return () => clearInterval(t)
+  }, [live, cancelled, state, started, runtime, countdown])
+
+  /** 카운트다운 — 0 이 되면 크레딧으로 (제어판이 아니라 화면이 스스로 바꾼다) */
+  useEffect(() => {
+    if (countdown === null) return
+    if (countdown <= 0) {
+      setCountdown(null)
+      void repo.cheer.setShow(slug, 'credits').catch(() => {})
+      return
+    }
+    const t = window.setTimeout(() => setCountdown((n) => (n === null ? null : n - 1)), 1000)
+    return () => clearTimeout(t)
+  }, [countdown, slug])
+
+  useEffect(() => {
+    if (!live) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        e.preventDefault()
+        void repo.cheer.setShow(slug, state === 'hidden' ? 'live' : 'hidden').catch(() => {})
+      }
+      if (e.key.toLowerCase() === 'c') void repo.cheer.setShow(slug, 'credits').catch(() => {})
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [live, slug, state])
+
+  return (
+    <>
+      {children ?? <div className={styles.overlay} style={vars} data-idle />}
+      {countdown !== null && (
+        <div className={styles.countdown} style={vars} data-countdown>
+          <span>{countdown}초 뒤 엔딩크레딧</span>
+          <button
+            type="button"
+            onClick={() => {
+              setCountdown(null)
+              setCancelled(true)
+            }}
+          >
+            취소
+          </button>
+        </div>
+      )}
+    </>
+  )
+}
+
+/**
+ * 제어 상태 → 그릴 화면.
+ * `hidden` 은 **아무것도 안 그린다** (투명한 빈 화면) — 영상만 보이게 하는 게 목적이다.
+ */
+function showScreen(s: CheerSettings | null): 'overlay' | 'credits' | 'idle' {
+  if (!s || s.showState === 'idle') return 'idle'
+  if (s.showState === 'credits') return 'credits'
+  if (s.showState === 'hidden') return 'idle'
+  return 'overlay'
 }
 
 /** 미리보기 표본 — 편집기에서 색을 고를 때 빈 화면을 보지 않게 */
@@ -201,7 +321,21 @@ function Write({
   }
 
   return (
-    <div className={`app ${styles.root}`} style={vars}>
+    <div
+      className={`app ${styles.root}`}
+      style={{
+        ...vars,
+        // 배경 이미지는 **올린 그대로** 그린다 (다른 서비스와 같은 규칙 — BackgroundField)
+        ...(display.bgImage
+          ? {
+              backgroundImage: cssUrl(display.bgImage),
+              backgroundRepeat: display.bgRepeat ? 'repeat' : 'no-repeat',
+              backgroundSize: display.bgRepeat ? 'auto' : 'cover',
+              backgroundPosition: 'center',
+            }
+          : {}),
+      }}
+    >
       <div className={styles.phone}>
         <header className={styles.head}>
           {display.logo && (

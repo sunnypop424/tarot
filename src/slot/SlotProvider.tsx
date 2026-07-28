@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 
 import { repo } from '@/lib/repo'
 import { onSlotChange } from '@/lib/repo/changed'
-import { applyTheme } from '@/lib/theme'
+import { applyTheme, filledTheme } from '@/lib/theme'
 import { isLight } from '@/lib/color'
 import { useLivePreview } from './preview'
 import { applyPwaHead } from './pwa'
@@ -52,7 +52,14 @@ export function SlotProvider({ children }: { children: ReactNode }) {
    * 저장 없이 색·형태를 바꿔보라고 있는 자리다 (`slot/preview.ts`).
    */
   const preview = useLivePreview()
-  const state: State = preview ? { status: 'ready', slot: preview.slot } : loaded
+  /**
+   * **빠진 테마 키를 여기서 채운다.** 손으로(SQL·API) 만든 슬롯은 `theme: {}` 인 경우가 있고,
+   * 그러면 `theme.assets.appIcon` 을 읽는 자리에서 **앱이 통째로 죽는다**(하얀 화면).
+   * 화면마다 방어하면 새 화면이 늘 때마다 빠뜨리므로, 슬롯이 들어오는 이 자리에서 한 번 채운다.
+   */
+  const fill = (s: State): State =>
+    s.status === 'ready' ? { status: 'ready', slot: { ...s.slot, theme: filledTheme(s.slot.theme) } } : s
+  const state: State = fill(preview ? { status: 'ready', slot: preview.slot } : loaded)
   const setState = setLoaded
 
   useEffect(() => {

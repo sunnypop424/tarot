@@ -28,6 +28,13 @@ export interface PreviewScreen {
   label: string
   /** 주소가 다르면 여기에 (슬러그 뒤에 붙는다). 없으면 첫 화면 */
   path?: string
+  /**
+   * 이 화면을 볼 **기기** (`SlotEditor` 의 DEVICES id). 없으면 서비스 기본값.
+   *
+   * 한 서비스 안에서도 화면마다 기기가 다르다 — 영상회는 손님이 폰으로 적고 **상영은 16:9 스크린**이다.
+   * 서비스 하나에 기기 하나로 묶으면 둘 중 하나는 늘 틀린 크기로 본다.
+   */
+  device?: string
 }
 
 export const PREVIEW_SCREENS: Record<ServiceId, PreviewScreen[]> = {
@@ -68,9 +75,10 @@ export const PREVIEW_SCREENS: Record<ServiceId, PreviewScreen[]> = {
     { state: 'entered', label: '응모 완료' },
   ],
   cheer: [
-    { state: 'write', label: '한마디 입력' },
-    { state: 'overlay', label: '오버레이', path: '/overlay' },
-    { state: 'credits', label: '엔딩크레딧', path: '/credits' },
+    // 손님은 폰으로 적고, 상영은 16:9 스크린이다 — 화면마다 기기가 다르다
+    { state: 'write', label: '한마디 입력', device: 'phone' },
+    { state: 'overlay', label: '오버레이', path: '/overlay', device: 'screen-169' },
+    { state: 'credits', label: '엔딩크레딧', path: '/credits', device: 'screen-169' },
   ],
   photocard: [
     { state: 'deck', label: '덱' },

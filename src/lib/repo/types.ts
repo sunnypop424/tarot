@@ -865,6 +865,16 @@ export interface CheerSettings {
   perPerson: number
   maxLength: number
   closed: boolean
+
+  /**
+   * 상영 상태 — **제어판(주최자 폰)이 쓰고 상영 화면이 실시간으로 받는다** (0031).
+   * 영상과 동기화하지 않는다: '상영 시작' 을 누른 시각 하나가 기준점이다.
+   */
+  showState: 'idle' | 'live' | 'hidden' | 'credits'
+  /** '상영 시작' 을 누른 시각 (ISO). 경과 시간을 여기서 센다 */
+  startedAt: string | null
+  /** 영상 길이(초). 0 이면 자동 크레딧 없음 */
+  runtimeSec: number
 }
 
 /**
@@ -875,6 +885,14 @@ export interface CheerRepo {
   ready(): boolean
   settings(slug: string): Promise<CheerSettings>
   saveSettings(slug: string, settings: CheerSettings): Promise<void>
+  /**
+   * 상영 제어 — 상태만 바꾼다 (`live` 로 갈 때 시작 시각을 서버가 박는다).
+   * 설정 저장과 나눈 이유: 제어는 **상영 중에 자주** 눌리고, 그때마다 개수·글자 수까지
+   * 같이 쓰면 주최자가 설정 화면에서 만지던 값과 덮어쓰기 경쟁이 난다.
+   */
+  setShow(slug: string, state: CheerSettings['showState']): Promise<CheerSettings>
+  /** 상영 화면이 제어를 실시간으로 받는다 — 무엇이 바뀌었는지는 안 보고 다시 읽는다 */
+  watch(slug: string, onChange: () => void): () => void
 }
 
 export interface Repo {

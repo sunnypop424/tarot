@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { AlertCircle, ArrowLeft, Check, Download, ExternalLink, Eye, Sparkles } from 'lucide-react'
 
-import defaultThemeJson from '@/data/slot-default.json'
 import { getSlotDeck } from '@/data/slots'
 import { SERVICES, getSlotService, serviceLabel, type ServiceId } from '@/data/services'
 import { PLANS, getPlan, planById, effectiveLimits, type PlanId } from '@/data/plans'
@@ -11,6 +10,7 @@ import type { DeckRange } from '@/data/cards'
 import type { Slot, CategorySetting, EventConfig } from '@/types/slot'
 import type { ThemeColors, ThemeShape } from '@/types/theme'
 import { isLight } from '@/lib/color'
+import { filledTheme } from '@/lib/theme'
 import { repo } from '@/lib/repo'
 import { hasSupabase } from '@/lib/repo/client'
 import { AlphaColor, CSS, Card, Field, Swatch, SwatchColor } from './editorUi'
@@ -609,6 +609,12 @@ const DEVICES = [
   { id: 'pad-air', w: 1180, h: 820, label: '아이패드 에어 가로' },
   { id: 'pad-pro', w: 1366, h: 1024, label: '아이패드 프로 가로' },
   { id: 'pad-port', w: 820, h: 1180, label: '아이패드 세로' },
+  /*
+   * 상영 화면(영상회 오버레이·엔딩크레딧)은 기기가 아니라 **영상 비율**로 본다 —
+   * 프로젝터·모니터·OBS 캔버스가 다 다르지만 결국 16:9 아니면 4:3 이다.
+   */
+  { id: 'screen-169', w: 1280, h: 720, label: '상영 화면 16:9' },
+  { id: 'screen-43', w: 1024, h: 768, label: '상영 화면 4:3' },
 ] as const
 
 type DeviceId = (typeof DEVICES)[number]['id']
@@ -626,8 +632,8 @@ const DEFAULT_DEVICE: Record<ServiceId, DeviceId> = {
   stamp: 'phone',
   quiz: 'phone',
   photocard: 'phone',
-  // 상영 화면(오버레이·엔딩크레딧)이 가로라 기본을 태블릿 가로로 둔다 — 입력 화면은 폰으로 바꿔 본다
-  cheer: 'pad-air',
+  // 상영 화면이 이 서비스의 본체다 — 기본을 16:9 로 (입력 화면은 폰으로 바꿔 본다)
+  cheer: 'screen-169',
 }
 
 /**
@@ -699,15 +705,14 @@ export function SlotEditor() {
      * 추가했을 때 옛 슬롯을 열자 편집기가 통째로 하얗게 죽었다 (undefined 를 색으로 읽으려다).
      * 저장할 때 채우면 늦다: 화면이 먼저 그려지기 때문이다. 읽어오는 이 자리가 맞다.
      */
-    setDraft(
-      found && {
-        ...found,
-        theme: {
-          ...found.theme,
-          colors: { ...defaultThemeJson.colors, ...found.theme.colors },
-        },
-      }
-    )
+    /**
+     * **없는 테마 키를 전부 채운다** (색·형태·자산).
+     *
+     * 색만 채우던 걸 넓혔다: 손으로(SQL·API) 만든 슬롯은 `theme: {}` 라 `assets` 자체가 없고,
+     * 그걸 읽는 칸(`assets.appIcon`)에서 **편집기가 통째로 죽었다** — 그런 슬롯이 목록에 하나만
+     * 있어도 편집기를 못 연다. 판정은 `lib/theme.ts` 의 `filledTheme` 한 곳이 한다.
+     */
+    setDraft(found && { ...found, theme: filledTheme(found.theme) })
     setSlugError(null)
     // slots 는 저장할 때만 바뀐다 — 저장 직후 초안을 되짚는 건 같은 값이라 무해하다
   }, [slug, slots])
@@ -743,8 +748,6 @@ export function SlotEditor() {
    */
   const service = draft ? getSlotService(draft) : 'tarot'
   const [device, setDevice] = useState<DeviceId | null>(null)
-  const previewDevice = DEVICES.find((d) => d.id === (device ?? DEFAULT_DEVICE[service])) ?? DEVICES[0]
-
   /**
    * 편집기 오른쪽 칸은 아이패드보다 좁다 — 줄여서 통째로 보여준다.
    * **iframe 을 좁게 만들지 않는다**: 그러면 앱이 그 폭을 진짜 기기 폭으로 알고 모바일 배치로
@@ -763,13 +766,23 @@ export function SlotEditor() {
   /** 저장된 값이 이 서비스에 없는 이름이면(서비스를 바꿨다) 첫 화면으로 되돌린다 */
   const previewScreen =
     previewScreens.find((x) => x.state === previewState) ?? previewScreens[0] ?? { state: '', label: '' }
+  /**
+   * 기기 = 사람이 고른 것 → **화면이 정한 것** → 서비스 기본값.
+   * 가운데가 있는 이유: 영상회처럼 한 서비스 안에서 화면마다 기기가 다른 경우가 있다.
+   */
+  const previewDevice =
+    DEVICES.find((d) => d.id === (device ?? previewScreen.device ?? DEFAULT_DEVICE[service])) ?? DEVICES[0]
+
   /** 지금 만지는 색이 화면의 **어느 자리**인지 — 미리보기가 그 부분을 깜빡인다 */
   const [highlight, setHighlight] = useState<string | null>(null)
 
-  /** 다른 서비스를 열면 골라둔 기기를 놓는다 — 폰 서비스에 아이패드가 남아 있으면 오해한다 */
+  /**
+   * 다른 서비스·다른 화면을 열면 골라둔 기기를 놓는다 — 폰 화면에 스크린 크기가 남아 있으면
+   * "이 화면은 원래 이렇게 넓나" 로 오해한다.
+   */
   useEffect(() => {
     setDevice(null)
-  }, [service])
+  }, [service, previewState])
 
   useEffect(() => {
     const el = previewBox.current

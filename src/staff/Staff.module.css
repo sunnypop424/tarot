@@ -73,6 +73,53 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* 지금 상태 — 어두운 상영장에서 힐끗 보고 알아야 한다 */
+.showState {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-wash) 55%, var(--color-surface));
+  border: 1px solid var(--ds-tile-border, var(--color-border));
+  text-align: center;
+  font-size: var(--title-s);
+  font-weight: var(--weight-bold);
+  color: var(--color-fg-2);
+}
+.showState[data-state='live'] {
+  background: color-mix(in srgb, var(--color-high) 14%, var(--color-surface));
+  border-color: var(--color-high);
+  color: var(--color-fg-1);
+}
+.showState[data-state='credits'] {
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  border-color: var(--color-primary);
+  color: var(--color-fg-1);
+}
+
+/* 경과 시간 — 상영 중엔 이 숫자가 유일한 기준이다 */
+.clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.clockMain {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--color-fg-1);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.clockSub {
+  font-size: var(--text-xs);
+  color: var(--color-fg-3);
+  font-variant-numeric: tabular-nums;
+}
+.clockSub[data-soon] {
+  color: var(--color-primary);
+  font-weight: var(--weight-bold);
+}
+
 .controls {
   width: 100%;
   display: flex;

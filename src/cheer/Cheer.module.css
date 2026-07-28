@@ -369,6 +369,41 @@
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
 }
 
+/*
+ * 자동 크레딧 카운트다운 — **상영 화면 위에 뜬다.**
+ * 이건 손님이 아니라 **운영자에게** 하는 말이라 눈에 띄어야 하고, 취소 버튼이 커야 한다.
+ */
+.countdown {
+  position: fixed;
+  left: 50%;
+  bottom: 5%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: 9999px;
+  background: rgb(0 0 0 / 0.78);
+  color: #fff;
+  font-family: var(--ch-font);
+  font-size: 16px;
+  font-weight: 800;
+  pointer-events: auto;
+}
+.countdown button {
+  height: 34px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 9999px;
+  background: #fff;
+  color: #121212;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 /* ── 엔딩크레딧 ─────────────────────────────────── */
 .credits {
   position: fixed;

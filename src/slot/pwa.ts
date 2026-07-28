@@ -1,3 +1,4 @@
+import { filledTheme } from '@/lib/theme'
 import type { Slot } from '@/types/slot'
 
 /**
@@ -22,9 +23,15 @@ export function applyPwaHead(slot: Slot): () => void {
       return u
     }
   }
-  const icon = slot.theme.assets.appIcon ? abs(slot.theme.assets.appIcon) : null
+  /**
+   * 손으로(SQL·API) 만든 슬롯엔 `theme: {}` 라 `assets`·`colors` 가 통째로 없다 —
+   * 여기서 읽다 **앱이 죽었다**(하얀 화면). 이 함수는 슬롯을 그대로 받으므로 여기서도 채운다
+   * (SlotProvider 가 이미 채워 넘기지만, 부르는 곳이 늘면 그 보장이 깨진다).
+   */
+  const theme = filledTheme(slot.theme)
+  const icon = theme.assets.appIcon ? abs(theme.assets.appIcon) : null
   const name = slot.name || '이벤트'
-  const canvas = slot.theme.colors.canvas || '#0f1020'
+  const canvas = theme.colors.canvas || '#0f1020'
 
   const manifest: Record<string, unknown> = {
     name,

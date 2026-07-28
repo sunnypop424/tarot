@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 import { useSlotState } from '@/slot/SlotProvider'
 import { getSlotService, type ServiceId } from '@/data/services'
 import { RedeemStaff } from './RedeemStaff'
+import { ShowStaff } from './ShowStaff'
 import styles from './Staff.module.css'
 
 /**
@@ -21,7 +22,7 @@ import styles from './Staff.module.css'
  */
 const PhotocardStaff = lazy(() => import('@/photocard/StaffApp'))
 
-type StaffKind = 'photocard' | 'redeem' | null
+type StaffKind = 'photocard' | 'redeem' | 'show' | null
 
 const STAFF_KIND: Record<ServiceId, StaffKind> = {
   tarot: null,
@@ -34,8 +35,8 @@ const STAFF_KIND: Record<ServiceId, StaffKind> = {
   stamp: 'redeem',
   quiz: 'redeem',
   photocard: 'photocard',
-  // 상영은 스태프가 아니라 노트북이 한다 (`/overlay`) — 기기 앞에서 처리할 일이 없다
-  cheer: null,
+  // 상영 제어 — 프로젝터 옆에 선 사람이 폰으로 누른다 (0031)
+  cheer: 'show',
 }
 
 export default function StaffApp() {
@@ -53,6 +54,7 @@ export default function StaffApp() {
     )
   }
   if (kind === 'redeem') return <RedeemStaff slot={state.slot} />
+  if (kind === 'show') return <ShowStaff slot={state.slot} />
 
   return (
     <div className={`app ${styles.app}`}>

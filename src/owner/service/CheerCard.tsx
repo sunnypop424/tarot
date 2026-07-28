@@ -3,6 +3,7 @@ import { WEBFONTS, type FontId } from '@/data/fonts'
 import type { Slot } from '@/types/slot'
 import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
+import { BackgroundField } from './BackgroundField'
 import { PaletteField } from './PaletteField'
 
 /**
@@ -119,6 +120,15 @@ export function CheerCard({
           value={d.logo || null}
           onChange={(v) => patch({ logo: v ?? '' })}
           hint="입력 화면 위에 떠요."
+        />
+        <BackgroundField
+          slug={slot.slug}
+          name="cheer-bg"
+          value={d.bgImage || null}
+          repeat={d.bgRepeat}
+          onImage={(v) => patch({ bgImage: v ?? '' })}
+          onRepeat={(on) => patch({ bgRepeat: on })}
+          hint="손님이 한마디를 적는 화면의 배경이에요."
         />
       </Divided>
     </Card>

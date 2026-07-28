@@ -31,6 +31,10 @@ export interface CheerDisplay {
   subText: string
   buttonColor: string
   logo: string
+  /** 입력 화면 배경 이미지 — 올린 그대로. 비우면 배경색을 쓴다 (다른 서비스와 같은 규칙) */
+  bgImage: string
+  /** 켜면 원본 크기로 타일링, 끄면 꽉 채우기(cover) */
+  bgRepeat: boolean
 
   /**
    * 말풍선 **팔레트** — hex 목록. 오버레이가 이 안에서 무작위로 고른다.
@@ -72,6 +76,8 @@ export const DEFAULT_CHEER: CheerDisplay = {
   subText: '#a5a3c0',
   buttonColor: '#816bff',
   logo: '',
+  bgImage: '',
+  bgRepeat: false,
   // 예능 자막바 결 — 진한 색 위 흰 글자가 기본이다 (참고 이미지의 문법)
   bubbleColors: ['#ff6b9d', '#ffd166', '#5bd1c4', '#8b8cf7', '#ff9f5a'],
   bubbleInk: '#161616',
@@ -87,20 +93,28 @@ export const DEFAULT_CHEER: CheerDisplay = {
 export function cheerDisplay(slot: Slot): CheerDisplay {
   const saved = (slot.cheer ?? {}) as Partial<CheerDisplay>
   return {
-    title: saved.title || DEFAULT_CHEER.title,
+    /*
+     * **문구는 지울 수 있어야 한다.** `||` 로 두면 빈 문자열이 "값 없음" 으로 읽혀 기본 문구가
+     * 되살아난다 — 편집기에서 지웠는데 다시 생기는 걸로 보였다(실제 신고). 비움이 뜻을 갖는
+     * 칸은 전부 `??` 로 살린다.
+     */
+    title: saved.title ?? DEFAULT_CHEER.title,
     showTitle: saved.showTitle ?? DEFAULT_CHEER.showTitle,
     subtitle: saved.subtitle ?? DEFAULT_CHEER.subtitle,
     showSubtitle: saved.showSubtitle ?? DEFAULT_CHEER.showSubtitle,
-    prompt: saved.prompt || DEFAULT_CHEER.prompt,
-    namePrompt: saved.namePrompt || DEFAULT_CHEER.namePrompt,
+    prompt: saved.prompt ?? DEFAULT_CHEER.prompt,
+    namePrompt: saved.namePrompt ?? DEFAULT_CHEER.namePrompt,
+    /** 버튼만 예외다 — 글자가 비면 **누를 게 안 보인다**(빈 알약이 뜬다) */
     postLabel: saved.postLabel || DEFAULT_CHEER.postLabel,
-    thanks: saved.thanks || DEFAULT_CHEER.thanks,
+    thanks: saved.thanks ?? DEFAULT_CHEER.thanks,
     font: saved.font || DEFAULT_CHEER.font,
     bg: saved.bg || DEFAULT_CHEER.bg,
     headText: saved.headText || DEFAULT_CHEER.headText,
     subText: saved.subText || DEFAULT_CHEER.subText,
     buttonColor: saved.buttonColor || DEFAULT_CHEER.buttonColor,
     logo: saved.logo ?? DEFAULT_CHEER.logo,
+    bgImage: saved.bgImage ?? DEFAULT_CHEER.bgImage,
+    bgRepeat: saved.bgRepeat ?? DEFAULT_CHEER.bgRepeat,
     // 빈 배열은 "색을 다 지웠다" 는 뜻이 아니라 대개 실수다 — 비면 기본 팔레트로 되돌린다
     bubbleColors: saved.bubbleColors?.length ? saved.bubbleColors : DEFAULT_CHEER.bubbleColors,
     bubbleInk: saved.bubbleInk || DEFAULT_CHEER.bubbleInk,
@@ -110,7 +124,7 @@ export function cheerDisplay(slot: Slot): CheerDisplay {
     bubbleBorderWidth: saved.bubbleBorderWidth ?? DEFAULT_CHEER.bubbleBorderWidth,
     creditsBg: saved.creditsBg || DEFAULT_CHEER.creditsBg,
     creditsText: saved.creditsText || DEFAULT_CHEER.creditsText,
-    creditsTitle: saved.creditsTitle || DEFAULT_CHEER.creditsTitle,
+    creditsTitle: saved.creditsTitle ?? DEFAULT_CHEER.creditsTitle,
   }
 }
 
