@@ -19,8 +19,14 @@ import type { Slot } from '@/types/slot'
 
 const CHANNEL = 'tarot-pocket:preview'
 
-/** 럭키드로우는 화면이 하나뿐이라 상태를 골라 봐야 한다 (미리보기에서 진짜로 뽑을 순 없다) */
-export type PreviewState = 'draw' | 'result' | 'summary'
+/**
+ * 편집기에서 고른 **화면 이름**. 목록은 `src/owner/previewScreens.ts` 가 서비스별로 들고 있고,
+ * 값은 각 앱의 내부 화면 이름과 같다 (`View`) — 앱이 그대로 받아 그 화면에 고정한다.
+ *
+ * 미리보기에서는 진짜로 뽑거나 제출할 수 없다(재고가 줄고 응모가 쌓인다).
+ * 그래서 **화면을 고르는 것**이 미리보기의 유일한 이동 수단이다.
+ */
+export type PreviewState = string
 
 export interface PreviewPayload {
   slot: Slot
@@ -72,7 +78,7 @@ export function useLivePreview(): PreviewPayload | null {
       if (e.data?.channel !== CHANNEL || !e.data?.slot) return
       setPayload({
         slot: e.data.slot as Slot,
-        state: (e.data.state as PreviewState) ?? 'draw',
+        state: (e.data.state as PreviewState) ?? '',
         highlight: (e.data.highlight as string | null) ?? null,
       })
     }

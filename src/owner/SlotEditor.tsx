@@ -31,6 +31,7 @@ import { PeriodFields } from './PeriodFields'
 import { periodLabel, rangeLabel, rangeInvalid } from './period'
 import { validateSlug } from './slug'
 import { onPreviewReady, postPreview, type PreviewState } from '@/slot/preview'
+import { PREVIEW_SCREENS } from './previewScreens'
 import {
   LUCKYDRAW_GROUPS,
   LUCKYDRAW_NEUTRALS,
@@ -683,7 +684,11 @@ export function SlotEditor() {
    * 눌러야 보이니, 마음에 안 들면 되돌릴 방법이 없는 채로 저장이 쌓였다.
    */
   const previewFrame = useRef<HTMLIFrameElement>(null)
-  const [previewState, setPreviewState] = useState<PreviewState>('draw')
+  /**
+   * 지금 보고 있는 **화면** — 서비스마다 목록이 다르다 (`previewScreens.ts`).
+   * 주소가 다른 화면(`/write`·`/staff`)도 여기 같이 들어 있어, 화면 고르기가 한 줄로 끝난다.
+   */
+  const [previewState, setPreviewState] = useState<PreviewState>('')
 
   /**
    * 럭키드로우 미리보기 기기 — 부스에 세워둔 아이패드를 **가로로** 쓴다. 모델마다 해상도가
@@ -716,7 +721,10 @@ export function SlotEditor() {
    * 두 서비스가 같은 상태를 쓴다: 화면 구조가 같고(`/{slug}` 과 `/{slug}/write`),
    * 한 슬롯은 둘 중 하나만 되므로 상태를 나눌 이유가 없다.
    */
-  const [rollingView, setRollingView] = useState<'wall' | 'write'>('wall')
+  const previewScreens = draft ? PREVIEW_SCREENS[getSlotService(draft)] : []
+  /** 저장된 값이 이 서비스에 없는 이름이면(서비스를 바꿨다) 첫 화면으로 되돌린다 */
+  const previewScreen =
+    previewScreens.find((x) => x.state === previewState) ?? previewScreens[0] ?? { state: '', label: '' }
   /** 지금 만지는 색이 화면의 **어느 자리**인지 — 미리보기가 그 부분을 깜빡인다 */
   const [highlight, setHighlight] = useState<string | null>(null)
 
@@ -731,7 +739,7 @@ export function SlotEditor() {
   }, [previewDevice.w])
 
   useEffect(() => {
-    if (draft) postPreview(previewFrame.current, { slot: draft, state: previewState, highlight })
+    if (draft) postPreview(previewFrame.current, { slot: draft, state: previewScreen.state, highlight })
   }, [draft, previewState, highlight])
 
   /**
@@ -741,7 +749,7 @@ export function SlotEditor() {
    */
   useEffect(() => {
     return onPreviewReady(() => {
-      if (draft) postPreview(previewFrame.current, { slot: draft, state: previewState, highlight })
+      if (draft) postPreview(previewFrame.current, { slot: draft, state: previewScreen.state, highlight })
     })
   }, [draft, previewState, highlight])
 
@@ -1683,40 +1691,19 @@ export function SlotEditor() {
               </div>
             </div>
 
-            {luckydraw && (
+            {previewScreens.length > 1 && (
               <div style={{ padding: '9px 15px', borderBottom: '1px solid #eeeeee', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {([['draw', '뽑기'], ['result', '당첨'], ['summary', '전체 결과']] as [PreviewState, string][]).map(([value, label]) => {
-                  const on = previewState === value
+                {previewScreens.map((screen) => {
+                  const on = previewScreen.state === screen.state
                   return (
                     <button
-                      key={value}
+                      key={screen.state}
                       type="button"
-                      onClick={() => setPreviewState(value)}
+                      onClick={() => setPreviewState(screen.state)}
                       style={{ height: 27, padding: '0 12px', border: `1px solid ${on ? '#816bff' : '#dddddd'}`, background: on ? '#f0edff' : '#fff', color: on ? '#816bff' : '#505050', borderRadius: 9999, fontSize: 11.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                      data-preview-screen={screen.state}
                     >
-                      {label}
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-
-            {(rolling || wish) && (
-              <div style={{ padding: '9px 15px', borderBottom: '1px solid #eeeeee', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {(
-                  wish
-                    ? ([['wall', '나무'], ['write', '소원 적기']] as ['wall' | 'write', string][])
-                    : ([['wall', '벽'], ['write', '작성 화면']] as ['wall' | 'write', string][])
-                ).map(([value, label]) => {
-                  const on = rollingView === value
-                  return (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setRollingView(value)}
-                      style={{ height: 27, padding: '0 12px', border: `1px solid ${on ? '#816bff' : '#dddddd'}`, background: on ? '#f0edff' : '#fff', color: on ? '#816bff' : '#505050', borderRadius: 9999, fontSize: 11.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
-                    >
-                      {label}
+                      {screen.label}
                     </button>
                   )
                 })}
@@ -1726,9 +1713,10 @@ export function SlotEditor() {
             <div ref={previewBox} style={{ padding: '20px 18px', background: '#f7f7f7', display: 'flex', justifyContent: 'center' }}>
               <div style={{ width: previewDevice.w * previewScale, height: previewDevice.h * previewScale, overflow: 'hidden', borderRadius: 16, background: '#fff', border: '1px solid #dddddd', flexShrink: 0 }}>
                 <iframe
-                  key={`${saved.slug}${rolling || wish ? `-${rollingView}` : ''}`}
+                  /* 주소가 바뀌는 화면은 iframe 을 새로 띄운다 (같은 문서에서 라우팅하면 초안이 끊긴다) */
+                  key={`${saved.slug}${previewScreen.path ?? ''}`}
                   ref={previewFrame}
-                  src={`/${saved.slug}${(rolling || wish) && rollingView === 'write' ? '/write' : ''}`}
+                  src={`/${saved.slug}${previewScreen.path ?? ''}`}
                   title="미리보기"
                   style={{ width: previewDevice.w, height: previewDevice.h, border: 0, transformOrigin: 'top left', transform: `scale(${previewScale})`, background: '#fff', display: 'block' }}
                 />
@@ -1736,7 +1724,7 @@ export function SlotEditor() {
             </div>
 
             <div style={{ padding: '11px 15px', borderTop: '1px solid #eeeeee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 11, color: '#8a8a8a' }}>{previewDevice.label} · /{saved.slug}</span>
+              <span style={{ fontSize: 11, color: '#8a8a8a' }}>{previewDevice.label} · /{saved.slug}{previewScreen.path ?? ''}</span>
               <a href={`/${saved.slug}`} target="_blank" rel="noreferrer" style={{ height: 26, padding: '0 10px', border: '1px solid #dddddd', background: '#fff', borderRadius: 9999, fontSize: 11, fontWeight: 700, color: '#505050', display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap', textDecoration: 'none' }}>
                 <ExternalLink size={11} strokeWidth={2} aria-hidden="true" />
                 새 창

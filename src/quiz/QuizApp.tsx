@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
+import { useLivePreview } from '@/slot/preview'
 import { quizDisplay, titleFor, type QuizDisplay } from '@/data/quiz'
 import { fontStack, loadWebfont } from '@/data/fonts'
 import { repo } from '@/lib/repo'
@@ -44,6 +45,38 @@ export default function QuizApp() {
 
 type View = 'start' | 'run' | 'grading' | 'result' | 'reward' | 'entered'
 
+/**
+ * 편집기 미리보기용 **표본** — 미리보기에서는 진짜로 제출할 수 없다(응모가 쌓이고 응시가 남는다).
+ * 색을 고르는 사람이 문항·결과·교환권 화면을 보려면 뭔가는 그려져 있어야 한다.
+ */
+const SAMPLE_Q: QuizQuestion = {
+  id: 'preview',
+  order: 1,
+  kind: 'choice',
+  body: '우리 최애가 데뷔한 해는?',
+  choices: ['2015년', '2016년', '2017년', '2018년'],
+  points: 10,
+  hidden: false,
+}
+const SAMPLE_RESULT: QuizResult = {
+  attemptId: 'preview',
+  score: 80,
+  total: 100,
+  correct: 8,
+  count: 10,
+  detail: [],
+  rewardCode: null,
+  rewardKind: null,
+}
+const SAMPLE_REWARD: MyReward = {
+  code: 'XK4T-9P2M',
+  label: '스페셜 포토카드 1장',
+  kind: 'guaranteed',
+  redeemedAt: null,
+  entered: false,
+  createdAt: '2026-01-01T00:00:00.000Z',
+}
+
 function Quiz({ slot }: { slot: Slot }) {
   const { slug } = slot
   const display = useMemo(() => quizDisplay(slot), [slot])
@@ -58,6 +91,12 @@ function Quiz({ slot }: { slot: Slot }) {
   const [reward, setReward] = useState<MyReward | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [left, setLeft] = useState<number | null>(null)
+  /**
+   * 편집기 미리보기가 고른 화면 — 있으면 **그 화면에 고정한다** (`src/owner/previewScreens.ts`).
+   * 미리보기에서 진짜로 제출할 수는 없으니, 데이터가 비면 표본으로 그린다.
+   */
+  const preview = useLivePreview()
+  const pinned = (preview?.state as View | undefined) ?? null
 
   useEffect(() => {
     loadWebfont(display.font)
@@ -153,19 +192,23 @@ function Quiz({ slot }: { slot: Slot }) {
   }
   if (!questions || !settings) return <div className="app" aria-busy="true" />
 
-  const rootClass = `app ${styles.root}${view === 'result' ? ` ${styles.resultRoot}` : ''}`
+  const at = pinned ?? view
+  const shownQs = pinned && ordered.length === 0 ? [SAMPLE_Q] : ordered
+  const shownResult = pinned && !result ? SAMPLE_RESULT : result
+  const shownReward = pinned && !reward ? SAMPLE_REWARD : reward
+  const rootClass = `app ${styles.root}${at === 'result' ? ` ${styles.resultRoot}` : ''}`
 
   return (
     <div className={rootClass} style={vars}>
       <div className={styles.phone}>
-        {view === 'start' && (
+        {at === 'start' && (
           <Start
             display={display}
             settings={settings}
-            count={ordered.length}
+            count={shownQs.length}
             error={error}
             slug={slug}
-            reward={reward}
+            reward={shownReward}
             onStart={() => {
               setPicks({})
               setStep(0)
@@ -177,41 +220,43 @@ function Quiz({ slot }: { slot: Slot }) {
           />
         )}
 
-        {view === 'run' && ordered.length > 0 && (
+        {at === 'run' && shownQs.length > 0 && (
           <Run
             display={display}
-            q={ordered[step]}
-            step={step}
-            total={ordered.length}
+            q={shownQs[Math.min(step, shownQs.length - 1)]}
+            step={Math.min(step, shownQs.length - 1)}
+            total={shownQs.length}
             left={left}
-            value={picks[ordered[step].id] ?? ''}
-            onPick={(v) => setPicks((p) => ({ ...p, [ordered[step].id]: v }))}
-            onNext={() => (step + 1 < ordered.length ? setStep(step + 1) : void submit())}
+            value={picks[shownQs[Math.min(step, shownQs.length - 1)].id] ?? ''}
+            onPick={(v) =>
+              setPicks((p) => ({ ...p, [shownQs[Math.min(step, shownQs.length - 1)].id]: v }))
+            }
+            onNext={() => (step + 1 < shownQs.length ? setStep(step + 1) : void submit())}
           />
         )}
 
-        {view === 'grading' && (
+        {at === 'grading' && (
           <div className={styles.grading}>
             <div className={styles.spinner} aria-hidden="true" />
             <div className={styles.gradingText}>채점하는 중…</div>
           </div>
         )}
 
-        {view === 'result' && result && (
+        {at === 'result' && shownResult && (
           <Result
             display={display}
-            result={result}
-            reward={reward}
+            result={shownResult}
+            reward={shownReward}
             settings={settings}
             onReward={() => setView('reward')}
           />
         )}
 
-        {view === 'reward' && (
+        {at === 'reward' && (
           <Reward
             display={display}
             settings={settings}
-            reward={reward}
+            reward={shownReward}
             slug={slug}
             subject={subject}
             onBack={() => setView(result ? 'result' : 'start')}
@@ -222,7 +267,7 @@ function Quiz({ slot }: { slot: Slot }) {
           />
         )}
 
-        {view === 'entered' && (
+        {at === 'entered' && (
           <Entered display={display} onBack={() => setView(result ? 'result' : 'start')} />
         )}
       </div>

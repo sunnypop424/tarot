@@ -63,13 +63,14 @@ try {
     await Promise.all([page.click('button[type="submit"]'), wait(2500)])
   }
 
-  /** 아무 슬롯이나 하나 — 목록의 첫 편집 링크를 탄다 */
-  const slug = await page.evaluate(() => {
-    const link = [...document.querySelectorAll('a')].find((a) =>
-      /\/theme-editor\/[^/]+$/.test(a.getAttribute('href') ?? '')
-    )
-    return link?.getAttribute('href')?.split('/').pop() ?? null
-  })
+  /**
+   * 아무 슬롯이나 하나 — 목록의 첫 줄에서 슬러그를 읽는다.
+   * **링크(`<a href>`)로 찾지 않는다:** 목록은 줄 전체를 눌러 `navigate` 한다(주소가 DOM 에 없다).
+   * 예전엔 href 를 훑다가 목록이 비었다고 오진했다.
+   */
+  const slug = await page.evaluate(
+    () => document.querySelector('[data-slot]')?.getAttribute('data-slot') ?? null
+  )
   check('편집할 슬롯을 찾았다', Boolean(slug), slug ?? '목록이 비었다')
   if (!slug) throw new Error('슬롯 없음')
 

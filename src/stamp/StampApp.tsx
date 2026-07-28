@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
+import { useLivePreview } from '@/slot/preview'
 import { stampDisplay, type StampCell, type StampDisplay } from '@/data/stamp'
 import { fontStack, loadWebfont } from '@/data/fonts'
 import { repo } from '@/lib/repo'
@@ -42,6 +43,19 @@ const MARKS = [StampIcon, Star, Heart]
 
 type View = 'board' | 'code' | 'reward' | 'entered'
 
+/**
+ * 편집기 미리보기용 **표본 교환권** — 미리보기에서 도장을 진짜로 찍을 수는 없다
+ * (현장 암호가 필요하고, 찍히면 기록이 남는다). 교환권·응모 화면의 색을 보려면 하나는 있어야 한다.
+ */
+const SAMPLE_REWARD: MyReward = {
+  code: 'XK4T-9P2M',
+  label: '스페셜 굿즈 1개',
+  kind: 'guaranteed',
+  redeemedAt: null,
+  entered: false,
+  createdAt: '2026-01-01T00:00:00.000Z',
+}
+
 function Board({ slot }: { slot: Slot }) {
   const { slug } = slot
   const display = useMemo(() => stampDisplay(slot), [slot])
@@ -53,6 +67,11 @@ function Board({ slot }: { slot: Slot }) {
   const [view, setView] = useState<View>('board')
   const [fresh, setFresh] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  /**
+   * 편집기 미리보기가 고른 화면 — 있으면 **그 화면에 고정한다** (`src/owner/previewScreens.ts`).
+   */
+  const preview = useLivePreview()
+  const pinned = (preview?.state as View | undefined) ?? null
 
   useEffect(() => {
     loadWebfont(display.font)
@@ -123,10 +142,17 @@ function Board({ slot }: { slot: Slot }) {
     )
   }
 
+  const at = pinned ?? view
+  /** 미리보기에서 보상 화면을 고르면 표본으로 그린다 (응모 폼은 kind='raffle' 로) */
+  const shownReward =
+    pinned === 'reward' && !reward
+      ? { ...SAMPLE_REWARD, kind: settings?.rewardMode === 'raffle' ? ('raffle' as const) : ('guaranteed' as const) }
+      : reward
+
   return (
     <div className={`app ${styles.root}`} style={vars}>
       <div className={styles.phone}>
-        {view === 'code' ? (
+        {at === 'code' ? (
           <CodeEntry
             display={display}
             onBack={() => {
@@ -136,15 +162,15 @@ function Board({ slot }: { slot: Slot }) {
             onSubmit={submitCode}
             notice={notice}
           />
-        ) : view === 'reward' && reward ? (
-          reward.kind === 'guaranteed' ? (
-            <Ticket reward={reward} onBack={() => setView('board')} />
-          ) : reward.entered ? (
+        ) : at === 'reward' && shownReward ? (
+          shownReward.kind === 'guaranteed' ? (
+            <Ticket reward={shownReward} onBack={() => setView('board')} />
+          ) : shownReward.entered ? (
             <Entered onBack={() => setView('board')} />
           ) : (
             <EntryForm
               settings={settings}
-              reward={reward}
+              reward={shownReward}
               onBack={() => setView('board')}
               onDone={async () => {
                 await load()
@@ -152,7 +178,7 @@ function Board({ slot }: { slot: Slot }) {
               }}
             />
           )
-        ) : view === 'entered' ? (
+        ) : at === 'entered' ? (
           <Entered onBack={() => setView('board')} />
         ) : complete && !reward ? (
           <Complete display={display} cells={cells} onBack={() => setView('board')} />

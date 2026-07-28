@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Check, ChevronLeft, CircleCheck, Crown, Heart, Image as ImageIcon, Settings } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
+import { useLivePreview } from '@/slot/preview'
 import { pollDisplay, type PollDisplay } from '@/data/poll'
 import { fontStack, loadWebfont } from '@/data/fonts'
 import { repo } from '@/lib/repo'
@@ -26,6 +27,25 @@ export default function PollApp() {
   return <PollHome slot={state.slot} />
 }
 
+/**
+ * 편집기 미리보기용 **표본 설문** — 미리보기에서 진짜로 투표할 수는 없다(표가 쌓인다).
+ * 설문을 아직 안 만든 슬롯에서도 투표·결과 화면의 색을 볼 수 있어야 한다.
+ */
+const SAMPLE_POLL: Poll = {
+  id: 'preview',
+  title: '오늘의 최애 컨셉은?',
+  kind: 'single',
+  maxPick: 1,
+  closed: false,
+  hidden: false,
+  order: 1,
+  options: [
+    { id: 'a', order: 1, label: '청량', votes: 42 },
+    { id: 'b', order: 2, label: '청순', votes: 31 },
+    { id: 'c', order: 3, label: '걸크러시', votes: 27 },
+  ],
+}
+
 function PollHome({ slot }: { slot: Slot }) {
   const { slug } = slot
   const display = useMemo(() => pollDisplay(slot), [slot])
@@ -34,6 +54,12 @@ function PollHome({ slot }: { slot: Slot }) {
   const [openId, setOpenId] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const subject = useMemo(() => visitorId(), [])
+  /**
+   * 편집기 미리보기가 고른 화면 — `list`(목록) · `vote`(투표) · `result`(결과).
+   * 있으면 그 화면에 고정한다 (`src/owner/previewScreens.ts`).
+   */
+  const preview = useLivePreview()
+  const pinned = preview?.state ?? null
 
   useEffect(() => {
     loadWebfont(display.font)
@@ -67,8 +93,18 @@ function PollHome({ slot }: { slot: Slot }) {
     ['--pl-bar' as string]: display.barColor,
   }
 
-  const open = polls?.find((p) => p.id === openId) ?? null
-  const myVote = (id: string) => mine.find((m) => m.pollId === id)
+  /**
+   * 미리보기: 투표·결과는 설문 하나를 연 화면이라, 첫 설문(없으면 표본)을 대신 연다.
+   * 결과 화면은 "이미 찍은 사람" 이 보는 화면이므로 내 표도 하나 지어 넣는다.
+   */
+  const previewPoll = pinned === 'vote' || pinned === 'result' ? (polls?.[0] ?? SAMPLE_POLL) : null
+  const open = previewPoll ?? polls?.find((p) => p.id === openId) ?? null
+  const myVote = (id: string) =>
+    pinned === 'result'
+      ? { pollId: id, optionIds: [open?.options[0]?.id ?? ''], at: '2026-01-01T00:00:00.000Z' }
+      : pinned === 'vote'
+        ? undefined
+        : mine.find((m) => m.pollId === id)
 
   async function submit(poll: Poll, picked: string[]) {
     setNotice(null)

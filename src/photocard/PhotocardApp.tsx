@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
+import { useLivePreview } from '@/slot/preview'
 import { photocardDisplay, photocardRules, RARITY_LABEL, type PhotocardDisplay } from '@/data/photocard'
 import { fontStack, loadWebfont } from '@/data/fonts'
 import { repo } from '@/lib/repo'
@@ -49,6 +50,28 @@ export default function PhotocardApp() {
 
 type View = 'deck' | 'drawing' | 'result' | 'locker' | 'ticket'
 
+/**
+ * 편집기 미리보기용 **표본** — 미리보기에서는 진짜로 뽑을 수 없다(재고가 준다).
+ * 색을 고르는 사람이 결과·보관함·뽑기권 화면을 보려면 뭔가는 그려져 있어야 한다.
+ * 이미지는 비워 둔다 — 슬롯이 올린 카드가 있으면 그건 실제 데이터로 뜨고,
+ * 없을 때 여기서 남의 그림을 지어내면 안 된다.
+ */
+const SAMPLE_CARD: PhotocardDrawn = { cardId: 'preview', name: '샘플 포토카드', image: '', rarity: 3 }
+const SAMPLE_KEPT: Kept[] = [1, 2, 3].map((n) => ({
+  id: `preview-${n}`,
+  name: `샘플 포토카드 ${n}`,
+  image: '',
+  rarity: n,
+  at: '2026-01-01T00:00:00.000Z',
+}))
+const SAMPLE_TICKET: PhotocardTicket = {
+  code: 'K7QM',
+  status: 'open',
+  cardName: null,
+  cardImage: null,
+  issuedAt: '2026-01-01T00:00:00.000Z',
+}
+
 /** 보관함에 남는 카드 한 장 — **서버로 안 간다** (`lib/locker.ts`) */
 interface Kept {
   id: string
@@ -69,6 +92,12 @@ function Photocard({ slot }: { slot: Slot }) {
   const [kept, setKept] = useState<Kept[]>(() => readList<Kept>('photocard', slug))
   const [drawn, setDrawn] = useState<PhotocardDrawn | null>(null)
   const [view, setView] = useState<View>('deck')
+  /**
+   * 편집기 미리보기가 고른 화면 — 있으면 **그 화면에 고정한다**
+   * (`src/owner/previewScreens.ts`). 미리보기에서 진짜로 뽑을 수는 없다.
+   */
+  const preview = useLivePreview()
+  const pinned = (preview?.state as View | undefined) ?? null
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -76,7 +105,15 @@ function Photocard({ slot }: { slot: Slot }) {
     loadWebfont(display.font)
   }, [display.font])
 
-  const rules = settings ? photocardRules(settings.mode) : null
+  /**
+   * 미리보기에서는 **고른 화면이 운영 방식을 정한다** — 뽑기권 화면을 보려면 gift,
+   * 덱·결과·보관함을 보려면 save 여야 한다. 실제 방문자에겐 언제나 주최자 설정이다.
+   */
+  const rules = pinned
+    ? photocardRules(pinned === 'ticket' ? 'gift' : 'save')
+    : settings
+      ? photocardRules(settings.mode)
+      : null
 
   const load = useCallback(async () => {
     if (!repo.photocard.ready()) return
@@ -184,16 +221,17 @@ function Photocard({ slot }: { slot: Slot }) {
 
   /* ── gift: 뽑기권 ── */
   if (rules.usesTicket) {
+    const shown = pinned === 'ticket' ? (ticket ?? SAMPLE_TICKET) : ticket
     return (
       <div className={`app ${styles.root}`} style={vars}>
         <div className={styles.phone}>
-          {ticket?.status === 'drawn' ? (
+          {shown?.status === 'drawn' ? (
             <Result
               display={display}
               card={{
                 cardId: '',
-                name: ticket.cardName ?? '',
-                image: ticket.cardImage ?? '',
+                name: shown.cardName ?? '',
+                image: shown.cardImage ?? '',
                 rarity: 0,
               }}
               vars={vars}
@@ -203,15 +241,15 @@ function Photocard({ slot }: { slot: Slot }) {
               onAgain={null}
               onLocker={null}
             />
-          ) : ticket ? (
+          ) : shown ? (
             <TicketView
               display={display}
-              ticket={ticket}
+              ticket={shown}
               busy={busy}
               onRefresh={async () => {
                 setBusy(true)
                 try {
-                  setTicket(await repo.photocard.ticket(slug, ticket.code))
+                  setTicket(await repo.photocard.ticket(slug, shown.code))
                 } finally {
                   setBusy(false)
                 }
@@ -234,15 +272,19 @@ function Photocard({ slot }: { slot: Slot }) {
 
   /* ── save: 덱 → 뽑는 중 → 결과 → 보관함 ── */
   const left = mine?.left ?? settings.drawsPerVisitor
+  /** 미리보기는 고른 화면에 고정된다. 데이터가 비었으면 표본으로 그린다 */
+  const at = pinned ?? view
+  const shownCard = pinned === 'result' ? (drawn ?? SAMPLE_CARD) : drawn
+  const shownKept = pinned && kept.length === 0 ? SAMPLE_KEPT : kept
 
-  if (view === 'locker') {
+  if (at === 'locker') {
     return (
       <div className={`app ${styles.root}`} style={vars}>
         <div className={styles.phone}>
           <Locker
             display={display}
-            kept={kept}
-            kinds={mine?.kinds ?? 0}
+            kept={shownKept}
+            kinds={mine?.kinds ?? shownKept.length}
             left={left}
             onBack={() => setView(drawn ? 'result' : 'deck')}
             onDraw={() => void draw()}
@@ -257,24 +299,24 @@ function Photocard({ slot }: { slot: Slot }) {
       <div
         className={styles.glow}
         style={{
-          background: `radial-gradient(120% 70% at 50% ${view === 'deck' ? '12%' : '40%'}, ${display.deckGlow} 0%, ${display.deckBg} 60%, ${mix(display.deckBg, 'black', 0.3)} 100%)`,
+          background: `radial-gradient(120% 70% at 50% ${at === 'deck' ? '12%' : '40%'}, ${display.deckGlow} 0%, ${display.deckBg} 60%, ${mix(display.deckBg, 'black', 0.3)} 100%)`,
         }}
         aria-hidden="true"
       />
       <div className={styles.phone}>
-        {view === 'deck' && (
+        {at === 'deck' && (
           <Deck
             display={display}
             slug={slug}
             left={left}
             closed={settings.closed}
             error={error}
-            kept={kept.length}
+            kept={shownKept.length}
             onPick={() => void draw()}
             onLocker={() => setView('locker')}
           />
         )}
-        {view === 'drawing' && (
+        {at === 'drawing' && (
           <div className={styles.drawing}>
             <div className={styles.spinCard}>
               <Sparkles size={34} strokeWidth={1.6} aria-hidden="true" />
@@ -283,10 +325,10 @@ function Photocard({ slot }: { slot: Slot }) {
             <div className={styles.drawingText}>카드를 뽑는 중…</div>
           </div>
         )}
-        {view === 'result' && drawn && (
+        {at === 'result' && shownCard && (
           <Result
             display={display}
-            card={drawn}
+            card={shownCard}
             vars={vars}
             physical={false}
             allowSave
