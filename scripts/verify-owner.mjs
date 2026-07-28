@@ -475,7 +475,7 @@ const shadows = await page.evaluate(async () => {
     shape: { radiusSm: 4, radiusMd: 8, radiusLg: 16 },
     assets: {
       logo: null, logoAlt: '', logoHeight: 28,
-      backgroundPattern: null, backgroundPatternOpacity: 0.12,
+      backgroundPattern: null, 
       backgroundPatternSize: 'cover', backgroundPatternRepeat: 'no-repeat',
       cardFrontBase: null, cardFrontExt: 'webp', cardBack: null,
     },

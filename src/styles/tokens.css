@@ -58,7 +58,6 @@
 
   /* ── 배경 패턴 (테마 종속) ────────────────────────── */
   --bg-pattern: none;
-  --bg-pattern-opacity: 0.12;
   --bg-pattern-size: cover;
   --bg-pattern-repeat: no-repeat;
 

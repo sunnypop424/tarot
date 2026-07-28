@@ -73,13 +73,17 @@ export interface ThemeAssets {
    */
   appIcon: string | null
 
-  /** 배경 패턴 이미지 URL */
+  /**
+   * 배경 이미지 URL — **올린 그대로 그린다.**
+   *
+   * 예전엔 불투명도(`backgroundPatternOpacity`)가 있었는데 **화면 어디서도 안 읽고 있었다** —
+   * 편집기에서 값을 내려도 아무 일이 없었다. 슬롯이 배경으로 쓰는 건 대개 패턴이 아니라
+   * 사진이고, 사진을 반투명하게 만들 이유가 없다. 고를 수 있는 건 **크기·반복 둘뿐**이다.
+   */
   backgroundPattern: string | null
-  /** 배경 패턴 불투명도 (0~1) — 카드를 가리지 않게 낮게 */
-  backgroundPatternOpacity: number
-  /** CSS background-size 값 (예: 'cover', '200px auto') */
+  /** CSS background-size — 꽉 채우면 'cover', 반복이면 'auto' */
   backgroundPatternSize: string
-  /** CSS background-repeat 값 */
+  /** CSS background-repeat — 'no-repeat'(기본) 또는 'repeat' */
   backgroundPatternRepeat: string
 
   /**

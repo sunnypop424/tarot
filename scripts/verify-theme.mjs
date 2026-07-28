@@ -35,7 +35,7 @@ const theme = (over) => ({
   shape: { radiusSm: 4, radiusMd: 8, radiusLg: 16 },
   assets: {
     logo: null, logoAlt: '데모', logoHeight: 28, backgroundPattern: null,
-    backgroundPatternOpacity: 0.12, backgroundPatternSize: 'cover', backgroundPatternRepeat: 'no-repeat',
+     backgroundPatternSize: 'cover', backgroundPatternRepeat: 'no-repeat',
     cardFrontBase: null, cardFrontExt: 'webp', cardBack: null,
   },
 })

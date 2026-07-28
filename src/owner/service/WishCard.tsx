@@ -3,6 +3,7 @@ import { WEBFONTS, type FontId } from '@/data/luckydraw'
 import type { Slot } from '@/types/slot'
 import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
+import { BackgroundField } from './BackgroundField'
 import { StickerField } from '../StickerField'
 import { PaletteField } from './PaletteField'
 
@@ -149,12 +150,13 @@ export function WishCard({
             />
           </Field>
         </div>
-        <ImageField
+        <BackgroundField
           slug={slot.slug}
-          label="배경 이미지"
           name="wish-bg"
           value={d.treeBg || null}
-          onChange={(v) => patch({ treeBg: v ?? '' })}
+          repeat={d.treeBgRepeat}
+          onImage={(v) => patch({ treeBg: v ?? '' })}
+          onRepeat={(on) => patch({ treeBgRepeat: on })}
           hint="나무·밤하늘 이미지예요. 비우면 배경색을 씁니다."
         />
         <ImageField

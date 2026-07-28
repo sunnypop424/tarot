@@ -11,6 +11,7 @@ import { AlphaColor, CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { uploadAsset, deleteAsset, extOf, nameFromUrl } from '../upload'
 import { BoxFields } from './BoxFields'
+import { BackgroundField } from './BackgroundField'
 import { PickerFields } from './PickerFields'
 
 const ICON: React.CSSProperties = {
@@ -47,11 +48,14 @@ export function PhotocardCard({
   slot,
   patch,
   patchAsset,
+  onRepeat,
 }: {
   slot: Slot
   patch: (change: Partial<PhotocardDisplay>) => void
   /** 배경 사진은 **슬롯 테마**가 든다 (럭드와 같은 자리) — 그래서 따로 받는다 */
   patchAsset: (key: 'backgroundPattern', value: string | null) => void
+  /** 배경 반복 여부 (테마 자산의 size·repeat 두 값을 같이 바꾼다) */
+  onRepeat: (repeat: boolean) => void
 }) {
   const d = photocardDisplay(slot)
   const slug = slot.slug
@@ -282,14 +286,14 @@ export function PhotocardCard({
           hint="덱에 깔리는 뒷면이에요 (세로 55:85). 비우면 덱 색에서 만든 무늬를 써요."
         />
         {/* 배경 사진은 슬롯 테마가 든다 — 스태프 화면(럭드와 같은 무대) 뒤에 깔려요 */}
-        <ImageField
+        <BackgroundField
           slug={slot.slug}
-          label="배경 이미지"
-          title="배경 이미지"
           name="photocard-bg"
           value={slot.theme.assets.backgroundPattern}
-          onChange={(v) => patchAsset('backgroundPattern', v)}
-          hint="화면을 꽉 채워요. 스태프 화면의 박스가 얹힐 자리를 비워둔 사진이 좋아요."
+          repeat={slot.theme.assets.backgroundPatternRepeat === 'repeat'}
+          onImage={(v) => patchAsset('backgroundPattern', v)}
+          onRepeat={onRepeat}
+          hint="스태프 화면의 박스가 얹힐 자리를 비워둔 사진이 좋아요."
         />
         <Field label="보관함 이름">
           <input value={d.lockerLabel} onChange={(e) => patch({ lockerLabel: e.target.value })} style={CSS.input} />

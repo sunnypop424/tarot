@@ -31,7 +31,6 @@
     "logoHeight": 28,
     "appIcon": null,
     "backgroundPattern": null,
-    "backgroundPatternOpacity": 0.12,
     "backgroundPatternSize": "cover",
     "backgroundPatternRepeat": "no-repeat",
     "cardFrontBase": null,

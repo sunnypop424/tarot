@@ -3,6 +3,7 @@ import { WEBFONTS, type FontId } from '@/data/luckydraw'
 import type { Slot } from '@/types/slot'
 import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
+import { BackgroundField } from './BackgroundField'
 import { FrameField } from './FrameField'
 
 /**
@@ -130,13 +131,13 @@ export function PhotozoneCard({
           onChange={(v) => patch({ logo: v ?? '' })}
           hint="헤더에 떠요. 없으면 제목 텍스트가 나와요."
         />
-        <ImageField
+        <BackgroundField
           slug={slot.slug}
-          label="배경 이미지"
           name="photozone-bg"
           value={d.bgImage || null}
-          onChange={(v) => patch({ bgImage: v ?? '' })}
-          hint="비우면 배경색을 써요."
+          repeat={d.bgRepeat}
+          onImage={(v) => patch({ bgImage: v ?? '' })}
+          onRepeat={(on) => patch({ bgRepeat: on })}
         />
         <ImageField
           slug={slot.slug}

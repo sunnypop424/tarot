@@ -32,6 +32,7 @@ import { periodLabel, rangeLabel, rangeInvalid } from './period'
 import { validateSlug } from './slug'
 import { onPreviewReady, postPreview, type PreviewState } from '@/slot/preview'
 import { PREVIEW_SCREENS } from './previewScreens'
+import { BackgroundField, bgRepeatValues } from './service/BackgroundField'
 import {
   LUCKYDRAW_GROUPS,
   LUCKYDRAW_NEUTRALS,
@@ -463,13 +464,16 @@ function LuckydrawExtra({
     case 'background':
       return (
         <>
-          <ImageField
+          <BackgroundField
             slug={slug}
-            label="배경 이미지"
             name="background"
             value={draft.theme.assets.backgroundPattern}
-            onChange={(v) => patchAsset('backgroundPattern', v)}
-            hint="화면을 꽉 채워요. 박스가 얹힐 자리를 비워둔 사진이 좋아요."
+            repeat={draft.theme.assets.backgroundPatternRepeat === 'repeat'}
+            onImage={(v) => patchAsset('backgroundPattern', v)}
+            onRepeat={(on) => patchSlot((prev) => ({
+              theme: { ...prev.theme, assets: { ...prev.theme.assets, ...bgRepeatValues(on) } },
+            }))}
+            hint="박스가 얹힐 자리를 비워둔 사진이 좋아요."
           />
           <AlphaColor
             label="관리자 링크 색"
@@ -1321,23 +1325,20 @@ export function SlotEditor() {
                       <input type="number" min={16} max={80} value={draft.theme.assets.logoHeight} onChange={(e) => patchAsset('logoHeight', Number(e.target.value))} style={CSS.input} />
                     </Field>
                   </div>
-                  <Field label="배경 패턴">
-                    <ImageField slug={saved.slug} label="배경 패턴" name="background" value={draft.theme.assets.backgroundPattern} onChange={(v) => patchAsset('backgroundPattern', v)} />
-                  </Field>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,105px),1fr))', gap: 10 }}>
-                    <Field label="불투명도" hint="카드를 가리지 않게 낮게.">
-                      <input type="number" min={0} max={1} step={0.01} value={draft.theme.assets.backgroundPatternOpacity} onChange={(e) => patchAsset('backgroundPatternOpacity', Number(e.target.value))} style={CSS.input} />
-                    </Field>
-                    <Field label="패턴 크기" hint="cover, 200px auto …">
-                      <input value={draft.theme.assets.backgroundPatternSize} onChange={(e) => patchAsset('backgroundPatternSize', e.target.value)} style={CSS.input} />
-                    </Field>
-                    <Field label="반복">
-                      <select value={draft.theme.assets.backgroundPatternRepeat} onChange={(e) => patchAsset('backgroundPatternRepeat', e.target.value)} style={CSS.select}>
-                        <option value="no-repeat">no-repeat</option>
-                        <option value="repeat">repeat</option>
-                      </select>
-                    </Field>
-                  </div>
+                  <BackgroundField
+                    slug={saved.slug}
+                    name="background"
+                    label="배경 이미지"
+                    value={draft.theme.assets.backgroundPattern}
+                    repeat={draft.theme.assets.backgroundPatternRepeat === 'repeat'}
+                    onImage={(v) => patchAsset('backgroundPattern', v)}
+                    onRepeat={(on) =>
+                      patchSlot((prev) => ({
+                        theme: { ...prev.theme, assets: { ...prev.theme.assets, ...bgRepeatValues(on) } },
+                      }))
+                    }
+                    hint="비우면 배경색을 써요."
+                  />
                 </div>
               </Card>
 
@@ -1492,6 +1493,30 @@ export function SlotEditor() {
 
           {/* ══ 실시간 투표 설정 ══ */}
           {poll && <PollCard slot={draft} patch={patchPoll} />}
+          {/*
+            * 배경 이미지는 **모든 서비스가 쓸 수 있다** (`.app::before` 가 어느 앱에서든 그린다).
+            * 자기 배경 칸이 이미 있는 서비스(타로 테마 카드 · 럭드 · 포토카드 · 소원나무 ·
+            * 롤페 · 포토존)엔 두 번 두지 않는다.
+            */}
+          {(poll || stamp || quiz) && (
+            <Card title="배경 이미지">
+              <p style={{ margin: '0 0 14px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
+                올린 그대로 화면 뒤에 깔려요. <b>투명도 같은 건 안 씌웁니다</b> — 크기와 반복만 정해요.
+              </p>
+              <BackgroundField
+                slug={saved.slug}
+                name="background"
+                value={draft.theme.assets.backgroundPattern}
+                repeat={draft.theme.assets.backgroundPatternRepeat === 'repeat'}
+                onImage={(v) => patchAsset('backgroundPattern', v)}
+                onRepeat={(on) =>
+                  patchSlot((prev) => ({
+                    theme: { ...prev.theme, assets: { ...prev.theme.assets, ...bgRepeatValues(on) } },
+                  }))
+                }
+              />
+            </Card>
+          )}
 
           {/* ══ 방문 스탬프 설정 ══ (칸 정의가 여기 있는 이유는 StampCard.tsx 주석) */}
           {stamp && <StampCard slot={draft} patch={patchStamp} />}
@@ -1505,6 +1530,11 @@ export function SlotEditor() {
               slot={draft}
               patch={patchPhotocard}
               patchAsset={(k, v) => patchAsset(k, v)}
+              onRepeat={(on) =>
+                patchSlot((prev) => ({
+                  theme: { ...prev.theme, assets: { ...prev.theme.assets, ...bgRepeatValues(on) } },
+                }))
+              }
             />
           )}
 
@@ -1609,16 +1639,16 @@ export function SlotEditor() {
                       </label>
                     </div>
                   </div>
-                  <div style={CSS.fieldCol}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
-                      <span style={CSS.label}>벽 배경 이미지</span>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#8a8a8a', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                        <input type="checkbox" checked={rd.wallBgRepeat} onChange={(e) => patchRolling({ wallBgRepeat: e.target.checked })} style={{ width: 14, height: 14, accentColor: '#816bff', cursor: 'pointer' }} />
-                        패턴 반복
-                      </label>
-                    </div>
-                    <ImageField slug={saved.slug} label="벽 배경 이미지" name="rolling-wallbg" value={rd.wallBg || null} onChange={(v) => patchRolling({ wallBg: v ?? '' })} hint="비우면 벽 배경색을 써요. 끄면 화면을 꽉 채워요." />
-                  </div>
+                  <BackgroundField
+                    slug={saved.slug}
+                    name="rolling-wallbg"
+                    label="벽 배경 이미지"
+                    value={rd.wallBg || null}
+                    repeat={rd.wallBgRepeat}
+                    onImage={(v) => patchRolling({ wallBg: v ?? '' })}
+                    onRepeat={(on) => patchRolling({ wallBgRepeat: on })}
+                    hint="비우면 벽 배경색을 써요."
+                  />
                 </div>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee' }}>
                   <div style={{ ...CSS.label, marginBottom: 9 }}>스티커</div>

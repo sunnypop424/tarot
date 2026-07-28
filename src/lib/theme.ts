@@ -147,10 +147,9 @@ export function applyTheme(raw: Theme): void {
   root.style.setProperty('--color-disabled-bg', disabled.bg)
   root.style.setProperty('--color-disabled-fg', disabled.fg)
 
-  const { backgroundPattern, backgroundPatternOpacity, backgroundPatternSize, backgroundPatternRepeat } =
+  const { backgroundPattern, backgroundPatternSize, backgroundPatternRepeat } =
     theme.assets
   root.style.setProperty('--bg-pattern', backgroundPattern ? `url("${backgroundPattern}")` : 'none')
-  root.style.setProperty('--bg-pattern-opacity', String(backgroundPatternOpacity))
   root.style.setProperty('--bg-pattern-size', backgroundPatternSize)
   root.style.setProperty('--bg-pattern-repeat', backgroundPatternRepeat)
 
