@@ -1,0 +1,202 @@
+/*
+ * 스태프 기기 공통 — **뽑기(포토카드)와 교환 확인(스탬프·모의고사)이 같은 판을 쓴다.**
+ * 무대·박스는 럭키드로우와 같은 CSS 다 (`components/DrawStage.module.css`).
+ */
+
+.app {
+  display: flex;
+  flex-direction: column;
+}
+
+.stage {
+  composes: stage from '../components/DrawStage.module.css';
+}
+.panel {
+  composes: panel from '../components/DrawStage.module.css';
+}
+.band {
+  composes: band from '../components/DrawStage.module.css';
+  align-items: center;
+  flex-wrap: nowrap;
+}
+.bandMsg {
+  composes: bandMsg from '../components/DrawStage.module.css';
+  min-width: 0;
+  word-break: keep-all;
+  text-align: left;
+}
+.adminLink {
+  composes: adminLink from '../components/DrawStage.module.css';
+}
+.reveal {
+  composes: reveal from '../components/DrawStage.module.css';
+}
+.revealHead {
+  composes: revealHead from '../components/DrawStage.module.css';
+}
+.eyebrow {
+  composes: eyebrow from '../components/DrawStage.module.css';
+}
+.revealTitle {
+  composes: revealTitle from '../components/DrawStage.module.css';
+}
+.revealFoot {
+  composes: revealFoot from '../components/DrawStage.module.css';
+}
+.banner {
+  composes: infoBanner from '../components/DrawStage.module.css';
+}
+
+/* 박스 아래 스태프 줄 — 오늘 처리 수 + 관리자 링크 */
+.footRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* 오늘 이 기기에서 처리한 수 */
+.tally {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--ds-tile-border, var(--color-border));
+  font-size: var(--text-xxs);
+  font-weight: var(--weight-bold);
+  color: var(--color-fg-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.controls {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.label {
+  margin: 0;
+  font-size: var(--text-m);
+  font-weight: var(--weight-bold);
+  color: var(--color-fg-1);
+  text-align: center;
+}
+.hint {
+  margin: -8px 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-fg-3);
+  text-align: center;
+  word-break: keep-all;
+}
+
+/* 교환코드 입력 — 손으로 치는 값이라 크게 */
+.codeInput {
+  width: 100%;
+  height: 74px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--ds-tile-border, var(--color-border));
+  background: var(--color-wash);
+  color: var(--color-fg-1);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-align: center;
+  text-transform: uppercase;
+  outline: none;
+}
+.codeInput:focus {
+  border-color: var(--color-primary);
+}
+
+/* 결과 — 처음 처리 / 이미 처리 / 없는 코드 셋을 색으로 가른다 */
+.verdict {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 26px 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--ds-tile-border, var(--color-border));
+  background: color-mix(in srgb, var(--color-wash) 55%, var(--color-surface));
+  text-align: center;
+}
+.verdict[data-kind='ok'] {
+  border-color: var(--color-high);
+  background: color-mix(in srgb, var(--color-high) 12%, var(--color-surface));
+}
+.verdictIcon {
+  color: var(--color-fg-2);
+}
+.verdict[data-kind='ok'] .verdictIcon {
+  color: var(--color-high);
+}
+.verdictTitle {
+  font-size: var(--title-s);
+  font-weight: var(--weight-bold);
+  color: var(--color-fg-1);
+}
+.verdictBody {
+  margin: 0;
+  font-size: var(--text-s);
+  line-height: 1.6;
+  color: var(--color-fg-2);
+  word-break: keep-all;
+}
+
+.error {
+  width: 100%;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-wash) 55%, var(--color-surface));
+  border: 1px solid var(--ds-tile-border, var(--color-border));
+  font-size: var(--text-s);
+  font-weight: var(--weight-bold);
+  color: var(--color-fg-1);
+  word-break: keep-all;
+}
+
+/* 로그인·안내 */
+.center {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.centerTitle {
+  font-size: var(--text-l);
+  font-weight: var(--weight-bold);
+}
+.centerBody {
+  margin: 0;
+  font-size: var(--text-s);
+  line-height: 1.7;
+  color: var(--color-fg-3);
+  word-break: keep-all;
+}
+.linkBtn {
+  margin-top: 6px;
+  height: 46px;
+  padding: 0 22px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: inherit;
+  font-size: var(--text-m);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}

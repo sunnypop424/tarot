@@ -45,6 +45,20 @@ const toEntry = (r: Row): RewardEntry => ({
 export const supabaseRewards: RewardsRepo = {
   ready: () => true,
 
+  async redeem(slug, code) {
+    const { data, error } = await (await db()).rpc('reward_redeem', { target: slug, raw_code: code })
+    if (error) throw new Error(error.message)
+    const row = (
+      data as { ok: boolean; label: string | null; already: boolean; redeemed_at: string | null }[]
+    )?.[0]
+    return {
+      ok: Boolean(row?.ok),
+      label: row?.label ?? null,
+      already: Boolean(row?.already),
+      redeemedAt: row?.redeemed_at ?? null,
+    }
+  },
+
   async issued(slug, source) {
     const { data, error } = await (await db())
       .from('rewards')
@@ -134,6 +148,7 @@ const nope = (): never => {
 
 export const localRewards: RewardsRepo = {
   ready: () => false,
+  redeem: nope,
   issued: nope,
   entries: nope,
   pick: nope,

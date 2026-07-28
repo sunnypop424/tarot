@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { CircleCheck, CircleX, Download, ScanLine, TriangleAlert } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
-import { db } from '@/lib/repo/client'
 import type { IssuedReward } from '@/lib/repo/types'
 import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
@@ -66,17 +65,13 @@ export function Redeem() {
     setBusy(true)
     setResult(null)
     try {
-      const { data, error } = await (await db()).rpc('reward_redeem', {
-        target: slug,
-        raw_code: code,
-      })
-      if (error) throw new Error(error.message)
-      const row = (data as { ok: boolean; label: string | null; already: boolean; redeemed_at: string | null }[])?.[0]
-      if (!row?.ok) setResult({ kind: 'none' })
-      else if (row.already) setResult({ kind: 'already', label: row.label ?? '', at: row.redeemed_at ?? '' })
+      // RPC 는 어댑터가 안다 — 스태프 화면(`/staff`)도 같은 걸 부른다
+      const row = await repo.rewards.redeem(slug, code)
+      if (!row.ok) setResult({ kind: 'none' })
+      else if (row.already) setResult({ kind: 'already', label: row.label ?? '', at: row.redeemedAt ?? '' })
       else setResult({ kind: 'ok', label: row.label ?? '' })
       // 목록에서 방금 처리한 줄을 잠깐 강조한다 — 어디가 바뀌었는지 눈으로 따라가게
-      if (row?.ok) setFresh(code.trim().toUpperCase().replace(/[^0-9A-Z]/g, ''))
+      if (row.ok) setFresh(code.trim().toUpperCase().replace(/[^0-9A-Z]/g, ''))
       setCode('')
       await load()
     } catch (e) {

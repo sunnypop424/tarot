@@ -85,6 +85,53 @@
   white-space: nowrap;
 }
 
+/* 박스 아래 스태프 줄 — 오늘 처리 수 + 관리자 링크 */
+.footRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* 오늘 이 기기에서 뽑은 수 (서버 합계가 아니라 이 기기 것이다) */
+.tally {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--ds-tile-border, var(--color-border));
+  font-size: var(--text-xxs);
+  font-weight: var(--weight-bold);
+  color: var(--color-fg-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 직전 결과 다시 보기 — 눈에 띄면 안 되지만 찾을 수는 있어야 한다 */
+.lastBtn {
+  width: 100%;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--ds-tile-border, var(--color-border));
+  background: transparent;
+  color: var(--color-fg-3);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+.lastBtn:hover {
+  background: var(--color-wash);
+  color: var(--color-fg-2);
+}
+
 /*
  * 배지는 **없다.** 'STAFF' 든 이벤트 이름이든, 부스에서 손님이 같이 보는 화면이라
  * 뭐가 붙어 있으면 "직원용" 으로 읽히고 밴드도 두 줄이 된다. 럭드와 같은 밴드가 답이다.

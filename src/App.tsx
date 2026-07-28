@@ -75,8 +75,10 @@ const PhotocardApp = lazy(() => import('@/photocard/PhotocardApp'))
 /**
  * 스태프 기기 — `/{slug}/staff`. **관리 화면 밖이다**: 부스에 세워두는 기기에 사이드바·
  * 로그아웃이 같이 떠 있으면 손님이 누르고, 손님이 같이 보는 화면이라 슬롯 색을 써야 한다.
+ *
+ * 서비스마다 스태프가 하는 일이 달라(뽑기 / 교환 확인) 그 분기는 `staff/StaffApp.tsx` 가 한다.
  */
-const StaffApp = lazy(() => import('@/photocard/StaffApp'))
+const StaffApp = lazy(() => import('@/staff/StaffApp'))
 
 /**
  * 서비스별 방문자 앱 — **`Record` 라 모든 서비스가 필수다.**

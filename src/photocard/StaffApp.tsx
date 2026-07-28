@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Image as ImageIcon, Info, Layers, Lock, Sparkles, Star, X } from 'lucide-react'
+import { History, Image as ImageIcon, Info, Layers, Lock, Sparkles, Star, WifiOff, X } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
 import { photocardDisplay, photocardRules, RARITY_LABEL } from '@/data/photocard'
@@ -11,6 +11,7 @@ import { repo } from '@/lib/repo'
 import { cssUrl } from '@/lib/image'
 import { CountPicker } from '@/components/CountPicker'
 import { useAdminAuth } from '@/admin/useAdminAuth'
+import { useOnline, useStaffLog } from '@/staff/staffLocal'
 import type { PhotocardDrawn, PhotocardLineupRow, PhotocardSettings } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import styles from './Staff.module.css'
@@ -39,6 +40,8 @@ function Staff({ slot }: { slot: Slot }) {
 
   const [settings, setSettings] = useState<PhotocardSettings | null>(null)
   const [lineup, setLineup] = useState<PhotocardLineupRow[]>([])
+  /** 한정 카드 재고 합 — 한정이 하나도 없으면 null (무제한이라 셀 게 없다) */
+  const [stock, setStock] = useState<number | null>(null)
   const [count, setCount] = useState(1)
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
@@ -47,6 +50,13 @@ function Staff({ slot }: { slot: Slot }) {
   const [sheet, setSheet] = useState(false)
   /** 당첨 결과 → 전체 결과 — **럭드의 `ResultReveal` 과 같은 전환이다** */
   const [summary, setSummary] = useState(false)
+  /**
+   * 오늘 **이 기기에서** 뽑은 수 + 직전 결과 (`staff/staffLocal.ts`).
+   * 서버 합계가 아니다 — 부스에 기기가 둘이면 그건 두 사람 몫이 섞인 값이라,
+   * 스태프가 알고 싶은 "내가 지금까지 몇 번 돌렸나" 와 다르다.
+   */
+  const log = useStaffLog<PhotocardDrawn[]>(slug)
+  const online = useOnline()
 
   useEffect(() => {
     loadWebfont(display.font)
@@ -54,12 +64,17 @@ function Staff({ slot }: { slot: Slot }) {
 
   const load = useCallback(async () => {
     if (!repo.photocard.ready()) return
-    const [st, cards] = await Promise.all([
+    const [st, cards, rows] = await Promise.all([
       repo.photocard.settings(slug),
       repo.photocard.lineup(slug).catch(() => []),
+      // 재고는 스태프에게 필요한 값이다 ("몇 장 남았어요?" 를 손님이 묻는다). 주최자 조회를 그대로 쓴다
+      repo.photocard.report(slug).catch(() => []),
     ])
     setSettings(st)
     setLineup(cards)
+    /** 재고를 정한 카드만 센다 — `null` 은 무제한이라 더하면 뜻이 흐려진다 */
+    const limited = rows.filter((r) => r.remaining !== null)
+    setStock(limited.length ? limited.reduce((a, r) => a + (r.remaining ?? 0), 0) : null)
   }, [slug])
 
   useEffect(() => {
@@ -172,10 +187,14 @@ function Staff({ slot }: { slot: Slot }) {
       setResult(cards)
       setSummary(false)
       setCode('')
+      log.record(cards)
       // 재고가 떨어졌으면 미리보기의 소진 표시가 바뀐다
       void load()
     } catch (e) {
-      setError(e instanceof Error ? e.message : '뽑지 못했어요')
+      // 끊긴 걸 모르면 "뽑지 못했어요" 만 뜨고 스태프는 시스템이 고장난 줄 안다
+      setError(
+        online ? (e instanceof Error ? e.message : '뽑지 못했어요') : '연결이 끊겼어요 — 와이파이를 확인하고 다시 눌러 주세요'
+      )
     } finally {
       setBusy(false)
     }
@@ -283,6 +302,14 @@ function Staff({ slot }: { slot: Slot }) {
             </div>
           ) : (
             <div className={styles.controls}>
+              {!online && (
+                <div className={styles.banner} data-offline>
+                  <WifiOff size={17} strokeWidth={2} aria-hidden="true" />
+                  <span>
+                    <b>연결이 끊겼어요.</b> 지금 누르면 뽑히지 않아요 — 와이파이를 확인해 주세요.
+                  </span>
+                </div>
+              )}
               {settings.rehearsal && (
                 <div className={styles.banner}>
                   <Info size={17} strokeWidth={2} aria-hidden="true" />
@@ -346,13 +373,46 @@ function Staff({ slot }: { slot: Slot }) {
                   {error}
                 </p>
               )}
+
+              {/*
+                * 직전 결과 다시 보기 — **전달 착오가 나면 되짚어야 한다.**
+                * '전달 완료' 를 누르면 화면이 비어서, 방금 뭘 건넸는지 확인할 길이 없었다.
+                */}
+              {log.last && log.last.length > 0 && (
+                <button
+                  type="button"
+                  className={styles.lastBtn}
+                  onClick={() => {
+                    setResult(log.last)
+                    setSummary(log.last!.length > 1)
+                  }}
+                  data-last
+                >
+                  <History size={14} strokeWidth={2} aria-hidden="true" />
+                  직전 결과 다시 보기 ({log.last.length}장)
+                </button>
+              )}
             </div>
           )}
         </div>
 
-        <a className={styles.adminLink} href={`/${slug}/admin/photocard`}>
-          관리자 페이지로 이동
-        </a>
+        {/*
+          * 박스 아래는 **스태프만 보는 줄**이다 (관리자 링크가 원래 거기 있다).
+          * 오늘 처리 수를 밴드에 넣었더니 문구·미리보기 버튼과 셋이 밀려 밴드가 네 줄이 됐다.
+          */}
+        <div className={styles.footRow}>
+          <span className={styles.tally} data-tally>
+            오늘 이 기기 {log.count}회
+          </span>
+          {stock !== null && (
+            <span className={styles.tally} data-stock>
+              남은 재고 {stock}장
+            </span>
+          )}
+          <a className={styles.adminLink} href={`/${slug}/admin/photocard`}>
+            관리자 페이지로 이동
+          </a>
+        </div>
         {display.footerNote && <div className={styles.footerNote}>{display.footerNote}</div>}
       </main>
 

@@ -818,6 +818,14 @@ export interface IssuedReward {
   createdAt: string
 }
 
+/** 교환코드 확인 결과 — 없는 코드·처음 처리·이미 처리 셋을 구분한다 */
+export interface RedeemResult {
+  ok: boolean
+  label: string | null
+  already: boolean
+  redeemedAt: string | null
+}
+
 export interface RewardsRepo {
   ready(): boolean
   /**
@@ -829,6 +837,12 @@ export interface RewardsRepo {
   issued(slug: string, source: string): Promise<IssuedReward[]>
   /** 응모자 명단 (`kind='raffle'` 만). 발표·CSV 의 원본 */
   entries(slug: string, source: string): Promise<RewardEntry[]>
+  /**
+   * 교환코드 확인 — **중복 수령을 실제로 막는 유일한 자리.**
+   * `manages_slot` 게이트라 anon 은 못 부른다(부르면 손님이 자기 코드를 스스로 처리한다).
+   * 이미 처리된 코드면 `already` 와 그 시각을 돌려준다 — "이미 받으셨어요 (7/27 14:32)".
+   */
+  redeem(slug: string, code: string): Promise<RedeemResult>
   /** 랜덤 또는 점수순으로 cnt 명 — 이미 당첨된 사람은 후보에서 빠진다 */
   pick(slug: string, source: string, count: number, method: 'random' | 'score'): Promise<RewardEntry[]>
   /** 그 회차만 되돌린다 */
