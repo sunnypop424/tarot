@@ -47,3 +47,73 @@
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+/* ── 발급 목록 ── */
+/* 코드는 손으로 대조하는 값이라 고정폭 + 크게 */
+.code {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 15px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+/* 수령한 줄은 흐리게 — 남은 줄(해야 할 일)이 먼저 눈에 들어와야 한다 */
+.table tbody tr[data-done] td {
+  color: var(--color-fg-3);
+}
+.table tbody tr[data-done] .code {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--color-wash);
+  font-size: var(--text-xxs);
+  font-weight: var(--weight-bold);
+  white-space: nowrap;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.kpi {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+.kpiLabel {
+  font-size: var(--text-xs);
+  color: var(--color-fg-3);
+  font-weight: var(--weight-bold);
+}
+.kpiValue {
+  margin-top: 4px;
+  font-size: 24px;
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 방금 처리한 줄 — 목록에서 어디가 바뀌었는지 눈으로 따라가게 */
+@keyframes rwFlash {
+  from {
+    background: #efeaff;
+  }
+  to {
+    background: transparent;
+  }
+}
+.table tbody tr[data-fresh] td {
+  animation: rwFlash 1.6s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .table tbody tr[data-fresh] td {
+    animation: none;
+  }
+}

@@ -776,8 +776,34 @@ export interface RewardEntry {
  *
  * **`ready()` 가 false 다** — 추첨·수령 판정이 서버여야 의미가 있다.
  */
+/**
+ * 발급된 보상 한 줄 — **개인정보가 안 붙는다.**
+ *
+ * 응모자 명단(`RewardEntry`)과 일부러 나눠 뒀다: 이건 "몇 장 나갔고 몇 장 수령됐나" 를
+ * 보는 운영 목록이라 스태프가 상시 띄워둔다. 닉네임·연락처를 여기 얹으면
+ * 카운터 화면에 남의 개인정보가 계속 떠 있게 된다.
+ */
+export interface IssuedReward {
+  code: string
+  label: string
+  kind: 'guaranteed' | 'raffle'
+  /** 모의고사만 채운다 */
+  score: number | null
+  redeemedAt: string | null
+  /** 응모(raffle)에서 폼을 냈나 */
+  entered: boolean
+  createdAt: string
+}
+
 export interface RewardsRepo {
   ready(): boolean
+  /**
+   * 발급된 보상 전부 — 확정·응모 가리지 않는다. **수령 목록의 원본.**
+   *
+   * 설정(`rewardMode`)이 바뀌어도 이미 나간 코드는 남으므로, 목록은 설정과 무관하게
+   * 늘 읽을 수 있어야 한다 — 그게 "확정으로 돌렸더니 어제 발급분이 안 보인다" 를 막는다.
+   */
+  issued(slug: string, source: string): Promise<IssuedReward[]>
   /** 응모자 명단 (`kind='raffle'` 만). 발표·CSV 의 원본 */
   entries(slug: string, source: string): Promise<RewardEntry[]>
   /** 랜덤 또는 점수순으로 cnt 명 — 이미 당첨된 사람은 후보에서 빠진다 */

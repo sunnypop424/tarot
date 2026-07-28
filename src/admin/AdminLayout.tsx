@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   Camera,
@@ -24,7 +23,6 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-import { repo } from '@/lib/repo'
 import { hasSupabase } from '@/lib/repo/client'
 import { getSlotService } from '@/data/services'
 import type { ServiceId } from '@/data/services'
@@ -87,53 +85,33 @@ const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
 }
 
 /**
- * **서비스가 아니라 설정값으로 메뉴가 갈리는 첫 사례다.**
+ * 보상 화면 셋 — **보상을 쓰는 서비스면 늘 붙인다.**
  *
- * 확정선물 이벤트에 '추첨'·'응모자' 가 떠 있으면 주최자가 뭘 눌러야 하는지 헷갈린다.
- * 반대로 응모 이벤트에 '수령 확인' 은 쓸 자리가 없다. 그래서 `rewardMode` 를 읽어 붙인다.
+ * 예전엔 `rewardMode` 를 읽어 골라 붙였는데 그게 틀렸다: **설정을 바꿔도 이미 나간 코드와
+ * 응모는 그대로 남는다.** '응모' 로 받다가 '확정' 으로 돌리면 어제 응모하신 분들 명단이
+ * 메뉴에서 통째로 사라진다 — 데이터는 있는데 볼 길이 없는 상태다.
  *
- * 읽어오기 전에는 아무것도 안 붙인다 — 잠깐 뒤에 메뉴가 늘어나는 건 괜찮지만,
- * 잘못된 메뉴가 먼저 떠 있다가 사라지면 그건 고장으로 읽힌다.
+ * 그래서 메뉴는 늘 두고, **각 화면이 자기 상황을 스스로 설명한다**(0건이면 왜 비었는지).
+ * 설정으로 화면을 숨기는 건 "지금 안 쓰는 기능" 을 감추는 데는 좋지만 **기록을 감추는 데는
+ * 나쁘다** — 기록은 설정보다 오래 산다.
  */
-const REWARD_NAV: Record<'guaranteed' | 'raffle', NavItem[]> = {
-  guaranteed: [{ to: 'redeem', label: '수령 확인', icon: ScanLine }],
-  raffle: [
-    { to: 'picker', label: '추첨', icon: Dices },
-    { to: 'entries', label: '응모자', icon: Users },
-  ],
+const REWARD_NAV: NavItem[] = [
+  { to: 'redeem', label: '수령 확인', icon: ScanLine },
+  { to: 'entries', label: '응모자', icon: Users },
+  { to: 'picker', label: '추첨', icon: Dices },
+]
+
+/** 보상 인프라(0019)를 쓰는 서비스 — 포토카드는 자기 뽑기권 목록을 따로 쓴다 */
+const USES_REWARDS: ServiceId[] = ['stamp', 'quiz']
+
+function rewardNav(service: ServiceId): NavItem[] {
+  return USES_REWARDS.includes(service) ? REWARD_NAV : []
 }
 
-/**
- * 보상을 쓰는 서비스만 여기서 설정을 읽는다 (포토카드가 뒤따른다).
- * 모의고사의 `threshold` 는 스탬프의 `guaranteed` 와 **같은 흐름**이다 — 조건을 넘으면
- * 교환코드가 나오고 스태프가 확인한다. 그래서 같은 메뉴로 접는다.
- */
-function useRewardNav(service: ServiceId, slug: string): NavItem[] {
-  const [mode, setMode] = useState<'none' | 'guaranteed' | 'raffle'>('none')
-
-  useEffect(() => {
-    let alive = true
-    const put = (m: 'none' | 'guaranteed' | 'raffle') => alive && setMode(m)
-    if (service === 'stamp' && repo.stamp.ready()) {
-      void repo.stamp.settings(slug).then((s) => put(s.rewardMode))
-    } else if (service === 'quiz' && repo.quiz.ready()) {
-      void repo.quiz
-        .settings(slug)
-        .then((s) => put(s.rewardMode === 'threshold' ? 'guaranteed' : s.rewardMode))
-    }
-    return () => {
-      alive = false
-    }
-  }, [service, slug])
-
-  return mode === 'none' ? [] : REWARD_NAV[mode]
-}
-
-function useNav(service: ServiceId, slug: string): NavItem[] {
-  const reward = useRewardNav(service, slug)
+function useNav(service: ServiceId, _slug: string): NavItem[] {
   return [
     ...SERVICE_NAV[service],
-    ...reward,
+    ...rewardNav(service),
     ...(hasSupabase ? [{ to: 'account', label: '내 계정', icon: UserCog }] : []),
   ]
 }

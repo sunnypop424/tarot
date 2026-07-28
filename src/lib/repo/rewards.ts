@@ -1,5 +1,5 @@
 import { db } from './client'
-import type { RewardEntry, RewardsRepo } from './types'
+import type { IssuedReward, RewardEntry, RewardsRepo } from './types'
 
 /**
  * 공용 보상 — **주최자 쪽 어댑터** (0019).
@@ -44,6 +44,38 @@ const toEntry = (r: Row): RewardEntry => ({
 
 export const supabaseRewards: RewardsRepo = {
   ready: () => true,
+
+  async issued(slug, source) {
+    const { data, error } = await (await db())
+      .from('rewards')
+      .select('code, label, kind, score, redeemed_at, created_at, reward_entries(reward_id)')
+      .eq('slug', slug)
+      .eq('source', source)
+      .order('created_at', { ascending: false })
+    if (error) throw new Error(error.message)
+    return (
+      data as unknown as {
+        code: string
+        label: string
+        kind: 'guaranteed' | 'raffle'
+        score: number | null
+        redeemed_at: string | null
+        created_at: string
+        reward_entries: { reward_id: string } | null
+      }[]
+    ).map(
+      (r): IssuedReward => ({
+        code: r.code,
+        label: r.label,
+        kind: r.kind,
+        score: r.score,
+        redeemedAt: r.redeemed_at,
+        // 응모 폼을 냈는지만 본다 — 닉네임·연락처는 여기로 안 가져온다 (types.ts 주석)
+        entered: !!r.reward_entries,
+        createdAt: r.created_at,
+      })
+    )
+  },
 
   async entries(slug, source) {
     const { data, error } = await (await db())
@@ -102,6 +134,7 @@ const nope = (): never => {
 
 export const localRewards: RewardsRepo = {
   ready: () => false,
+  issued: nope,
   entries: nope,
   pick: nope,
   unpick: nope,
