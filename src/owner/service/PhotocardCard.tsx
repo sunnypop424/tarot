@@ -271,6 +271,16 @@ export function PhotocardCard({
           onChange={(v) => patch({ logo: v ?? '' })}
           hint="덱 헤더와 안내 화면에 떠요."
         />
+        {/* 덱에 깔리는 뒷면 — 타로 뒷면과 별개다 (비율이 다르고 같이 팔지 않는다) */}
+        <ImageField
+          slug={slot.slug}
+          label="카드 뒷면"
+          title="카드 뒷면"
+          name="photocard-back"
+          value={d.cardBack || null}
+          onChange={(v) => patch({ cardBack: v ?? '' })}
+          hint="덱에 깔리는 뒷면이에요 (세로 55:85). 비우면 덱 색에서 만든 무늬를 써요."
+        />
         {/* 배경 사진은 슬롯 테마가 든다 — 스태프 화면(럭드와 같은 무대) 뒤에 깔려요 */}
         <ImageField
           slug={slot.slug}

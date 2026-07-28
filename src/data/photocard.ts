@@ -34,6 +34,14 @@ export interface PhotocardDisplay {
   subText: string
   buttonColor: string
   logo: string
+  /**
+   * 덱에 깔리는 **카드 뒷면** 이미지 — 비우면 내장 무늬(덱 색에서 파생한 그러데이션).
+   *
+   * 타로 뒷면(`theme.assets.cardBack`)과 **별개다.** 카드 비율이 다르고(55×85 vs 63×88),
+   * 한 슬롯이 두 서비스를 같이 팔지 않으니 굳이 같은 값을 공유할 이유가 없다.
+   * `background-image` 로 그린다 — 길게 눌러 저장되면 안 된다 (CLAUDE.md).
+   */
+  cardBack: string
 
   /** 수량 고르기 겉모습 — **럭키드로우와 같은 컴포넌트** (`src/components/CountPicker.tsx`) */
   picker: Partial<CountPickerStyle>
@@ -103,6 +111,7 @@ export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
   subText: '#7a7a78',
   buttonColor: '#26262a',
   logo: '',
+  cardBack: '',
   picker: {},
   // 럭키드로우와 같은 출발점 (`DEFAULT_DISPLAY`) — 같은 무대라 기본값도 같아야 한다
   boxTopMargin: 160,
@@ -147,6 +156,7 @@ export function photocardDisplay(slot: Slot): PhotocardDisplay {
     subText: saved.subText || DEFAULT_PHOTOCARD.subText,
     buttonColor: saved.buttonColor || DEFAULT_PHOTOCARD.buttonColor,
     logo: saved.logo ?? DEFAULT_PHOTOCARD.logo,
+    cardBack: saved.cardBack ?? DEFAULT_PHOTOCARD.cardBack,
     // 저장값만 든다 — 안 고른 색의 기본값은 화면이 자기 팔레트로 채운다
     picker: saved.picker ?? {},
     // 0 은 유효한 값이다 (맨 위 · 여백 없음 · 테두리 없음) — ?? 로 살린다

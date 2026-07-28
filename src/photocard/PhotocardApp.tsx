@@ -147,6 +147,8 @@ function Photocard({ slot }: { slot: Slot }) {
     ['--pc-deckGlow' as string]: display.deckGlow,
     // 관리자 링크 색 — **스태프 화면과 같은 값**을 쓴다 (같은 성격의 링크다)
     ['--pc-adminLink' as string]: display.adminLinkColor,
+    // 덱 뒷면 — 비우면 CSS 가 내장 무늬로 폴백한다
+    ['--pc-backImage' as string]: display.cardBack ? cssUrl(display.cardBack) : 'none',
     // 배경 밝기에서 파생 (CLAUDE.md 규칙)
     ['--pc-wash' as string]: mix(display.bg, isLight(display.bg) ? 'black' : 'white', 0.045),
     ['--pc-line' as string]: mix(display.bg, isLight(display.bg) ? 'black' : 'white', 0.1),
@@ -463,7 +465,8 @@ function Deck({
                 data-deck-card
               >
                 <span className={styles.face}>
-                  <Sparkles size={20} strokeWidth={1.6} aria-hidden="true" />
+                  {/* 뒷면 그림을 올렸으면 반짝임은 안 그린다 — 그림 위에 겹치면 지저분하다 */}
+                  {!display.cardBack && <Sparkles size={20} strokeWidth={1.6} aria-hidden="true" />}
                 </span>
               </button>
             )
