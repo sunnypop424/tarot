@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Image as ImageIcon, Sparkles, TriangleAlert } from 'lucide-react'
+import { Image as ImageIcon, Sparkles, Star, TriangleAlert } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import { photocardRules, RARITY_LABEL } from '@/data/photocard'
@@ -70,6 +70,15 @@ export function Cards() {
     toast('재고를 고쳤어요')
   }
 
+  /** 카드 한 장의 운영값을 고친다 — 목록(report)엔 없는 필드가 있어 원본을 되읽는다 */
+  const patchCard = async (id: string, change: { lucky?: boolean; rarity?: number }) => {
+    const cards = await repo.photocard.listCards(slug)
+    const card = cards.find((c) => c.id === id)
+    if (!card) return
+    await repo.photocard.saveCard(slug, { ...card, ...change })
+    await load()
+  }
+
   const totalLeft = rows.reduce((n, r) => n + (r.remaining ?? 0), 0)
   const anyFinite = rows.some((r) => r.remaining !== null)
 
@@ -98,12 +107,15 @@ export function Cards() {
         <div className="admin-empty">
           <Sparkles size={44} strokeWidth={1.6} aria-hidden="true" />
           <div className="admin-empty__title">아직 카드가 없어요</div>
-          <div className="t-text-s t-muted">카드 이미지 등록은 담당자가 해요 — 원본을 보내 주세요.</div>
+          <div className="t-text-s t-muted">
+            카드 이미지 등록은 담당자가 해요 — 원본을 보내 주세요. 등록되면 여기서 레어도·재고를
+            정하실 수 있어요.
+          </div>
         </div>
       ) : (
         <div className={styles.list} data-cards>
           {rows.map((r) => (
-            <div key={r.cardId} className={styles.row} data-out={r.remaining === 0 || undefined}>
+            <div key={r.cardId} className={styles.row} data-out={r.remaining === 0 || undefined} style={{ flexWrap: 'wrap' }}>
               {/* 썸네일도 background-image — 관리 화면도 예외가 아니다 (CLAUDE.md) */}
               <div
                 className={styles.thumb}
@@ -116,7 +128,12 @@ export function Cards() {
               <div className={styles.rowMain}>
                 <div className={styles.rowTop}>
                   <span className="t-text-m" style={{ fontWeight: 700 }}>{r.name}</span>
-                  <span className={styles.tag}>{RARITY_LABEL[r.rarity] ?? `레어도 ${r.rarity}`}</span>
+                  {r.lucky && (
+                    <span className={styles.lucky}>
+                      <Star size={11} strokeWidth={2.4} aria-hidden="true" />
+                      럭키
+                    </span>
+                  )}
                   {r.remaining === 0 && <span className={styles.warn}>소진</span>}
                 </div>
                 <div className={styles.rowMeta}>
@@ -125,6 +142,31 @@ export function Cards() {
                   <span>{r.remaining === null ? '수량 무제한' : `남은 수량 ${r.remaining}장`}</span>
                 </div>
               </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 7, flex: 'none' }}>
+                <span className="t-text-xs t-muted">레어도</span>
+                <select
+                  className="select"
+                  style={{ width: 104 }}
+                  value={String(r.rarity)}
+                  onChange={(e) => r.cardId && void patchCard(r.cardId, { rarity: Number(e.target.value) })}
+                  aria-label={`${r.name} 레어도`}
+                  data-rarity
+                >
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <option key={n} value={n}>{RARITY_LABEL[n]}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="check" style={{ flex: 'none' }}>
+                <input
+                  type="checkbox"
+                  checked={r.lucky}
+                  onChange={(e) => r.cardId && void patchCard(r.cardId, { lucky: e.target.checked })}
+                  aria-label={`${r.name} 럭키`}
+                  data-lucky
+                />
+                럭키
+              </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: 7, flex: 'none' }}>
                 <span className="t-text-xs t-muted">재고</span>
                 <input
@@ -144,7 +186,11 @@ export function Cards() {
           <p className="t-text-xs t-muted" style={{ margin: '4px 0 0' }}>
             재고를 비워두면 <b>무제한</b>이에요. 0으로 두면 그 카드는 더 이상 안 나옵니다.
             <br />
-            <b>레어도는 재고와 상관없이 지켜져요</b> — 스페셜이 한 장 남아도 스페셜 확률로 나옵니다.
+            <b>레어도가 곧 확률이에요</b> — 높을수록 자주 나옵니다. 재고는 "나올지 말지" 만 정하고
+            확률은 안 건드려요 (스페셜이 한 장 남아도 스페셜 확률 그대로).
+            <br />
+            <b>'럭키'</b> 를 켜면 스태프 화면 라인업에 별이 붙어요 — 손님이 뽑기 전에 뭘 노리는지
+            보이게 하는 표시입니다. <b>확률은 안 바뀌어요</b> (그건 레어도가 정합니다).
           </p>
         </div>
       )}

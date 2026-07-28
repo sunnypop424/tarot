@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ExternalLink, Image as ImageIcon, Lock, Shuffle, Sparkles, TriangleAlert } from 'lucide-react'
+import { ExternalLink, Image as ImageIcon, Layers, Lock, Shuffle, Sparkles, Star, TriangleAlert, X } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
 import { photocardDisplay, photocardRules, RARITY_LABEL, type PhotocardDisplay } from '@/data/photocard'
@@ -10,7 +10,7 @@ import { repo } from '@/lib/repo'
 import { isLight, mix } from '@/lib/color'
 import { cssUrl } from '@/lib/image'
 import { useAdminAuth } from '@/admin/useAdminAuth'
-import type { PhotocardDrawn, PhotocardSettings } from '@/lib/repo/types'
+import type { PhotocardDrawn, PhotocardLineupRow, PhotocardSettings } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import styles from './Staff.module.css'
 
@@ -40,6 +40,8 @@ function Staff({ slot }: { slot: Slot }) {
   const { status } = useAdminAuth(slug)
 
   const [settings, setSettings] = useState<PhotocardSettings | null>(null)
+  const [lineup, setLineup] = useState<PhotocardLineupRow[]>([])
+  const [sheet, setSheet] = useState(false)
   const [count, setCount] = useState(1)
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
@@ -51,12 +53,14 @@ function Staff({ slot }: { slot: Slot }) {
    * 화면에도 "확률은 그대로" 라고 적는다 — 안 적으면 섞으면 잘 나온다고 믿는다.
    */
   const [shuffling, setShuffling] = useState(false)
+  // 같은 클래스를 다시 붙이는 것만으론 애니메이션이 안 돈다 — key 를 올려 다시 마운트한다
+  const [shuffleKey, setShuffleKey] = useState(0)
 
   useEffect(() => {
     if (!shuffling) return
-    const t = setTimeout(() => setShuffling(false), 700)
+    const t = setTimeout(() => setShuffling(false), 760 + DECK * 18)
     return () => clearTimeout(t)
-  }, [shuffling])
+  }, [shuffling, shuffleKey])
 
   useEffect(() => {
     loadWebfont(display.font)
@@ -64,7 +68,12 @@ function Staff({ slot }: { slot: Slot }) {
 
   const load = useCallback(async () => {
     if (!repo.photocard.ready()) return
-    setSettings(await repo.photocard.settings(slug))
+    const [st, cards] = await Promise.all([
+      repo.photocard.settings(slug),
+      repo.photocard.lineup(slug).catch(() => []),
+    ])
+    setSettings(st)
+    setLineup(cards)
   }, [slug])
 
   useEffect(() => {
@@ -156,6 +165,8 @@ function Staff({ slot }: { slot: Slot }) {
       await wait
       setResult(cards)
       setCode('')
+      // 재고가 떨어졌으면 라인업의 소진 표시가 바뀐다
+      void load()
     } catch (e) {
       await wait
       setError(e instanceof Error ? e.message : '뽑지 못했어요')
@@ -228,23 +239,45 @@ function Staff({ slot }: { slot: Slot }) {
         </div>
       ) : (
         <div className={styles.body}>
+          {/**
+            * 왼쪽 무대 — **뒷면 덱**. 뽑기 시작하면 카드 한 장으로 바뀐다.
+            *
+            * 앞면 라인업을 여기 깔았다가 뺐다: **보이는 카드를 섞는 건 말이 안 된다.**
+            * 손님이 이미 다 보고 있으니 섞어도 아무 신호가 아니고, 섞기가 섞기로 읽히려면
+            * 뒷면이 똑같은 뭉치여야 한다. "뭐가 있나요" 는 아래 모달이 맡는다 —
+            * 스태프가 손님에게 **의도적으로** 보여주는 순간이 되기도 한다.
+            */}
           <div className={styles.stage}>
-            <div
-              className={styles.stageCard}
-              data-busy={busy || undefined}
-              data-shuffle={shuffling ? '' : undefined}
-            >
-              <Sparkles size={38} strokeWidth={1.5} aria-hidden="true" />
-              {busy && <div className={styles.shine} aria-hidden="true" />}
-            </div>
-            {(busy || shuffling) && (
-              <div className={styles.stageText}>
-                {shuffling
-                  ? '섞는 중…'
-                  : rules.usesTicket
-                    ? '카드를 뽑는 중…'
-                    : `${count}장을 뽑는 중…`}
-              </div>
+            {busy ? (
+              <>
+                <div className={styles.stageCard} data-busy>
+                  <Sparkles size={38} strokeWidth={1.5} aria-hidden="true" />
+                  <div className={styles.shine} aria-hidden="true" />
+                </div>
+                <div className={styles.stageText}>
+                  {rules.usesTicket ? '카드를 뽑는 중…' : `${count}장을 뽑는 중…`}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className={styles.deck} data-deck data-shuffle={shuffling ? '' : undefined} key={shuffleKey}>
+                  {Array.from({ length: DECK }, (_, i) => (
+                    <div key={i} className={styles.deckCard} style={jitter(i)} aria-hidden="true">
+                      <Sparkles size={13} strokeWidth={1.6} />
+                    </div>
+                  ))}
+                </div>
+                {shuffling ? (
+                  <div style={{ fontSize: 15, fontWeight: 800, color: '#e6e5e1' }}>섞는 중…</div>
+                ) : (
+                  lineup.length > 0 && (
+                    <button type="button" className={styles.stageBtn} onClick={() => setSheet(true)} data-open-sheet>
+                      <Layers size={15} strokeWidth={1.9} aria-hidden="true" />
+                      카드 목록 ({lineup.length}종)
+                    </button>
+                  )
+                )}
+              </>
             )}
           </div>
 
@@ -275,7 +308,10 @@ function Staff({ slot }: { slot: Slot }) {
                 >
                   {busy ? '뽑는 중…' : '뽑기'}
                 </button>
-                <ShuffleRow busy={busy || shuffling} onShuffle={() => setShuffling(true)} />
+                <ShuffleRow busy={busy || shuffling} onShuffle={() => {
+                  setShuffleKey((v) => v + 1)
+                  setShuffling(true)
+                }} />
               </>
             ) : (
               <>
@@ -323,7 +359,10 @@ function Staff({ slot }: { slot: Slot }) {
                 >
                   {busy ? '뽑는 중…' : `${count}장 뽑기`}
                 </button>
-                <ShuffleRow busy={busy || shuffling} onShuffle={() => setShuffling(true)} />
+                <ShuffleRow busy={busy || shuffling} onShuffle={() => {
+                  setShuffleKey((v) => v + 1)
+                  setShuffling(true)
+                }} />
               </>
             )}
 
@@ -335,8 +374,88 @@ function Staff({ slot }: { slot: Slot }) {
           </div>
         </div>
       )}
+
+      {sheet && (
+        <div className={styles.sheetBackdrop} onClick={() => setSheet(false)} data-sheet>
+          <div
+            className={styles.sheet}
+            role="dialog"
+            aria-modal="true"
+            aria-label="카드 목록"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.sheetBar}>
+              <div className={styles.sheetTitle}>카드 목록</div>
+              <button type="button" className={styles.sheetClose} onClick={() => setSheet(false)} aria-label="닫기">
+                <X size={18} strokeWidth={2} aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className={styles.lineup} data-lineup>
+              {lineup.map((c) => (
+                <div
+                  key={c.id}
+                  className={styles.lineupCard}
+                  data-lucky={c.lucky ? '' : undefined}
+                  data-sold={c.soldOut ? '' : undefined}
+                >
+                  {/* 카드 앞면도 background-image — 길게 눌러 저장되면 안 된다 (CLAUDE.md) */}
+                  <div
+                    className={styles.lineupFace}
+                    style={c.image ? { backgroundImage: cssUrl(c.image) } : undefined}
+                    role={c.image ? 'img' : undefined}
+                    aria-label={c.name}
+                  >
+                    {!c.image && <ImageIcon size={20} strokeWidth={1.6} aria-hidden="true" />}
+                  </div>
+                  {c.lucky && !c.soldOut && (
+                    <span className={styles.luckyMark} aria-label="럭키 카드">
+                      <Star size={13} strokeWidth={2.6} fill="currentColor" aria-hidden="true" />
+                    </span>
+                  )}
+                  <div className={styles.lineupName}>{c.name}</div>
+                </div>
+              ))}
+            </div>
+
+            {(lineup.some((c) => c.lucky) || lineup.some((c) => c.soldOut)) && (
+              <div className={styles.lineupLegend}>
+                {lineup.some((c) => c.lucky) && (
+                  <span>
+                    <span className={styles.legendDot} aria-hidden="true" />
+                    럭키 카드
+                  </span>
+                )}
+                {lineup.some((c) => c.soldOut) && <span>흐린 카드는 소진됐어요</span>}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   )
+}
+
+/**
+ * 뒷면 덱의 장수 — **연출값이다.** 실제 카드 종류와 아무 상관이 없다.
+ * 3줄 × 7장 = 21장 (타로 메이저 22장 언저리라 한 벌처럼 보인다).
+ */
+const DECK = 21
+
+/**
+ * 섞을 때 카드가 흩어지는 방향 — 인덱스에서 만든다.
+ *
+ * `Math.random()` 을 안 쓰는 이유: 렌더마다 값이 바뀌면 애니메이션 중간에 방향이 튄다.
+ * 같은 자리의 카드는 늘 같은 쪽으로 흩어져야 눈이 따라간다.
+ */
+function jitter(i: number): React.CSSProperties {
+  const a = (i * 137.5 * Math.PI) / 180
+  return {
+    ['--i' as string]: String(i),
+    ['--dx' as string]: `${Math.round(Math.cos(a) * 34)}px`,
+    ['--dy' as string]: `${Math.round(Math.sin(a) * 26)}px`,
+    ['--dr' as string]: `${Math.round(Math.cos(a * 2) * 12)}deg`,
+  }
 }
 
 /**
@@ -356,7 +475,6 @@ function ShuffleRow({ busy, onShuffle }: { busy: boolean; onShuffle: () => void 
         <Shuffle size={18} strokeWidth={1.9} aria-hidden="true" />
         섞기
       </button>
-      <p className={styles.shuffleNote}>섞어도 확률은 그대로예요 — 손님께 보여드리는 연출이에요.</p>
     </>
   )
 }

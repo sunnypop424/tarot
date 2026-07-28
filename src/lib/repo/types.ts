@@ -647,6 +647,12 @@ export interface Photocard {
   remaining: number | null
   /** 한 묶음에서 이 카드가 차지할 최대 비율 (N연차용) */
   batchCapRatio: number | null
+  /**
+   * '럭키' 표시 — **레어도와 다르다.** 레어도는 확률이고 이건 연출이다.
+   * 스태프 화면에 별로 뜨고, 손님이 뽑기 전에 뭘 노리는지 보게 한다.
+   * 레어도와 달리 **주최자가 켠다** (행사 중에 바뀔 수 있는 값이라 재고와 같은 자리).
+   */
+  lucky: boolean
   order: number
 }
 
@@ -667,6 +673,20 @@ export interface PhotocardDrawn {
   name: string
   image: string
   rarity: number
+}
+
+/**
+ * 스태프 화면 왼쪽에 세워두는 라인업 한 장.
+ *
+ * **재고 숫자도 레어도도 안 준다** — 손님이 같이 보는 화면이라 확률이 노출되면 안 된다.
+ * 소진 여부(`soldOut`)만 준다: 없는 걸 노리게 두는 게 더 나쁘다.
+ */
+export interface PhotocardLineupRow {
+  id: string
+  name: string
+  image: string
+  lucky: boolean
+  soldOut: boolean
 }
 
 export interface PhotocardTicket {
@@ -698,6 +718,7 @@ export interface PhotocardReportRow {
   /** 주최자 화면 썸네일 — 이름만으로는 어느 카드인지 못 알아본다 */
   image: string
   rarity: number
+  lucky: boolean
   drawn: number
   remaining: number | null
 }
@@ -720,6 +741,8 @@ export interface PhotocardRepo {
   saveSettings(slug: string, s: PhotocardSettings): Promise<void>
   report(slug: string): Promise<PhotocardReportRow[]>
 
+  /** 스태프 화면 라인업 — 확률·재고 숫자 없이 "뭐가 있고 뭐가 럭키인지" 만 */
+  lineup(slug: string): Promise<PhotocardLineupRow[]>
   /** anon — `save` 모드 전용. 다른 모드에서는 서버가 거절한다 */
   drawSelf(slug: string, subject: string): Promise<PhotocardDrawn>
   mine(slug: string, subject: string): Promise<PhotocardMine>

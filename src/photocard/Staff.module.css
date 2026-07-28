@@ -91,8 +91,10 @@
 }
 .stage {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 18px;
   background: var(--pc-deckBg);
   background-image: radial-gradient(90% 60% at 50% 45%, var(--pc-deckGlow) 0%, var(--pc-deckBg) 62%, var(--pc-deckDeep) 100%);
   padding: 34px 24px;
@@ -208,6 +210,208 @@
   font-weight: 800;
   color: #e6e5e1;
   animation: pcsPulse 1.4s ease-in-out infinite;
+}
+
+/*
+ * ── 뒷면 덱 ──
+ *
+ * **앞면이 보이는 카드는 섞을 수 없다.** 손님이 이미 다 보고 있으니 섞어도 아무 의미가
+ * 없다 — 섞기가 섞기로 읽히려면 뒷면이 똑같은 카드 뭉치여야 한다.
+ * 그래서 무대에는 뒷면 덱을 깔고, "뭐가 있나요" 는 모달(.sheet)로 뺐다.
+ * 이 덱의 장수는 **연출값**이고 실제 카드 종류와 아무 상관이 없다.
+ */
+.deck {
+  width: 100%;
+  max-width: 430px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+.deckCard {
+  aspect-ratio: 55 / 85;
+  border-radius: 7px;
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--pc-deckGlow) 84%, #ffffff 16%),
+    color-mix(in srgb, var(--pc-deckBg) 68%, var(--pc-deckGlow) 32%)
+  );
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.09);
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.16);
+}
+/* 섞기 — 카드마다 시차를 두고 흩어졌다 제자리로. 뒷면이라 진짜 섞는 것처럼 보인다 */
+.deck[data-shuffle] .deckCard {
+  animation: pcsCard 760ms cubic-bezier(0.36, 0.1, 0.24, 1) both;
+  animation-delay: calc(var(--i) * 18ms);
+}
+@keyframes pcsCard {
+  0%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--dr)) scale(1.05);
+  }
+  62% {
+    transform: translate(calc(var(--dx) * -0.45), calc(var(--dy) * -0.4)) rotate(calc(var(--dr) * -0.5));
+  }
+}
+
+/* 무대 위 보조 버튼 — 카드 목록 열기 */
+.stageBtn {
+  flex: none;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #f2f1ee;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ── 카드 목록 모달 ── */
+.sheetBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(10, 10, 14, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.sheet {
+  width: 100%;
+  max-width: 760px;
+  max-height: 86dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--pc-bg);
+  color: var(--pc-head);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+.sheetBar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--pc-line);
+}
+.sheetTitle {
+  font-size: 18px;
+  font-weight: 800;
+}
+.sheetClose {
+  margin-left: auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 9999px;
+  border: none;
+  background: var(--pc-wash);
+  color: var(--pc-head);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.lineup {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 22px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 16px;
+  align-content: start;
+}
+.lineupCard {
+  position: relative;
+}
+.lineupFace {
+  width: 100%;
+  aspect-ratio: 55 / 85;
+  border-radius: 10px;
+  background-color: var(--pc-wash);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border: 1px solid var(--pc-line);
+  box-shadow: 0 8px 20px rgba(20, 20, 20, 0.12);
+  display: grid;
+  place-items: center;
+  color: var(--pc-sub);
+  overflow: hidden;
+}
+/* 럭키 — 카드 위 별. 손님이 뽑기 전에 뭘 노리는지 보게 하는 표시다 */
+.lineupCard[data-lucky] .lineupFace {
+  border-color: #f0c04a;
+  box-shadow:
+    0 8px 20px rgba(20, 20, 20, 0.12),
+    0 0 0 2px #f0c04a;
+}
+.luckyMark {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background: #f0c04a;
+  color: #3a2a06;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+}
+/* 소진 — 없는 걸 노리게 두는 게 더 나쁘다 */
+.lineupCard[data-sold] .lineupFace {
+  filter: grayscale(1);
+  opacity: 0.4;
+  box-shadow: none;
+}
+.lineupName {
+  margin-top: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--pc-head);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lineupCard[data-sold] .lineupName {
+  color: var(--pc-sub);
+  text-decoration: line-through;
+}
+.lineupLegend {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  padding: 12px 22px 18px;
+  border-top: 1px solid var(--pc-line);
+  font-size: 12px;
+  color: var(--pc-sub);
+}
+.lineupLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.legendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: #f0c04a;
+  display: inline-block;
 }
 
 .panel {
@@ -515,7 +719,8 @@
   .stageCard::after,
   .shine,
   .stageText,
-  .face {
+  .face,
+  .deck[data-shuffle] .deckCard {
     animation: none;
   }
 }

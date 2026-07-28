@@ -2,6 +2,7 @@ import { db } from './client'
 import type {
   Photocard,
   PhotocardDrawn,
+  PhotocardLineupRow,
   PhotocardMine,
   PhotocardReportRow,
   PhotocardRepo,
@@ -37,6 +38,7 @@ interface CardRow {
   image: string
   remaining: number | null
   batch_cap_ratio: number | null
+  lucky: boolean
   order: number
 }
 
@@ -47,6 +49,7 @@ const toCard = (r: CardRow): Photocard => ({
   image: r.image,
   remaining: r.remaining,
   batchCapRatio: r.batch_cap_ratio,
+  lucky: r.lucky,
   order: r.order,
 })
 
@@ -78,7 +81,7 @@ export const supabasePhotocard: PhotocardRepo = {
   async listCards(slug) {
     const { data, error } = await (await db())
       .from('photocards')
-      .select('id, name, rarity, image, remaining, batch_cap_ratio, "order"')
+      .select('id, name, rarity, image, remaining, batch_cap_ratio, lucky, "order"')
       .eq('slug', slug)
       .order('order')
     if (error) throw new Error(error.message)
@@ -94,6 +97,7 @@ export const supabasePhotocard: PhotocardRepo = {
       image: card.image,
       remaining: card.remaining,
       batch_cap_ratio: card.batchCapRatio,
+      lucky: card.lucky,
       order: card.order,
     })
     if (error) throw new Error(error.message)
@@ -150,7 +154,7 @@ export const supabasePhotocard: PhotocardRepo = {
   async report(slug) {
     const db_ = await db()
     const [{ data: cards, error: e1 }, { data: draws, error: e2 }] = await Promise.all([
-      db_.from('photocards').select('id, name, image, rarity, remaining, "order"').eq('slug', slug).order('order'),
+      db_.from('photocards').select('id, name, image, rarity, lucky, remaining, "order"').eq('slug', slug).order('order'),
       // 리허설 분은 빼고 센다 — 그게 리허설의 뜻이다 (재고도 안 깎였다)
       db_.from('photocard_draws').select('card_id').eq('slug', slug).eq('rehearsal', false),
     ])
@@ -161,15 +165,44 @@ export const supabasePhotocard: PhotocardRepo = {
       if (d.card_id) n.set(d.card_id, (n.get(d.card_id) ?? 0) + 1)
     }
     return (
-      (cards ?? []) as unknown as { id: string; name: string; image: string; rarity: number; remaining: number | null }[]
+      (cards ?? []) as unknown as {
+        id: string
+        name: string
+        image: string
+        rarity: number
+        lucky: boolean
+        remaining: number | null
+      }[]
     ).map(
       (c): PhotocardReportRow => ({
         cardId: c.id,
         name: c.name,
         image: c.image,
         rarity: c.rarity,
+        lucky: c.lucky,
         drawn: n.get(c.id) ?? 0,
         remaining: c.remaining,
+      })
+    )
+  },
+
+  async lineup(slug) {
+    const { data, error } = await (await db())
+      .from('photocards')
+      // **레어도를 안 읽는다** — 손님이 같이 보는 화면으로 가는 값이라 확률이 새면 안 된다
+      .select('id, name, image, lucky, remaining, "order"')
+      .eq('slug', slug)
+      .order('order')
+    if (error) throw new Error(error.message)
+    return (
+      data as unknown as { id: string; name: string; image: string; lucky: boolean; remaining: number | null }[]
+    ).map(
+      (c): PhotocardLineupRow => ({
+        id: c.id,
+        name: c.name,
+        image: c.image,
+        lucky: c.lucky,
+        soldOut: c.remaining === 0,
       })
     )
   },
@@ -278,6 +311,7 @@ export const localPhotocard: PhotocardRepo = {
   settings: nope,
   saveSettings: nope,
   report: nope,
+  lineup: nope,
   drawSelf: nope,
   mine: nope,
   issueTicket: nope,

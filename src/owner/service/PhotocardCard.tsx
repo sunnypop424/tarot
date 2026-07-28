@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Upload, X } from 'lucide-react'
 
-import { photocardDisplay, RARITY_LABEL, type PhotocardDisplay } from '@/data/photocard'
+import { photocardDisplay, type PhotocardDisplay } from '@/data/photocard'
 import { WEBFONTS, type FontId } from '@/data/luckydraw'
 import { repo } from '@/lib/repo'
 import type { Photocard } from '@/lib/repo/types'
@@ -31,8 +31,11 @@ const ICON: React.CSSProperties = {
  * Storage 쓰기가 owner-only 로 잠겨 있고(`0002_storage.sql`) 그 정책을 안 건드리는 게
  * 이 플랫폼의 설계다(방문자 사진 호스팅으로 번지지 않게).
  *
- * 대신 **행사 중에 바뀌는 값(재고·운영 방식·연습·마감)은 주최자**가 만진다 —
- * `/{slug}/admin` 의 '카드' 화면. 재고는 숫자라 업로드가 필요 없다.
+ * 대신 **행사 중에 바뀌는 값은 전부 주최자**가 만진다 — 레어도·재고·럭키·운영 방식·연습·마감.
+ * `/{slug}/admin` 의 '카드' 화면이다. 전부 숫자나 스위치라 업로드가 필요 없다.
+ *
+ * 레어도까지 저쪽으로 보낸 이유: 확률은 행사 반응을 보고 조정하는 값인데, 그때마다 배포자를
+ * 부르게 만들면 현장에서 못 고친다.
  *
  * **저장 방식이 다른 카드들과 다르다:** 이 목록은 슬롯 jsonb 가 아니라 `photocards`
  * 테이블에 들어간다. 그래서 편집기의 '저장하기' 와 무관하게 **즉시 저장**된다 —
@@ -78,6 +81,7 @@ export function PhotocardCard({
           image: url,
           remaining: null,
           batchCapRatio: null,
+          lucky: false,
           order: base + i + 1,
         })
       }
@@ -107,8 +111,8 @@ export function PhotocardCard({
     <Card title="포토카드 뽑기">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
         레어도에 따라 카드가 뽑히고, 운영 방식에 따라 손님 화면이 통째로 달라져요.{' '}
-        <b>재고·운영 방식·연습 모드는 주최자가 관리 화면에서 정합니다</b> — 여기서는 카드와 겉모습만
-        정해요.
+        <b>레어도·재고·운영 방식은 주최자가 관리 화면에서 정합니다</b> — 여기서는 카드 이미지와
+        겉모습만 정해요.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
@@ -198,35 +202,14 @@ export function PhotocardCard({
                   placeholder="카드 이름"
                   style={{ ...CSS.input, flex: 1, minWidth: 90 }}
                 />
-                <select
-                  value={String(c.rarity)}
-                  onChange={(e) => void setCard(c, { rarity: Number(e.target.value) })}
-                  style={{ ...CSS.select, width: 104 }}
-                  aria-label={`${c.name} 레어도`}
-                >
-                  {[1, 2, 3, 4, 5].map((r) => (
-                    <option key={r} value={r}>{RARITY_LABEL[r]}</option>
-                  ))}
-                </select>
-                <input
-                  type="number"
-                  min={0}
-                  value={c.remaining ?? ''}
-                  placeholder="무제한"
-                  onChange={(e) =>
-                    void setCard(c, { remaining: e.target.value.trim() === '' ? null : Math.max(0, Number(e.target.value) || 0) })
-                  }
-                  style={{ ...CSS.input, width: 82 }}
-                  aria-label={`${c.name} 재고`}
-                />
                 <button type="button" onClick={() => void removeCard(c)} aria-label="카드 삭제" style={ICON}>
                   <X size={14} />
                 </button>
               </div>
             ))}
             <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
-              <b>레어도가 곧 확률이에요</b> — 숫자가 클수록 자주 나옵니다. 재고는 "나올지 말지" 만
-              정하고 확률은 안 건드려요 (스페셜이 한 장 남아도 스페셜 확률 그대로).
+              <b>레어도·재고·럭키는 주최자 관리 화면에서 정합니다</b> — 행사 중에 바뀌는 값이라
+              고객이 직접 만질 수 있어야 해서요. 여기서는 이미지와 이름만 정해요.
             </p>
           </div>
         )}
