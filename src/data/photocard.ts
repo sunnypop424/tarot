@@ -37,6 +37,27 @@ export interface PhotocardDisplay {
 
   /** 수량 고르기 겉모습 — **럭키드로우와 같은 컴포넌트** (`src/components/CountPicker.tsx`) */
   picker: Partial<CountPickerStyle>
+
+  /*
+   * ── 스태프 화면의 박스 — **럭키드로우와 같은 무대**를 쓴다
+   * (`src/components/DrawStage.module.css`). 그래서 설정 항목도 럭드와 같다.
+   *
+   * 배경(사진)·로고는 슬롯 테마가 이미 갖고 있어 여기 없다 — 럭드도 같다.
+   */
+
+  /** 박스를 화면 가운데에서 얼마나 더 내릴지 (px). 배경 사진마다 얼굴이 오는 높이가 다르다 */
+  boxTopMargin: number
+  /** 박스 안쪽 여백 (px) */
+  boxPadding: number
+  /** 박스 테두리 — 두께 0 이면 없음 */
+  boxBorderWidth: number
+  boxBorderColor: string
+  /** 박스 그림자 — 색·번짐·내림. 번짐 0 이면 사실상 없다 */
+  boxShadowColor: string
+  boxShadowBlur: number
+  boxShadowY: number
+  /** 박스 아래 '관리자 페이지로 이동' 링크 색 — 손님 눈엔 안 띄고 스태프는 찾을 수 있어야 한다 */
+  adminLinkColor: string
 }
 
 export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
@@ -61,6 +82,15 @@ export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
   buttonColor: '#26262a',
   logo: '',
   picker: {},
+  // 럭키드로우와 같은 출발점 (`DEFAULT_DISPLAY`) — 같은 무대라 기본값도 같아야 한다
+  boxTopMargin: 160,
+  boxPadding: 32,
+  boxBorderWidth: 0,
+  boxBorderColor: '',
+  boxShadowColor: 'rgba(0, 0, 0, 0.12)',
+  boxShadowBlur: 40,
+  boxShadowY: 12,
+  adminLinkColor: 'rgba(0, 0, 0, 0.45)',
 }
 
 /** 슬롯 설정 + 기본값 — **키 단위로 채운다** */
@@ -89,6 +119,16 @@ export function photocardDisplay(slot: Slot): PhotocardDisplay {
     logo: saved.logo ?? DEFAULT_PHOTOCARD.logo,
     // 저장값만 든다 — 안 고른 색의 기본값은 화면이 자기 팔레트로 채운다
     picker: saved.picker ?? {},
+    // 0 은 유효한 값이다 (맨 위 · 여백 없음 · 테두리 없음) — ?? 로 살린다
+    boxTopMargin: saved.boxTopMargin ?? DEFAULT_PHOTOCARD.boxTopMargin,
+    boxPadding: saved.boxPadding ?? DEFAULT_PHOTOCARD.boxPadding,
+    boxBorderWidth: saved.boxBorderWidth ?? DEFAULT_PHOTOCARD.boxBorderWidth,
+    boxBorderColor: saved.boxBorderColor ?? DEFAULT_PHOTOCARD.boxBorderColor,
+    boxShadowColor: saved.boxShadowColor || DEFAULT_PHOTOCARD.boxShadowColor,
+    // 번짐 0 = 그림자 없음 — ?? 로 살린다
+    boxShadowBlur: saved.boxShadowBlur ?? DEFAULT_PHOTOCARD.boxShadowBlur,
+    boxShadowY: saved.boxShadowY ?? DEFAULT_PHOTOCARD.boxShadowY,
+    adminLinkColor: saved.adminLinkColor || DEFAULT_PHOTOCARD.adminLinkColor,
   }
 }
 

@@ -13,7 +13,7 @@ import type { ThemeColors, ThemeShape } from '@/types/theme'
 import { isLight } from '@/lib/color'
 import { repo } from '@/lib/repo'
 import { hasSupabase } from '@/lib/repo/client'
-import { CSS, Card, Field, Swatch, SwatchColor } from './editorUi'
+import { AlphaColor, CSS, Card, Field, Swatch, SwatchColor } from './editorUi'
 import { PhotozoneCard } from './service/PhotozoneCard'
 import { WishCard } from './service/WishCard'
 import { PollCard } from './service/PollCard'
@@ -45,31 +45,7 @@ import { pollDisplay, type PollDisplay } from '@/data/poll'
 import { stampDisplay, type StampDisplay } from '@/data/stamp'
 import { quizDisplay, type QuizDisplay } from '@/data/quiz'
 import { photocardDisplay, type PhotocardDisplay } from '@/data/photocard'
-import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 import { exportSlots } from './slotsFile'
-
-/** hex + 투명도 → rgba (시안 박스·카운터·모달 색): 라벨·힌트 위, [스와치 | hex] · 슬라이더 · % 아래. */
-function AlphaColor({ label, value, hint, onChange }: { label: string; value: string; hint?: string; onChange: (v: string) => void }) {
-  const pct = Math.round(alphaOf(value) * 100)
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div style={{ fontSize: 12.5, fontWeight: 700, color: '#505050' }}>{label}</div>
-      {hint && <div style={CSS.hint}>{hint}</div>}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={CSS.colorPill}>
-          <Swatch value={value} label={label} onChange={(hex) => onChange(withAlphaValue(hex, alphaOf(value)))} />
-          <input value={hexOf(value)} onChange={(e) => onChange(withAlphaValue(e.target.value, alphaOf(value)))} style={{ ...CSS.hexInput, width: 76 }} />
-        </div>
-        <input
-          type="range" min={0} max={1} step={0.05} value={alphaOf(value)} aria-label={`${label} 투명도`}
-          onChange={(e) => onChange(withAlphaValue(hexOf(value), Number(e.target.value)))}
-          style={{ ...CSS.range, minWidth: 50 }}
-        />
-        <span style={{ fontSize: 11.5, color: '#505050', width: 36, textAlign: 'right', flexShrink: 0 }}>{pct}%</span>
-      </div>
-    </div>
-  )
-}
 
 /** radius 슬라이더 (시안) — 라벨 위, [슬라이더 · 숫자칸+px] 아래. 그리드 셀 한 줄 차지. */
 function RadiusSlider({ label, value, max = 40, onChange }: { label: string; value: number; max?: number; onChange: (n: number) => void }) {

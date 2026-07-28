@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 
-import { hexOf } from '@/lib/color'
+import { alphaOf, hexOf, withAlphaValue } from '@/lib/color'
 
 /**
  * 슬롯 편집기의 **공용 부품** — 카드·필드·색 스와치와 인라인 스타일 원자들.
@@ -114,6 +114,53 @@ export function SwatchColor({
       <div style={CSS.colorPill}>
         <Swatch value={value} label={label} onChange={onChange} />
         <input id={id} value={value} onChange={(e) => onChange(e.target.value)} style={CSS.hexInput} />
+      </div>
+    </div>
+  )
+}
+
+/**
+ * hex + 투명도 → rgba (박스·그림자·관리자 링크 색).
+ *
+ * `SlotEditor` 안에 있던 것을 뺐다 — **럭키드로우와 포토카드가 같은 무대를 쓰면서**
+ * 같은 색 칸이 두 곳에 필요해졌다 (`service/BoxFields.tsx`).
+ */
+export function AlphaColor({
+  label,
+  value,
+  hint,
+  onChange,
+}: {
+  label: string
+  value: string
+  hint?: string
+  onChange: (v: string) => void
+}) {
+  const pct = Math.round(alphaOf(value) * 100)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ fontSize: 12.5, fontWeight: 700, color: '#505050' }}>{label}</div>
+      {hint && <div style={CSS.hint}>{hint}</div>}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={CSS.colorPill}>
+          <Swatch value={value} label={label} onChange={(hex) => onChange(withAlphaValue(hex, alphaOf(value)))} />
+          <input
+            value={hexOf(value)}
+            onChange={(e) => onChange(withAlphaValue(e.target.value, alphaOf(value)))}
+            style={{ ...CSS.hexInput, width: 76 }}
+          />
+        </div>
+        <input
+          type="range"
+          min={0}
+          max={1}
+          step={0.05}
+          value={alphaOf(value)}
+          aria-label={`${label} 투명도`}
+          onChange={(e) => onChange(withAlphaValue(hexOf(value), Number(e.target.value)))}
+          style={{ ...CSS.range, minWidth: 50 }}
+        />
+        <span style={{ fontSize: 11.5, color: '#505050', width: 36, textAlign: 'right', flexShrink: 0 }}>{pct}%</span>
       </div>
     </div>
   )

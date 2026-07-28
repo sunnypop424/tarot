@@ -10,6 +10,7 @@ import type { Slot } from '@/types/slot'
 import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { uploadAsset, deleteAsset, extOf, nameFromUrl } from '../upload'
+import { BoxFields } from './BoxFields'
 import { PickerFields } from './PickerFields'
 
 const ICON: React.CSSProperties = {
@@ -270,6 +271,14 @@ export function PhotocardCard({
           <input value={d.lockerLabel} onChange={(e) => patch({ lockerLabel: e.target.value })} style={CSS.input} />
         </Field>
       </Divided>
+
+      {/* 스태프 화면은 럭키드로우와 **같은 무대**를 쓴다 — 그래서 설정도 같은 부품이다 */}
+      <BoxFields
+        value={d}
+        onChange={(change) => patch(change)}
+        borderFallback={slot.theme.colors.border}
+        hint="스태프 화면에서 사진 위에 뜨는 상자예요 (럭키드로우와 같은 화면)."
+      />
 
       <PickerFields
         value={d.picker}

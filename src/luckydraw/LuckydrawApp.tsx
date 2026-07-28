@@ -81,7 +81,7 @@ export default function LuckydrawApp() {
    */
   useEffect(() => {
     // 배송·경품 모달은 body 로 포털돼 .stage 밖에 있다 — :root 에도 실어야 웹폰트가 먹는다
-    document.documentElement.style.setProperty('--ld-font', fontStack(display.fontFamily))
+    document.documentElement.style.setProperty('--ds-font', fontStack(display.fontFamily))
     loadWebfont(display.fontFamily)
   }, [display.fontFamily])
 
@@ -100,7 +100,7 @@ export default function LuckydrawApp() {
     // 테두리 없음이면 색을 무시하고 투명으로 (비면 CSS 가 테마 border 로 폴백)
     set('--ld-modal-border', display.modalNoBorder ? 'transparent' : display.modalBorder)
     // 타일 테두리 없애기 — 결과 타일·요약 줄·경품 모달 줄까지 (포털이라 :root 에 실어야 닿는다)
-    set('--ld-tile-border', display.noBorder ? 'transparent' : '')
+    set('--ds-tile-border', display.noBorder ? 'transparent' : '')
     // 수량 카운터 전용 색 (비우면 CSS 가 테마 색·시안 그림자로 폴백)
     set('--ld-counter-shadow', display.counterShadow)
     /*
@@ -243,14 +243,14 @@ export default function LuckydrawApp() {
         /* 박스 위치·여백은 슬롯이 정한다 — 배경 사진마다 얼굴이 오는 높이가 다르다 */
         style={
           {
-            '--ld-box-top': `${display.boxTopMargin}px`,
-            '--ld-box-padding': `${display.boxPadding}px`,
-            '--ld-box-border-w': `${display.boxBorderWidth}px`,
-            '--ld-box-border-c': display.boxBorderColor || 'transparent',
-            '--ld-admin-link': display.adminLinkColor,
+            '--ds-box-top': `${display.boxTopMargin}px`,
+            '--ds-box-padding': `${display.boxPadding}px`,
+            '--ds-box-border-w': `${display.boxBorderWidth}px`,
+            '--ds-box-border-c': display.boxBorderColor || 'transparent',
+            '--ds-admin-link': display.adminLinkColor,
             // 색만이 아니라 **완전한 그림자 문자열** — 슬롯이 색·번짐·내림을 다 정한다
-            '--ld-shadow': `0 ${display.boxShadowY}px ${display.boxShadowBlur}px ${display.boxShadowColor}`,
-            '--ld-font': fontStack(display.fontFamily),
+            '--ds-shadow': `0 ${display.boxShadowY}px ${display.boxShadowBlur}px ${display.boxShadowColor}`,
+            '--ds-font': fontStack(display.fontFamily),
           } as React.CSSProperties
         }
       >
