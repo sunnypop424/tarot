@@ -699,12 +699,20 @@ button.dash__link:disabled {
   color: var(--color-fg-3);
 }
 
-/* ══ 행 목록 ═══════════════════════════════════════ */
-
+/* ══ 행 목록 ═══════════════════════════════════════
+ *
+ * **목록은 카드 한 장이고, 행은 구분선으로만 나뉜다.** 행마다 테두리와 배경을 주면
+ * 카드 안에 카드가 생겨 화면마다 다른 물건처럼 보인다 — 서비스별 목록(문항·카드·쪽지·계정)이
+ * 실제로 그렇게 제각각이었다. 판을 까는 자리는 **바깥 카드 하나**뿐이다.
+ */
 .row-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+.row-list > * + * {
+  border-top: 1px solid var(--color-border);
 }
 
 .row-item {
@@ -713,13 +721,11 @@ button.dash__link:disabled {
   flex-wrap: wrap;
   gap: var(--space-md);
   padding: 14px 16px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  transition: border-color var(--dur-micro) var(--ease);
+  background: transparent;
+  transition: background-color var(--dur-micro) var(--ease);
 }
 .row-item:hover {
-  border-color: var(--color-border-hover);
+  background: #faf9fc;
 }
 
 .row-item__grow {
@@ -1007,19 +1013,18 @@ button.dash__link:disabled {
  * 자리라 다른 인풋과 같은 34px 면 오타가 는다. 큰 칸은 여기 하나뿐이고 이름을 붙여 둔다.
  */
 .input--entry {
-  height: 60px;
-  min-height: 60px;
+  height: 46px;
+  min-height: 46px;
   font-family: ui-monospace, Menlo, monospace;
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-align: center;
   text-transform: uppercase;
 }
 .admin .btn--tall {
   min-height: 46px;
   height: 46px;
-  margin-top: 14px;
   font-size: 13.5px;
 }
 .admin .btn--block {
@@ -1330,9 +1335,9 @@ button.dash__link:disabled {
  * 실행 패널 — 누르면 **되돌릴 수 없는 일**이 일어나는 자리(추첨·수령 확인).
  * 설정 카드와 같은 흰 판이면 "그냥 폼" 으로 보여서 손이 먼저 나간다. 강조색 띠를 왼쪽에 둔다.
  */
+/* 되돌릴 수 없는 자리는 **제목 색으로만** 표시한다 — 띠와 테두리까지 주면 화면에서 튄다 */
 .admin-section--do {
-  border-color: #ddd6ff;
-  box-shadow: inset 3px 0 0 var(--color-primary);
+  border-color: var(--color-border);
 }
 .admin-section--do .admin-section__title {
   color: var(--color-primary);
@@ -1363,6 +1368,23 @@ button.dash__link:disabled {
  */
 .admin-split > .admin-section {
   margin: 0;
+}
+
+/* 카드 안에 목록이 들어가면 목록의 테두리는 뺀다 (판이 두 겹이 된다) */
+.admin-section > .row-list {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+.admin-section > .row-list > :first-child {
+  padding-top: 0;
+}
+.admin-section > .row-list .row-item {
+  padding-left: 0;
+  padding-right: 0;
+}
+.admin-section > .row-list .row-item:hover {
+  background: transparent;
 }
 
 /* 카드 안의 빈 상태는 판을 또 깔지 않는다 (카드 안 카드가 된다) */

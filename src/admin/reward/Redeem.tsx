@@ -155,37 +155,37 @@ export function Redeem() {
         </div>
       </div>
 
-      <form onSubmit={go} className="admin-section admin-section--narrow admin-section--do" data-redeem-form>
+      <form onSubmit={go} className="admin-section" data-redeem-form>
         <h2 className="admin-section__title">
           <ScanLine size={15} strokeWidth={2} aria-hidden="true" />
           교환코드 확인
         </h2>
-        <label className="field">
-          <span className="field__label">교환코드</span>
-          <input
-            className="input input--entry"
-            value={code}
+        <div className="admin-inline-form">
+          <label className="field field--md">
+            <span className="field__label">교환코드</span>
+            <input
+              className="input input--entry"
+              value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="XK4T-9P2M"
             autoFocus
-            autoCapitalize="characters"
-            autoComplete="off"
-            data-redeem-code
-          />
-          <span className="field__hint">소문자·하이픈·공백은 알아서 맞춰집니다.</span>
-        </label>
-        <button
-          type="submit"
-          className="btn btn--primary btn--block btn--tall"
-          disabled={!code.trim() || busy}
-        >
-          <ScanLine size={16} strokeWidth={2} aria-hidden="true" />
-          {busy ? '확인 중…' : '수령 처리'}
-        </button>
+              autoCapitalize="characters"
+              autoComplete="off"
+              data-redeem-code
+            />
+          </label>
+          <button type="submit" className="btn btn--primary btn--tall" disabled={!code.trim() || busy}>
+            <ScanLine size={16} strokeWidth={2} aria-hidden="true" />
+            {busy ? '확인 중…' : '수령 처리'}
+          </button>
+        </div>
+        <p className="admin-note" style={{ margin: '10px 0 0' }}>
+          소문자·하이픈·공백은 알아서 맞춰집니다. 한 번 처리한 코드는 다시 쓸 수 없어요.
+        </p>
       </form>
 
       {result && (
-        <div className="admin-section admin-section--narrow" data-redeem-result>
+        <div className="admin-section" data-redeem-result>
           {result.kind === 'ok' && (
             <div className="admin-result">
               <CircleCheck size={26} strokeWidth={2} aria-hidden="true" />

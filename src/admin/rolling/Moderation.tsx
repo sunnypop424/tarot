@@ -117,18 +117,18 @@ export function Moderation() {
               <div className={styles.actions}>
                 <button
                   type="button"
-                  className="btn btn--state btn--sm"
-                  data-on={!m.hidden || undefined}
+                  /* 라벨이 '숨기기/보이기' 라 **동작**이다 — 상태 토글로 칠하면 8줄이 다 물든다 */
+                  className="btn btn--quiet btn--sm"
                   disabled={busy}
                   onClick={() => void toggleHidden(m)}
                 >
                   {m.hidden ? (
                     <>
-                      <Eye size={16} aria-hidden="true" /> 보이기
+                      <Eye size={14} aria-hidden="true" /> 보이기
                     </>
                   ) : (
                     <>
-                      <EyeOff size={16} aria-hidden="true" /> 숨기기
+                      <EyeOff size={14} aria-hidden="true" /> 숨기기
                     </>
                   )}
                 </button>

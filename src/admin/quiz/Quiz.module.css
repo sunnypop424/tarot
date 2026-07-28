@@ -1,9 +1,14 @@
 /* 모의고사 주최자 화면 — .admin 서브트리라 색은 이미 고정 라이트다 (src/styles/admin.css) */
 
+/* 목록은 **카드 한 장 + 구분선** (src/styles/admin.css 의 `.row-list` 와 같은 규칙) */
 .list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+.list > * + * {
+  border-top: 1px solid var(--color-border);
 }
 
 .row {
@@ -11,17 +16,13 @@
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-bg);
 }
 .row[data-hidden] {
   opacity: 0.62;
-  border-style: dashed;
 }
-/* 정답이 비면 그 문항은 아무도 못 맞힌다 — 눈에 띄어야 한다 */
+/* 정답이 비면 그 문항은 아무도 못 맞힌다 — 왼쪽 띠로 (테두리를 물들이면 행이 카드처럼 보인다) */
 .row[data-noanswer] {
-  border-color: var(--color-accent);
+  box-shadow: inset 3px 0 0 var(--color-accent);
 }
 
 .rowNum {

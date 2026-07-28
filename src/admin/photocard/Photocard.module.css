@@ -1,10 +1,15 @@
 /* 포토카드 주최자·스태프 화면 — .admin 서브트리라 색은 고정 라이트다.
    Draw.tsx 는 **부스 태블릿에서 손으로 누르는 화면**이라 다른 화면보다 전부 크다. */
 
+/* 목록은 **카드 한 장 + 구분선** (admin.css 의 `.row-list` 와 같은 규칙) */
 .list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+.list > * + * {
+  border-top: 1px solid var(--color-border);
 }
 /*
  * 카드 한 줄 — 폰에서는 **감싸야 한다.** 안 그러면 이름 칸이 한 글자 폭까지 눌려
@@ -15,14 +20,10 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-bg);
+  padding: 12px 16px;
 }
 .row[data-out] {
   opacity: 0.55;
-  border-style: dashed;
 }
 .thumb {
   width: 44px;
