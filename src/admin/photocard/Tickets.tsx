@@ -145,9 +145,9 @@ export function Tickets() {
             발급 {rows.length}장 · 뽑음 {drawn.length}장 · 대기 {open}장
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className="admin-actions" style={{ marginTop: 0 }}>
           <a
-            className="btn btn--ghost btn--sm"
+            className="btn btn--outline btn--sm"
             href={`/${slug}/staff`}
             target="_blank"
             rel="noreferrer"
@@ -156,14 +156,14 @@ export function Tickets() {
             스태프 화면
           </a>
           {rows.length > 0 && (
-            <button type="button" className="btn btn--ghost btn--sm" onClick={download}>
+            <button type="button" className="btn btn--outline btn--sm" onClick={download}>
               CSV
             </button>
           )}
         </div>
       </header>
 
-      <p className="t-text-xs t-muted" style={{ margin: '0 0 14px' }}>
+      <p className="admin-note" style={{ margin: '0 0 14px' }}>
         <b>발급 수가 손님 수보다 훨씬 많으면</b> 브라우저 기록을 지우고 다시 받은 경우일 수 있어요.
         번호를 지우면 그 손님이 새로 받을 수 있게 됩니다 — 잘못 발급했거나 손님이 못 받았을 때
         쓰세요.
@@ -227,11 +227,10 @@ export function Tickets() {
               )}
               <button
                 type="button"
-                className="btn btn--ghost btn--sm"
+                className="btn btn--danger btn--sm btn--iconOnly"
                 disabled={busy}
                 onClick={() => void remove(r)}
                 aria-label={`${r.code} 삭제`}
-                style={{ flex: 'none' }}
               >
                 <Trash2 size={14} aria-hidden="true" />
               </button>

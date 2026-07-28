@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, Copy, ExternalLink, X } from 'lucide-react'
 
 import type { ServiceId } from '@/data/services'
-import { FORM_ORDER, KAKAO_URL, NICKNAME_EXAMPLE, NICKNAME_RULE, SERVICE_FORM, buildInquiry } from './inquiry'
+import { CUSTOM_FORM, FORM_ORDER, KAKAO_URL, NICKNAME_EXAMPLE, NICKNAME_RULE, SERVICE_FORM, buildInquiry } from './inquiry'
 import styles from './InquiryModal.module.css'
 
 /**
@@ -14,12 +14,27 @@ import styles from './InquiryModal.module.css'
  *
  * 순서가 곧 설계다: 별명을 바꾸지 않으면 방에서 누가 누군지 몰라 문의가 섞인다.
  */
-export function InquiryModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function InquiryModal({
+  open,
+  preset,
+  onClose,
+}: {
+  open: boolean
+  /** '주문 제작 문의' 로 들어오면 그 칸이 먼저 켜져 있다 — 누른 버튼과 창이 어긋나면 안 된다 */
+  preset?: 'custom'
+  onClose: () => void
+}) {
   const [picked, setPicked] = useState<ServiceId[]>([])
+  const [custom, setCustom] = useState(false)
   const [copied, setCopied] = useState(false)
   const boxRef = useRef<HTMLDivElement>(null)
 
-  const text = useMemo(() => buildInquiry(picked), [picked])
+  const text = useMemo(() => buildInquiry(picked, custom), [picked, custom])
+
+  /** 열릴 때마다 눌러 들어온 버튼에 맞춘다 (닫았다 다시 열면 그때의 뜻을 따른다) */
+  useEffect(() => {
+    if (open) setCustom(preset === 'custom')
+  }, [open, preset])
 
   useEffect(() => {
     if (!open) return
@@ -37,7 +52,7 @@ export function InquiryModal({ open, onClose }: { open: boolean; onClose: () => 
 
   useEffect(() => {
     setCopied(false)
-  }, [picked, open])
+  }, [picked, custom, open])
 
   if (!open) return null
 
@@ -87,7 +102,7 @@ export function InquiryModal({ open, onClose }: { open: boolean; onClose: () => 
           <li>
             <b>오픈채팅방 별명</b>을 <b>{NICKNAME_RULE}</b> 으로 바꿔 주세요 (예: {NICKNAME_EXAMPLE})
           </li>
-          <li>쓰고 싶은 서비스를 고르고 양식을 복사해 주세요</li>
+          <li>쓰고 싶은 서비스(또는 주문 제작)를 고르고 양식을 복사해 주세요</li>
           <li>채팅방에 붙여넣어 채워 보내 주시면 금액과 일정을 확정해 드려요</li>
         </ol>
         {/* 긴급 여부는 고르는 값이 아니라 두 날짜에서 나오는 값이다 — 양식에도 같은 문장이 들어간다 */}
@@ -113,10 +128,27 @@ export function InquiryModal({ open, onClose }: { open: boolean; onClose: () => 
               {SERVICE_FORM[id].name}
             </button>
           ))}
+          {/* 목록에 없는 것 — 서비스가 아니라 '만들어 주세요' 라 칸을 따로 둔다 */}
+          <button
+            type="button"
+            className={styles.chip}
+            data-on={custom || undefined}
+            data-svc="custom"
+            onClick={() => setCustom((v) => !v)}
+            aria-pressed={custom}
+          >
+            {custom && <Check size={14} strokeWidth={2.4} aria-hidden="true" />}
+            {CUSTOM_FORM.name}
+          </button>
         </div>
 
         <p className={styles.label}>
-          보낼 양식 <span>{picked.length ? `${picked.length}개 서비스` : '아직 못 정하셨어도 괜찮아요'}</span>
+          보낼 양식{' '}
+          <span>
+            {picked.length + (custom ? 1 : 0) > 0
+              ? `${picked.length + (custom ? 1 : 0)}개 항목`
+              : '아직 못 정하셨어도 괜찮아요'}
+          </span>
         </p>
         <pre className={styles.preview} data-preview>
           {text}
@@ -133,7 +165,7 @@ export function InquiryModal({ open, onClose }: { open: boolean; onClose: () => 
               오픈채팅 열기 <ExternalLink size={15} strokeWidth={1.8} aria-hidden="true" />
             </a>
           </div>
-          <p className={styles.foot}>복사한 뒤 채팅방에 그대로 붙여넣으면 됩니다.</p>
+          <p className={styles.foot}>복사한 뒤 채팅방에 그대로 붙여넣으면 돼요.</p>
         </div>
       </div>
     </div>

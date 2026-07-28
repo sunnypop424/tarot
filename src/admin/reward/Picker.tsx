@@ -141,9 +141,13 @@ export function Picker() {
         </div>
       </header>
 
-      <section className="card" style={{ padding: 18 }} data-picker>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-          <label className="field" style={{ width: 120 }}>
+      <section className="admin-section admin-section--do admin-section--narrow" data-picker>
+        <h2 className="admin-section__title">
+          <Dices size={15} strokeWidth={2} aria-hidden="true" />
+          응모자 중에서 뽑기
+        </h2>
+        <div className="admin-inline-form">
+          <label className="field field--xs">
             <span className="field__label">인원</span>
             <input
               className="input"
@@ -156,7 +160,7 @@ export function Picker() {
             />
           </label>
           {hasScore && (
-            <label className="field" style={{ width: 180 }}>
+            <label className="field field--sm">
               <span className="field__label">방식</span>
               <select
                 className="select"
@@ -171,32 +175,31 @@ export function Picker() {
           <button
             type="button"
             className="btn btn--primary"
-            style={{ height: 44 }}
             disabled={busy || pool.length === 0}
             onClick={() => void draw()}
             data-pick-go
           >
-            <Dices size={17} aria-hidden="true" />
+            <Dices size={15} aria-hidden="true" />
             추첨하기
           </button>
         </div>
         {method === 'score' && (
-          <p className="t-text-xs t-muted" style={{ margin: '10px 0 0' }}>
+          <p className="admin-note" style={{ margin: '12px 0 0' }}>
             점수가 높은 순으로 뽑고, <b>커트라인 동점자 안에서만 무작위</b>로 갈려요 — 정원은 정확히 맞습니다.
           </p>
         )}
         {pool.length === 0 && (
-          <p className="t-text-xs t-muted" style={{ margin: '10px 0 0' }}>
+          <p className="admin-note" style={{ margin: '12px 0 0' }}>
             뽑을 후보가 없어요. 응모를 낸 사람만 후보가 됩니다.
           </p>
         )}
       </section>
 
       {picked && picked.length > 0 && (
-        <section className="card" style={{ padding: 18, marginTop: 16 }} data-picked>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
-            <h2 className="t-title-s" style={{ margin: 0 }}>이번 회차 당첨 {picked.length}명</h2>
-            <div style={{ display: 'flex', gap: 8 }}>
+        <section className="admin-section" data-picked>
+          <h2 className="admin-section__title">
+            이번 회차 당첨 {picked.length}명
+            <span className="admin-section__actions">
               <button
                 type="button"
                 className="btn btn--primary btn--sm"
@@ -208,13 +211,13 @@ export function Picker() {
                 <Copy size={14} aria-hidden="true" />
                 트위터용 복사
               </button>
-              <button type="button" className="btn btn--ghost btn--sm" onClick={() => downloadCsv(picked, '당첨자')}>
+              <button type="button" className="btn btn--outline btn--sm" onClick={() => downloadCsv(picked, '당첨자')}>
                 <Download size={14} aria-hidden="true" />
                 CSV
               </button>
-            </div>
-          </div>
-          <ol style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            </span>
+          </h2>
+          <ol className="admin-oList">
             {picked.map((w) => (
               <li key={w.rewardId} className="t-text-m">
                 {w.nickname}
@@ -227,24 +230,21 @@ export function Picker() {
       )}
 
       {rounds.length > 0 && (
-        <section className="card" style={{ padding: 18, marginTop: 16 }}>
-          <h2 className="t-title-s" style={{ margin: '0 0 12px' }}>지난 회차</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <section className="admin-section">
+          <h2 className="admin-section__title">지난 회차</h2>
+          <div className="row-list">
             {rounds.map((r) => {
               const rows = winners.filter((w) => w.pickedRound === r)
               return (
-                <div
-                  key={r}
-                  style={{ display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}
-                >
-                  <span className="t-text-m">
+                <div key={r} className="row-item">
+                  <span className="row-item__grow t-text-m">
                     {r}회차 · {rows.length}명
                     <span className="t-muted t-text-xs"> — {rows.map((x) => x.nickname).join(', ')}</span>
                   </span>
-                  <div style={{ display: 'flex', gap: 6 }}>
+                  <div className="row-actions">
                     <button
                       type="button"
-                      className="btn btn--ghost btn--sm"
+                      className="btn btn--quiet btn--sm"
                       onClick={async () => {
                         await navigator.clipboard.writeText(copyText(rows))
                         toast('복사했어요')
@@ -253,7 +253,7 @@ export function Picker() {
                       <Copy size={13} aria-hidden="true" />
                       복사
                     </button>
-                    <button type="button" className="btn btn--ghost btn--sm" disabled={busy} onClick={() => void undo(r)}>
+                    <button type="button" className="btn btn--quiet btn--sm" disabled={busy} onClick={() => void undo(r)}>
                       <Undo2 size={13} aria-hidden="true" />
                       되돌리기
                     </button>

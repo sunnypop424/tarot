@@ -24,58 +24,25 @@ export function SearchBox({
   total?: number
 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
-      <div style={{ position: 'relative', flex: 1, minWidth: 200, maxWidth: 360 }}>
-        <Search
-          size={14}
-          strokeWidth={2}
-          aria-hidden="true"
-          style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#8a8a8a' }}
-        />
+    <div className="admin-toolbar">
+      <div className="search">
+        <Search size={14} strokeWidth={2} aria-hidden="true" className="search__icon" />
         <input
+          className="input search__input"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           aria-label="목록 검색"
           data-search
-          style={{
-            width: '100%',
-            height: 34,
-            padding: '0 32px 0 32px',
-            border: '1px solid #dddddd',
-            borderRadius: 9999,
-            fontSize: 12.5,
-            outline: 'none',
-            background: '#fff',
-            color: '#121212',
-          }}
         />
         {value && (
-          <button
-            type="button"
-            onClick={() => onChange('')}
-            aria-label="검색어 지우기"
-            style={{
-              position: 'absolute',
-              right: 6,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              width: 22,
-              height: 22,
-              border: 'none',
-              background: 'none',
-              color: '#8a8a8a',
-              cursor: 'pointer',
-              display: 'grid',
-              placeItems: 'center',
-            }}
-          >
+          <button type="button" className="search__clear" onClick={() => onChange('')} aria-label="검색어 지우기">
             <X size={13} strokeWidth={2.2} />
           </button>
         )}
       </div>
       {value && found !== undefined && total !== undefined && (
-        <span style={{ fontSize: 11.5, color: '#8a8a8a' }}>
+        <span className="t-text-xs t-muted">
           {found}건 / 전체 {total}건
         </span>
       )}

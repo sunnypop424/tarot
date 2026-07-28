@@ -53,16 +53,19 @@ export function Account() {
         <h1 className="t-title-l">내 계정</h1>
       </div>
 
-      <section className="admin-section" style={{ maxWidth: '480px' }}>
-        <h2 className="t-title-s admin-section__title">비밀번호 바꾸기</h2>
-        <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+      <section className="admin-section admin-section--narrow">
+        <h2 className="admin-section__title">
+          <KeyRound size={15} strokeWidth={2} aria-hidden="true" />
+          비밀번호 바꾸기
+        </h2>
+        <p className="admin-note">
           {user?.email} · 이 슬롯(<b>/{slot.slug}</b>)의 관리 계정이에요.
           {/* 임시 비번을 받아 들어왔을 수 있다 — 바꾸라고 말해주는 게 이 화면의 일이다 */}
           <br />
           받은 비밀번호를 그대로 쓰고 있다면 지금 자기 것으로 바꾸세요.
         </p>
 
-        <div className="field" style={{ marginBottom: 'var(--space-base)' }}>
+        <div className="field">
           <span className="field__label">새 비밀번호</span>
           <PasswordInput
             value={password}
@@ -90,37 +93,27 @@ export function Account() {
         </div>
 
         {error && (
-          <p className="field__error" style={{ marginTop: 'var(--space-base)' }}>
+          <p className="field__error" style={{ marginTop: 14 }}>
             {error}
           </p>
         )}
 
         {done && (
-          <p
-            className="t-text-xs"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-xs)',
-              marginTop: 'var(--space-base)',
-              color: 'var(--color-primary-soft)',
-            }}
-            data-changed
-          >
-            <Check size={16} strokeWidth={2} aria-hidden="true" />
+          <p className="admin-done" data-changed>
+            <Check size={15} strokeWidth={2} aria-hidden="true" />
             바꿨어요. 다음 로그인부터 새 비밀번호를 쓰세요.
           </p>
         )}
 
         <button
           type="button"
-          className="btn btn--sm btn--primary"
-          style={{ marginTop: 'var(--space-lg)' }}
+          className="btn btn--primary"
+          style={{ marginTop: 18 }}
           disabled={!canSubmit}
           onClick={() => void handleSubmit()}
           data-change-password
         >
-          <KeyRound size={18} strokeWidth={2} aria-hidden="true" />
+          <KeyRound size={15} strokeWidth={2} aria-hidden="true" />
           비밀번호 바꾸기
         </button>
       </section>

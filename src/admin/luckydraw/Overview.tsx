@@ -410,7 +410,7 @@ export function Overview() {
         </div>
 
         <h3 className={styles.subhead}>경품 미리보기</h3>
-        <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+        <p className="admin-note">
           손님이 뽑기 전에 <b>어떤 경품이 있는지</b> 볼 수 있게 해줘요. 상품명이 스포일러가 되는
           행사라면 꺼두세요.
         </p>
@@ -451,7 +451,7 @@ export function Overview() {
         </div>
 
         <h3 className={styles.subhead}>묶음 뽑기 제한</h3>
-        <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+        <p className="admin-note">
           여러 개를 한 번에 뽑을 때 같은 상품이 몰려 나오는 걸 줄여요. 켜면 위 표에서 상품마다
           <b> 5개 뽑을 때 최대 몇 개</b>까지 나올지 정할 수 있어요 (비우면 제한 없음).
         </p>

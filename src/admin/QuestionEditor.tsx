@@ -212,7 +212,7 @@ export function QuestionEditor() {
         <h2 className="t-title-s admin-section__title">뽑기 설정</h2>
         {/* 뽑는 수(항상 1장)·카드 범위·역방향 확률(50%)은 주최자가 고르지 않는다.
             범위는 슬롯 설정이라 최고관리자만 바꾼다 — 여긴 결과만 알려준다 */}
-        <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+        <p className="admin-note">
           이 슬롯은 <b>{effDeck === 'major' ? '메이저 22장' : '전체 78장'}</b>을 써요. 카드를 한 장
           뽑고, 역방향은 50% 로 나와요. 카드 범위는 슬롯 설정이라 여기서는 못 바꿔요.
         </p>
@@ -299,12 +299,12 @@ export function QuestionEditor() {
         </div>
 
         {plan.answerGenLimit === 0 ? (
-          <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+          <p className="admin-note">
             {plan.label} 플랜은 답변을 <b>직접 입력</b>해요. AI 일괄 생성은 라이트 플랜부터예요.
           </p>
         ) : (
           !aiReady && (
-            <p className="t-text-xs t-muted" style={{ marginBottom: 'var(--space-base)' }}>
+            <p className="admin-note">
               AI 가 아직 연결되지 않았어요 — 연결되면 이 버튼으로 {cards.length}장을 한 번에 만들어
               검수할 수 있어요.
             </p>

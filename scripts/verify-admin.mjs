@@ -156,10 +156,21 @@ try {
   const notFound = await page.$eval('h1', (h) => h.textContent.trim())
   check('없는 슬롯은 찾을 수 없음', notFound.includes('찾을 수 없'), notFound)
 
+  /*
+   * 배포 루트는 이제 랜딩이다(404 가 아니다). 계약은 "무엇이 뜨느냐" 가 아니라
+   * **고객 슬러그가 한 글자도 안 나오느냐** 다 — 예전 검사는 h1 문구에 매여 있어
+   * 랜딩이 붙자마자 깨졌다. 실제 위험을 보게 고친다.
+   */
   await page.goto(`${BASE}/`, { waitUntil: 'networkidle0' })
-  await wait(300)
-  const rootH1 = await page.$eval('h1', (h) => h.textContent.trim())
-  check('배포 루트는 슬롯 목록을 안 보인다', rootH1.includes('찾을 수 없'), rootH1)
+  await wait(400)
+  const rootText = await page.evaluate(() => document.body.innerText)
+  const rootHtml = await page.content()
+  check('배포 루트가 그려진다 (랜딩)', rootText.trim().length > 200, `본문 ${rootText.trim().length}자`)
+  check(
+    '**배포 루트에 내 슬롯이 안 보인다**',
+    ![A.slug, B.slug].some((s) => rootHtml.includes(s)),
+    [A.slug, B.slug].filter((s) => rootHtml.includes(s)).join(', ') || '없음'
+  )
 
   // ── 슬롯별 테마 격리 (CTA 색이 서로 다르다) ─────────
   const ctaColor = async (slug) => {

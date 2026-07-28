@@ -51,7 +51,7 @@ export function Stats() {
         </div>
         <button
           type="button"
-          className="btn btn--ghost btn--sm"
+          className="btn btn--outline btn--sm"
           disabled={busy || data.attempts === 0}
           onClick={async () => {
             setBusy(true)
@@ -91,7 +91,7 @@ export function Stats() {
         )}
       </div>
 
-      <p className="t-text-xs t-muted" style={{ margin: '0 0 14px' }}>
+      <p className="admin-note" style={{ margin: '0 0 14px' }}>
         정답률이 유난히 낮은 <b>주관식</b>은 표현 차이 때문일 때가 많아요. 문항 편집에서 인정할 답을
         더한 뒤 <b>다시 채점</b>을 누르면 이미 응시하신 분들의 점수도 같이 고쳐집니다.
       </p>

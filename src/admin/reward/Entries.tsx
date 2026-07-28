@@ -102,7 +102,7 @@ export function Entries() {
           </p>
         </div>
         {list.length > 0 && (
-          <button type="button" className="btn btn--ghost btn--sm" onClick={download}>
+          <button type="button" className="btn btn--outline btn--sm" onClick={download}>
             <Download size={15} aria-hidden="true" />
             CSV 내려받기
           </button>
@@ -127,19 +127,19 @@ export function Entries() {
       )}
 
       {raffle.length > list.length && (
-        <p className="t-text-xs t-muted" style={{ margin: '0 0 14px' }}>
+        <p className="admin-note" style={{ margin: '0 0 14px' }}>
           <b>자격은 얻었는데 아직 응모 폼을 안 내신 분</b>이 {raffle.length - list.length}명 있어요 —
           그분들은 연락할 방법이 없어서 <b>추첨 후보에도 안 들어갑니다.</b>
         </p>
       )}
 
       {(cols.contact || cols.address) && (
-        <div className="card" style={{ padding: 14, marginBottom: 14, display: 'flex', gap: 10 }}>
-          <ShieldAlert size={20} strokeWidth={2} aria-hidden="true" style={{ flex: 'none' }} />
-          <p className="t-text-xs t-muted" style={{ margin: 0 }}>
+        <div className="admin-banner admin-banner--warn">
+          <ShieldAlert size={16} aria-hidden="true" />
+          <span>
             연락처·주소가 들어 있어요. <b>선물을 다 보내고 나면 지워 주세요</b> — 이벤트가 끝나고 14일이
             지나면 이 화면이 잠기고, 슬롯을 지우면 함께 삭제됩니다.
-          </p>
+          </span>
         </div>
       )}
 

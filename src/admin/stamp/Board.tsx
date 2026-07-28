@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Eye, EyeOff, RefreshCw, Stamp } from 'lucide-react'
+import { Eye, EyeOff, RefreshCw, SlidersHorizontal, Stamp } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import type { StampSettings } from '@/lib/repo/types'
@@ -77,36 +77,40 @@ export function Board() {
           <div className="t-text-s t-muted">칸 구성은 담당자가 정합니다 — 필요하시면 말씀해 주세요.</div>
         </div>
       ) : (
-        <section className="card" style={{ padding: 18 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, gap: 10, flexWrap: 'wrap' }}>
-            <h2 className="t-title-s" style={{ margin: 0 }}>현장 암호</h2>
-            <button type="button" className="btn btn--ghost btn--sm" onClick={() => setShown((v) => !v)}>
-              {shown ? <EyeOff size={15} aria-hidden="true" /> : <Eye size={15} aria-hidden="true" />}
-              {shown ? '가리기' : '보기'}
-            </button>
-          </div>
-          <p className="t-text-xs t-muted" style={{ marginTop: 0, marginBottom: 14 }}>
+        <section className="admin-section" data-stamp-panel>
+          <h2 className="admin-section__title">
+            <Stamp size={15} strokeWidth={2} aria-hidden="true" />
+            현장 암호
+            <span className="admin-section__actions">
+              <button type="button" className="btn btn--quiet btn--sm" onClick={() => setShown((v) => !v)}>
+                {shown ? <EyeOff size={14} aria-hidden="true" /> : <Eye size={14} aria-hidden="true" />}
+                {shown ? '가리기' : '보기'}
+              </button>
+            </span>
+          </h2>
+          <p className="admin-note">
             암호가 새면 <b>새로 만들기</b>로 바꾸세요. 바꾸면 예전 암호는 바로 안 먹습니다.
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }} data-stamp-codes>
+          <div className="row-list" data-stamp-codes>
             {display.stamps.map((c, i) => (
-              <div key={c.id} style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                <span className="t-text-s" style={{ width: 24, opacity: 0.5 }}>{i + 1}</span>
-                <span className="t-text-m" style={{ flex: 1, minWidth: 120, fontWeight: 600 }}>{c.name}</span>
-                <input
-                  className="input"
-                  style={{ width: 130, fontFamily: 'ui-monospace, Menlo, monospace', letterSpacing: '0.12em', textTransform: 'uppercase' }}
-                  type={shown ? 'text' : 'password'}
-                  value={codes[c.id] ?? ''}
-                  maxLength={8}
-                  aria-label={`${c.name} 암호`}
-                  onChange={(e) => setCodes({ ...codes, [c.id]: e.target.value.toUpperCase() })}
-                  onBlur={() => codes[c.id] && void repo.stamp.saveCode(slug, c.id, codes[c.id])}
-                />
+              <div key={c.id} className="row-item">
+                <span className="t-text-s t-muted" style={{ width: 18 }}>{i + 1}</span>
+                <span className="row-item__grow t-text-m" style={{ fontWeight: 600 }}>{c.name}</span>
+                <div className="field field--sm">
+                  <input
+                    className="input input--code"
+                    type={shown ? 'text' : 'password'}
+                    value={codes[c.id] ?? ''}
+                    maxLength={8}
+                    aria-label={`${c.name} 암호`}
+                    onChange={(e) => setCodes({ ...codes, [c.id]: e.target.value.toUpperCase() })}
+                    onBlur={() => codes[c.id] && void repo.stamp.saveCode(slug, c.id, codes[c.id])}
+                  />
+                </div>
                 <button
                   type="button"
-                  className="btn btn--ghost btn--sm"
+                  className="btn btn--quiet btn--sm"
                   onClick={async () => {
                     const code = makeCode()
                     setCodes({ ...codes, [c.id]: code })
@@ -124,9 +128,12 @@ export function Board() {
         </section>
       )}
 
-      <section className="card" style={{ padding: 18, marginTop: 16 }}>
-        <h2 className="t-title-s" style={{ margin: '0 0 14px' }}>운영 설정</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,220px),1fr))', gap: 14 }}>
+      <section className="admin-section">
+        <h2 className="admin-section__title">
+          <SlidersHorizontal size={15} strokeWidth={2} aria-hidden="true" />
+          운영 설정
+        </h2>
+        <div className="form-grid">
           <label className="field">
             <span className="field__label">다 모으면</span>
             <select
@@ -187,9 +194,9 @@ export function Board() {
         </div>
 
         {settings.rewardMode === 'raffle' && (
-          <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--color-border)' }}>
-            <div className="field__label" style={{ marginBottom: 9 }}>응모 때 받을 정보</div>
-            <p className="t-text-xs t-muted" style={{ margin: '0 0 10px' }}>
+          <div className="admin-subsection">
+            <div className="admin-subsection__title">응모 때 받을 정보</div>
+            <p className="admin-note">
               <b>안 켠 항목은 받지 않습니다</b> — 쓰지 않을 개인정보를 모아두지 않는 게 안전해요.
               닉네임은 항상 받습니다.
             </p>

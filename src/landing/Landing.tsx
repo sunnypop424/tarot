@@ -66,8 +66,10 @@ export default function Landing() {
   const [active, setActive] = useState(SERVICES[0].key)
   const [openFaq, setOpenFaq] = useState<number | null>(0)
   /** 문의는 오픈채팅으로 받는다 — 창이 양식을 만들어 주고 보내는 건 손님의 카톡이 한다 */
-  const [inquiry, setInquiry] = useState(false)
-  const openInquiry = useCallback(() => setInquiry(true), [])
+  const [inquiry, setInquiry] = useState<null | 'any' | 'custom'>(null)
+  const openInquiry = useCallback(() => setInquiry('any'), [])
+  /** 주문 제작 버튼은 그 칸이 켜진 채로 열린다 */
+  const openCustom = useCallback(() => setInquiry('custom'), [])
   /** 좁은 화면에서 화면이 여럿일 때 뭘 볼지 (넓으면 둘 다 나란히 뜬다) */
   const [screenIdx, setScreenIdx] = useState(0)
   /**
@@ -274,7 +276,7 @@ export default function Landing() {
             <button
               type="button"
               className={`${styles.customCta} ${styles.asBtn}`}
-              onClick={openInquiry}
+              onClick={openCustom}
               data-inquiry-open
             >
               주문 제작 문의하기 <ArrowRight size={15} strokeWidth={1.8} aria-hidden="true" />
@@ -582,7 +584,11 @@ export default function Landing() {
       </div>
 
       {/* 문의 창은 `.root` 안에 둔다 — 색 토큰이 여기서 상속된다 */}
-      <InquiryModal open={inquiry} onClose={() => setInquiry(false)} />
+      <InquiryModal
+        open={inquiry !== null}
+        preset={inquiry === 'custom' ? 'custom' : undefined}
+        onClose={() => setInquiry(null)}
+      />
     </div>
   )
 }

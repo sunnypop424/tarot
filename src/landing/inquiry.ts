@@ -132,6 +132,23 @@ export const SERVICE_FORM: Record<ServiceId, { name: string; lines: string[] }> 
   },
 }
 
+/**
+ * **주문 제작** — 서비스 목록에 없는 것을 만들어 달라는 문의.
+ * `ServiceId` 가 아니라서 `SERVICE_FORM` 밖에 따로 둔다 (서비스가 아니라 요청 종류다).
+ * 여기서 묻는 건 딱 셋이다 — **무엇을 · 누가 조작하고 · 무엇이 보이는지.**
+ * 그 셋이 없으면 견적을 낼 수 없고, 그 셋만 있으면 나머지는 대화로 채워진다.
+ */
+export const CUSTOM_FORM = {
+  name: '주문 제작',
+  lines: [
+    '만들고 싶은 것 (어떤 이벤트에서 어떻게 쓰나요):',
+    '조작하는 사람 (방문자 폰 / 스태프 기기 / 스크린 — 여럿이면 다 적어 주세요):',
+    '화면 흐름 (손님이 무엇을 하면 무엇이 보이나요):',
+    '비슷하다고 생각한 서비스나 사례:',
+    '이미 준비된 자료 (이미지·문구·명단 등):',
+  ],
+}
+
 /** 화면에 뜨는 순서 — 랜딩의 서비스 순서와 같게 둔다 */
 export const FORM_ORDER: ServiceId[] = [
   'tarot',
@@ -152,8 +169,8 @@ export const FORM_ORDER: ServiceId[] = [
  * 공통 칸(일정·계정·디자인)은 **서비스를 몇 개 고르든 한 번만** 나온다 — 슬롯이 여럿이어도
  * 행사는 하나고, 같은 걸 두 번 묻는 양식은 채우다 만다.
  */
-export function buildInquiry(picked: ServiceId[]): string {
-  const names = picked.map((id) => SERVICE_FORM[id].name)
+export function buildInquiry(picked: ServiceId[], custom = false): string {
+  const names = [...picked.map((id) => SERVICE_FORM[id].name), ...(custom ? [CUSTOM_FORM.name] : [])]
   const out: string[] = []
 
   out.push(`[문의] ${names.length ? names.join(' · ') : '서비스 미정'}`)
@@ -199,8 +216,7 @@ export function buildInquiry(picked: ServiceId[]): string {
   if (names.length) {
     out.push('4) 서비스별 설정')
     out.push('')
-    for (const id of picked) {
-      const svc = SERVICE_FORM[id]
+    for (const svc of [...picked.map((id) => SERVICE_FORM[id]), ...(custom ? [CUSTOM_FORM] : [])]) {
       out.push(`■ ${svc.name}`)
       out.push('')
       for (const line of svc.lines) {

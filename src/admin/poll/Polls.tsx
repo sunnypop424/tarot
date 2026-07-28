@@ -104,7 +104,7 @@ export function Polls() {
           <div className="t-text-s t-muted">'설문 추가' 로 첫 설문을 만들어 보세요.</div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }} data-poll-admin>
+        <div data-poll-admin>
           {list.map((p) => (
             <PollEditor key={p.id} poll={p} busy={busy} onSave={save} onRemove={remove} />
           ))}
@@ -133,18 +133,18 @@ function PollEditor({
   const dirty = JSON.stringify(d) !== JSON.stringify(poll)
 
   return (
-    <section className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+    <section className="admin-section">
+      <div className="admin-toolbar">
         <input
-          className="input"
-          style={{ flex: 1, minWidth: 200, fontWeight: 700 }}
+          className="input input--title"
           value={d.title}
           onChange={(e) => setD({ ...d, title: e.target.value })}
           aria-label="설문 제목"
         />
         <button
           type="button"
-          className="btn btn--ghost btn--sm"
+          className="btn btn--state btn--sm"
+          data-on={!d.hidden || undefined}
           onClick={() => onSave({ ...d, hidden: !d.hidden })}
           title={d.hidden ? '공개하기' : '숨기기'}
         >
@@ -153,20 +153,27 @@ function PollEditor({
         </button>
         <button
           type="button"
-          className="btn btn--ghost btn--sm"
+          className="btn btn--state btn--sm"
+          data-tone={d.closed ? 'off' : undefined}
+          data-on={!d.closed || undefined}
           onClick={() => onSave({ ...d, closed: !d.closed })}
           title={d.closed ? '다시 열기' : '마감하기'}
         >
           {d.closed ? <Lock size={16} aria-hidden="true" /> : <Unlock size={16} aria-hidden="true" />}
           {d.closed ? '마감됨' : '진행 중'}
         </button>
-        <button type="button" className="btn btn--ghost btn--sm" onClick={() => onRemove(d)} aria-label="설문 지우기">
-          <Trash2 size={16} aria-hidden="true" />
+        <button
+          type="button"
+          className="btn btn--kill btn--sm btn--iconOnly"
+          onClick={() => onRemove(d)}
+          aria-label="설문 지우기"
+        >
+          <Trash2 size={14} aria-hidden="true" />
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-        <label className="field" style={{ minWidth: 150 }}>
+      <div className="admin-inline-form" style={{ marginBottom: 18 }}>
+        <label className="field field--sm">
           <span className="field__label">고르는 방식</span>
           <select
             className="select"
@@ -181,7 +188,7 @@ function PollEditor({
           </select>
         </label>
         {d.kind === 'multi' && (
-          <label className="field" style={{ maxWidth: 120 }}>
+          <label className="field field--xs">
             <span className="field__label">최대 개수</span>
             <input
               className="input"
@@ -193,29 +200,29 @@ function PollEditor({
             />
           </label>
         )}
-        <span className="t-text-xs t-muted" style={{ marginLeft: 'auto' }}>
-          지금까지 {total.toLocaleString('ko-KR')}표
-        </span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div className="field-head">
+        <span className="field__label">선택지</span>
+        <span className="t-text-xs t-muted">지금까지 {total.toLocaleString('ko-KR')}표</span>
+      </div>
+      <div className="choice-list">
         {d.options.map((o, i) => (
-          <div key={o.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div key={o.id} className="choice-row">
             <input
               className="input"
-              style={{ flex: 1 }}
               value={o.label}
               onChange={(e) =>
                 setD({ ...d, options: d.options.map((x) => (x.id === o.id ? { ...x, label: e.target.value } : x)) })
               }
               aria-label={`선택지 ${i + 1}`}
             />
-            <span className="t-text-xs t-muted" style={{ width: 64, textAlign: 'right' }}>
+            <span className="t-text-xs t-muted choice-row__count">
               {o.votes.toLocaleString('ko-KR')}표
             </span>
             <button
               type="button"
-              className="btn-icon"
+              className="btn btn--kill btn--sm btn--iconOnly"
               aria-label={`선택지 ${i + 1} 지우기`}
               onClick={() => setD({ ...d, options: d.options.filter((x) => x.id !== o.id) })}
             >
@@ -225,7 +232,7 @@ function PollEditor({
         ))}
         <button
           type="button"
-          className="btn btn--ghost btn--sm"
+          className="btn btn--outline btn--sm"
           style={{ alignSelf: 'flex-start' }}
           onClick={() =>
             setD({
@@ -250,7 +257,7 @@ function PollEditor({
         <p className="field__error">표가 있는 선택지를 지우면 그 표도 함께 사라져요.</p>
       )}
 
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div className="admin-actions">
         <button
           type="button"
           className="btn btn--primary"
@@ -260,7 +267,7 @@ function PollEditor({
           저장하기
         </button>
         {dirty && (
-          <button type="button" className="btn btn--ghost" onClick={() => setD(poll)}>
+          <button type="button" className="btn btn--quiet" onClick={() => setD(poll)}>
             되돌리기
           </button>
         )}

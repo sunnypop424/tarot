@@ -117,7 +117,8 @@ export function Moderation() {
               <div className={styles.actions}>
                 <button
                   type="button"
-                  className="btn btn--ghost btn--sm"
+                  className="btn btn--state btn--sm"
+                  data-on={!m.hidden || undefined}
                   disabled={busy}
                   onClick={() => void toggleHidden(m)}
                 >
@@ -133,7 +134,7 @@ export function Moderation() {
                 </button>
                 <button
                   type="button"
-                  className="btn btn--ghost btn--sm"
+                  className="btn btn--kill btn--sm btn--iconOnly"
                   disabled={busy}
                   onClick={() => void remove(m)}
                   aria-label="삭제"

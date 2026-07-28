@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Image as ImageIcon, Sparkles, Star, TriangleAlert } from 'lucide-react'
+import { Image as ImageIcon, SlidersHorizontal, Sparkles, Star, TriangleAlert } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import { photocardRules, RARITY_LABEL } from '@/data/photocard'
@@ -95,8 +95,8 @@ export function Cards() {
 
       {settings.rehearsal && (
         <div className={`${styles.banner} ${styles.bannerWarn}`}>
-          <TriangleAlert size={20} strokeWidth={2} aria-hidden="true" style={{ flex: 'none' }} />
-          <p className="t-text-s" style={{ margin: 0 }}>
+          <TriangleAlert size={20} strokeWidth={2} aria-hidden="true" />
+          <p className="t-text-s">
             <b>연습 모드가 켜져 있어요.</b> 지금 뽑아도 재고가 줄지 않아요 — 전날 시연에서 한정 카드를
             태우는 사고를 막으려고 기본으로 켜 둡니다. <b>행사 시작 전에 꺼 주세요.</b>
           </p>
@@ -115,7 +115,7 @@ export function Cards() {
       ) : (
         <div className={styles.list} data-cards>
           {rows.map((r) => (
-            <div key={r.cardId} className={styles.row} data-out={r.remaining === 0 || undefined} style={{ flexWrap: 'wrap' }}>
+            <div key={r.cardId} className={styles.row} data-out={r.remaining === 0 || undefined}>
               {/* 썸네일도 background-image — 관리 화면도 예외가 아니다 (CLAUDE.md) */}
               <div
                 className={styles.thumb}
@@ -142,11 +142,10 @@ export function Cards() {
                   <span>{r.remaining === null ? '수량 무제한' : `남은 수량 ${r.remaining}장`}</span>
                 </div>
               </div>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 7, flex: 'none' }}>
+              <label className="cell-field">
                 <span className="t-text-xs t-muted">레어도</span>
                 <select
-                  className="select"
-                  style={{ width: 104 }}
+                  className="select cell-field__sm"
                   value={String(r.rarity)}
                   onChange={(e) => r.cardId && void patchCard(r.cardId, { rarity: Number(e.target.value) })}
                   aria-label={`${r.name} 레어도`}
@@ -157,7 +156,7 @@ export function Cards() {
                   ))}
                 </select>
               </label>
-              <label className="check" style={{ flex: 'none' }}>
+              <label className="check cell-field">
                 <input
                   type="checkbox"
                   checked={r.lucky}
@@ -167,11 +166,10 @@ export function Cards() {
                 />
                 럭키
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 7, flex: 'none' }}>
+              <label className="cell-field">
                 <span className="t-text-xs t-muted">재고</span>
                 <input
-                  className="input"
-                  style={{ width: 92 }}
+                  className="input cell-field__xs"
                   type="number"
                   min={0}
                   placeholder="무제한"
@@ -183,7 +181,7 @@ export function Cards() {
               </label>
             </div>
           ))}
-          <p className="t-text-xs t-muted" style={{ margin: '4px 0 0' }}>
+          <p className="admin-note" style={{ margin: '10px 0 0' }}>
             재고를 비워두면 <b>무제한</b>이에요. 0으로 두면 그 카드는 더 이상 안 나옵니다.
             <br />
             <b>레어도가 곧 확률이에요</b> — 높을수록 자주 나옵니다. 재고는 "나올지 말지" 만 정하고
@@ -195,9 +193,12 @@ export function Cards() {
         </div>
       )}
 
-      <section className="card" style={{ padding: 18, marginTop: 18 }}>
-        <h2 className="t-title-s" style={{ margin: '0 0 14px' }}>운영 설정</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,220px),1fr))', gap: 14 }}>
+      <section className="admin-section">
+        <h2 className="admin-section__title">
+          <SlidersHorizontal size={15} strokeWidth={2} aria-hidden="true" />
+          운영 설정
+        </h2>
+        <div className="form-grid">
           <label className="field">
             <span className="field__label">운영 방식</span>
             <select

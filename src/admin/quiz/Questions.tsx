@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Eye, EyeOff, GraduationCap, Pencil, Plus, Trash2, X } from 'lucide-react'
+import { Eye, EyeOff, GraduationCap, Pencil, Plus, SlidersHorizontal, Trash2, X } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import type { QuizQuestionFull, QuizSettings } from '@/lib/repo/types'
@@ -140,7 +140,8 @@ export function Questions() {
               <div className={styles.rowActions}>
                 <button
                   type="button"
-                  className="btn btn--ghost btn--sm"
+                  className="btn btn--state btn--sm"
+                  data-on={!q.hidden || undefined}
                   disabled={busy || (q.hidden && q.answers.length === 0)}
                   title={q.hidden && q.answers.length === 0 ? '정답을 먼저 채워 주세요' : undefined}
                   onClick={() => void save({ ...q, hidden: !q.hidden })}
@@ -148,13 +149,13 @@ export function Questions() {
                   {q.hidden ? <EyeOff size={14} aria-hidden="true" /> : <Eye size={14} aria-hidden="true" />}
                   {q.hidden ? '비공개' : '공개'}
                 </button>
-                <button type="button" className="btn btn--ghost btn--sm" onClick={() => setEditing(q)}>
+                <button type="button" className="btn btn--quiet btn--sm" onClick={() => setEditing(q)}>
                   <Pencil size={14} aria-hidden="true" />
                   고치기
                 </button>
                 <button
                   type="button"
-                  className="btn btn--ghost btn--sm"
+                  className="btn btn--kill btn--sm btn--iconOnly"
                   disabled={busy}
                   onClick={async () => {
                     if (
@@ -180,9 +181,12 @@ export function Questions() {
         </div>
       )}
 
-      <section className="card" style={{ padding: 18, marginTop: 18 }}>
-        <h2 className="t-title-s" style={{ margin: '0 0 14px' }}>운영 설정</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,220px),1fr))', gap: 14 }}>
+      <section className="admin-section">
+        <h2 className="admin-section__title">
+          <SlidersHorizontal size={15} strokeWidth={2} aria-hidden="true" />
+          운영 설정
+        </h2>
+        <div className="form-grid">
           <label className="field">
             <span className="field__label">보상</span>
             <select
@@ -298,12 +302,12 @@ export function Questions() {
         </div>
 
         {settings.rewardMode === 'raffle' && (
-          <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--color-border)' }}>
-            <div className="field__label" style={{ marginBottom: 9 }}>응모 때 받을 정보</div>
-            <p className="t-text-xs t-muted" style={{ margin: '0 0 10px' }}>
+          <div className="admin-subsection">
+            <div className="admin-subsection__title">응모 때 받을 정보</div>
+            <p className="admin-note">
               <b>안 켠 항목은 받지 않습니다.</b> 닉네임은 항상 받아요.
             </p>
-            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+            <div className="check-row">
               {(
                 [
                   ['handle', '트위터 아이디'],
@@ -365,20 +369,20 @@ function Editor({
         </div>
       </header>
 
-      <section className="card" style={{ padding: 18 }}>
+      <section className="admin-section">
+        <h2 className="admin-section__title">문항</h2>
         <div className={styles.editor}>
           <label className="field">
             <span className="field__label">문제</span>
             <textarea
-              className="input"
-              style={{ height: 90, padding: '10px 12px', resize: 'vertical' }}
+              className="textarea"
               value={q.body}
               onChange={(e) => set({ body: e.target.value })}
               data-q-body
             />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,180px),1fr))', gap: 14 }}>
+          <div className="form-grid">
             <label className="field">
               <span className="field__label">유형</span>
               <select
@@ -420,7 +424,7 @@ function Editor({
           {q.kind === 'choice' ? (
             <div className="field">
               <span className="field__label">보기 · 정답 하나를 골라 주세요</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+              <div className="choice-list">
                 {q.choices.map((c, i) => (
                   <div key={i} className={styles.choiceRow}>
                     <input
@@ -432,7 +436,6 @@ function Editor({
                     />
                     <input
                       className="input"
-                      style={{ flex: 1 }}
                       value={c}
                       placeholder={`${i + 1}번 보기`}
                       onChange={(e) => set({ choices: q.choices.map((x, n) => (n === i ? e.target.value : x)) })}
@@ -440,7 +443,7 @@ function Editor({
                     />
                     <button
                       type="button"
-                      className="btn btn--ghost btn--sm"
+                      className="btn btn--kill btn--sm btn--iconOnly"
                       disabled={q.choices.length <= 2}
                       aria-label="보기 삭제"
                       onClick={() =>
@@ -458,8 +461,8 @@ function Editor({
               </div>
               <button
                 type="button"
-                className="btn btn--ghost btn--sm"
-                style={{ marginTop: 8 }}
+                className="btn btn--outline btn--sm"
+                style={{ marginTop: 10 }}
                 onClick={() => set({ choices: [...q.choices, ''] })}
               >
                 <Plus size={14} aria-hidden="true" />
@@ -469,7 +472,7 @@ function Editor({
           ) : (
             <div className="field">
               <span className="field__label">정답 · 여러 개를 인정할 수 있어요</span>
-              <p className="t-text-xs t-muted" style={{ margin: '4px 0 8px' }}>
+              <p className="admin-note" style={{ margin: '4px 0 8px' }}>
                 띄어쓰기·문장부호·대소문자는 채점에서 무시돼요. 손님이 다르게 쓸 만한 표현을
                 미리 넣어두면 문의가 줄어요.
               </p>
@@ -487,10 +490,9 @@ function Editor({
                   </span>
                 ))}
               </div>
-              <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+              <div className="admin-inline-form" style={{ marginTop: 10 }}>
                 <input
                   className="input"
-                  style={{ flex: 1 }}
                   value={extra}
                   placeholder="인정할 답을 적고 추가"
                   onChange={(e) => setExtra(e.target.value)}
@@ -504,7 +506,7 @@ function Editor({
                 />
                 <button
                   type="button"
-                  className="btn btn--ghost btn--sm"
+                  className="btn btn--outline btn--sm"
                   disabled={!extra.trim()}
                   onClick={() => {
                     if (!q.answers.includes(extra.trim())) set({ answers: [...q.answers, extra.trim()] })
@@ -523,7 +525,7 @@ function Editor({
           </label>
         </div>
 
-        <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
+        <div className="admin-actions">
           <button
             type="button"
             className="btn btn--primary"
@@ -533,11 +535,11 @@ function Editor({
           >
             저장하기
           </button>
-          <button type="button" className="btn btn--ghost" onClick={onCancel}>
+          <button type="button" className="btn btn--quiet" onClick={onCancel}>
             취소
           </button>
           {!canSave && (
-            <span className="t-text-xs t-muted" style={{ alignSelf: 'center' }}>
+            <span className="t-text-xs t-muted">
               문제와 정답을 채워 주세요.
             </span>
           )}

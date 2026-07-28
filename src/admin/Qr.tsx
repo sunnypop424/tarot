@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Download, Info, Link as LinkIcon } from 'lucide-react'
+import { Download, Info, Link as LinkIcon, QrCode } from 'lucide-react'
 import qrcode from 'qrcode-generator'
 
 import { getSlotService } from '@/data/services'
@@ -101,11 +101,15 @@ export function Qr() {
         </div>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,280px),1fr))', gap: 20, alignItems: 'start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div className="admin-split">
+        <section className="admin-section">
+          <h2 className="admin-section__title">
+            <QrCode size={15} strokeWidth={2} aria-hidden="true" />
+            주소와 크기
+          </h2>
           <div className="field">
             <span className="field__label">어느 주소</span>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <div className="pill-group">
               {(
                 [
                   ['visitor', '손님용', `/${slot.slug}`],
@@ -117,17 +121,8 @@ export function Qr() {
                   type="button"
                   onClick={() => setTarget(id)}
                   data-qr-target={id}
-                  style={{
-                    height: 34,
-                    padding: '0 14px',
-                    borderRadius: 9999,
-                    border: `1px solid ${target === id ? '#816bff' : '#dddddd'}`,
-                    background: target === id ? '#f0edff' : '#fff',
-                    color: target === id ? '#816bff' : '#505050',
-                    fontSize: 12.5,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                  }}
+                  className="pill"
+                  data-on={target === id || undefined}
                   title={path}
                 >
                   {label}
@@ -141,23 +136,14 @@ export function Qr() {
 
           <div className="field">
             <span className="field__label">크기</span>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <div className="pill-group">
               {SCALES.map((s) => (
                 <button
                   key={s.id}
                   type="button"
                   onClick={() => setScale(s.id)}
-                  style={{
-                    height: 34,
-                    padding: '0 14px',
-                    borderRadius: 9999,
-                    border: `1px solid ${scale === s.id ? '#816bff' : '#dddddd'}`,
-                    background: scale === s.id ? '#f0edff' : '#fff',
-                    color: scale === s.id ? '#816bff' : '#505050',
-                    fontSize: 12.5,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                  }}
+                  className="pill"
+                  data-on={scale === s.id || undefined}
                 >
                   {s.label}
                 </button>
@@ -167,30 +153,18 @@ export function Qr() {
 
           <div className="field">
             <span className="field__label">주소</span>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-              <code
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  padding: '9px 11px',
-                  border: '1px solid #dddddd',
-                  borderRadius: 4,
-                  fontSize: 12.5,
-                  background: '#fff',
-                  wordBreak: 'break-all',
-                }}
-                data-qr-url
-              >
+            <div className="admin-inline-form">
+              <code className="admin-url" data-qr-url>
                 {url}
               </code>
-              <button type="button" className="btn btn--slight" onClick={() => void copy()} style={{ height: 34 }}>
+              <button type="button" className="btn btn--outline btn--sm" onClick={() => void copy()}>
                 <LinkIcon size={14} strokeWidth={2} aria-hidden="true" />
                 복사
               </button>
             </div>
           </div>
 
-          <div className="admin-banner admin-banner--info" style={{ marginBottom: 0 }}>
+          <div className="admin-banner admin-banner--info" style={{ marginBottom: 0, marginTop: 16 }}>
             <Info size={16} aria-hidden="true" />
             <span>
               인쇄 전에 <b>폰으로 한 번 찍어 보세요.</b> 종이·조명에 따라 인식률이 달라져요.
@@ -198,22 +172,17 @@ export function Qr() {
               {service === 'photocard' && ' 스태프 기기는 QR 대신 주소를 직접 열어 로그인해 두시는 게 편해요.'}
             </span>
           </div>
-        </div>
+        </section>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+        <section className="admin-section admin-qr">
+          <h2 className="admin-section__title">미리보기</h2>
           {/* QR 은 캔버스다 — `<img>` 를 쓰지 않는다 (이 레포의 규칙) */}
-          <canvas
-            ref={canvasRef}
-            data-qr-canvas
-            style={{ width: '100%', maxWidth: 320, height: 'auto', border: '1px solid #eeeeee', borderRadius: 8, background: '#fff' }}
-            aria-label="QR 코드"
-            role="img"
-          />
-          <button type="button" className="btn btn--primary" onClick={save} data-qr-save style={{ height: 38 }}>
+          <canvas ref={canvasRef} data-qr-canvas className="admin-qr__canvas" aria-label="QR 코드" role="img" />
+          <button type="button" className="btn btn--primary" onClick={save} data-qr-save>
             <Download size={15} strokeWidth={2} aria-hidden="true" />
             PNG 로 저장
           </button>
-        </div>
+        </section>
       </div>
     </>
   )

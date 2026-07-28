@@ -124,42 +124,46 @@ export function Redeem() {
           </p>
         </div>
         {guaranteed.length > 0 && (
-          <button type="button" className="btn btn--ghost btn--sm" onClick={download}>
+          <button type="button" className="btn btn--outline btn--sm" onClick={download}>
             <Download size={15} aria-hidden="true" />
             CSV
           </button>
         )}
       </header>
 
-      <div className={styles.kpis}>
-        <div className={styles.kpi}>
-          <div className={styles.kpiLabel}>발급</div>
-          <div className={styles.kpiValue} data-issued>{guaranteed.length}장</div>
+      <div className="stat-row">
+        <div className="stat-tile">
+          <span className="stat-label">발급</span>
+          <span className="stat-value" data-issued>
+            {guaranteed.length}
+            <span className="stat-unit">장</span>
+          </span>
         </div>
-        <div className={styles.kpi}>
-          <div className={styles.kpiLabel}>수령 완료</div>
-          <div className={styles.kpiValue} data-redeemed>{done.length}장</div>
+        <div className="stat-tile">
+          <span className="stat-label">수령 완료</span>
+          <span className="stat-value" data-redeemed>
+            {done.length}
+            <span className="stat-unit">장</span>
+          </span>
         </div>
-        <div className={styles.kpi}>
-          <div className={styles.kpiLabel}>아직 안 받음</div>
-          <div className={styles.kpiValue} data-left>{left}장</div>
+        <div className="stat-tile">
+          <span className="stat-label">아직 안 받음</span>
+          <span className="stat-value" data-left>
+            {left}
+            <span className="stat-unit">장</span>
+          </span>
         </div>
       </div>
 
-      <form onSubmit={go} className="card" style={{ padding: 22, maxWidth: 520 }} data-redeem-form>
+      <form onSubmit={go} className="admin-section admin-section--narrow admin-section--do" data-redeem-form>
+        <h2 className="admin-section__title">
+          <ScanLine size={15} strokeWidth={2} aria-hidden="true" />
+          교환코드 확인
+        </h2>
         <label className="field">
           <span className="field__label">교환코드</span>
           <input
-            className="input"
-            style={{
-              height: 62,
-              fontSize: 30,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              fontFamily: 'ui-monospace, Menlo, monospace',
-              textAlign: 'center',
-            }}
+            className="input input--entry"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="XK4T-9P2M"
@@ -172,34 +176,33 @@ export function Redeem() {
         </label>
         <button
           type="submit"
-          className="btn btn--primary"
-          style={{ width: '100%', height: 52, marginTop: 14 }}
+          className="btn btn--primary btn--block btn--tall"
           disabled={!code.trim() || busy}
         >
-          <ScanLine size={18} strokeWidth={2} aria-hidden="true" />
+          <ScanLine size={16} strokeWidth={2} aria-hidden="true" />
           {busy ? '확인 중…' : '수령 처리'}
         </button>
       </form>
 
       {result && (
-        <div className="card" style={{ padding: 20, marginTop: 16, maxWidth: 520 }} data-redeem-result>
+        <div className="admin-section admin-section--narrow" data-redeem-result>
           {result.kind === 'ok' && (
-            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-              <CircleCheck size={26} strokeWidth={2} aria-hidden="true" style={{ flex: 'none' }} />
+            <div className="admin-result">
+              <CircleCheck size={26} strokeWidth={2} aria-hidden="true" />
               <div>
-                <div className="t-title-s" style={{ margin: 0 }}>수령 처리했어요</div>
-                <p className="t-text-s t-muted" style={{ margin: '4px 0 0' }}>
+                <div className="admin-result__title">수령 처리했어요</div>
+                <p className="admin-result__body">
                   {result.label} — 손님께 전달해 주세요.
                 </p>
               </div>
             </div>
           )}
           {result.kind === 'already' && (
-            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-              <TriangleAlert size={26} strokeWidth={2} aria-hidden="true" style={{ flex: 'none' }} />
+            <div className="admin-result">
+              <TriangleAlert size={26} strokeWidth={2} aria-hidden="true" />
               <div>
-                <div className="t-title-s" style={{ margin: 0 }}>이미 수령한 코드예요</div>
-                <p className="t-text-s t-muted" style={{ margin: '4px 0 0' }}>
+                <div className="admin-result__title">이미 수령한 코드예요</div>
+                <p className="admin-result__body">
                   {result.at &&
                     `${new Date(result.at).toLocaleString('ko-KR', {
                       month: 'long',
@@ -213,23 +216,23 @@ export function Redeem() {
             </div>
           )}
           {result.kind === 'none' && (
-            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-              <CircleX size={26} strokeWidth={2} aria-hidden="true" style={{ flex: 'none' }} />
+            <div className="admin-result">
+              <CircleX size={26} strokeWidth={2} aria-hidden="true" />
               <div>
-                <div className="t-title-s" style={{ margin: 0 }}>없는 코드예요</div>
-                <p className="t-text-s t-muted" style={{ margin: '4px 0 0' }}>
+                <div className="admin-result__title">없는 코드예요</div>
+                <p className="admin-result__body">
                   손님 화면의 코드를 다시 확인해 주세요.
                 </p>
               </div>
             </div>
           )}
-          {result.kind === 'error' && <p className="field__error" style={{ margin: 0 }}>{result.message}</p>}
+          {result.kind === 'error' && <p className="field__error">{result.message}</p>}
         </div>
       )}
 
-      <section style={{ marginTop: 24 }}>
-        <h2 className="t-title-s" style={{ margin: '0 0 4px' }}>발급 목록</h2>
-        <p className="t-text-xs t-muted" style={{ margin: '0 0 12px' }}>
+      <section className="admin-section">
+        <h2 className="admin-section__title">발급 목록</h2>
+        <p className="admin-note">
           손님 이름은 여기 안 나와요 — 카운터 화면은 계속 켜져 있으니까요. 응모하신 분들의
           정보는 '응모자' 화면에서 보실 수 있어요.
         </p>

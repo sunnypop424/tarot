@@ -150,27 +150,17 @@ export function Staff() {
         </span>
       </div>
 
-      <form onSubmit={(e) => void add(e)} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
+      <form onSubmit={(e) => void add(e)} className="admin-toolbar">
         <input
+          className="input input--title"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="staff@example.com"
           aria-label="스태프 이메일"
           data-staff-email
-          style={{
-            flex: 1,
-            minWidth: 220,
-            height: 36,
-            padding: '0 11px',
-            border: '1px solid #dddddd',
-            borderRadius: 4,
-            fontSize: 13,
-            background: '#fff',
-            color: '#121212',
-          }}
         />
-        <button type="submit" className="btn btn--primary" disabled={busy} data-staff-add style={{ height: 36 }}>
+        <button type="submit" className="btn btn--primary" disabled={busy} data-staff-add>
           <UserPlus size={15} strokeWidth={2} aria-hidden="true" />
           계정 만들기
         </button>
@@ -189,11 +179,10 @@ export function Staff() {
           <span>
             <b>{temp.email}</b> 의 임시 비밀번호예요 — <b>이 화면을 벗어나면 다시 못 봅니다.</b>
             <br />
-            <code style={{ fontSize: 15, fontWeight: 700, letterSpacing: '0.04em' }}>{temp.password}</code>{' '}
+            <code className="admin-code">{temp.password}</code>{' '}
             <button
               type="button"
-              className="btn btn--slight"
-              style={{ height: 26, marginLeft: 6 }}
+              className="btn btn--outline btn--sm"
               onClick={() => {
                 void navigator.clipboard.writeText(temp.password).then(
                   () => toast('복사했어요'),
@@ -216,36 +205,21 @@ export function Staff() {
           <div className="t-text-s t-muted">위에 이메일을 넣으면 계정과 임시 비밀번호가 만들어져요.</div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }} data-staff-list>
+        <div className="row-list" data-staff-list>
           {list.map((o) => {
             const me = user?.email?.toLowerCase() === o.email.toLowerCase()
             return (
-              <div
-                key={o.userId}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  flexWrap: 'wrap',
-                  padding: '11px 14px',
-                  border: '1px solid #eeeeee',
-                  borderRadius: 8,
-                  background: '#fff',
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div key={o.userId} className="row-item">
+                <div className="row-item__grow">
+                  <div className="row-item__name">
                     {o.email}
-                    {me && <span style={{ marginLeft: 6, fontSize: 11, color: '#816bff' }}>나</span>}
+                    {me && <span className="row-item__me">나</span>}
                   </div>
-                  <div style={{ fontSize: 11, color: '#8a8a8a' }}>
-                    {new Date(o.createdAt).toLocaleDateString('ko-KR')} 부터
-                  </div>
+                  <div className="row-item__sub">{new Date(o.createdAt).toLocaleDateString('ko-KR')} 부터</div>
                 </div>
                 <button
                   type="button"
-                  className="btn btn--slight"
-                  style={{ height: 30 }}
+                  className="btn btn--quiet btn--sm"
                   disabled={busy}
                   onClick={() => void reset(o)}
                 >
@@ -256,8 +230,7 @@ export function Staff() {
                 {!me && (
                   <button
                     type="button"
-                    className="btn btn--slight"
-                    style={{ height: 30, color: '#b23b3a' }}
+                    className="btn btn--danger btn--sm"
                     disabled={busy}
                     onClick={() => void remove(o)}
                     data-staff-remove
