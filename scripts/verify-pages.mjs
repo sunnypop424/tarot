@@ -15,6 +15,12 @@ const chrome = [
 ].find((p) => existsSync(p))
 
 const outDir = process.argv[2] ?? '.'
+/**
+ * 타로 슬롯 슬러그 — 두 번째 인자로 준다. 기본은 `demo` 다.
+ * **이 슬롯이 없으면 아무것도 못 본다** (도감·질문이 슬롯 스코프라서) — 그때는
+ * 빈 화면을 훑다가 엉뚱한 자리에서 터졌다. 지금은 먼저 확인하고 무엇이 없는지 말한다.
+ */
+const SLUG = process.argv[3] ?? 'demo'
 const wait = (ms) => new Promise((r) => setTimeout(r, ms))
 const BASE = 'http://localhost:5174'
 
@@ -31,8 +37,14 @@ page.on('pageerror', (e) => errors.push(String(e)))
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
 
 // ── 카드 도감 ──────────────────────────────────────
-await page.goto(`${BASE}/demo/cards`, { waitUntil: 'networkidle0' })
+await page.goto(`${BASE}/${SLUG}/cards`, { waitUntil: 'networkidle0' })
 await wait(400)
+if (!(await page.$('[role="tab"]'))) {
+  console.log(`타로 슬롯 '${SLUG}' 을 열 수 없습니다 — 슬러그를 두 번째 인자로 주세요.`)
+  console.log(`  예: node scripts/verify-pages.mjs shots dinotest`)
+  await browser.close()
+  process.exit(1)
+}
 
 const suits = await page.$$eval('[role="tab"]', (ts) => ts.map((t) => t.textContent.trim()))
 console.log(`도감 수트 필터: ${suits.join(' / ')}`)
@@ -68,7 +80,7 @@ console.log(
 await page.screenshot({ path: join(outDir, 'cards-detail.png'), fullPage: true })
 
 // ── 질문 타로 ──────────────────────────────────────
-await page.goto(`${BASE}/demo/fortune`, { waitUntil: 'networkidle0' })
+await page.goto(`${BASE}/${SLUG}/fortune`, { waitUntil: 'networkidle0' })
 await wait(400)
 const questions = await page.$$eval('[class*="list-row"] span', (e) => e.map((x) => x.textContent.trim()))
 console.log(`운세 탭 질문 목록: ${questions.length}개`)

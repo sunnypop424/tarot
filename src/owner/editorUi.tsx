@@ -138,7 +138,9 @@ export function AlphaColor({
 }) {
   const pct = Math.round(alphaOf(value) * 100)
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+    /* `data-alpha-color` 는 검증용 손잡이다 — 색 고르개가 리렌더에 다시 만들어지면
+       누르는 순간 브라우저 색 창이 닫혀 **드래그로 색을 못 고른다** (verify-preview) */
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }} data-alpha-color>
       <div style={{ fontSize: 12.5, fontWeight: 700, color: '#505050' }}>{label}</div>
       {hint && <div style={CSS.hint}>{hint}</div>}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

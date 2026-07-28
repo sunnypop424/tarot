@@ -210,7 +210,12 @@ try {
       check(`럭키드로우: '${gone}' 입력이 없다`, !body.includes(gone))
     }
     // 카드 안에 색·크기·문구가 **같이** 들어 있어야 묶은 의미가 있다
-    for (const kept of ['본문 폰트', '배경 이미지', '상단 여백', '커버 문자', '남은 수량 배지', '둥글기']) {
+    // 배경 이미지는 **글자가 아니라 업로드 칸**이다 (ImageField 는 라벨을 안 그린다)
+    check(
+      "럭키드로우: '배경 이미지' 칸이 있다",
+      Boolean(await page.$('[data-image-field="background"]'))
+    )
+    for (const kept of ['본문 폰트', '상단 여백', '커버 문자', '남은 수량 배지', '둥글기']) {
       check(`럭키드로우: '${kept}' 칸이 있다`, body.includes(kept))
     }
     check('럭키드로우: 미리보기가 아이패드 가로다', body.includes('아이패드 가로'))
@@ -234,8 +239,8 @@ try {
      * (네이티브 고르개는 자동화로 못 여니 원인을 직접 본다).
      */
     const survives = await page.evaluate(() => {
-      const color = document.querySelector('.color-field input[type="color"]')
-      const range = document.querySelector('.color-field input[type="range"]')
+      const color = document.querySelector('[data-alpha-color] input[type="color"]')
+      const range = document.querySelector('[data-alpha-color] input[type="range"]')
       if (!color || !range) return 'not-found'
       color.dataset.probe = 'same-node'
 
@@ -247,7 +252,7 @@ try {
     check('색 고르개 조작이 반영된다', survives === 'ok', survives)
     await wait(600)
     const sameNode = await page.evaluate(
-      () => document.querySelector('.color-field input[type="color"]')?.dataset.probe === 'same-node'
+      () => document.querySelector('[data-alpha-color] input[type="color"]')?.dataset.probe === 'same-node'
     )
     check('색 고르개가 리렌더에 다시 만들어지지 않는다 (드래그로 고를 수 있다)', sameNode)
 
