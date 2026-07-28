@@ -280,6 +280,10 @@ function Lantern({
               ['--padR' as string]: `${display.shapePad.right}%`,
               ['--padB' as string]: `${display.shapePad.bottom}%`,
               ['--padL' as string]: `${display.shapePad.left}%`,
+              ['--nameT' as string]: `${display.shapeNamePad.top}%`,
+              ['--nameR' as string]: `${display.shapeNamePad.right}%`,
+              ['--nameB' as string]: `${display.shapeNamePad.bottom}%`,
+              ['--nameL' as string]: `${display.shapeNamePad.left}%`,
             }
           : {}),
       }}

@@ -1,0 +1,95 @@
+import type { CountPickerStyle } from '@/data/countPicker'
+import { CSS, Divided, Field, SwatchColor } from '../editorUi'
+
+/**
+ * 수량 고르기 설정 — **럭키드로우와 포토카드가 같이 쓴다.**
+ *
+ * 화면이 공용 컴포넌트(`src/components/CountPicker.tsx`)라 설정 칸도 하나여야 한다.
+ * 둘로 두면 한쪽에만 항목이 늘어나는 날이 온다.
+ *
+ * **비워둔 색은 서비스 기본값을 따른다** — 여기서 굳이 안 고르면 슬롯 색이 그대로 온다.
+ * 그래서 값이 없을 때 빈 문자열을 넣지 않고 키를 아예 뺀다(`undefined`).
+ */
+export function PickerFields({
+  value,
+  onChange,
+  hint,
+}: {
+  value: Partial<CountPickerStyle>
+  onChange: (next: Partial<CountPickerStyle>) => void
+  /** 이 서비스에서 이 묶음이 어디에 뜨는지 한 줄 */
+  hint: string
+}) {
+  const set = (change: Partial<CountPickerStyle>) => onChange({ ...value, ...change })
+
+  /** 색을 비우면 키를 지운다 — 빈 문자열이 남으면 "검은색" 으로 읽히는 자리가 생긴다 */
+  const setColor = (key: keyof CountPickerStyle, v: string) => {
+    const next = { ...value }
+    if (v) (next as Record<string, unknown>)[key] = v
+    else delete (next as Record<string, unknown>)[key]
+    onChange(next)
+  }
+
+  return (
+    <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid #ededf2' }}>
+      <span style={CSS.label}>수량 고르기</span>
+      <p style={{ margin: '6px 0 12px', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
+        {hint} <b>비워두면 이 이벤트 색을 그대로 따라갑니다</b> — 따로 맞추고 싶을 때만 채우세요.
+      </p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,180px),1fr))', gap: 14 }}>
+        <Field label="모서리 둥글기" hint="0 이면 각진 사각형이에요.">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <input
+              type="number"
+              min={0}
+              max={40}
+              value={value.radius ?? 16}
+              onChange={(e) => set({ radius: Math.min(40, Math.max(0, Number(e.target.value) || 0)) })}
+              style={{ ...CSS.input, flex: 1, minWidth: 0 }}
+              aria-label="모서리 둥글기"
+              data-picker-radius
+            />
+            <span style={{ fontSize: 11.5, color: '#8a8a8a', flexShrink: 0 }}>px</span>
+          </div>
+        </Field>
+        <Field label="테두리">
+          <select
+            value={String(value.borderWidth ?? 1)}
+            onChange={(e) => set({ borderWidth: Number(e.target.value) })}
+            style={CSS.select}
+            data-picker-border
+          >
+            <option value="0">없음</option>
+            <option value="1">얇게 (1px)</option>
+            <option value="2">보통 (2px)</option>
+            <option value="3">굵게 (3px)</option>
+          </select>
+        </Field>
+      </div>
+
+      <Divided min={230} gap={12}>
+        {(
+          [
+            ['bg', '상자 배경', '− 숫자 + 를 감싸는 판'],
+            ['borderColor', '테두리색'],
+            ['fg', '글자색', '숫자 · 프리셋'],
+            ['stepBg', '± 버튼 배경'],
+            ['onBg', '고른 프리셋 배경'],
+            ['onFg', '고른 프리셋 글자'],
+            ['goBg', '뽑기 버튼 배경'],
+            ['goFg', '뽑기 버튼 글자'],
+          ] as [keyof CountPickerStyle, string, string?][]
+        ).map(([key, label, h]) => (
+          <SwatchColor
+            key={key}
+            label={label}
+            hint={h}
+            value={(value[key] as string) ?? ''}
+            onChange={(v) => setColor(key, v)}
+          />
+        ))}
+      </Divided>
+    </div>
+  )
+}

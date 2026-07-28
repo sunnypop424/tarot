@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Flag, Gift, Info, Lock, Minus, Plus } from 'lucide-react'
+import { Flag, Gift, Info, Lock } from 'lucide-react'
 
 import { luckydrawDisplay, loadWebfont, fontStack, type LuckydrawDisplay } from '@/data/luckydraw'
 import { luminance } from '@/lib/color'
@@ -9,13 +9,14 @@ import type { DrawResult, LuckydrawSettings, Prize } from '@/lib/repo'
 import { useAdminAuth } from '@/admin/useAdminAuth'
 import { useSlot } from '@/slot/SlotProvider'
 import { useLivePreview } from '@/slot/preview'
+import { CountPicker } from '@/components/CountPicker'
+import { countPicker, pickerVars } from '@/data/countPicker'
 import { ResultReveal } from './ResultReveal'
 import { PrizePreview } from './PrizePreview'
 import styles from './Luckydraw.module.css'
 
 /** 한 번에 뽑을 수 있는 최대 — 서버도 같은 값으로 막는다 (`draw_prizes`) */
 const MAX_DRAW = 100
-const QUICK = [1, 5, 10]
 
 /** 두 색 중 **더 어두운 쪽** — 등수 배지가 옅은 배경에서도 읽히게 (휘도 못 재면 앞 색) */
 function darker(a: string, b: string): string {
@@ -88,6 +89,7 @@ export default function LuckydrawApp() {
    * 모달 전용 색 — 배송·경품 모달은 body 로 포털돼 .stage 밖이라 :root 에 실어야 닿는다.
    * 비어 있으면 변수를 지워 CSS 가 테마 토큰으로 폴백한다 (기본은 지금과 똑같다).
    */
+  const c0 = slot.theme.colors
   useEffect(() => {
     const root = document.documentElement
     const set = (name: string, value: string) =>
@@ -100,9 +102,24 @@ export default function LuckydrawApp() {
     // 타일 테두리 없애기 — 결과 타일·요약 줄·경품 모달 줄까지 (포털이라 :root 에 실어야 닿는다)
     set('--ld-tile-border', display.noBorder ? 'transparent' : '')
     // 수량 카운터 전용 색 (비우면 CSS 가 테마 색·시안 그림자로 폴백)
-    set('--ld-counter-bg', display.counterBg)
-    set('--ld-counter-border', display.counterBorder)
     set('--ld-counter-shadow', display.counterShadow)
+    /*
+     * 수량 고르기는 공용 컴포넌트라 `--cp-*` 로 넘긴다. 안 고른 색은 **슬롯 테마와 옛
+     * counter* 값에서** 물려받는다 — 이미 도는 럭드 슬롯의 화면이 달라지면 안 된다.
+     */
+    const cp = pickerVars(
+      countPicker(display.picker, {
+        bg: display.counterBg || c0.wash,
+        borderColor: display.counterBorder || c0.border,
+        fg: c0.fg1,
+        stepBg: c0.surfaceRaised,
+        onBg: c0.primary,
+        onFg: c0.onPrimary,
+        goBg: c0.primary,
+        goFg: c0.onPrimary,
+      })
+    )
+    for (const [k, v] of Object.entries(cp)) root.style.setProperty(k, v)
     // 등수 배지 스타일 — 경품 미리보기 모달이 body 로 포털돼 :root 에 실어야 닿는다
     root.setAttribute('data-ld-badge', display.badgeStyle)
     /**
@@ -111,9 +128,8 @@ export default function LuckydrawApp() {
      * 밝은 쪽(예: onHigh 가 흰색)을 그대로 쓰면 soft 에서 글자가 안 보이고 solid 도 흰 배경이
      * 된다. 늘 어두운 쪽을 골라 두 스타일 모두 대비를 확보한다.
      */
-    const c = slot.theme.colors
-    set('--ld-rank', darker(c.primary, c.onPrimary))
-    set('--ld-rank-hi', darker(c.high, c.onHigh))
+    set('--ld-rank', darker(c0.primary, c0.onPrimary))
+    set('--ld-rank-hi', darker(c0.high, c0.onHigh))
   }, [
     display.modalBg,
     display.modalText,
@@ -124,8 +140,9 @@ export default function LuckydrawApp() {
     display.counterBg,
     display.counterBorder,
     display.counterShadow,
+    display.picker,
     display.badgeStyle,
-    slot.theme.colors,
+    c0,
   ])
 
   const load = useCallback(async () => {
@@ -302,65 +319,22 @@ export default function LuckydrawApp() {
                     </div>
                   )}
 
-                  <p className={styles.pickLabel}>몇 개를 뽑을까요?</p>
-
-                  <div className={styles.counter}>
-                    <button
-                      type="button"
-                      className={styles.step}
-                      aria-label="한 개 줄이기"
-                      disabled={count <= 1}
-                      onClick={() => setCount((n) => Math.max(1, n - 1))}
-                    >
-                      <Minus size={22} aria-hidden="true" />
-                    </button>
-                    <input
-                      className={styles.countInput}
-                      type="number"
-                      inputMode="numeric"
-                      aria-label="뽑을 개수"
-                      value={count}
-                      min={1}
-                      max={MAX_DRAW}
-                      onChange={(e) =>
-                        setCount(Math.max(1, Math.min(MAX_DRAW, Number(e.target.value) || 1)))
-                      }
-                    />
-                    <button
-                      type="button"
-                      className={styles.step}
-                      aria-label="한 개 늘리기"
-                      disabled={count >= MAX_DRAW}
-                      onClick={() => setCount((n) => Math.min(MAX_DRAW, n + 1))}
-                    >
-                      <Plus size={22} aria-hidden="true" />
-                    </button>
-                  </div>
-
-                  <div className={styles.quick}>
-                    {QUICK.map((n) => (
-                      <button
-                        key={n}
-                        type="button"
-                        className={styles.quickBtn}
-                        data-on={count === n || undefined}
-                        onClick={() => setCount(n)}
-                      >
-                        {n}개
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* 버튼은 늘 이 자리에 있고 로그인 전엔 비활성 (스태프만 뽑는다) */}
-                  <button
-                    type="button"
-                    className={`btn btn--primary btn--block ${styles.drawBtn}`}
-                    disabled={(authStatus !== 'in' && !previewing) || drawing}
-                    onClick={draw}
-                    data-draw
-                  >
-                    {drawing ? '뽑는 중…' : display.drawLabel}
-                  </button>
+                  {/**
+                    * 수량 고르기 — **포토카드와 같은 컴포넌트**를 쓴다
+                    * (`src/components/CountPicker.tsx`). 예전엔 두 서비스가 같은 묶음을
+                    * 각자 그려서 프리셋 숫자가 이미 갈라져 있었다 (여기 1·5·10 / 포토카드 1·3·5·10).
+                    */}
+                  <CountPicker
+                    count={count}
+                    max={MAX_DRAW}
+                    onCount={setCount}
+                    onGo={draw}
+                    label="몇 개를 뽑을까요?"
+                    goLabel={display.drawLabel}
+                    busy={drawing}
+                    disabled={authStatus !== 'in' && !previewing}
+                    className={styles.picker}
+                  />
 
                   {authStatus !== 'in' && !previewing && (
                     <p className={styles.staffHint}>

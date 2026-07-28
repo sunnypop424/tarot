@@ -1,4 +1,5 @@
 import type { Slot } from '@/types/slot'
+import type { CountPickerStyle } from './countPicker'
 
 /**
  * 럭키드로우 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다 (주최자는 못 건드린다).
@@ -130,6 +131,12 @@ export interface LuckydrawDisplay {
    * - `solid`: 배경이 **진한 solid**, 글자는 흰색(onPrimary). 또렷하게 도장 찍은 느낌.
    */
   badgeStyle: 'soft' | 'solid'
+
+  /**
+   * 수량 고르기(스테퍼·프리셋·뽑기 버튼)의 겉모습 — **포토카드와 같은 컴포넌트를 쓴다**
+   * (`src/components/CountPicker.tsx`). 색이 비면 아래 `counterBg` 등 옛 값에서 물려받는다.
+   */
+  picker: Partial<CountPickerStyle>
 }
 
 /**
@@ -306,6 +313,7 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   counterShadow: '',
   // 시안 기본 — 옅은 배경 + 글자색
   badgeStyle: 'soft',
+  picker: {},
 }
 
 /**
@@ -354,5 +362,10 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
     counterShadow: saved.counterShadow ?? DEFAULT_DISPLAY.counterShadow,
     // 'solid' 만 유효값으로 받고 나머지는 기본 soft
     badgeStyle: saved.badgeStyle === 'solid' ? 'solid' : 'soft',
+    /*
+     * **저장값만 든다.** 안 고른 색의 기본값은 화면이 정한다 — 럭드는 슬롯 테마 토큰을
+     * 그대로 쓰고 포토카드는 자기 팔레트를 쓰기 때문에, 여기서 하나로 못 정한다.
+     */
+    picker: saved.picker ?? {},
   }
 }

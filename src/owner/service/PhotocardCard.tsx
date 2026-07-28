@@ -10,6 +10,7 @@ import type { Slot } from '@/types/slot'
 import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { uploadAsset, deleteAsset, extOf, nameFromUrl } from '../upload'
+import { PickerFields } from './PickerFields'
 
 const ICON: React.CSSProperties = {
   width: 24,
@@ -269,6 +270,12 @@ export function PhotocardCard({
           <input value={d.lockerLabel} onChange={(e) => patch({ lockerLabel: e.target.value })} style={CSS.input} />
         </Field>
       </Divided>
+
+      <PickerFields
+        value={d.picker}
+        onChange={(picker) => patch({ picker })}
+        hint="'판매' 방식에서 스태프 화면에 뜨는 − 숫자 + 스테퍼와 1·5·10 프리셋, 뽑기 버튼이에요."
+      />
     </Card>
   )
 }

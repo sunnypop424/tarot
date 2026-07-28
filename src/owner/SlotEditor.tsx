@@ -343,20 +343,93 @@ function LuckydrawExtra({
           </span>
         </label>
       )
-    case 'counter':
+    case 'counter': {
+      /**
+       * 수량 고르기 — **포토카드와 같은 컴포넌트**를 쓴다 (`components/CountPicker.tsx`).
+       * 그래서 저장되는 값(`display.picker`)도 같은 모양이다. 화면 스타일이 이 편집기와
+       * 서비스 카드가 서로 달라 UI 는 각자 그리지만, **데이터는 한 벌**이라 동작이 안 갈린다.
+       */
+      const p = d.picker
+      const setPicker = (change: Record<string, unknown>) => patchLd({ picker: { ...p, ...change } })
+      /** 색을 비우면 키를 지운다 — 빈 문자열이 남으면 "검은색" 으로 읽히는 자리가 생긴다 */
+      const setColor = (key: string, v: string) => {
+        const next: Record<string, unknown> = { ...p }
+        if (v) next[key] = v
+        else delete next[key]
+        patchLd({ picker: next })
+      }
       return (
         <>
+          <div className="field">
+            <span className="field__label">모서리 둥글기</span>
+            <input
+              className="input"
+              type="number"
+              min={0}
+              max={40}
+              value={p.radius ?? 16}
+              onChange={(e) => setPicker({ radius: Math.min(40, Math.max(0, Number(e.target.value) || 0)) })}
+              data-picker-radius
+            />
+            <span className="field__hint">0 이면 각진 사각형이에요 (px).</span>
+          </div>
+          <div className="field">
+            <span className="field__label">테두리</span>
+            <select
+              className="select"
+              value={String(p.borderWidth ?? 1)}
+              onChange={(e) => setPicker({ borderWidth: Number(e.target.value) })}
+              data-picker-border
+            >
+              <option value="0">없음</option>
+              <option value="1">얇게 (1px)</option>
+              <option value="2">보통 (2px)</option>
+              <option value="3">굵게 (3px)</option>
+            </select>
+          </div>
           <AlphaColor
             label="배경색"
-            value={d.counterBg || draft.theme.colors.wash}
-            hint="수량 알약 안쪽 배경. 비우면 테마 보조 배경색"
-            onChange={(v) => patchLd({ counterBg: v })}
+            value={p.bg || d.counterBg || draft.theme.colors.wash}
+            hint="− 숫자 + 를 감싸는 판. 비우면 테마 보조 배경색"
+            onChange={(v) => setColor('bg', v)}
           />
           <AlphaColor
             label="테두리색"
-            value={d.counterBorder || draft.theme.colors.border}
-            hint="알약 전체를 감싸는 테두리. 비우면 테마 테두리색"
-            onChange={(v) => patchLd({ counterBorder: v })}
+            value={p.borderColor || d.counterBorder || draft.theme.colors.border}
+            hint="비우면 테마 테두리색"
+            onChange={(v) => setColor('borderColor', v)}
+          />
+          <AlphaColor
+            label="글자색"
+            value={p.fg || draft.theme.colors.fg1}
+            hint="숫자와 프리셋(1·5·10). 비우면 테마 글자색"
+            onChange={(v) => setColor('fg', v)}
+          />
+          <AlphaColor
+            label="± 버튼 배경"
+            value={p.stepBg || draft.theme.colors.surfaceRaised}
+            hint="비우면 테마 표면색"
+            onChange={(v) => setColor('stepBg', v)}
+          />
+          <AlphaColor
+            label="고른 프리셋 배경"
+            value={p.onBg || draft.theme.colors.primary}
+            onChange={(v) => setColor('onBg', v)}
+          />
+          <AlphaColor
+            label="고른 프리셋 글자"
+            value={p.onFg || draft.theme.colors.onPrimary}
+            onChange={(v) => setColor('onFg', v)}
+          />
+          <AlphaColor
+            label="뽑기 버튼 배경"
+            value={p.goBg || draft.theme.colors.primary}
+            onChange={(v) => setColor('goBg', v)}
+          />
+          <AlphaColor
+            label="뽑기 버튼 글자"
+            value={p.goFg || draft.theme.colors.onPrimary}
+            onChange={(v) => setColor('goFg', v)}
           />
           <AlphaColor
             label="그림자색"
@@ -366,6 +439,7 @@ function LuckydrawExtra({
           />
         </>
       )
+    }
     case 'badgeStyle':
       return (
         <div className="field">

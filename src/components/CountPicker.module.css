@@ -1,0 +1,116 @@
+/*
+ * 수량 고르기 — 럭키드로우·포토카드 공용.
+ * 색·모서리는 전부 `--cp-*` 커스텀 프로퍼티로 들어온다 (`src/data/countPicker.ts`).
+ * 여기엔 hex 가 없다 — 슬롯마다 색이 갈아끼워지므로 (CLAUDE.md).
+ */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.label {
+  margin: 0;
+  font-size: var(--cp-label-size, 14px);
+  font-weight: 700;
+  color: var(--cp-fg);
+  text-align: var(--cp-label-align, center);
+}
+
+/* ── 스테퍼 ── */
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--cp-pad, 10px);
+  border-radius: var(--cp-radius);
+  border: var(--cp-border);
+  background: var(--cp-bg);
+}
+.step {
+  width: var(--cp-step, 56px);
+  height: var(--cp-step, 56px);
+  flex: none;
+  border: none;
+  border-radius: calc(var(--cp-radius) * 0.7);
+  background: var(--cp-step-bg);
+  color: var(--cp-fg);
+  font-family: inherit;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+/* 숫자는 입력칸이다 — 큰 수를 스테퍼로만 맞추게 하면 10연차에 아홉 번 누른다 */
+.value {
+  flex: 1;
+  min-width: 0;
+  height: var(--cp-step, 56px);
+  border: none;
+  background: none;
+  color: var(--cp-fg);
+  font-family: inherit;
+  font-size: var(--cp-value-size, 40px);
+  font-weight: 800;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  /* 브라우저 기본 증감 화살표 — 스테퍼가 있으니 중복이다 */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.value::-webkit-outer-spin-button,
+.value::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ── 프리셋 ── */
+.quick {
+  display: flex;
+  gap: 8px;
+}
+.quickBtn {
+  flex: 1;
+  height: var(--cp-quick, 42px);
+  border-radius: calc(var(--cp-radius) * 0.62);
+  border: var(--cp-border);
+  background: var(--cp-bg);
+  color: var(--cp-fg);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.quickBtn[data-on] {
+  background: var(--cp-on-bg);
+  color: var(--cp-on-fg);
+  border-color: var(--cp-on-bg);
+  font-weight: 800;
+}
+.quickBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ── 실행 ── */
+.go {
+  height: var(--cp-go, 62px);
+  border: none;
+  border-radius: calc(var(--cp-radius) * 0.85);
+  background: var(--cp-go-bg);
+  color: var(--cp-go-fg);
+  font-family: inherit;
+  font-size: var(--cp-go-size, 19px);
+  font-weight: 800;
+  cursor: pointer;
+  width: 100%;
+}
+.go:disabled {
+  opacity: 0.45;
+  cursor: default;
+}

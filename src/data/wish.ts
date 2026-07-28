@@ -77,6 +77,14 @@ export interface WishDisplay {
    * **실루엣이 없으면 안 쓴다** — 기본 등불은 CSS 로 그려서 모양을 이미 안다.
    */
   shapePad: { top: number; right: number; bottom: number; left: number }
+  /**
+   * 이름 줄의 여백 — 본문과 **따로** 잡는다.
+   *
+   * 이름은 본문 아래 오른쪽에 작게 붙어서, 실루엣이 아래로 좁아지는 모양이면 본문은
+   * 멀쩡한데 이름만 밖으로 삐진다. 한 값으로 묶으면 이름을 넣으려다 본문까지 밀려
+   * 등불 위쪽이 텅 빈다. **표시되는 이름에만** 적용된다 (닉네임이 없으면 줄 자체가 없다).
+   */
+  shapeNamePad: { top: number; right: number; bottom: number; left: number }
   /** 등불이 바람에 흔들릴지 — 끄면 정적 (움직임에 민감한 사람도 있다) */
   sway: boolean
 
@@ -120,7 +128,8 @@ export const DEFAULT_WISH: WishDisplay = {
   treeBgRepeat: false,
   lanternShape: '',
   // 가운데가 넓은 흔한 등불 모양 기준 — 올린 그림에 맞춰 편집기에서 조정한다
-  shapePad: { top: 22, right: 19, bottom: 22, left: 19 },
+  shapePad: { top: 22, right: 19, bottom: 4, left: 19 },
+  shapeNamePad: { top: 0, right: 22, bottom: 20, left: 19 },
   sway: true,
   logo: '',
   logoAlign: 'left',
@@ -157,6 +166,7 @@ export function wishDisplay(slot: Slot): WishDisplay {
     lanternShape: saved.lanternShape ?? DEFAULT_WISH.lanternShape,
     // 네 값이 다 있어야 CSS 가 온전하다 — 한 면만 저장된 옛 슬롯도 나머지가 채워진다
     shapePad: { ...DEFAULT_WISH.shapePad, ...(saved.shapePad ?? {}) },
+    shapeNamePad: { ...DEFAULT_WISH.shapeNamePad, ...(saved.shapeNamePad ?? {}) },
     sway: saved.sway ?? DEFAULT_WISH.sway,
     logo: saved.logo ?? DEFAULT_WISH.logo,
     logoAlign: saved.logoAlign || DEFAULT_WISH.logoAlign,

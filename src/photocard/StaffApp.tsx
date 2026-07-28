@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ExternalLink, Image as ImageIcon, Layers, Lock, Shuffle, Sparkles, Star, TriangleAlert, X } from 'lucide-react'
 
+import { CountPicker } from '@/components/CountPicker'
+import { countPicker, pickerVars } from '@/data/countPicker'
+
 import { useSlotState } from '@/slot/SlotProvider'
 import { photocardDisplay, photocardRules, RARITY_LABEL, type PhotocardDisplay } from '@/data/photocard'
 import { getSlotService } from '@/data/services'
@@ -92,6 +95,22 @@ function Staff({ slot }: { slot: Slot }) {
     ['--pc-deckDeep' as string]: mix(display.deckBg, 'black', 0.3),
     ['--pc-wash' as string]: mix(display.bg, isLight(display.bg) ? 'black' : 'white', 0.045),
     ['--pc-line' as string]: mix(display.bg, isLight(display.bg) ? 'black' : 'white', 0.1),
+    /*
+     * 수량 고르기는 럭드와 **같은 컴포넌트**다. 안 고른 색은 이 서비스의 팔레트에서
+     * 물려받는다 — 따로 만지지 않아도 한 이벤트처럼 보여야 한다.
+     */
+    ...pickerVars(
+      countPicker(display.picker, {
+        bg: mix(display.bg, isLight(display.bg) ? 'black' : 'white', 0.045),
+        borderColor: mix(display.bg, isLight(display.bg) ? 'black' : 'white', 0.1),
+        fg: display.headText,
+        stepBg: display.bg,
+        onBg: display.buttonColor,
+        onFg: isLight(display.buttonColor) ? '#1f1f1f' : '#ffffff',
+        goBg: display.buttonColor,
+        goFg: isLight(display.buttonColor) ? '#1f1f1f' : '#ffffff',
+      })
+    ),
   }
 
   const shell = (children: React.ReactNode) => (
@@ -314,56 +333,26 @@ function Staff({ slot }: { slot: Slot }) {
                 }} />
               </>
             ) : (
-              <>
-                <div className={styles.ask}>몇 장을 뽑을까요?</div>
-                <div className={styles.stepper}>
-                  <button
-                    type="button"
-                    className={styles.stepBtn}
-                    disabled={count <= 1}
-                    onClick={() => setCount((n) => Math.max(1, n - 1))}
-                    aria-label="한 장 줄이기"
-                  >
-                    −
-                  </button>
-                  <div className={styles.stepValue} data-count>{count}</div>
-                  <button
-                    type="button"
-                    className={styles.stepBtn}
-                    disabled={count >= max}
-                    onClick={() => setCount((n) => Math.min(max, n + 1))}
-                    aria-label="한 장 늘리기"
-                  >
-                    +
-                  </button>
-                </div>
-                <div className={styles.quick}>
-                  {[1, 3, 5, 10].filter((n) => n <= max).map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      className={styles.quickBtn}
-                      data-on={count === n || undefined}
-                      onClick={() => setCount(n)}
-                    >
-                      {n}장
-                    </button>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  className={styles.go}
-                  disabled={busy || shuffling || settings.closed}
-                  onClick={() => void go()}
-                  data-draw
-                >
-                  {busy ? '뽑는 중…' : `${count}장 뽑기`}
-                </button>
-                <ShuffleRow busy={busy || shuffling} onShuffle={() => {
+              <CountPicker
+                count={count}
+                max={max}
+                onCount={setCount}
+                onGo={() => void go()}
+                label="몇 장을 뽑을까요?"
+                goLabel={`${count}장 뽑기`}
+                busy={busy}
+                disabled={shuffling || settings.closed}
+                className={styles.picker}
+              />
+            )}
+            {!rules.usesTicket && (
+              <ShuffleRow
+                busy={busy || shuffling}
+                onShuffle={() => {
                   setShuffleKey((v) => v + 1)
                   setShuffling(true)
-                }} />
-              </>
+                }}
+              />
             )}
 
             {error && (

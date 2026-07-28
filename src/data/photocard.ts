@@ -1,5 +1,6 @@
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
+import type { CountPickerStyle } from './countPicker'
 
 /**
  * 포토카드 뽑기 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다.
@@ -33,6 +34,9 @@ export interface PhotocardDisplay {
   subText: string
   buttonColor: string
   logo: string
+
+  /** 수량 고르기 겉모습 — **럭키드로우와 같은 컴포넌트** (`src/components/CountPicker.tsx`) */
+  picker: Partial<CountPickerStyle>
 }
 
 export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
@@ -56,6 +60,7 @@ export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
   subText: '#7a7a78',
   buttonColor: '#26262a',
   logo: '',
+  picker: {},
 }
 
 /** 슬롯 설정 + 기본값 — **키 단위로 채운다** */
@@ -82,6 +87,8 @@ export function photocardDisplay(slot: Slot): PhotocardDisplay {
     subText: saved.subText || DEFAULT_PHOTOCARD.subText,
     buttonColor: saved.buttonColor || DEFAULT_PHOTOCARD.buttonColor,
     logo: saved.logo ?? DEFAULT_PHOTOCARD.logo,
+    // 저장값만 든다 — 안 고른 색의 기본값은 화면이 자기 팔레트로 채운다
+    picker: saved.picker ?? {},
   }
 }
 

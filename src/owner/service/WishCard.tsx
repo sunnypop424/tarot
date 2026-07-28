@@ -179,43 +179,54 @@ export function WishCard({
           <span style={CSS.label}>실루엣 안 글자 자리</span>
           <p style={{ margin: '6px 0 12px', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
             등불 크기의 <b>%</b> 로 잡습니다. 올리신 그림 모양에 맞춰 <b>오른쪽 미리보기를 보면서</b>{' '}
-            네 면을 조절해 주세요 — 글자가 실루엣 안쪽에 앉으면 됩니다.
+            조절해 주세요 — 글자가 실루엣 안쪽에 앉으면 됩니다.
             <br />
-            좁아지는 모양(호리병·물방울)일수록 값을 키우시면 돼요.
+            <b>본문과 이름을 따로 잡습니다.</b> 실루엣이 아래로 좁아지면 본문은 멀쩡한데 이름만
+            삐지는 일이 흔해서요 (이름은 <b>닉네임을 적은 소원에만</b> 나옵니다).
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,120px),1fr))', gap: 12 }}>
-            {(
-              [
-                ['top', '위'],
-                ['right', '오른쪽'],
-                ['bottom', '아래'],
-                ['left', '왼쪽'],
-              ] as ['top' | 'right' | 'bottom' | 'left', string][]
-            ).map(([key, label]) => (
-              <Field key={key} label={label}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <input
-                    type="number"
-                    min={0}
-                    max={45}
-                    value={d.shapePad[key]}
-                    onChange={(e) =>
-                      patch({
-                        shapePad: {
-                          ...d.shapePad,
-                          [key]: Math.min(45, Math.max(0, Number(e.target.value) || 0)),
-                        },
-                      })
-                    }
-                    style={{ ...CSS.input, flex: 1, minWidth: 0 }}
-                    aria-label={`${label} 여백`}
-                    data-shape-pad={key}
-                  />
-                  <span style={{ fontSize: 11.5, color: '#8a8a8a', flexShrink: 0 }}>%</span>
-                </div>
-              </Field>
-            ))}
-          </div>
+          {(
+            [
+              ['shapePad', '본문 여백'],
+              ['shapeNamePad', '이름 여백'],
+            ] as ['shapePad' | 'shapeNamePad', string][]
+          ).map(([group, groupLabel]) => (
+            <div key={group} style={{ marginBottom: 14 }}>
+              <div style={{ ...CSS.label, marginBottom: 8, color: '#8a8a8a' }}>{groupLabel}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,110px),1fr))', gap: 10 }}>
+                {(
+                  [
+                    ['top', '위'],
+                    ['right', '오른쪽'],
+                    ['bottom', '아래'],
+                    ['left', '왼쪽'],
+                  ] as ['top' | 'right' | 'bottom' | 'left', string][]
+                ).map(([key, label]) => (
+                  <Field key={key} label={label}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <input
+                        type="number"
+                        min={0}
+                        max={45}
+                        value={d[group][key]}
+                        onChange={(e) =>
+                          patch({
+                            [group]: {
+                              ...d[group],
+                              [key]: Math.min(45, Math.max(0, Number(e.target.value) || 0)),
+                            },
+                          } as Partial<WishDisplay>)
+                        }
+                        style={{ ...CSS.input, flex: 1, minWidth: 0 }}
+                        aria-label={`${groupLabel} ${label}`}
+                        data-shape-pad={`${group}-${key}`}
+                      />
+                      <span style={{ fontSize: 11.5, color: '#8a8a8a', flexShrink: 0 }}>%</span>
+                    </div>
+                  </Field>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </Card>
