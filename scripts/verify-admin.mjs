@@ -214,7 +214,7 @@ try {
   check('메뉴로 질문 목록에 든다', page.url().includes('/admin/questions'), page.url())
   await page.screenshot({ path: join(outDir, 'admin-questions-desktop.png') })
 
-  const rowCount = () => page.$$eval('.row-item', (e) => e.length)
+  const rowCount = () => page.$$eval('.ad-row', (e) => e.length)
   const before = await rowCount()
   await page.$$eval('button', (bs) => bs.find((b) => b.textContent.includes('질문 추가'))?.click())
   await wait(800)
@@ -223,7 +223,10 @@ try {
   // 질문 작성 + 공개 + 첫 카드 답변 입력
   await page.type('#q-text', '테스트 질문이 잘 저장되나요?')
   await wait(400)
-  await page.$$eval('input[type=checkbox]', (cs) => cs[0]?.click()) // 공개
+  // 공개 — 체크박스가 아니라 버튼이다 (조작 결과가 바로 저장된다)
+  await page.$$eval('button', (bs) =>
+    bs.find((b) => b.textContent.trim() === '손님에게 공개')?.click()
+  )
   await wait(400)
   await page.$$eval('[aria-expanded]', (bs) => bs[0]?.click())
   await wait(300)
@@ -252,13 +255,13 @@ try {
   page.on('dialog', (d) => void d.accept())
   await page.goto(`${BASE}/${A.slug}/admin/questions`, { waitUntil: 'networkidle0' })
   await wait(600)
-  await page.$$eval('.row-item', (rows) => {
+  await page.$$eval('.ad-row', (rows) => {
     rows.find((r) => r.textContent.includes('테스트 질문'))?.querySelector('button[aria-label="삭제"]')?.click()
   })
   await wait(400)
-  // 네이티브 confirm 이 아니라 확인 모달이 뜬다 — 모달의 '삭제' 를 눌러야 지워진다
+  // 네이티브 confirm 이 아니라 확인 모달이 뜬다 — 모달의 '지우기' 를 눌러야 지워진다
   await page.$$eval('[role="dialog"] button', (bs) =>
-    bs.find((b) => b.textContent.trim() === '삭제')?.click()
+    bs.find((b) => b.textContent.trim() === '지우기')?.click()
   )
   await wait(1000)
   const afterDelete = await rowCount()
