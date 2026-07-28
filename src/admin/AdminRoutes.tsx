@@ -9,6 +9,7 @@ import { useSlotOrNull } from '@/slot/SlotProvider'
 import { NotFound } from '@/screens/NotFound'
 import { Account } from './Account'
 import { AdminLayout } from './AdminLayout'
+import { Dashboard } from './Dashboard'
 import { Login } from './Login'
 import { QuestionList } from './QuestionList'
 import { QuestionEditor } from './QuestionEditor'
@@ -36,22 +37,10 @@ import { useAdminAuth } from './useAdminAuth'
  * **`Record` 라 모든 서비스가 필수다** — 삼항 체인이었을 땐 새 서비스가 조용히 `else`(타로 질문
  * 화면)로 떨어졌다. 이제 `SERVICES` 에 한 줄 넣으면 여기가 컴파일 에러로 터진다.
  *
- * `home` 은 **경로 조각만** 든다. 절대 경로 조립은 아래에서 한다 — 상대 경로(`to="prizes"`)를
- * catch-all 에 쓰면 리다이렉트가 경로를 **덧붙여서** `/admin/x/prizes/prizes/prizes/…` 로
- * 무한히 자란다. 못 찾은 주소를 첫 화면으로 되돌리는 게 이 라우트의 일인데, 상대 경로면
- * 되돌리는 게 아니라 계속 파고든다.
+ * 못 찾은 주소는 **대시보드**로 되돌린다. 되돌릴 때 **절대 경로**를 써야 한다 —
+ * 상대 경로(`to="prizes"`)면 리다이렉트가 경로를 덧붙여 `/admin/x/prizes/prizes/…` 로
+ * 무한히 자란다(되돌리는 게 아니라 계속 파고든다).
  */
-const ADMIN_HOME: Record<ServiceId, string> = {
-  tarot: 'questions',
-  luckydraw: 'overview',
-  rolling: 'messages',
-  photozone: 'photozone',
-  wish: 'messages',
-  poll: 'polls',
-  stamp: 'stamp',
-  quiz: 'quiz',
-  photocard: 'photocard',
-}
 
 const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
   tarot: (
@@ -130,14 +119,20 @@ export default function AdminRoutes() {
   if (!slot) return <NotFound />
 
   const service = getSlotService(slot)
-  const home = `/${slot.slug}/admin/${ADMIN_HOME[service]}`
+  /** 못 찾은 주소가 되돌아갈 자리 — **대시보드다** (예전엔 서비스 첫 화면이었다) */
+  const home = `/${slot.slug}/admin`
 
   return (
     <Routes>
       <Route path="login" element={<Login />} />
       <Route element={<RequireAuth />}>
-        <Route index element={<Navigate to={home} replace />} />
         <Route element={<AdminLayout />}>
+          {/*
+            * 로그인하면 **현황부터** 본다. 예전엔 곧장 고치는 화면(카드 목록·문항 목록)으로
+            * 떨어져서, 오늘 몇 장 나갔는지 알려면 메뉴를 돌아다녀야 했다.
+            * 서비스 첫 화면은 `ADMIN_HOME` 이 여전히 들고 있다 — 대시보드의 바로가기가 쓴다.
+            */}
+          <Route index element={<Dashboard />} />
           {ADMIN_ROUTES[service]}
           {/* local 어댑터엔 바꿀 비밀번호가 없다 (아무 값이나 통과한다) — 메뉴도 화면도 안 만든다 */}
           {hasSupabase && <Route path="account" element={<Account />} />}

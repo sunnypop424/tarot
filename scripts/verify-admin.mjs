@@ -193,7 +193,14 @@ try {
   await page.type('#admin-password', ORG_PASSWORD)
   await page.click('button[type="submit"]')
   await wait(2500)
-  check('로그인 후 질문 목록에 든다', page.url().includes('/admin/questions'), page.url())
+  // 로그인하면 **대시보드**로 든다 (예전엔 서비스 첫 화면이었다 — admin/Dashboard.tsx 주석)
+  check('로그인 후 대시보드에 든다', /\/admin\/?$/.test(page.url()), page.url())
+  check('대시보드에 숫자 카드가 뜬다', Boolean(await page.$('[data-stats]')))
+  await page.screenshot({ path: join(outDir, 'admin-dashboard-desktop.png') })
+
+  await page.goto(`${BASE}/${A.slug}/admin/questions`, { waitUntil: 'networkidle0' })
+  await wait(800)
+  check('메뉴로 질문 목록에 든다', page.url().includes('/admin/questions'), page.url())
   await page.screenshot({ path: join(outDir, 'admin-questions-desktop.png') })
 
   const rowCount = () => page.$$eval('.row-item', (e) => e.length)

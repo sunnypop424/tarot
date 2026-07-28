@@ -15,6 +15,7 @@ import {
   Ticket as TicketIcon,
   ScanLine,
   Dices,
+  Gift,
   Stamp,
   StickyNote,
   Truck,
@@ -24,7 +25,7 @@ import {
 import type { LucideIcon } from 'lucide-react'
 
 import { hasSupabase } from '@/lib/repo/client'
-import { getSlotService } from '@/data/services'
+import { getSlotService, serviceLabel } from '@/data/services'
 import type { ServiceId } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
 import { AdminFeedbackHost } from './AdminFeedback'
@@ -37,6 +38,18 @@ interface NavItem {
   icon: LucideIcon
   /** 관리 셸 밖으로 나가는 화면 — 새 탭으로 연다 (스태프 기기·전광판 같은 현장 화면) */
   external?: boolean
+}
+
+/**
+ * 메뉴 묶음 — **제목이 붙는다.**
+ *
+ * 한 계정이 슬롯을 여러 개 갖고(`0006_multi_slot_admins.sql`) 서비스도 아홉이 되면서,
+ * 메뉴만 죽 늘어놓으면 **지금 무슨 서비스를 보고 있는지**가 사라졌다. 묶음 제목이 그걸 말한다
+ * ("포토카드 뽑기" 아래 카드·뽑기권·스태프 화면).
+ */
+interface NavGroup {
+  title: string
+  items: NavItem[]
 }
 
 /**
@@ -55,7 +68,7 @@ interface NavItem {
 const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
   tarot: [{ to: 'questions', label: '질문 타로', icon: MessageCircleQuestion }],
   luckydraw: [
-    { to: 'overview', label: '대시보드', icon: LayoutDashboard },
+    { to: 'overview', label: '상품 · 운영', icon: Gift },
     { to: 'shipping', label: '배송 정보', icon: Truck },
   ],
   rolling: [{ to: 'messages', label: '롤링페이퍼', icon: StickyNote }],
@@ -108,11 +121,14 @@ function rewardNav(service: ServiceId): NavItem[] {
   return USES_REWARDS.includes(service) ? REWARD_NAV : []
 }
 
-function useNav(service: ServiceId, _slug: string): NavItem[] {
+function useNav(service: ServiceId): NavGroup[] {
+  const rewards = rewardNav(service)
   return [
-    ...SERVICE_NAV[service],
-    ...rewardNav(service),
-    ...(hasSupabase ? [{ to: 'account', label: '내 계정', icon: UserCog }] : []),
+    { title: '현황', items: [{ to: '', label: '대시보드', icon: LayoutDashboard }] },
+    // 묶음 제목이 곧 이 슬롯이 파는 서비스다 — 슬롯을 오갈 때 여기가 바뀐다
+    { title: serviceLabel(service), items: SERVICE_NAV[service] },
+    ...(rewards.length ? [{ title: '보상', items: rewards }] : []),
+    ...(hasSupabase ? [{ title: '계정', items: [{ to: 'account', label: '내 계정', icon: UserCog }] }] : []),
   ]
 }
 
@@ -120,7 +136,7 @@ export function AdminLayout() {
   const slot = useSlot()
   const navigate = useNavigate()
   const { user, signOut } = useAdminAuth(slot.slug)
-  const NAV = useNav(getSlotService(slot), slot.slug)
+  const GROUPS = useNav(getSlotService(slot))
 
   /**
    * 로그아웃하면 **바로** 나간다.
@@ -145,37 +161,45 @@ export function AdminLayout() {
           {user && <SlotSwitcher current={slot.slug} slugs={user.slugs} />}
 
           <nav className="admin__nav" aria-label="관리 메뉴">
-            {NAV.map(({ to, label, icon: Icon, external }) =>
-              external ? (
-                // 관리 셸 밖 화면 — 새 탭으로 연다 (부스 기기를 따로 띄워두고 쓴다)
-                <a
-                  key={to}
-                  className="admin__navlink"
-                  href={`/${slot.slug}/${to}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <Icon size={20} strokeWidth={2} aria-hidden="true" />
-                  {label}
-                  <ExternalLink size={13} strokeWidth={2} aria-hidden="true" style={{ marginLeft: 'auto', opacity: 0.5 }} />
-                </a>
-              ) : (
-                // 절대 경로로 — 상대 경로는 현재 URL 에 누적돼 /questions/questions… 로 늘어난다
-                <NavLink key={to} to={`/${slot.slug}/admin/${to}`} className="admin__navlink">
-                  <Icon size={20} strokeWidth={2} aria-hidden="true" />
-                  {label}
-                </NavLink>
-              )
-            )}
-            <a
-              className="admin__navlink"
-              href={`/${slot.slug}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <ExternalLink size={20} strokeWidth={2} aria-hidden="true" />
-              내 페이지 보기
-            </a>
+            {GROUPS.map((group) => (
+              <div className="admin__navgroup" key={group.title}>
+                <p className="admin__navtitle">{group.title}</p>
+                {group.items.map(({ to, label, icon: Icon, external }) =>
+                  external ? (
+                    // 관리 셸 밖 화면 — 새 탭으로 연다 (부스 기기를 따로 띄워두고 쓴다)
+                    <a
+                      key={to}
+                      className="admin__navlink"
+                      href={`/${slot.slug}/${to}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Icon size={18} strokeWidth={2} aria-hidden="true" />
+                      {label}
+                      <ExternalLink size={13} strokeWidth={2} aria-hidden="true" style={{ marginLeft: 'auto', opacity: 0.5 }} />
+                    </a>
+                  ) : (
+                    // 절대 경로로 — 상대 경로는 현재 URL 에 누적돼 /questions/questions… 로 늘어난다
+                    <NavLink
+                      key={to}
+                      to={`/${slot.slug}/admin${to ? `/${to}` : ''}`}
+                      end={to === ''}
+                      className="admin__navlink"
+                    >
+                      <Icon size={18} strokeWidth={2} aria-hidden="true" />
+                      {label}
+                    </NavLink>
+                  )
+                )}
+              </div>
+            ))}
+            <div className="admin__navgroup">
+              <p className="admin__navtitle">이벤트</p>
+              <a className="admin__navlink" href={`/${slot.slug}`} target="_blank" rel="noreferrer">
+                <ExternalLink size={18} strokeWidth={2} aria-hidden="true" />
+                내 페이지 보기
+              </a>
+            </div>
           </nav>
 
           <div style={{ marginTop: 'auto' }}>

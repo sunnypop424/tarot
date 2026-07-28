@@ -64,13 +64,17 @@
   text-wrap: pretty;
   word-break: keep-all;
 }
+/*
+ * 안내 문구는 **제목과 같은 줄에서 시작한다.** 제목은 왼쪽(로고 옆)인데 문구만 가운데면
+ * 둘이 따로 노는 것처럼 보인다 — 여백을 헤더와 같은 20px 로 맞춘다.
+ */
 .deckGuide {
   position: relative;
-  margin: 14px 22px 0;
+  margin: 10px 20px 0;
   font-size: 13px;
   color: #93959f;
   line-height: 1.6;
-  text-align: center;
+  text-align: left;
   word-break: keep-all;
 }
 

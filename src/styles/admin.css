@@ -146,14 +146,32 @@
 .admin__nav {
   display: flex;
   flex-direction: column;
+  gap: var(--space-base);
+}
+
+/*
+ * 메뉴 묶음 — **제목이 붙는다.** 서비스가 아홉이 되고 한 계정이 슬롯을 여러 개 갖게 되면서,
+ * 메뉴만 죽 늘어놓으면 "지금 무슨 서비스를 보고 있나" 가 사라졌다.
+ */
+.admin__navgroup {
+  display: flex;
+  flex-direction: column;
   gap: 2px;
+}
+.admin__navtitle {
+  margin: 0 0 4px var(--space-md);
+  font-size: 10.5px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+  color: var(--color-fg-3);
+  text-transform: uppercase;
 }
 
 .admin__navlink {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 42px;
+  min-height: 38px;
   padding: 0 var(--space-md);
   /* 알약 (시안) */
   border-radius: var(--radius-full);
@@ -224,6 +242,109 @@
   .admin__main {
     padding: var(--space-base);
   }
+}
+
+/* ══ 대시보드 (주최자 첫 화면) ═════════════════════ */
+
+/*
+ * 숫자 카드가 주인공이다 — 행사 중에 주최자가 보는 건 "지금 얼마나 나갔나" 하나다.
+ * 색은 관리 도구의 것이고 **슬롯 테마를 절대 안 따른다** (위 `.admin` 토큰 덮어쓰기).
+ */
+.dash__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  gap: 12px;
+  margin-bottom: var(--space-xl);
+}
+.dash__card {
+  padding: 16px 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+/* 눈에 띄어야 하는 값 (재고 임박·미수령) — 테두리만 바꾼다, 숫자는 그대로 읽혀야 한다 */
+.dash__card[data-warn] {
+  border-color: var(--color-warn-border);
+  background: var(--color-warn-bg);
+}
+.dash__label {
+  font-size: 11.5px;
+  font-weight: var(--weight-bold);
+  color: var(--color-fg-3);
+}
+.dash__value {
+  margin-top: 6px;
+  font-size: 28px;
+  font-weight: var(--weight-bold);
+  color: var(--color-fg-1);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.dash__note {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--color-fg-3);
+  line-height: 1.5;
+}
+
+/* 기간 배지 — 열림/임박/끝남 */
+.dash__periodBox {
+  display: flex;
+  align-items: center;
+}
+.dash__period {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: var(--weight-bold);
+  background: var(--color-wash);
+  color: var(--color-primary);
+}
+.dash__period[data-state='soon'] {
+  background: var(--color-warn-bg);
+  color: var(--color-warn-fg);
+}
+.dash__period[data-state='closed'] {
+  background: #fdeceb;
+  color: #b23b3a;
+}
+
+.dash__section {
+  margin-top: var(--space-lg);
+}
+.dash__sectionTitle {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  font-weight: var(--weight-bold);
+  color: var(--color-fg-2);
+}
+.dash__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dash__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--color-field-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-fg-2);
+  font-size: 12.5px;
+  font-weight: var(--weight-bold);
+  text-decoration: none;
+}
+.dash__link:hover {
+  background: var(--color-wash);
+  color: var(--color-primary);
+  border-color: var(--color-border-hover);
 }
 
 /* ══ 폼 ════════════════════════════════════════════ */

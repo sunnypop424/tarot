@@ -1160,7 +1160,16 @@ export function SlotEditor() {
               </div>
               <div>
                 <div style={{ ...CSS.label, marginBottom: 7 }}>서비스</div>
-                <div role="radiogroup" aria-label="서비스" style={{ display: 'inline-flex', background: '#f7f7f7', border: '1px solid #eeeeee', borderRadius: 9999, padding: 3, gap: 2, flexWrap: 'wrap' }}>
+                {/*
+                  * **알약 한 줄이 아니라 카드 격자다.** 서비스가 아홉이 되면서 알약이 두 줄로
+                  * 접히고, 이름만 있어서 "포토존" 과 "포토카드" 를 고를 때 무엇이 다른지
+                  * 화면이 말해주지 못했다. 카드에 한 줄 설명을 같이 둔다.
+                  */}
+                <div
+                  role="radiogroup"
+                  aria-label="서비스"
+                  style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,168px),1fr))', gap: 8 }}
+                >
                   {SERVICES.map((s) => {
                     const on = getSlotService(draft) === s.id
                     return (
@@ -1169,24 +1178,40 @@ export function SlotEditor() {
                         type="button"
                         role="radio"
                         aria-checked={on}
+                        data-service={s.id}
                         onClick={() => {
                           patchSlot({ service: s.id })
                           if (s.id === 'luckydraw') applyBase(LUCKYDRAW_NEUTRALS)
                         }}
-                        style={{ height: 32, padding: '0 20px', border: 'none', borderRadius: 9999, fontSize: 13, fontWeight: 700, cursor: 'pointer', background: on ? '#816bff' : 'transparent', color: on ? '#fff' : '#8a8a8a' }}
+                        style={{
+                          textAlign: 'left',
+                          padding: '11px 13px',
+                          borderRadius: 8,
+                          cursor: 'pointer',
+                          border: `1px solid ${on ? '#816bff' : '#e4e4ea'}`,
+                          background: on ? '#f5f2ff' : '#fff',
+                          // 선택된 카드만 한 겹 더 — 테두리 색만으로는 훑을 때 안 잡힌다
+                          boxShadow: on ? '0 0 0 1px #816bff inset' : 'none',
+                        }}
                       >
-                        {s.label}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: on ? '#5b45d6' : '#121212' }}>
+                            {s.label}
+                          </span>
+                          {on && <Check size={13} strokeWidth={3} color="#816bff" aria-hidden="true" />}
+                        </div>
+                        <div style={{ marginTop: 3, fontSize: 11, lineHeight: 1.5, color: on ? '#7a6bc4' : '#8a8a8a' }}>
+                          {s.hint}
+                        </div>
                       </button>
                     )
                   })}
                 </div>
-                <div style={{ fontSize: 11.5, color: '#8a8a8a', marginTop: 8, lineHeight: 1.55 }}>
-                  이 슬롯이 파는 것.{' '}
-                  {luckydraw
-                    ? '아래 설정은 럭키드로우용이에요 (카드·AI 관련 항목은 안 나와요).'
-                    : rolling
-                      ? '아래 “롤링페이퍼” 칸에서 벽 문구·카드 색·스티커·배경을 정해요 (색·형태는 테마를 따라가요).'
-                      : '아래 카드 · 뽑기 관련 항목은 타로 서비스의 설정이에요.'}
+                {/* 설명은 **고른 서비스 기준**이다 — 서비스가 아홉인데 삼항으로 갈라 두면
+                    새 서비스가 조용히 타로 문장을 받는다 (그 함정을 여기서도 안 만든다) */}
+                <div style={{ fontSize: 11.5, color: '#8a8a8a', marginTop: 10, lineHeight: 1.55 }}>
+                  이 슬롯이 파는 것 — 아래 <b>{serviceLabel(getSlotService(draft))}</b> 칸에서 그 서비스의
+                  문구·색·이미지를 정해요. 색·형태는 위 테마를 따라갑니다.
                 </div>
               </div>
             </div>
