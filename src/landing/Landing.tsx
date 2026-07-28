@@ -27,6 +27,7 @@ import {
   THEIRS,
   type DemoScreen,
 } from './landingData'
+import { InquiryModal } from './InquiryModal'
 import styles from './Landing.module.css'
 
 /**
@@ -64,6 +65,9 @@ const STAGE_H_NARROW = 448
 export default function Landing() {
   const [active, setActive] = useState(SERVICES[0].key)
   const [openFaq, setOpenFaq] = useState<number | null>(0)
+  /** 문의는 오픈채팅으로 받는다 — 창이 양식을 만들어 주고 보내는 건 손님의 카톡이 한다 */
+  const [inquiry, setInquiry] = useState(false)
+  const openInquiry = useCallback(() => setInquiry(true), [])
   /** 좁은 화면에서 화면이 여럿일 때 뭘 볼지 (넓으면 둘 다 나란히 뜬다) */
   const [screenIdx, setScreenIdx] = useState(0)
   /**
@@ -160,9 +164,9 @@ export default function Landing() {
             <a className={styles.navLink} href="#demo">
               체험
             </a>
-            <a className={styles.navCta} href="#contact">
+            <button type="button" className={`${styles.navCta} ${styles.asBtn}`} onClick={openInquiry} data-inquiry-open>
               문의하기
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -187,9 +191,9 @@ export default function Landing() {
             <a className={styles.ctaDark} href="#services">
               서비스 둘러보기
             </a>
-            <a className={styles.ctaGhost} href="#contact">
+            <button type="button" className={`${styles.ctaGhost} ${styles.asBtn}`} onClick={openInquiry} data-inquiry-open>
               문의하기
-            </a>
+            </button>
           </div>
 
           <div className={`${styles.facts} ${styles.rv}`} data-rv>
@@ -266,9 +270,14 @@ export default function Landing() {
                 생각하고 계신 기획이 있다면 그 행사에만 쓰는 페이지로 주문 제작합니다.
               </p>
             </div>
-            <a className={styles.customCta} href="#contact">
+            <button
+              type="button"
+              className={`${styles.customCta} ${styles.asBtn}`}
+              onClick={openInquiry}
+              data-inquiry-open
+            >
               주문 제작 문의하기 <ArrowRight size={15} strokeWidth={1.8} aria-hidden="true" />
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -499,9 +508,24 @@ export default function Landing() {
             <div className={styles.eyebrow}>05 — FAQ</div>
             <h2 className={styles.h2}>자주 묻는 것</h2>
             <p className={styles.sub}>여기서 답이 안 나오면 바로 물어보셔도 됩니다.</p>
-            <a href="#contact" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, fontSize: 14, fontWeight: 700 }}>
+            <button
+              type="button"
+              className={styles.asBtn}
+              onClick={openInquiry}
+              data-inquiry-open
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                marginTop: 16,
+                padding: 0,
+                fontSize: 14,
+                fontWeight: 700,
+                color: 'var(--accent)',
+              }}
+            >
               문의하기 <ArrowRight size={15} strokeWidth={1.8} aria-hidden="true" />
-            </a>
+            </button>
           </div>
 
           <div className={`${styles.faqList} ${styles.rv}`} data-rv>
@@ -535,15 +559,15 @@ export default function Landing() {
             그때 이야기해요.
           </h2>
           <p className={`${styles.contactBody} ${styles.rv}`} data-rv>
-            어떤 서비스를 쓸지 아직 몰라도 괜찮습니다. 행사 규모와 날짜만 알려 주세요.
+            문의는 <b>카카오 오픈채팅</b>으로 받고 있어요. 어떤 서비스를 쓸지 아직 몰라도 괜찮습니다 —
+            행사 규모와 날짜만 알려 주세요.
           </p>
           <div className={`${styles.contactRow} ${styles.rv}`} data-rv>
-            {/* 실제 주소는 사장님이 정하시면 그때 채웁니다 — 지금 지어내지 않는다 */}
-            <a className={styles.ctaDark} href="#contact">
-              트위터 DM 보내기
-            </a>
-            <a className={styles.ctaGhost} href="#contact">
-              문의 폼 작성하기
+            <button type="button" className={`${styles.ctaDark} ${styles.asBtn}`} onClick={openInquiry} data-inquiry-open>
+              오픈채팅으로 문의하기
+            </button>
+            <a className={styles.ctaGhost} href="#demo">
+              체험 페이지 둘러보기
             </a>
           </div>
         </div>
@@ -555,6 +579,9 @@ export default function Landing() {
           <span className={styles.footerNote}>이벤트 하나에 페이지 하나. 준비는 우리가, 운영은 주최자가.</span>
         </div>
       </div>
+
+      {/* 문의 창은 `.root` 안에 둔다 — 색 토큰이 여기서 상속된다 */}
+      <InquiryModal open={inquiry} onClose={() => setInquiry(false)} />
     </div>
   )
 }

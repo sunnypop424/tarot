@@ -1,0 +1,205 @@
+/*
+ * 문의 창 — 랜딩 안에 그린다. 색 토큰(`--bg`·`--accent` …)은 `.root` 가 들고 있고
+ * 커스텀 프로퍼티는 상속되니 여기서 다시 정의하지 않는다 (두 벌이 되면 한쪽만 고치는 날이 온다).
+ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgb(12 12 16 / 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+.box {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: min(88vh, 860px);
+  overflow-y: auto;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  padding: 30px clamp(20px, 4vw, 34px) 26px;
+  box-shadow: 0 30px 90px rgb(10 10 14 / 0.3);
+}
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--fg-dim);
+  cursor: pointer;
+}
+.close:hover {
+  background: var(--bg-soft);
+  color: var(--fg);
+}
+
+.kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+.title {
+  margin: 8px 0 0;
+  font-size: clamp(21px, 3.4vw, 25px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* 순서가 곧 안내다 — 별명을 먼저 바꾸지 않으면 방에서 누구 문의인지 모른다 */
+.steps {
+  margin: 18px 0 0;
+  /* 전역 리셋이 목록 마커를 지운다 — 순서가 안내의 뼈대라 여기서 되살린다 */
+  list-style: decimal;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--fg-mid);
+}
+.steps b {
+  color: var(--fg);
+  font-weight: 700;
+}
+
+.hint {
+  margin: 14px 0 0;
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--fg-mid);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.hint b {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.label {
+  margin: 26px 0 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--fg);
+}
+.label span {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg-dim);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 9999px;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--fg-mid);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.chip[data-on] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.preview {
+  margin: 0;
+  max-height: 240px;
+  overflow: auto;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-soft);
+  color: var(--fg-mid);
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 창 바닥에 붙는 띠 — 양식이 길어 스크롤해도 복사·열기가 늘 보인다 */
+.stick {
+  position: sticky;
+  bottom: -26px; /* 상자 아래 패딩만큼 내려 붙는다 */
+  margin: 0 -4px;
+  padding: 14px 4px 4px;
+  background: linear-gradient(to bottom, transparent, var(--bg) 22%);
+}
+.actions {
+  display: flex;
+  gap: 10px;
+}
+.copyBtn,
+.kakaoBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.copyBtn {
+  border-color: var(--line-strong);
+  background: var(--card);
+  color: var(--fg);
+}
+/* 카카오 노랑은 브랜드 색이라 다크에서도 그대로 둔다 — 이 버튼만 알아보면 되는 자리다 */
+.kakaoBtn {
+  background: #fee500;
+  color: #191600;
+}
+.kakaoBtn:hover {
+  color: #191600;
+  opacity: 0.9;
+}
+
+.foot {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--fg-dim);
+}
+
+@media (max-width: 479px) {
+  .actions {
+    flex-direction: column;
+  }
+}
