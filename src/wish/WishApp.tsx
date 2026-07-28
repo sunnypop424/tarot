@@ -158,11 +158,18 @@ function scatter(items: RollingMessage[], canopyW: number, canopyH: number): Pla
     const size = { w: sw, h: Math.round(sw * 1.09) }
     const half = size.w / 2 + 10
     /**
+     * **등불 아래로 삐져나오는 것들.** 장식(`charm`)은 등불 바닥에서 16px 내려가 22px 이
+     * 더 걸리고, 흔들리면 그만큼 더 내려온다. 이걸 안 빼면 등불이 **페이지 번호를 덮는다**
+     * (실제로 그랬다) — 좌우 잘림은 `swingOf` 로 고쳤는데 아래쪽은 안 봤던 자리다.
+     * 장식이 없는 소원은 덜 잡아 자리를 아낀다.
+     */
+    const tail = w.sticker ? 42 : 12
+    /**
      * **줄 길이는 가지 높이 안으로 자른다.** 안 자르면 아래쪽 등불이 화면 밖으로 나가
      * 잘린 채 보인다 (`.tree` 가 overflow:hidden 이라 스크롤도 안 된다).
      * 한 화면에 안 들어가는 만큼은 다음 페이지로 넘긴다 — 그게 페이지를 나눈 이유다.
      */
-    const maxDrop = Math.max(14, canopyH - size.h - 14)
+    const maxDrop = Math.max(14, canopyH - size.h - tail)
 
     /**
      * **줄이 길수록 좌우로 더 크게 흔들린다.** 흔들림은 `.hang` 전체를 줄 맨 위를 축으로
@@ -194,7 +201,7 @@ function scatter(items: RollingMessage[], canopyW: number, canopyH: number): Pla
       const lo = margin
       const hi = Math.max(margin, canopyW - margin)
       const cx = lo + seeded(w.id, 21 + t * 7) * (hi - lo)
-      const box = { l: cx - size.w / 2 - PAD, r: cx + size.w / 2 + PAD, t: dy, b: dy + size.h + PAD }
+      const box = { l: cx - size.w / 2 - PAD, r: cx + size.w / 2 + PAD, t: dy, b: dy + size.h + tail + PAD }
       // 겹친 넓이의 합 — 0 이면 완전히 빈 자리다
       let cost = 0
       for (const p of boxes) {
@@ -264,8 +271,16 @@ function Lantern({
         ['--lantern' as string]: color,
         ['--w' as string]: `${w}px`,
         ['--h' as string]: `${h}px`,
+        // 마스크는 배경 층(::before)이 쓴다 — 등불 자체에 걸면 글자까지 잘린다 (CSS 주석)
         ...(shaped
-          ? { WebkitMaskImage: cssUrl(display.lanternShape), maskImage: cssUrl(display.lanternShape) }
+          ? {
+              ['--shape' as string]: cssUrl(display.lanternShape),
+              // 글자 자리는 올린 실루엣마다 달라서 편집기에서 네 면을 직접 잡는다
+              ['--padT' as string]: `${display.shapePad.top}%`,
+              ['--padR' as string]: `${display.shapePad.right}%`,
+              ['--padB' as string]: `${display.shapePad.bottom}%`,
+              ['--padL' as string]: `${display.shapePad.left}%`,
+            }
           : {}),
       }}
     >

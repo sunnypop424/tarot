@@ -18,8 +18,9 @@
  */
 
 import puppeteer from 'puppeteer-core'
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { checkNoImg } from './verify-noimg.mjs'
 
 const env = {}
 try {
@@ -51,29 +52,11 @@ const check = (name, ok, detail = '') => {
 }
 
 // ══ 1. 소스 규칙: <img> 는 SavableImage 에서만 ══════
-{
-  const hits = []
-  const walk = (dir) => {
-    for (const e of readdirSync(dir)) {
-      const p = join(dir, e)
-      if (statSync(p).isDirectory()) walk(p)
-      else if (/\.tsx?$/.test(e)) {
-        // 주석 줄은 뺀다 — 규칙을 설명하는 문장에도 <img> 가 나온다
-        const lines = readFileSync(p, 'utf8').split('\n')
-        for (const ln of lines) {
-          const t = ln.trim()
-          if (t.startsWith('*') || t.startsWith('//')) continue
-          // `\b` 로 잡는다 — JSX 는 `<img` 에서 줄을 바꾸는 일이 흔해 뒤 문자를 요구하면 놓친다
-          if (/<img\b/.test(ln)) hits.push(p)
-        }
-      }
-    }
-  }
-  walk('src')
-  const unique = [...new Set(hits)]
-  const only = unique.length === 1 && unique[0].endsWith('SavableImage.tsx')
-  check('`<img>` 는 SavableImage 에서만 쓴다', only, unique.join(', ') || '0곳')
-}
+//
+// **검사 본체는 `verify-noimg.mjs` 에 있다.** 예전엔 여기 같은 검사를 따로 갖고 있었는데
+// 그쪽은 `//`·`*` 로 시작하는 줄만 주석으로 쳐서, JSX 주석 안의 `<img>` 를 코드로 읽고
+// 오탐을 냈다(실제로 그랬다). 같은 검사가 둘이면 한쪽만 고치는 날이 온다.
+for (const r of checkNoImg()) check(r.name, r.ok, r.detail)
 
 // ══ 2. anon 은 Storage 에 못 쓴다 (0002 정책 회귀) ══
 let OWNER = null

@@ -8,6 +8,7 @@ import {
   Lock,
   RotateCw,
   Settings,
+  Share2,
   Shuffle,
   Sparkles,
   Store,
@@ -23,7 +24,7 @@ import { isLight, mix } from '@/lib/color'
 import { cssUrl } from '@/lib/image'
 import { visitorId } from '@/lib/visitor'
 import { appendItem, readList } from '@/lib/locker'
-import { fromUrl, releaseResult, saveResult, type ResultImage } from '@/lib/compose'
+import { fromUrl, releaseResult, saveResult, shareResult, type ResultImage } from '@/lib/compose'
 import { SavableImage } from '@/components/SavableImage'
 import type { PhotocardDrawn, PhotocardMine, PhotocardSettings, PhotocardTicket } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
@@ -527,10 +528,11 @@ function Result({
     }
   }, [card.image, allowSave])
 
-  async function save() {
+  async function run(kind: 'save' | 'share') {
     if (!image) return
-    const how = await saveResult(image, `${card.name || '포토카드'}.png`)
-    if (how === 'opened') setNote('새 탭에서 사진을 길게 눌러 저장해 주세요.')
+    const name = `${card.name || '포토카드'}.png`
+    const how = kind === 'save' ? await saveResult(image, name) : await shareResult(image, name)
+    setNote(how === 'opened' ? '새 탭에서 사진을 길게 눌러 저장해 주세요.' : null)
   }
 
   return (
@@ -579,10 +581,31 @@ function Result({
 
       <div className={styles.resultFoot}>
         {allowSave && (
-          <button type="button" className={styles.lightBtn} disabled={!image} onClick={() => void save()} data-save>
-            <Download size={19} strokeWidth={1.9} aria-hidden="true" />
-            {display.saveLabel}
-          </button>
+          <>
+            <button
+              type="button"
+              className={styles.lightBtn}
+              disabled={!image}
+              onClick={() => void run('save')}
+              data-save
+            >
+              <Download size={19} strokeWidth={1.9} aria-hidden="true" />
+              {display.saveLabel}
+            </button>
+            {/* 공유는 이 기기가 실제로 공유를 할 수 있을 때만 — 없으면 저장과 똑같아진다 */}
+            {typeof navigator !== 'undefined' && 'share' in navigator && (
+              <button
+                type="button"
+                className={styles.ghostDark}
+                disabled={!image}
+                onClick={() => void run('share')}
+                data-share
+              >
+                <Share2 size={17} strokeWidth={1.8} aria-hidden="true" />
+                공유
+              </button>
+            )}
+          </>
         )}
         {onAgain && (
           <button type="button" className={styles.ghostDark} onClick={onAgain} data-again>

@@ -67,6 +67,16 @@ export interface WishDisplay {
    * 비면 CSS 로 그린 기본 등불(둥근 몸통 + 위아래 갓)을 쓴다.
    */
   lanternShape: string
+  /**
+   * 실루엣을 쓸 때 **글자를 어디에 둘지** — 위·오른쪽·아래·왼쪽 여백을 등불 크기의 %로.
+   *
+   * 실루엣은 가장자리가 좁아지는 모양이 많아서, 글자 상자가 등불 전체를 쓰면 **글자 밑이
+   * 투명해져 등불 밖으로 나간 것처럼 보인다.** 모양은 PNG 마다 달라 코드가 짐작할 수 없으니
+   * (호리병·원형·사각형이 다 다르다) 올리는 사람이 눈으로 보고 맞춘다.
+   *
+   * **실루엣이 없으면 안 쓴다** — 기본 등불은 CSS 로 그려서 모양을 이미 안다.
+   */
+  shapePad: { top: number; right: number; bottom: number; left: number }
   /** 등불이 바람에 흔들릴지 — 끄면 정적 (움직임에 민감한 사람도 있다) */
   sway: boolean
 
@@ -109,6 +119,8 @@ export const DEFAULT_WISH: WishDisplay = {
   treeBg: '',
   treeBgRepeat: false,
   lanternShape: '',
+  // 가운데가 넓은 흔한 등불 모양 기준 — 올린 그림에 맞춰 편집기에서 조정한다
+  shapePad: { top: 22, right: 19, bottom: 22, left: 19 },
   sway: true,
   logo: '',
   logoAlign: 'left',
@@ -143,6 +155,8 @@ export function wishDisplay(slot: Slot): WishDisplay {
     treeBg: saved.treeBg ?? DEFAULT_WISH.treeBg,
     treeBgRepeat: saved.treeBgRepeat ?? DEFAULT_WISH.treeBgRepeat,
     lanternShape: saved.lanternShape ?? DEFAULT_WISH.lanternShape,
+    // 네 값이 다 있어야 CSS 가 온전하다 — 한 면만 저장된 옛 슬롯도 나머지가 채워진다
+    shapePad: { ...DEFAULT_WISH.shapePad, ...(saved.shapePad ?? {}) },
     sway: saved.sway ?? DEFAULT_WISH.sway,
     logo: saved.logo ?? DEFAULT_WISH.logo,
     logoAlign: saved.logoAlign || DEFAULT_WISH.logoAlign,

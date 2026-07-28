@@ -362,7 +362,10 @@
   letter-spacing: 0.14em;
   color: var(--qz-sub);
 }
+/* 폭을 넘기면 useFitText 가 폰트를 줄인다 — 그래도 안 되면 줄바꿈으로 받는다 */
 .titleBig {
+  max-width: 100%;
+  overflow-wrap: anywhere;
   margin-top: 12px;
   font-size: clamp(28px, 10vw, 40px);
   font-weight: 800;

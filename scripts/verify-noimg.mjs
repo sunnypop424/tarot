@@ -15,16 +15,12 @@
  */
 
 import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { join, relative, resolve } from 'node:path'
 
 const ROOT = 'src'
 const ALLOWED = ['src/components/SavableImage.tsx']
 
-let failed = 0
-const check = (name, ok, detail = '') => {
-  if (!ok) failed++
-  console.log(`${ok ? '✓' : '✗'} ${name}${detail ? ` — ${detail}` : ''}`)
-}
 
 /** 블록·줄 주석과 문자열을 지운 뒤 본다 (주석 속 `<img>` 는 설명이지 코드가 아니다) */
 function stripComments(src) {
@@ -44,33 +40,41 @@ function walk(dir, out = []) {
   return out
 }
 
-const offenders = []
-for (const file of walk(ROOT)) {
-  const rel = relative('.', file).replaceAll('\\', '/')
-  const code = stripComments(readFileSync(file, 'utf8'))
-  // JSX 여는 태그만 — `<image>`(SVG)나 `<imgSomething>` 은 아니다
-  const hits = code.match(/<img[\s/>]/g)
-  if (hits && !ALLOWED.includes(rel)) offenders.push(`${rel} (${hits.length}개)`)
-}
+/**
+ * 검사 셋을 돌려준다 — **`verify-photozone.mjs` 도 이걸 부른다.**
+ *
+ * 예전엔 포토존 쪽에 같은 검사가 따로 있었는데, 그쪽은 `//` 나 `*` 로 **시작하는** 줄만
+ * 주석으로 쳐서 JSX 주석을 코드로 읽고 오탐을 냈다. 같은 검사가 둘이면 한쪽만 고치는 날이
+ * 온다 — 구현은 여기 하나만 둔다.
+ */
+export function checkNoImg() {
+  const out = []
+  const add = (name, ok, detail = '') => out.push({ name, ok, detail })
 
-check(
-  '**`<img>` 는 SavableImage.tsx 에만 있다**',
-  offenders.length === 0,
-  offenders.length ? offenders.join(' · ') : `예외 ${ALLOWED.length}곳`
-)
+  const offenders = []
+  for (const file of walk(ROOT)) {
+    const rel = relative('.', file).replaceAll('\\', '/')
+    const code = stripComments(readFileSync(file, 'utf8'))
+    // JSX 여는 태그만 — `<image>`(SVG)나 `<imgSomething>` 은 아니다
+    const hits = code.match(/<img[\s/>]/g)
+    if (hits && !ALLOWED.includes(rel)) offenders.push(`${rel} (${hits.length}개)`)
+  }
 
-// 예외 파일이 실제로 존재하고 ResultImage 만 받는지 (통째로 지우고 규칙만 남는 걸 막는다)
-{
+  add(
+    '**`<img>` 는 SavableImage.tsx 에만 있다**',
+    offenders.length === 0,
+    offenders.length ? offenders.join(' · ') : `예외 ${ALLOWED.length}곳`
+  )
+
+  // 예외 파일이 실제로 존재하고 ResultImage 만 받는지 (통째로 지우고 규칙만 남는 걸 막는다)
   const src = readFileSync(ALLOWED[0], 'utf8')
-  check(
+  add(
     '예외 파일은 `ResultImage` 만 받는다 (문자열 URL 을 못 넣는다)',
     /image:\s*ResultImage/.test(src) && /<img/.test(src),
     ALLOWED[0]
   )
-}
 
-// `compose.ts` 만 ResultImage 를 만든다 — 다른 데서 캐스팅으로 만들면 예외가 샌다
-{
+  // `compose.ts` 만 ResultImage 를 만든다 — 다른 데서 캐스팅으로 만들면 예외가 샌다
   const minters = walk(ROOT)
     .filter((f) => {
       const rel = relative('.', f).replaceAll('\\', '/')
@@ -78,12 +82,20 @@ check(
       return /as unknown as ResultImage|as ResultImage/.test(readFileSync(f, 'utf8'))
     })
     .map((f) => relative('.', f).replaceAll('\\', '/'))
-  check(
+  add(
     '**`ResultImage` 를 만드는 곳은 compose.ts 뿐이다** (캐스팅으로 못 만든다)',
     minters.length === 0,
     minters.join(' · ') || '없음'
   )
+
+  return out
 }
 
-console.log(failed === 0 ? '\n전부 통과' : `\n${failed}개 실패`)
-process.exit(failed === 0 ? 0 : 1)
+// 직접 실행할 때만 찍는다 — import 하면 함수만 가져간다 (scripts/db.mjs 와 같은 패턴)
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  const rows = checkNoImg()
+  for (const r of rows) console.log(`${r.ok ? '✓' : '✗'} ${r.name}${r.detail ? ` — ${r.detail}` : ''}`)
+  const failed = rows.filter((r) => !r.ok).length
+  console.log(failed === 0 ? '\n전부 통과' : `\n${failed}개 실패`)
+  process.exit(failed === 0 ? 0 : 1)
+}

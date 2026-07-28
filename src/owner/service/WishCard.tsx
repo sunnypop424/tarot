@@ -166,6 +166,58 @@ export function WishCard({
           hint="실루엣 PNG 를 올리면 그 모양으로 그려요. 색은 위 팔레트가 채웁니다 — 한 장으로 여섯 색이 나와요."
         />
       </Divided>
+
+      {/**
+        * 실루엣을 올린 슬롯에만 나온다.
+        *
+        * 실루엣은 가장자리가 좁아지는 모양이 많아서 글자 상자가 등불 전체를 쓰면
+        * **글자 밑이 투명해져 등불 밖으로 나간 것처럼 보인다.** 모양은 PNG 마다 달라
+        * (호리병·원형·사각형) 코드가 짐작할 수 없으니 눈으로 보고 맞추는 자리다.
+        */}
+      {d.lanternShape && (
+        <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid #ededf2' }}>
+          <span style={CSS.label}>실루엣 안 글자 자리</span>
+          <p style={{ margin: '6px 0 12px', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
+            등불 크기의 <b>%</b> 로 잡습니다. 올리신 그림 모양에 맞춰 <b>오른쪽 미리보기를 보면서</b>{' '}
+            네 면을 조절해 주세요 — 글자가 실루엣 안쪽에 앉으면 됩니다.
+            <br />
+            좁아지는 모양(호리병·물방울)일수록 값을 키우시면 돼요.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,120px),1fr))', gap: 12 }}>
+            {(
+              [
+                ['top', '위'],
+                ['right', '오른쪽'],
+                ['bottom', '아래'],
+                ['left', '왼쪽'],
+              ] as ['top' | 'right' | 'bottom' | 'left', string][]
+            ).map(([key, label]) => (
+              <Field key={key} label={label}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <input
+                    type="number"
+                    min={0}
+                    max={45}
+                    value={d.shapePad[key]}
+                    onChange={(e) =>
+                      patch({
+                        shapePad: {
+                          ...d.shapePad,
+                          [key]: Math.min(45, Math.max(0, Number(e.target.value) || 0)),
+                        },
+                      })
+                    }
+                    style={{ ...CSS.input, flex: 1, minWidth: 0 }}
+                    aria-label={`${label} 여백`}
+                    data-shape-pad={key}
+                  />
+                  <span style={{ fontSize: 11.5, color: '#8a8a8a', flexShrink: 0 }}>%</span>
+                </div>
+              </Field>
+            ))}
+          </div>
+        </div>
+      )}
     </Card>
   )
 }

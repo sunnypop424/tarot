@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   Check,
   ChevronLeft,
@@ -17,7 +17,7 @@ import { repo } from '@/lib/repo'
 import { isLight, mix } from '@/lib/color'
 import { cssUrl } from '@/lib/image'
 import { visitorId } from '@/lib/visitor'
-import { releaseResult, saveResult, type ResultImage } from '@/lib/compose'
+import { releaseResult, saveResult, shareResult, type ResultImage } from '@/lib/compose'
 import { SavableImage } from '@/components/SavableImage'
 import type { MyReward, QuizQuestion, QuizResult, QuizSettings } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
@@ -453,6 +453,7 @@ function Result({
   const [note, setNote] = useState<string | null>(null)
   const won = titleFor(display.titles, result.score, result.total)
   const title = won?.label ?? ''
+  const fitRef = useFitText(title)
   const wrong = result.detail.filter((d) => !d.ok && d.body)
   const date = new Date().toLocaleDateString('sv-SE').replaceAll('-', '.')
 
@@ -493,11 +494,16 @@ function Result({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  async function save() {
+  /**
+   * **'저장' 과 '공유' 는 다른 일을 한다.** 예전엔 두 버튼이 같은 함수를 불러서 글자만
+   * 다르고 하는 일이 똑같았다 — 어느 쪽을 눌러도 공유 시트가 떴다 (compose.ts 주석).
+   */
+  async function run(kind: 'save' | 'share') {
     if (!image) return
-    const how = await saveResult(image, `${display.title}-${title}.png`)
-    // 3번 폴백(새 탭)까지 떨어지면 사용자가 직접 눌러 저장해야 한다 — 그걸 말해준다
-    if (how === 'opened') setNote('새 탭에서 사진을 길게 눌러 저장해 주세요.')
+    const name = `${display.title}-${title}.png`
+    const how = kind === 'save' ? await saveResult(image, name) : await shareResult(image, name)
+    // 새 탭까지 떨어지면 사용자가 직접 눌러 저장해야 한다 — 그걸 말해준다
+    setNote(how === 'opened' ? '새 탭에서 사진을 길게 눌러 저장해 주세요.' : null)
   }
 
   return (
@@ -530,7 +536,12 @@ function Result({
               />
             )}
             <div className={styles.kicker}>{display.resultKicker}</div>
-            <div className={styles.titleBig} data-my-title>
+            {/**
+              * **칭호는 카드 밖으로 나가면 안 된다.** 저장되는 캔버스에는 글자를 줄이는 장치가
+              * 있었는데(`titleCard.ts` 의 `fitFont`) 화면 카드엔 없어서, 긴 칭호가 카드를
+              * 넘어 튀어나왔다 — 같은 값을 그리는 두 곳 중 한쪽만 방어한 셈이었다.
+              */}
+            <div className={styles.titleBig} data-my-title ref={fitRef}>
               {title}
             </div>
             <div className={styles.rule} />
@@ -545,14 +556,14 @@ function Result({
         </div>
 
         <div className={styles.actions}>
-          <button type="button" onClick={() => void save()} disabled={!image} data-save>
+          <button type="button" onClick={() => void run('save')} disabled={!image} data-save>
             <Download size={17} strokeWidth={1.9} aria-hidden="true" />
             저장
           </button>
           <button
             type="button"
             className={styles.ghost}
-            onClick={() => void save()}
+            onClick={() => void run('share')}
             disabled={!image}
             data-share
           >
@@ -621,6 +632,45 @@ function Result({
       </div>
     </>
   )
+}
+
+/**
+ * 글자가 상자를 넘으면 폰트를 줄인다 — **저장되는 카드의 `fitFont` 와 같은 일**을 화면에서 한다.
+ *
+ * CSS 만으로는 안 된다: `clamp()` 는 화면 폭만 보고 **글자 길이는 모른다.** "찐팬 인증" 은
+ * 들어가는 크기가 "우주 최강 초통령 덕후" 는 안 들어간다.
+ *
+ * `useLayoutEffect` 인 이유: 페인트 전에 줄여야 큰 글자가 한 프레임 번쩍이지 않는다.
+ * 폰트가 늦게 로드되면 폭이 변하므로 `document.fonts.ready` 뒤에 한 번 더 잰다.
+ */
+function useFitText(text: string) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    const el = ref.current
+    const box = el?.parentElement
+    if (!el || !box) return
+
+    const fit = () => {
+      el.style.fontSize = ''
+      const start = parseFloat(getComputedStyle(el).fontSize) || 40
+      const limit = box.clientWidth
+      let size = start
+      // 넘치는 동안 2px 씩 — 40px 에서 시작해 최소 18px 까지. 그보다 작으면 어차피 안 읽힌다
+      while (size > 18 && (el.scrollWidth > limit || el.scrollHeight > el.clientHeight + 1)) {
+        size -= 2
+        el.style.fontSize = `${size}px`
+      }
+    }
+
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(box)
+    void document.fonts?.ready.then(fit)
+    return () => ro.disconnect()
+  }, [text])
+
+  return ref
 }
 
 /* ── ⑤ 보상 ───────────────────────────────────── */

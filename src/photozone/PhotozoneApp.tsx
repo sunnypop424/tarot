@@ -29,6 +29,7 @@ import {
   photoFromVideo,
   releaseResult,
   saveResult,
+  shareResult,
   type Photo,
   type ResultImage,
 } from '@/lib/compose'
@@ -174,9 +175,14 @@ function Photozone({ slot }: { slot: Slot }) {
     }
   }
 
-  async function save() {
+  /**
+   * **'저장' 과 '공유' 는 다른 일을 한다.** 예전엔 두 버튼이 같은 함수를 불러서 어느 쪽을
+   * 눌러도 공유 시트가 떴다 — 글자만 다르고 하는 일이 똑같았다 (compose.ts 주석).
+   */
+  async function save(kind: 'save' | 'share' = 'save') {
     if (!result) return
-    const how = await saveResult(result, `${slot.slug}-photo.png`)
+    const name = `${slot.slug}-photo.png`
+    const how = kind === 'save' ? await saveResult(result, name) : await shareResult(result, name)
     setSaveBlocked(how === 'opened')
   }
 
@@ -370,14 +376,14 @@ function Photozone({ slot }: { slot: Slot }) {
                   </span>
                 </div>
               ) : (
-                <button type="button" className={styles.primary} onClick={() => void save()} data-save>
+                <button type="button" className={styles.primary} onClick={() => void save('save')} data-save>
                   <Download size={19} strokeWidth={1.7} aria-hidden="true" />
                   {display.saveLabel}
                 </button>
               )}
               <div className={styles.row}>
                 {typeof navigator !== 'undefined' && 'share' in navigator && (
-                  <button type="button" className={styles.ghost} onClick={() => void save()}>
+                  <button type="button" className={styles.ghost} onClick={() => void save('share')} data-share>
                     <Share2 size={17} strokeWidth={1.7} aria-hidden="true" />
                     공유
                   </button>

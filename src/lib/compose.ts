@@ -221,37 +221,75 @@ export async function fromUrl(src: string, watermarkSrc?: string): Promise<Resul
 }
 
 /**
- * 저장 — **폴백이 세 겹인 이유가 있다.**
+ * 저장 — **다운로드를 먼저 시도한다.**
  *
- * 1. `navigator.share({files})` — iOS Safari 에서 유일하게 확실한 길이고, 사진첩·메신저로 바로 간다.
- * 2. `<a download>` — 데스크톱·안드로이드의 정석 (`slotsFile.ts`·`Shipping.tsx` 와 같은 패턴).
- *    iOS 는 `blob:` 에서 이 속성을 **무시하고 그냥 열어버리는** 경우가 있어 1번이 먼저다.
- * 3. 새 탭 — 여기까지 오면 사용자가 직접 길게 눌러 저장한다. 그래서 안내 문구가 필요하다.
+ * 처음엔 공유를 먼저 뒀다. iOS Safari 가 `blob:` 에서 `<a download>` 를 무시하고 그냥
+ * 열어버리는 경우가 있어서였다. 그런데 그러면 **안드로이드·데스크톱은 공유가 되니까 거기서
+ * 멈춰서**, 어디서 '저장' 을 눌러도 공유 시트가 떴다. "저장" 이라고 적힌 버튼이 저장을
+ * 안 하는 건 그냥 거짓말이다.
  *
- * 3번으로 떨어졌는지를 반환한다 — 화면이 "길게 눌러 저장하세요" 를 띄울지 정해야 한다.
+ * 그래서 순서를 뒤집었다: **다운로드 → 공유 → 새 탭.** iOS 처럼 다운로드가 실제로 안 되는
+ * 데서만 공유로 물러선다. 공유가 목적이면 `shareResult` 를 쓴다 — 두 버튼이 같은 함수를
+ * 부르면 글자만 다르고 하는 일이 똑같아진다(실제로 그랬다).
+ *
+ * **다운로드가 통했는지는 브라우저가 안 알려준다.** `download` 속성 지원 여부로만 가르고,
+ * iOS Safari 는 속성을 지원한다고 말하면서 무시하므로 거기서 한 겹 더 본다.
  */
 export async function saveResult(img: ResultImage, filename: string): Promise<'shared' | 'downloaded' | 'opened'> {
-  const file = new File([img.blob], filename, { type: img.blob.type })
-  if (typeof navigator !== 'undefined' && navigator.canShare?.({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file] })
-      return 'shared'
-    } catch (e) {
-      // 사용자가 공유 시트를 닫은 것뿐이면 다운로드로 또 떨어뜨리지 않는다
-      if (e instanceof DOMException && e.name === 'AbortError') return 'shared'
-    }
+  if (canDownload()) {
+    const a = document.createElement('a')
+    a.href = img.url
+    a.download = filename
+    a.rel = 'noopener'
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    return 'downloaded'
   }
 
-  const a = document.createElement('a')
-  a.href = img.url
-  a.download = filename
-  a.rel = 'noopener'
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
+  // 여기부터는 다운로드가 안 먹는 기기다 (iOS Safari 계열)
+  if (await tryShare(img, filename)) return 'shared'
 
-  // download 를 무시하는 브라우저 판별은 불가능하다 — 속성 지원 여부로만 가른다
-  return 'download' in HTMLAnchorElement.prototype ? 'downloaded' : 'opened'
+  window.open(img.url, '_blank', 'noopener')
+  return 'opened'
+}
+
+/**
+ * 공유 — **공유 시트를 먼저 연다.** 못 열면 저장으로 물러선다.
+ *
+ * '저장' 과 반대 순서라는 게 요점이다. 두 버튼이 실제로 다른 일을 해야 나란히 둘 이유가 있다.
+ */
+export async function shareResult(img: ResultImage, filename: string): Promise<'shared' | 'downloaded' | 'opened'> {
+  if (await tryShare(img, filename)) return 'shared'
+  return saveResult(img, filename)
+}
+
+/**
+ * `<a download>` 가 실제로 파일을 내려받나.
+ *
+ * iOS Safari 는 속성을 **지원한다고 말하면서 무시한다** — blob URL 을 그냥 새 화면으로 연다.
+ * 그래서 속성 지원만 보면 안 되고 iOS 를 따로 가른다. (iPadOS 는 데스크톱 Safari 로
+ * 위장하므로 `maxTouchPoints` 까지 본다 — 그게 없으면 아이패드에서 저장이 조용히 실패한다.)
+ */
+function canDownload(): boolean {
+  if (typeof document === 'undefined') return false
+  if (!('download' in HTMLAnchorElement.prototype)) return false
+  const ua = navigator.userAgent
+  const iOS = /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)
+  return !iOS
+}
+
+/** 공유 시트. 열렸으면 true — 사용자가 닫은 것도 "열렸다" 로 본다 (다시 저장으로 떨어뜨리지 않는다) */
+async function tryShare(img: ResultImage, filename: string): Promise<boolean> {
+  if (typeof navigator === 'undefined') return false
+  const file = new File([img.blob], filename, { type: img.blob.type })
+  if (!navigator.canShare?.({ files: [file] })) return false
+  try {
+    await navigator.share({ files: [file] })
+    return true
+  } catch (e) {
+    return e instanceof DOMException && e.name === 'AbortError'
+  }
 }
 
 /** blob URL 을 돌려준다. 안 부르면 탭이 살아 있는 동안 메모리에 남는다 */
