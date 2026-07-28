@@ -56,8 +56,30 @@ export interface PhotocardDisplay {
   boxShadowColor: string
   boxShadowBlur: number
   boxShadowY: number
-  /** 박스 아래 '관리자 페이지로 이동' 링크 색 — 손님 눈엔 안 띄고 스태프는 찾을 수 있어야 한다 */
+  /** '관리자 페이지로 이동' 링크 색 — 손님 눈엔 안 띄고 스태프는 찾을 수 있어야 한다.
+   * **스태프 화면과 손님 화면이 같은 값을 쓴다** (같은 성격의 링크다) */
   adminLinkColor: string
+
+  /** 마감됐을 때 스태프 화면에 뜨는 문구 */
+  closedText: string
+  /** 화면 아래 아주 흐리게 들어가는 제작사 표기. 비우면 안 그린다 */
+  footerNote: string
+  /**
+   * **타일 테두리를 아예 뺀다** — 결과 카드·요약 줄·배너 같은 상자들의 테두리를 투명하게.
+   * 배경색만으로 구분되는 더 납작한 인상을 원할 때 (럭드의 같은 설정과 짝이다).
+   */
+  noBorder: boolean
+
+  /**
+   * 포토카드 미리보기 **모달** 전용 색 — 비우면 슬롯 테마 색을 그대로 쓴다.
+   * 모달은 화면 위에 따로 뜨는 판이라 박스와 다르게 꾸미고 싶을 때가 있다 (럭드와 같은 이유).
+   */
+  modalBg: string
+  modalText: string
+  modalItemBg: string
+  modalBorder: string
+  /** 모달 안 테두리를 아예 없앤다 (켜지면 `modalBorder` 는 무시된다) */
+  modalNoBorder: boolean
 }
 
 export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
@@ -91,6 +113,14 @@ export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
   boxShadowBlur: 40,
   boxShadowY: 12,
   adminLinkColor: 'rgba(0, 0, 0, 0.45)',
+  closedText: '오늘은 마감됐어요',
+  footerNote: '',
+  noBorder: false,
+  modalBg: '',
+  modalText: '',
+  modalItemBg: '',
+  modalBorder: '',
+  modalNoBorder: false,
 }
 
 /** 슬롯 설정 + 기본값 — **키 단위로 채운다** */
@@ -129,6 +159,16 @@ export function photocardDisplay(slot: Slot): PhotocardDisplay {
     boxShadowBlur: saved.boxShadowBlur ?? DEFAULT_PHOTOCARD.boxShadowBlur,
     boxShadowY: saved.boxShadowY ?? DEFAULT_PHOTOCARD.boxShadowY,
     adminLinkColor: saved.adminLinkColor || DEFAULT_PHOTOCARD.adminLinkColor,
+    closedText: saved.closedText || DEFAULT_PHOTOCARD.closedText,
+    // 빈 문자열은 "안 그린다" 는 뜻이라 살린다
+    footerNote: saved.footerNote ?? DEFAULT_PHOTOCARD.footerNote,
+    noBorder: saved.noBorder ?? DEFAULT_PHOTOCARD.noBorder,
+    // 빈 문자열은 "테마 색을 쓴다" 는 뜻이라 살린다
+    modalBg: saved.modalBg ?? DEFAULT_PHOTOCARD.modalBg,
+    modalText: saved.modalText ?? DEFAULT_PHOTOCARD.modalText,
+    modalItemBg: saved.modalItemBg ?? DEFAULT_PHOTOCARD.modalItemBg,
+    modalBorder: saved.modalBorder ?? DEFAULT_PHOTOCARD.modalBorder,
+    modalNoBorder: saved.modalNoBorder ?? DEFAULT_PHOTOCARD.modalNoBorder,
   }
 }
 

@@ -145,6 +145,8 @@ function Photocard({ slot }: { slot: Slot }) {
     ['--pc-bg' as string]: display.bg,
     ['--pc-deckBg' as string]: display.deckBg,
     ['--pc-deckGlow' as string]: display.deckGlow,
+    // 관리자 링크 색 — **스태프 화면과 같은 값**을 쓴다 (같은 성격의 링크다)
+    ['--pc-adminLink' as string]: display.adminLinkColor,
     // 배경 밝기에서 파생 (CLAUDE.md 규칙)
     ['--pc-wash' as string]: mix(display.bg, isLight(display.bg) ? 'black' : 'white', 0.045),
     ['--pc-line' as string]: mix(display.bg, isLight(display.bg) ? 'black' : 'white', 0.1),
@@ -244,6 +246,7 @@ function Photocard({ slot }: { slot: Slot }) {
           ) : shown ? (
             <TicketView
               display={display}
+              slug={slug}
               ticket={shown}
               busy={busy}
               onRefresh={async () => {
@@ -516,7 +519,7 @@ function Deck({
         <div className={styles.adminRow}>
           <a className={styles.adminLink} href={`/${slug}/admin`}>
             <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-            관리자
+            관리자 페이지로 이동
           </a>
         </div>
       </div>
@@ -813,7 +816,7 @@ function TicketIntro({
         <div className={styles.adminRow} style={{ textAlign: 'center' }}>
           <a className={`${styles.adminLink} ${styles.adminLinkLight}`} href={`/${slug}/admin`}>
             <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-            관리자
+            관리자 페이지로 이동
           </a>
         </div>
       </div>
@@ -823,11 +826,13 @@ function TicketIntro({
 
 function TicketView({
   display: _display,
+  slug,
   ticket,
   busy,
   onRefresh,
 }: {
   display: PhotocardDisplay
+  slug: string
   ticket: PhotocardTicket
   busy: boolean
   onRefresh: () => void
@@ -880,6 +885,12 @@ function TicketView({
       <div className={`${styles.stamp} ${styles.tnum}`}>
         발급 {new Date(ticket.issuedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
       </div>
+      <div className={styles.adminRow} style={{ textAlign: 'center' }}>
+        <a className={`${styles.adminLink} ${styles.adminLinkLight}`} href={`/${slug}/admin`}>
+          <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
+          관리자 페이지로 이동
+        </a>
+      </div>
     </>
   )
 }
@@ -908,7 +919,7 @@ function Counter({ display, slug }: { display: PhotocardDisplay; slug: string })
       <div className={styles.bottom} style={{ textAlign: 'center' }}>
         <a className={`${styles.adminLink} ${styles.adminLinkLight}`} href={`/${slug}/admin`}>
           <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-          관리자
+          관리자 페이지로 이동
         </a>
       </div>
     </>

@@ -7,7 +7,7 @@ import { repo } from '@/lib/repo'
 import type { Photocard } from '@/lib/repo/types'
 import { cssUrl } from '@/lib/image'
 import type { Slot } from '@/types/slot'
-import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
+import { AlphaColor, CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { uploadAsset, deleteAsset, extOf, nameFromUrl } from '../upload'
 import { BoxFields } from './BoxFields'
@@ -46,9 +46,12 @@ const ICON: React.CSSProperties = {
 export function PhotocardCard({
   slot,
   patch,
+  patchAsset,
 }: {
   slot: Slot
   patch: (change: Partial<PhotocardDisplay>) => void
+  /** 배경 사진은 **슬롯 테마**가 든다 (럭드와 같은 자리) — 그래서 따로 받는다 */
+  patchAsset: (key: 'backgroundPattern', value: string | null) => void
 }) {
   const d = photocardDisplay(slot)
   const slug = slot.slug
@@ -262,15 +265,82 @@ export function PhotocardCard({
         <ImageField
           slug={slot.slug}
           label="로고"
+          title="로고"
           name="photocard-logo"
           value={d.logo || null}
           onChange={(v) => patch({ logo: v ?? '' })}
           hint="덱 헤더와 안내 화면에 떠요."
         />
+        {/* 배경 사진은 슬롯 테마가 든다 — 스태프 화면(럭드와 같은 무대) 뒤에 깔려요 */}
+        <ImageField
+          slug={slot.slug}
+          label="배경 이미지"
+          title="배경 이미지"
+          name="photocard-bg"
+          value={slot.theme.assets.backgroundPattern}
+          onChange={(v) => patchAsset('backgroundPattern', v)}
+          hint="화면을 꽉 채워요. 스태프 화면의 박스가 얹힐 자리를 비워둔 사진이 좋아요."
+        />
         <Field label="보관함 이름">
           <input value={d.lockerLabel} onChange={(e) => patch({ lockerLabel: e.target.value })} style={CSS.input} />
         </Field>
+        <Field label="마감 문구" hint="마감했을 때 스태프 화면에 떠요.">
+          <input value={d.closedText} onChange={(e) => patch({ closedText: e.target.value })} style={CSS.input} />
+        </Field>
+        <Field label="화면 아래 표기" hint="비우면 안 그려요 (제작사 표기 자리).">
+          <input
+            value={d.footerNote}
+            onChange={(e) => patch({ footerNote: e.target.value })}
+            placeholder="made by ○○"
+            style={CSS.input}
+          />
+        </Field>
       </Divided>
+
+      {/* ── 미리보기 모달 · 타일 테두리 (럭드와 같은 설정) ── */}
+      <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid #ededf2' }}>
+        <span style={CSS.label}>포토카드 미리보기 창</span>
+        <p style={{ margin: '6px 0 12px', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
+          스태프 화면에서 '포토카드 미리보기' 를 눌렀을 때 뜨는 창이에요.{' '}
+          <b>비워두면 이 이벤트 색을 그대로 따라갑니다.</b>
+        </p>
+        <Divided min={230} gap={12}>
+          <AlphaColor label="배경색" value={d.modalBg || slot.theme.colors.surface} onChange={(v) => patch({ modalBg: v })} />
+          <AlphaColor label="글자색" value={d.modalText || slot.theme.colors.fg1} onChange={(v) => patch({ modalText: v })} />
+          <AlphaColor
+            label="카드 칸 배경"
+            value={d.modalItemBg || slot.theme.colors.wash}
+            onChange={(v) => patch({ modalItemBg: v })}
+          />
+          {!d.modalNoBorder && (
+            <AlphaColor
+              label="테두리색"
+              value={d.modalBorder || slot.theme.colors.border}
+              onChange={(v) => patch({ modalBorder: v })}
+            />
+          )}
+        </Divided>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#505050', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={d.modalNoBorder}
+              onChange={(e) => patch({ modalNoBorder: e.target.checked })}
+              style={{ width: 14, height: 14, accentColor: '#816bff', cursor: 'pointer' }}
+            />
+            창 안 테두리 없음 (배경색만으로 구분)
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#505050', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={d.noBorder}
+              onChange={(e) => patch({ noBorder: e.target.checked })}
+              style={{ width: 14, height: 14, accentColor: '#816bff', cursor: 'pointer' }}
+            />
+            결과 카드·줄의 테두리 없음
+          </label>
+        </div>
+      </div>
 
       {/* 스태프 화면은 럭키드로우와 **같은 무대**를 쓴다 — 그래서 설정도 같은 부품이다 */}
       <BoxFields

@@ -1500,7 +1500,13 @@ export function SlotEditor() {
           {quiz && <QuizCard slot={draft} patch={patchQuiz} />}
 
           {/* ══ 포토카드 뽑기 설정 ══ (카드 목록이 여기 있는 이유는 PhotocardCard.tsx 주석) */}
-          {photocard && <PhotocardCard slot={draft} patch={patchPhotocard} />}
+          {photocard && (
+            <PhotocardCard
+              slot={draft}
+              patch={patchPhotocard}
+              patchAsset={(k, v) => patchAsset(k, v)}
+            />
+          )}
 
           {/* ══ 롤링페이퍼 서비스 설정 ══ */}
           {rolling && (

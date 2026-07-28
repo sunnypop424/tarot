@@ -226,8 +226,9 @@
   max-height: 84dvh;
   display: flex;
   flex-direction: column;
-  background: var(--color-surface-raised, var(--color-surface));
-  color: var(--color-fg-1);
+  /* 비우면 테마 색 — 편집기에서 고른 값이 있으면 그게 이긴다 (럭드 모달과 같은 규칙) */
+  background: var(--pc-modal-bg, var(--color-surface-raised, var(--color-surface)));
+  color: var(--pc-modal-text, var(--color-fg-1));
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
@@ -237,7 +238,7 @@
   align-items: center;
   gap: 10px;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--ds-tile-border, var(--color-border));
+  border-bottom: 1px solid var(--pc-modal-border, var(--ds-tile-border, var(--color-border)));
 }
 .sheetTitle {
   font-size: var(--text-l);
@@ -272,11 +273,11 @@
   width: 100%;
   aspect-ratio: 55 / 85;
   border-radius: var(--radius-md);
-  background-color: var(--color-wash);
+  background-color: var(--pc-modal-item, var(--color-wash));
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  border: 1px solid var(--ds-tile-border, var(--color-border));
+  border: 1px solid var(--pc-modal-border, var(--ds-tile-border, var(--color-border)));
   display: grid;
   place-items: center;
   color: var(--color-fg-3);
@@ -324,7 +325,7 @@
   justify-content: center;
   gap: 14px;
   padding: 12px 20px 16px;
-  border-top: 1px solid var(--ds-tile-border, var(--color-border));
+  border-top: 1px solid var(--pc-modal-border, var(--ds-tile-border, var(--color-border)));
   font-size: var(--text-xxs);
   color: var(--color-fg-3);
 }
@@ -338,6 +339,13 @@
   height: 11px;
   border-radius: var(--radius-full);
   background: var(--color-high);
+}
+
+/* 화면 아래 아주 흐린 제작사 표기 — 럭드의 같은 자리 */
+.footerNote {
+  font-size: var(--text-xxs);
+  color: var(--ds-admin-link, var(--color-fg-3));
+  opacity: 0.7;
 }
 
 /* 로그인·안내 */

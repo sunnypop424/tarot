@@ -79,6 +79,13 @@ function Staff({ slot }: { slot: Slot }) {
     ['--ds-box-border-w' as string]: `${display.boxBorderWidth}px`,
     ['--ds-box-border-c' as string]: display.boxBorderColor || 'transparent',
     ['--ds-admin-link' as string]: display.adminLinkColor,
+    // 켜면 타일·배너·줄의 테두리를 통째로 뺀다 (럭드와 같은 설정)
+    ['--ds-tile-border' as string]: display.noBorder ? 'transparent' : '',
+    // 미리보기 모달 — 비운 값은 CSS 가 테마 토큰으로 폴백한다
+    ['--pc-modal-bg' as string]: display.modalBg,
+    ['--pc-modal-text' as string]: display.modalText,
+    ['--pc-modal-item' as string]: display.modalItemBg,
+    ['--pc-modal-border' as string]: display.modalNoBorder ? 'transparent' : display.modalBorder,
     ['--ds-shadow' as string]: `0 ${display.boxShadowY}px ${display.boxShadowBlur}px ${display.boxShadowColor}`,
     ...pickerVars(
       countPicker(display.picker, {
@@ -287,7 +294,7 @@ function Staff({ slot }: { slot: Slot }) {
               {settings.closed && (
                 <div className={styles.banner}>
                   <Info size={17} strokeWidth={2} aria-hidden="true" />
-                  <span>마감된 이벤트예요 — 지금은 뽑을 수 없습니다.</span>
+                  <span>{display.closedText}</span>
                 </div>
               )}
 
@@ -346,6 +353,7 @@ function Staff({ slot }: { slot: Slot }) {
         <a className={styles.adminLink} href={`/${slug}/admin/photocard`}>
           관리자 페이지로 이동
         </a>
+        {display.footerNote && <div className={styles.footerNote}>{display.footerNote}</div>}
       </main>
 
       {sheet && (
