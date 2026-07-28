@@ -376,13 +376,23 @@ function Photozone({ slot }: { slot: Slot }) {
                   </span>
                 </div>
               ) : (
-                <button type="button" className={styles.primary} onClick={() => void save('save')} data-save>
-                  <Download size={19} strokeWidth={1.7} aria-hidden="true" />
-                  {display.saveLabel}
-                </button>
+                /* 저장·공유는 **한 줄이다** — 같은 사진을 어디로 보낼지만 다른 짝이다 */
+                <div className={styles.row}>
+                  <button type="button" className={styles.primary} onClick={() => void save('save')} data-save>
+                    <Download size={19} strokeWidth={1.7} aria-hidden="true" />
+                    {display.saveLabel}
+                  </button>
+                  {typeof navigator !== 'undefined' && 'share' in navigator && (
+                    <button type="button" className={styles.ghost} onClick={() => void save('share')} data-share>
+                      <Share2 size={17} strokeWidth={1.7} aria-hidden="true" />
+                      공유
+                    </button>
+                  )}
+                </div>
               )}
               <div className={styles.row}>
-                {typeof navigator !== 'undefined' && 'share' in navigator && (
+                {/* 저장이 막힌 기기(주로 iOS)에서는 공유가 유일한 길이다 — 여기서 사라지면 안 된다 */}
+                {saveBlocked && typeof navigator !== 'undefined' && 'share' in navigator && (
                   <button type="button" className={styles.ghost} onClick={() => void save('share')} data-share>
                     <Share2 size={17} strokeWidth={1.7} aria-hidden="true" />
                     공유

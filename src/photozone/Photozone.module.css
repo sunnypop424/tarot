@@ -230,10 +230,13 @@
   font-size: 15px;
   font-weight: 700;
 }
-.row .ghost {
+/* 한 줄에 놓이면 폭을 나눠 갖고 높이를 맞춘다 (저장·공유가 같은 줄이다) */
+.row .ghost,
+.row .primary {
   flex: 1;
-  height: 48px;
-  font-size: 14px;
+  min-width: 0;
+  height: 50px;
+  font-size: 15px;
 }
 .primary:disabled,
 .ghost:disabled,

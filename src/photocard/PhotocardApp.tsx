@@ -631,7 +631,9 @@ function Result({
 
       <div className={styles.resultFoot}>
         {allowSave && (
-          <>
+          /* 저장·공유는 **한 줄이다** — 같은 결과물을 어디로 보낼지만 다른 짝이라
+             위아래로 쌓으면 서로 다른 단계처럼 읽힌다 (공유가 없는 기기면 저장이 줄을 다 쓴다) */
+          <div className={styles.resultRow}>
             <button
               type="button"
               className={styles.lightBtn}
@@ -655,7 +657,7 @@ function Result({
                 공유
               </button>
             )}
-          </>
+          </div>
         )}
         {onAgain && (
           <button type="button" className={styles.ghostDark} onClick={onAgain} data-again>

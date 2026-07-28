@@ -336,6 +336,16 @@
   flex-direction: column;
   gap: 10px;
 }
+/* 저장 · 공유 한 줄 — 둘이 같은 폭을 나눠 갖는다 */
+.resultRow {
+  display: flex;
+  gap: 10px;
+}
+.resultRow > button {
+  flex: 1;
+  min-width: 0;
+}
+
 .lightBtn {
   height: 54px;
   border: none;
