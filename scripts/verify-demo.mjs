@@ -144,6 +144,13 @@ const drawReal = await fetch(`${URL_}/rest/v1/rpc/photocard_draw_batch`, {
 })
 check('**일반 슬롯에서는 여전히 스태프만 뽑는다**', !drawReal.ok, `HTTP ${drawReal.status}`)
 
+// 스태프 화면은 카드 목록도 읽는다 (0033) — 체험 슬롯만 열린다
+const cardsDemo = await (await fetch(`${URL_}/rest/v1/photocards?slug=eq.${DEMO}&select=name`, { headers: anon })).json()
+check('체험 슬롯의 카드 목록은 읽힌다 (스태프 화면이 그린다)', cardsDemo.length > 0, `${cardsDemo.length}행`)
+
+const cardsReal = await (await fetch(`${URL_}/rest/v1/photocards?slug=eq.${REAL}&select=name`, { headers: anon })).json()
+check('**일반 슬롯의 카드 목록은 안 읽힌다** (확률·재고가 새면 안 된다)', cardsReal.length === 0, `${cardsReal.length}행`)
+
 // 정리
 for (const slug of [DEMO, REAL]) {
   await fetch(`${URL_}/rest/v1/slots?slug=eq.${slug}`, { method: 'DELETE', headers: { ...owner, Prefer: 'return=minimal' } })

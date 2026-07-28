@@ -627,6 +627,17 @@ export function SlotList() {
                       <ExternalLink size={13} strokeWidth={2} aria-hidden="true" />
                       열기
                     </a>
+                    {/* 주최자 화면 — 손님 화면과 다른 물건이라 새 탭으로 나란히 연다 */}
+                    <a
+                      href={`/${s.slug}/admin`}
+                      target="_blank"
+                      rel="noreferrer"
+                      data-slot-admin
+                      style={{ ...ghostBtn, textDecoration: 'none' }}
+                    >
+                      <ExternalLink size={13} strokeWidth={2} aria-hidden="true" />
+                      주최
+                    </a>
                     <button
                       type="button"
                       style={{ ...ghostBtn, fontWeight: 600, color: INK2 }}

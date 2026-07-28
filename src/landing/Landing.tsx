@@ -177,15 +177,16 @@ export default function Landing() {
         <div className={styles.heroGrid} aria-hidden="true" />
         <div className={styles.heroInner}>
           <div className={styles.rv} data-rv>
-            <span className={styles.badge}>생일카페 이벤트 페이지 · 슬롯 단위 대여</span>
+            <span className={styles.badge}>생일카페 · 팬 이벤트 페이지</span>
           </div>
           <h1 className={`${styles.h1} ${styles.rv}`} data-rv>
-            하루짜리 행사에도,
+            최애의 하루를,
             <br />
-            <em>제대로 만든 페이지를.</em>
+            <em>한 페이지에 담아요.</em>
           </h1>
           <p className={`${styles.lead} ${styles.rv}`} data-rv>
-            행사 하나에 주소 하나를 빌려 드립니다. 방문자는 QR만 찍으면 되고, 페이지를 만드는 일은 저희가 맡습니다.
+            QR 하나면 카페에 온 팬들이 카드를 뽑고, 한마디를 남기고, 인증샷을 챙겨 가요.
+            페이지는 그날의 컨셉에 맞춰 새로 그려집니다.
           </p>
           <div className={`${styles.ctaRow} ${styles.rv}`} data-rv>
             <a className={styles.ctaDark} href="#services">
@@ -212,8 +213,8 @@ export default function Landing() {
         <div className={styles.sectionInner}>
           <div className={`${styles.head} ${styles.rv}`} data-rv>
             <div className={styles.eyebrow}>01 — SERVICES</div>
-            <h2 className={styles.h2}>이런 서비스들이 있습니다</h2>
-            <p className={styles.sub}>필요한 것만 골라 한 슬롯에 담습니다. 전부 지금 눌러 볼 수 있어요.</p>
+            <h2 className={styles.h2}>이런 걸로 그날을 채워요</h2>
+            <p className={styles.sub}>필요한 것만 골라 한 슬롯에 담아요. 전부 지금 눌러 볼 수 있어요.</p>
           </div>
 
           <div className={styles.groups}>
@@ -265,9 +266,9 @@ export default function Landing() {
 
           <div className={`${styles.custom} ${styles.rv}`} data-rv>
             <div style={{ minWidth: 'min(100%, 20em)' }}>
-              <div className={styles.customTitle}>여기 없는 서비스도 만들어 드립니다</div>
+              <div className={styles.customTitle}>여기 없는 것도 만들어요</div>
               <p className={styles.customBody}>
-                생각하고 계신 기획이 있다면 그 행사에만 쓰는 페이지로 주문 제작합니다.
+                생각해 둔 기획이 있다면 그 행사에만 쓰는 페이지로 새로 만들어요.
               </p>
             </div>
             <button
@@ -288,7 +289,7 @@ export default function Landing() {
           <div className={`${styles.head} ${styles.rv}`} data-rv>
             <div className={styles.eyebrow}>02 — DEMO</div>
             <h2 className={styles.h2}>지금 이 자리에서 열어 보세요</h2>
-            <p className={styles.sub}>스크린샷이 아니라 실제로 도는 페이지입니다.</p>
+            <p className={styles.sub}>그림이 아니라 진짜로 도는 페이지예요.</p>
           </div>
 
           <div className={styles.demoGrid}>
@@ -360,7 +361,7 @@ export default function Landing() {
                             <div className={styles.placeholder}>
                               <span style={{ fontSize: Math.round(15 / scale), fontWeight: 700 }}>{service.name}</span>
                               <span style={{ fontSize: Math.round(12 / scale), lineHeight: 1.6 }}>
-                                {sc.transparent ? '영상 자리 — 실제 상영 영상은 넣지 않았습니다' : '체험 페이지를 불러오는 중입니다'}
+                                {sc.transparent ? '영상 자리 — 실제 상영 영상은 넣지 않았어요' : '체험 페이지를 여는 중이에요'}
                               </span>
                             </div>
                             <iframe
@@ -406,7 +407,7 @@ export default function Landing() {
 
               <div className={styles.demoFoot}>
                 <div className={styles.demoFootText}>
-                  체험용이라 눌러도 실제로 저장되지 않아요. 샘플 데이터가 들어 있는 전용 슬롯입니다.
+                  체험용이라 마음껏 눌러도 실제로 저장되지 않아요. 샘플 데이터가 들어 있는 전용 슬롯이에요.
                 </div>
                 <a
                   className={styles.demoFootLink}
@@ -430,7 +431,7 @@ export default function Landing() {
             03 — PROCESS
           </div>
           <h2 className={`${styles.h2} ${styles.rv}`} data-rv>
-            어떻게 진행되나
+            그날까지 이렇게 준비해요
           </h2>
           <div className={styles.steps}>
             <div className={styles.stepRail} aria-hidden="true" />
@@ -457,7 +458,7 @@ export default function Landing() {
             04 — ROLES
           </div>
           <h2 className={`${styles.h2} ${styles.rv}`} data-rv>
-            누가 무엇을 하나
+            이건 우리 몫, 저건 주최자 몫
           </h2>
           <div className={styles.roles}>
             <div className={`${styles.roleCard} ${styles.roleOurs} ${styles.rv}`} data-rv>
@@ -465,7 +466,7 @@ export default function Landing() {
                 <span>SLOT</span>
                 <span>04 / A</span>
               </div>
-              <div className={styles.roleTitle}>우리가 해드립니다</div>
+              <div className={styles.roleTitle}>우리 몫</div>
               <div className={styles.roleList}>
                 {OURS.map((t, i) => (
                   <div className={styles.roleRow} key={t}>
@@ -486,7 +487,7 @@ export default function Landing() {
                 <span>HOST</span>
                 <span>04 / B</span>
               </div>
-              <div className={styles.roleTitle}>주최자가 맡습니다</div>
+              <div className={styles.roleTitle}>주최자 몫</div>
               <div className={styles.roleList}>
                 {THEIRS.map((t, i) => (
                   <div className={styles.roleRow} key={t}>
@@ -507,7 +508,7 @@ export default function Landing() {
           <div className={styles.rv} data-rv>
             <div className={styles.eyebrow}>05 — FAQ</div>
             <h2 className={styles.h2}>자주 묻는 것</h2>
-            <p className={styles.sub}>여기서 답이 안 나오면 바로 물어보셔도 됩니다.</p>
+            <p className={styles.sub}>여기 없는 게 궁금하면 바로 물어보세요.</p>
             <button
               type="button"
               className={styles.asBtn}
@@ -559,8 +560,8 @@ export default function Landing() {
             그때 이야기해요.
           </h2>
           <p className={`${styles.contactBody} ${styles.rv}`} data-rv>
-            문의는 <b>카카오 오픈채팅</b>으로 받고 있어요. 어떤 서비스를 쓸지 아직 몰라도 괜찮습니다 —
-            행사 규모와 날짜만 알려 주세요.
+            문의는 <b>카카오 오픈채팅</b>으로 받아요. 어떤 서비스를 쓸지 아직 몰라도 괜찮아요 —
+            언제, 누구의 하루인지만 알려 주세요.
           </p>
           <div className={`${styles.contactRow} ${styles.rv}`} data-rv>
             <button type="button" className={`${styles.ctaDark} ${styles.asBtn}`} onClick={openInquiry} data-inquiry-open>
@@ -576,7 +577,7 @@ export default function Landing() {
       <div className={styles.footer}>
         <div className={styles.footerInner}>
           <span className={styles.brand}>OLUCKY!</span>
-          <span className={styles.footerNote}>이벤트 하나에 페이지 하나. 준비는 우리가, 운영은 주최자가.</span>
+          <span className={styles.footerNote}>하루짜리 행사에도 페이지 하나. 준비는 우리가, 그날은 주최자가.</span>
         </div>
       </div>
 

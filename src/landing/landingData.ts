@@ -66,7 +66,7 @@ export const SERVICES: LandingService[] = [
   {
     key: 'tarot',
     name: '타로카드',
-    desc: '궁금한 걸 고르면 카드를 뽑고 해석이 나옵니다.',
+    desc: '궁금한 걸 고르면 카드를 뽑고 해석이 나와요.',
     deviceNote: '방문자 폰',
     group: 0,
     screens: [{ label: '방문자', device: 'phone', variants: [{ label: '방문자', path: '/demo-tarot' }] }],
@@ -74,7 +74,7 @@ export const SERVICES: LandingService[] = [
   {
     key: 'luckydraw',
     name: '럭키드로우',
-    desc: '스태프가 경품을 추첨합니다. 등수·재고·스크래치 연출.',
+    desc: '스태프가 경품을 추첨해요. 등수·재고·스크래치 연출까지.',
     deviceNote: '스태프 태블릿',
     group: 0,
     screens: [{ label: '스태프 기기', device: 'tablet', variants: [{ label: '추첨', path: '/demo-luckydraw' }] }],
@@ -82,7 +82,7 @@ export const SERVICES: LandingService[] = [
   {
     key: 'photocard',
     name: '포토카드 뽑기',
-    desc: '레어도 가챠. 저장용·1장 증정·판매 세 가지로 운영합니다.',
+    desc: '레어도 가챠. 저장용·1장 증정·판매 세 가지로 굴려요.',
     deviceNote: '방문자 폰 + 스태프 기기',
     group: 0,
     /**
@@ -97,7 +97,7 @@ export const SERVICES: LandingService[] = [
   {
     key: 'rolling',
     name: '롤링페이퍼',
-    desc: '방문자가 응원 메시지를 남기면 벽에 붙습니다.',
+    desc: '팬들이 남긴 응원이 벽에 한 장씩 붙어요.',
     deviceNote: '스크린 + 방문자 폰',
     group: 1,
     screens: [
@@ -108,7 +108,7 @@ export const SERVICES: LandingService[] = [
   {
     key: 'wish',
     name: '소원 나무',
-    desc: '소원을 적어 등불로 매답니다. 밤하늘 버전 롤링페이퍼.',
+    desc: '소원을 적어 등불로 매달아요. 밤하늘 버전 롤링페이퍼.',
     deviceNote: '스크린 + 방문자 폰',
     group: 1,
     screens: [
@@ -119,7 +119,7 @@ export const SERVICES: LandingService[] = [
   {
     key: 'photozone',
     name: '포토존 프레임',
-    desc: '사진에 이벤트 프레임을 씌워 저장합니다.',
+    desc: '사진에 그날의 프레임을 씌워 저장해요.',
     deviceNote: '방문자 폰',
     group: 1,
     screens: [{ label: '방문자', device: 'phone', variants: [{ label: '방문자', path: '/demo-photozone' }] }],
@@ -127,7 +127,7 @@ export const SERVICES: LandingService[] = [
   {
     key: 'cheer',
     name: '영상회 응원',
-    desc: '한마디가 상영 화면에 말풍선으로 뜹니다.',
+    desc: '한마디가 상영 화면에 말풍선으로 떠요.',
     deviceNote: '방문자 폰 + 상영 화면',
     group: 1,
     screens: [
@@ -147,7 +147,7 @@ export const SERVICES: LandingService[] = [
   {
     key: 'poll',
     name: '실시간 투표',
-    desc: '즉석 투표. 결과가 그 자리에서 차오릅니다.',
+    desc: '즉석 투표. 결과가 그 자리에서 차올라요.',
     deviceNote: '방문자 폰 · 스크린',
     group: 2,
     screens: [{ label: '방문자', device: 'phone', variants: [{ label: '방문자', path: '/demo-poll' }] }],
@@ -155,7 +155,7 @@ export const SERVICES: LandingService[] = [
   {
     key: 'stamp',
     name: '방문 스탬프',
-    desc: '현장 암호로 도장을 모으고 다 모으면 선물로 바꿉니다.',
+    desc: '현장 암호로 도장을 모으고 다 모으면 선물로 바꿔요.',
     deviceNote: '방문자 폰 · 스태프 기기',
     group: 2,
     screens: [{ label: '방문자', device: 'phone', variants: [{ label: '방문자', path: '/demo-stamp' }] }],
@@ -163,7 +163,7 @@ export const SERVICES: LandingService[] = [
   {
     key: 'quiz',
     name: '최애 모의고사',
-    desc: '문제를 풀고 점수와 칭호를 받습니다. 칭호 카드는 저장·공유.',
+    desc: '문제를 풀고 점수와 칭호를 받아요. 칭호 카드는 저장·공유까지.',
     deviceNote: '방문자 폰',
     group: 2,
     screens: [{ label: '방문자', device: 'phone', variants: [{ label: '방문자', path: '/demo-quiz' }] }],
@@ -171,47 +171,47 @@ export const SERVICES: LandingService[] = [
 ]
 
 export const GROUPS = [
-  { name: '뽑는 것', hint: '결과가 한 장으로 남습니다' },
-  { name: '남기는 것', hint: '방문자의 말과 사진이 쌓입니다' },
-  { name: '참여하고 모으는 것', hint: '현장에서 계속 움직입니다' },
+  { name: '뽑는 것', hint: '그날의 운이 한 장으로 남아요' },
+  { name: '남기는 것', hint: '팬들의 말과 사진이 쌓여요' },
+  { name: '참여하고 모으는 것', hint: '카페 안에서 계속 움직여요' },
 ]
 
 export const HERO_FACTS = [
   { k: '설치', v: '앱 없이 브라우저에서' },
   { k: '주소', v: '행사 하나에 하나' },
   { k: '기기', v: '폰 · 태블릿 · 스크린' },
-  { k: '기간', v: '행사 기간 동안만' },
+  { k: '기간', v: '여는 날부터 닫는 날까지' },
 ]
 
 export const STEPS = [
   {
     no: '01',
     name: '서비스 고르기',
-    desc: '열 개 중 이번 행사에 쓸 것만 고릅니다. 기기 구성도 이때 정합니다.',
+    desc: '열 개 중 이번 행사에 쓸 것만 고르면 돼요. 기기 구성도 이때 같이 정해요.',
     meta: '문의 후 하루 이내',
   },
   {
     no: '02',
     name: '디자인',
-    desc: '행사 컨셉에 맞춰 페이지 전체를 디자인해 시안으로 보내 드립니다.',
+    desc: '그날의 컨셉에 맞춰 페이지 전체를 새로 그려 시안으로 보내요.',
     meta: '시안 확인 후 수정',
   },
   {
     no: '03',
     name: 'QR 인쇄',
-    desc: '완성된 주소의 QR을 받아 포스터나 테이블 안내에 붙입니다.',
+    desc: '완성된 주소의 QR을 받아 포스터나 테이블 안내에 붙이면 준비 끝이에요.',
     meta: '인쇄용 파일 전달',
   },
   {
     no: '04',
     name: '현장 운영',
-    desc: '당일에는 주최자가 그대로 운영합니다. 페이지는 저희가 지켜봅니다.',
+    desc: '당일엔 주최자가 그대로 운영해요. 페이지가 잘 도는지는 계속 지켜보고 있어요.',
     meta: '행사 기간 내내',
   },
 ]
 
-export const OURS = ['슬롯 제작과 서비스 구성', '페이지 디자인', '주소 발급과 QR 만들기', '행사 기간 동안의 페이지 유지']
-export const THEIRS = ['문항과 카드 내용 준비', '경품 선정과 재고 관리', '현장 암호 안내와 추첨 진행', '방문자 응대와 당첨자 발표']
+export const OURS = ['슬롯 제작과 서비스 구성', '그날의 페이지 디자인', '주소 발급과 QR 만들기', '행사 기간 내내 페이지 지키기']
+export const THEIRS = ['문항과 카드 내용 준비', '경품 고르기와 재고 관리', '현장 암호 안내와 추첨 진행', '팬 응대와 당첨자 발표']
 
 /**
  * 자주 묻는 것 — **없는 사실을 적지 않는다.**
@@ -221,26 +221,26 @@ export const THEIRS = ['문항과 카드 내용 준비', '경품 선정과 재�
 export const FAQS = [
   {
     q: '문의는 어떻게 하나요?',
-    a: '카카오 오픈채팅으로 받고 있어요. 페이지의 문의하기를 누르면 고르신 서비스에 맞는 양식이 만들어집니다 — 복사해서 채팅방에 붙여넣어 채워 보내 주시면 금액과 일정을 확정해 드려요. 들어오시면 방 별명을 "행사기간 / 멤버이름" 으로 바꿔 주세요.',
+    a: '카카오 오픈채팅으로 받아요. 페이지의 문의하기를 누르면 고른 서비스에 맞는 양식이 만들어져요 — 복사해서 채팅방에 붙여넣고 채워 보내 주시면 금액과 일정을 확정해 드려요. 들어오시면 방 별명을 "행사기간 / 멤버이름" 으로 바꿔 주세요.',
   },
   {
     q: '앱을 설치해야 하나요?',
-    a: '아니요. QR을 찍으면 브라우저에서 바로 열립니다. 방문자는 아무것도 설치하지 않습니다.',
+    a: '아니요. QR을 찍으면 브라우저에서 바로 열려요. 카페에 온 팬들은 아무것도 설치하지 않아요.',
   },
   {
     q: '기간이 끝나면 어떻게 되나요?',
-    a: '대여 기간이 지나면 그 주소는 닫혀서 페이지를 찾을 수 없다고 나옵니다. 럭키드로우처럼 행사 뒤에 꺼낼 자료가 있는 서비스는 종료 +14일까지 주최자가 내려받을 수 있고, 그 뒤에는 슬롯째 삭제됩니다.',
+    a: '대여 기간이 지나면 그 주소는 닫혀서 페이지를 찾을 수 없다고 나와요. 럭키드로우처럼 행사 뒤에 꺼낼 자료가 있는 서비스는 종료 +14일까지 주최자가 내려받을 수 있고, 그 뒤엔 슬롯째 지워져요.',
   },
   {
     q: '사진은 서버에 저장되나요?',
-    a: '포토존 프레임은 방문자 기기 안에서 합성하고 저장까지 끝냅니다. 방문자 사진을 서버에 올리지 않습니다.',
+    a: '포토존 프레임은 찍은 폰 안에서 합성하고 저장까지 끝나요. 팬들의 사진은 서버에 올라가지 않아요.',
   },
   {
     q: '여러 서비스를 같이 쓸 수 있나요?',
-    a: '한 주소에는 서비스 하나를 담습니다. 여러 개가 필요하시면 슬롯을 여러 개 열어 같은 행사로 묶어 드려요 — QR도 그만큼 나갑니다.',
+    a: '한 주소에는 서비스 하나만 담아요. 여러 개가 필요하면 슬롯을 여러 개 열어 같은 행사로 묶어요 — QR도 그만큼 나가요.',
   },
   {
     q: '체험 페이지에서 남긴 건 어떻게 되나요?',
-    a: '체험 주소는 샘플 데이터가 들어 있는 전용 슬롯입니다. 눌러 보는 것은 되지만 쪽지·투표처럼 남에게 보이는 것은 서버에 저장되지 않도록 막아 두었습니다.',
+    a: '체험 주소는 샘플 데이터가 들어 있는 전용 슬롯이에요. 마음껏 눌러 보셔도 되고, 쪽지·투표처럼 남에게 보이는 건 저장되지 않게 막아 뒀어요.',
   },
 ]
