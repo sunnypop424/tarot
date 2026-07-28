@@ -25,7 +25,7 @@ import { Entries } from './reward/Entries'
 import { Questions as QuizQuestions } from './quiz/Questions'
 import { Stats as QuizStats } from './quiz/Stats'
 import { Cards as PhotocardCards } from './photocard/Cards'
-import { Draw as PhotocardDraw } from './photocard/Draw'
+import { Tickets as PhotocardTickets } from './photocard/Tickets'
 import { useAdminAuth } from './useAdminAuth'
 
 /**
@@ -106,13 +106,14 @@ const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
     </>
   ),
   /**
-   * 포토카드는 **스태프가 쓰는 화면(`draw`)이 관리 화면 안에 있다** — 럭키드로우와 같은 자리다.
-   * 실물이 걸리면 뽑기는 항상 스태프 기기에서 일어나기 때문이다.
+   * **스태프가 뽑는 화면은 여기 없다** — `/{slug}/staff` 로 뺐다 (App.tsx).
+   * 부스 기기에 관리 사이드바가 같이 뜨면 손님이 누르고, 손님이 같이 보는 화면이라
+   * 관리 도구의 고정 라이트가 아니라 슬롯 색을 써야 한다.
    */
   photocard: (
     <>
       <Route path="photocard" element={<PhotocardCards />} />
-      <Route path="draw" element={<PhotocardDraw />} />
+      <Route path="tickets" element={<PhotocardTickets />} />
     </>
   ),
 }

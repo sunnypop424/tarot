@@ -26,6 +26,8 @@ export interface TitleCardInput {
   date: string
   footer: string
   logo?: string
+  /** 칭호 그림 — 칭호 **위**에 그린다 (화면 카드와 같은 자리) */
+  badge?: string
   colors: { bg: string; head: string; sub: string; line: string }
   fontFamily: string
 }
@@ -90,8 +92,25 @@ export async function drawTitleCard(input: TitleCardInput): Promise<ResultImage>
   ctx.fillText(input.eventTitle, headX, pad + 46, W - headX - pad)
 
   // ── 가운데: 칭호 ──
-  const midY = H / 2
+  //
+  // 그림이 있으면 글자 뭉치를 아래로 밀어 그림 자리를 만든다 — 화면 카드와 같은 순서
+  // (그림 → MY TITLE → 칭호 → 선 → 점수). 한쪽만 고치면 저장물과 화면이 어긋난다.
+  let midY = H / 2
   ctx.textAlign = 'center'
+
+  if (input.badge) {
+    const badge = await loadForCanvas(input.badge).catch(() => null)
+    if (badge) {
+      const box = 300
+      const ar = badge.naturalWidth / (badge.naturalHeight || 1)
+      const bw = ar >= 1 ? box : box * ar
+      const bh = ar >= 1 ? box / ar : box
+      // 그림 + 글자 뭉치를 통째로 세로 가운데에 — 그림만 얹으면 아래가 무거워 보인다
+      const blockTop = midY - 250
+      ctx.drawImage(badge, W / 2 - bw / 2, blockTop, bw, bh)
+      midY = blockTop + bh + 190
+    }
+  }
 
   ctx.fillStyle = c.sub
   ctx.font = `800 28px ${ff}`

@@ -451,7 +451,8 @@ function Result({
 }) {
   const [image, setImage] = useState<ResultImage | null>(null)
   const [note, setNote] = useState<string | null>(null)
-  const title = titleFor(display.titles, result.score, result.total)
+  const won = titleFor(display.titles, result.score, result.total)
+  const title = won?.label ?? ''
   const wrong = result.detail.filter((d) => !d.ok && d.body)
   const date = new Date().toLocaleDateString('sv-SE').replaceAll('-', '.')
 
@@ -468,6 +469,7 @@ function Result({
       date,
       footer: display.cardFooter,
       logo: display.logo || undefined,
+      badge: won?.image || undefined,
       colors: {
         bg: display.bg,
         head: display.headText,
@@ -514,6 +516,19 @@ function Result({
             <span className={styles.cardTitle}>{display.title}</span>
           </div>
           <div className={styles.cardMid}>
+            {/**
+              * 칭호 그림 — **`background-image` 다** (슬롯 자산이라 길게 눌러 저장되면 안 된다).
+              * 저장되는 카드에는 캔버스가 같이 그린다 (`titleCard.ts`).
+              */}
+            {won?.image && (
+              <div
+                className={styles.badge}
+                style={{ backgroundImage: cssUrl(won.image) }}
+                role="img"
+                aria-label={title}
+                data-title-badge
+              />
+            )}
             <div className={styles.kicker}>{display.resultKicker}</div>
             <div className={styles.titleBig} data-my-title>
               {title}

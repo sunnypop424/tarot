@@ -7,6 +7,7 @@ import type {
   PhotocardRepo,
   PhotocardSettings,
   PhotocardTicket,
+  PhotocardTicketRow,
 } from './types'
 
 /**
@@ -223,6 +224,46 @@ export const supabasePhotocard: PhotocardRepo = {
     ])
     return { issued: a.count ?? 0, drawn: b.count ?? 0 }
   },
+
+  async removeTicket(slug, code) {
+    const { error } = await (await db())
+      .from('photocard_tickets')
+      .delete()
+      .eq('slug', slug)
+      .eq('code', code)
+    if (error) throw new Error(error.message)
+  },
+
+  async listTickets(slug) {
+    const { data, error } = await (await db())
+      .from('photocard_tickets')
+      .select('code, status, card_name, card_image, issued_at, drawn_at, photocards(rarity)')
+      .eq('slug', slug)
+      .order('issued_at', { ascending: false })
+    if (error) throw new Error(error.message)
+    return (
+      data as unknown as {
+        code: string
+        status: 'open' | 'drawn'
+        card_name: string | null
+        card_image: string | null
+        issued_at: string
+        drawn_at: string | null
+        photocards: { rarity: number } | null
+      }[]
+    ).map(
+      (r): PhotocardTicketRow => ({
+        code: r.code,
+        status: r.status,
+        cardName: r.card_name,
+        cardImage: r.card_image,
+        issuedAt: r.issued_at,
+        drawnAt: r.drawn_at,
+        // 카드를 나중에 지워도 이름은 티켓에 박아뒀다 — 레어도만 못 따라온다
+        rarity: r.photocards?.rarity ?? null,
+      })
+    )
+  },
 }
 
 const nope = (): never => {
@@ -244,4 +285,6 @@ export const localPhotocard: PhotocardRepo = {
   drawByTicket: nope,
   drawBatch: nope,
   ticketStats: nope,
+  listTickets: nope,
+  removeTicket: nope,
 }

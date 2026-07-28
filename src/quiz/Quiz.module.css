@@ -346,6 +346,16 @@
   text-align: center;
   min-height: 0;
 }
+/* 칭호 그림 — 칭호 바로 위. 카드 높이를 안 넘게 vh 로도 막는다 */
+.badge {
+  width: min(38%, 140px);
+  aspect-ratio: 1;
+  max-height: 26vh;
+  margin-bottom: 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
 .kicker {
   font-size: 12px;
   font-weight: 800;

@@ -47,9 +47,17 @@ export interface QuizDisplay {
 }
 
 export interface QuizTitle {
-  /** 이 점수 이상이면 이 칭호 */
+  /** 이 점수 이상이면 이 칭호 (백분율) */
   min: number
   label: string
+  /**
+   * 칭호 그림 (투명 PNG). 칭호 **위**에 뜬다.
+   *
+   * **`background-image` 로 그린다** — 슬롯 자산이라 길게 눌러 저장되면 안 된다.
+   * 다만 저장되는 칭호 카드(캔버스)에는 이 그림이 **같이 그려진다** — 그건 방문자가
+   * 획득한 결과물이라 저장이 목적이다 (CLAUDE.md 의 예외).
+   */
+  image?: string
 }
 
 export const DEFAULT_QUIZ: QuizDisplay = {
@@ -109,9 +117,9 @@ export function quizDisplay(slot: Slot): QuizDisplay {
  * 점수 → 칭호. **백분율로 본다** — 문항 수가 이벤트마다 다른데 칭호 기준을 절대 점수로 두면
  * 문항을 하나 지우는 순간 아무도 최고 칭호를 못 받는다.
  */
-export function titleFor(titles: QuizTitle[], score: number, total: number): string {
-  if (!titles.length) return ''
+export function titleFor(titles: QuizTitle[], score: number, total: number): QuizTitle | null {
+  if (!titles.length) return null
   const pct = total > 0 ? Math.round((score / total) * 100) : 0
   const sorted = [...titles].sort((a, b) => b.min - a.min)
-  return (sorted.find((t) => pct >= t.min) ?? sorted[sorted.length - 1]).label
+  return sorted.find((t) => pct >= t.min) ?? sorted[sorted.length - 1]
 }

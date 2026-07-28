@@ -4,9 +4,11 @@ import {
   Download,
   Image as ImageIcon,
   Info,
+  Layers,
   Lock,
   RotateCw,
   Settings,
+  Shuffle,
   Sparkles,
   Store,
   Ticket,
@@ -317,7 +319,14 @@ function fanCard(i: number, n: number) {
    * 안 빼면 위가 통째로 비고 아래가 잘린다.
    */
   const y = t * t * 150
-  return { left: Math.round(x), top: Math.round(y), rot: Number(rot.toFixed(1)), z: i + 1 }
+  return {
+    left: Math.round(x),
+    top: Math.round(y),
+    rot: Number(rot.toFixed(1)),
+    z: i + 1,
+    // 섞기 애니메이션이 "가운데" 를 알아야 한다 — 카드마다 중심까지의 거리가 다르다
+    toCenter: Math.round(170 - W / 2 - x),
+  }
 }
 
 function Deck({
@@ -342,6 +351,18 @@ function Deck({
   const n = Math.max(3, Math.min(display.spreadCount, 21))
   const wrapRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
+  /**
+   * 섞기 — **명목상이다.** 결과는 서버가 누른 뒤에 정하므로 이 상태는 연출에만 쓴다.
+   * `key` 를 올려 애니메이션을 다시 트리거한다(같은 클래스를 다시 붙이는 것만으론 안 돈다).
+   */
+  const [shuffle, setShuffle] = useState(0)
+  const [shuffling, setShuffling] = useState(false)
+
+  useEffect(() => {
+    if (!shuffling) return
+    const t = setTimeout(() => setShuffling(false), 720 + n * 26)
+    return () => clearTimeout(t)
+  }, [shuffling, shuffle, n])
 
   // 부채꼴은 340px 고정 좌표라 좁은 폰에서 넘친다 — 상자째 줄인다
   useEffect(() => {
@@ -367,7 +388,13 @@ function Deck({
       {display.deckGuide && <p className={styles.deckGuide}>{display.deckGuide}</p>}
 
       <div className={styles.fanWrap} ref={wrapRef}>
-        <div className={styles.fan} style={{ ['--fanScale' as string]: scale }} data-fan>
+        <div
+          className={styles.fan}
+          style={{ ['--fanScale' as string]: scale }}
+          data-fan
+          data-shuffle={shuffling ? '' : undefined}
+          key={shuffle}
+        >
           {Array.from({ length: n }, (_, i) => {
             const p = fanCard(i, n)
             return (
@@ -375,8 +402,16 @@ function Deck({
                 key={i}
                 type="button"
                 className={styles.card}
-                style={{ left: p.left, top: p.top, transform: `rotate(${p.rot}deg)`, zIndex: p.z }}
-                disabled={disabled}
+                style={{
+                  left: p.left,
+                  top: p.top,
+                  transform: `rotate(${p.rot}deg)`,
+                  zIndex: p.z,
+                  ['--rot' as string]: `${p.rot}deg`,
+                  ['--toCenter' as string]: `${p.toCenter}px`,
+                  ['--i' as string]: String(i),
+                }}
+                disabled={disabled || shuffling}
                 onClick={onPick}
                 aria-label="카드 뽑기"
                 data-deck-card
@@ -400,24 +435,40 @@ function Deck({
             {closed ? '마감됐어요' : left > 0 ? `남은 기회 ${left}회` : '뽑을 수 있는 횟수를 다 쓰셨어요'}
           </div>
         )}
-        <div className={styles.deckHint}>
-          {disabled ? (
-            kept > 0 ? (
-              <button
-                type="button"
-                className={styles.ghostDark}
-                style={{ margin: '0 auto', paddingInline: 20 }}
-                onClick={onLocker}
-                data-open-locker
-              >
-                {display.lockerLabel} 열기
-              </button>
-            ) : (
-              '이벤트를 확인해 주세요'
-            )
-          ) : (
-            '카드를 눌러 한 장을 골라 주세요'
+        {/**
+          * 섞기·보관함은 **덱에서 항상 닿아야 한다.**
+          * 보관함을 결과 화면에서만 열 수 있으면, 뽑기를 다 쓴 뒤 새로고침한 손님이
+          * 자기가 모은 카드로 돌아갈 길이 없다.
+          */}
+        <div className={styles.deckActions}>
+          <button
+            type="button"
+            onClick={() => {
+              setShuffle((v) => v + 1)
+              setShuffling(true)
+            }}
+            disabled={shuffling}
+            data-shuffle-btn
+          >
+            <Shuffle size={15} strokeWidth={1.9} aria-hidden="true" />
+            섞기
+          </button>
+          {kept > 0 && (
+            <button type="button" onClick={onLocker} data-open-locker>
+              <Layers size={15} strokeWidth={1.9} aria-hidden="true" />
+              {display.lockerLabel} {kept > 0 && `(${kept})`}
+            </button>
           )}
+        </div>
+
+        <div className={styles.deckHint}>
+          {disabled
+            ? kept > 0
+              ? '모은 카드는 보관함에서 볼 수 있어요'
+              : '이벤트를 확인해 주세요'
+            : shuffling
+              ? '섞는 중…'
+              : '카드를 눌러 한 장을 골라 주세요'}
         </div>
         <div className={styles.adminRow}>
           <a className={styles.adminLink} href={`/${slug}/admin`}>

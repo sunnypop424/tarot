@@ -677,6 +677,12 @@ export interface PhotocardTicket {
   issuedAt: string
 }
 
+/** 주최자 목록용 — 뽑힌 시각까지 (방문자용 `PhotocardTicket` 엔 없다) */
+export interface PhotocardTicketRow extends PhotocardTicket {
+  drawnAt: string | null
+  rarity: number | null
+}
+
 export interface PhotocardMine {
   used: number
   left: number
@@ -728,6 +734,22 @@ export interface PhotocardRepo {
   drawBatch(slug: string, count: number): Promise<PhotocardDrawn[]>
   /** 스태프 화면의 "오늘 발급/소각" — 이상하면 눈에 띄어야 한다 */
   ticketStats(slug: string): Promise<{ issued: number; drawn: number }>
+  /**
+   * 발급된 뽑기권 전부 + 그 코드로 뽑힌 카드 — 주최자 목록.
+   *
+   * **`subject` 는 안 준다.** 그건 그 폰을 가리키는 값이라 목록에 뿌릴 이유가 없다
+   * (누가 뭘 뽑았는지 서로 짝지을 수 있게 되면 그건 다른 종류의 정보다).
+   */
+  listTickets(slug: string): Promise<PhotocardTicketRow[]>
+  /**
+   * 뽑기권 한 장을 지운다 (주최자).
+   *
+   * **지우면 그 폰이 뽑기권을 새로 받을 수 있게 된다** — `unique(slug, subject)` 가 풀리기
+   * 때문이다. 그게 이 기능의 쓸모다(잘못 발급했거나 손님이 못 받았을 때). 이미 뽑은
+   * 뽑기권을 지우면 그 손님이 한 번 더 뽑을 수 있게 되므로 화면이 그걸 경고해야 한다.
+   * 뽑힌 기록(`photocard_draws`)과 재고는 그대로 둔다 — 그건 되돌리는 게 아니다.
+   */
+  removeTicket(slug: string, code: string): Promise<void>
 }
 
 /** 응모 추첨의 후보/결과 한 줄 — 주최자만 본다 (준-PII) */

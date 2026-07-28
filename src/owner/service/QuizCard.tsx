@@ -1,10 +1,13 @@
-import { Plus, X } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Image as ImageIcon, Plus, Upload, X } from 'lucide-react'
 
 import { quizDisplay, type QuizDisplay, type QuizTitle } from '@/data/quiz'
 import { WEBFONTS, type FontId } from '@/data/luckydraw'
+import { cssUrl } from '@/lib/image'
 import type { Slot } from '@/types/slot'
 import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
+import { uploadAsset, deleteAsset, extOf, nameFromUrl } from '../upload'
 
 const ICON: React.CSSProperties = {
   width: 24,
@@ -35,9 +38,40 @@ export function QuizCard({
   patch: (change: Partial<QuizDisplay>) => void
 }) {
   const d = quizDisplay(slot)
+  const [busy, setBusy] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  // 칭호마다 파일 입력을 두면 DOM 이 칭호 수만큼 는다 - 하나를 돌려 쓰고 대상만 기억한다
+  const fileRef = useRef<HTMLInputElement>(null)
+  const targetRef = useRef<number | null>(null)
 
   const setTitle = (i: number, change: Partial<QuizTitle>) =>
     patch({ titles: d.titles.map((t, n) => (n === i ? { ...t, ...change } : t)) })
+
+  /** Storage 에서도 지운다 - 안 지우면 슬롯을 지울 때까지 남는다 */
+  async function dropImage(url: string) {
+    const file = nameFromUrl(url)
+    if (file) await deleteAsset(slot.slug, `quiz/${file}`).catch(() => {})
+  }
+
+  async function uploadBadge(file: File) {
+    const i = targetRef.current
+    if (i === null) return
+    setBusy(i)
+    setError(null)
+    try {
+      const name = `quiz/${crypto.randomUUID().slice(0, 8)}.${extOf(file)}`
+      const url = await uploadAsset(slot.slug, name, file)
+      const prev = d.titles[i]?.image
+      setTitle(i, { image: url })
+      if (prev) void dropImage(prev)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '업로드하지 못했어요')
+    } finally {
+      setBusy(null)
+      targetRef.current = null
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
 
   return (
     <Card title="최애 모의고사">
@@ -91,7 +125,18 @@ export function QuizCard({
           문항 하나만 지워도 아무도 최고 칭호를 못 받아요.)
           <br />
           가장 낮은 칭호는 <b>0%</b> 로 두세요. 그래야 모든 손님이 무언가는 받습니다.
+          <br />
+          칭호마다 <b>그림(투명 PNG)</b>을 올릴 수 있어요 &mdash; 칭호 <b>위</b>에 뜨고,{' '}
+          <b>손님이 저장하는 칭호 카드에도 같이 들어갑니다.</b>
         </p>
+        {error && <p style={{ margin: '0 0 10px', fontSize: 11.5, color: '#b4443c' }}>{error}</p>}
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/png,image/webp,image/svg+xml"
+          hidden
+          onChange={(e) => e.target.files?.[0] && void uploadBadge(e.target.files[0])}
+        />
 
         {d.titles.length === 0 ? (
           <div style={{ padding: '18px 14px', borderRadius: 8, border: '1px dashed #dcdce4', fontSize: 11.5, color: '#9a9a9a', textAlign: 'center' }}>
@@ -110,19 +155,66 @@ export function QuizCard({
                     max={100}
                     value={t.min}
                     onChange={(e) => setTitle(i, { min: Math.min(100, Math.max(0, Number(e.target.value) || 0)) })}
-                    style={{ ...CSS.input, width: 72 }}
+                    style={{ ...CSS.input, width: 68 }}
                     aria-label="기준 백분율"
                   />
-                  <span style={{ fontSize: 11.5, color: '#8a8a8a', flexShrink: 0 }}>% 이상 →</span>
+                  <span style={{ fontSize: 11.5, color: '#8a8a8a', flexShrink: 0 }}>% →</span>
+                  {/* 썸네일도 background-image - 편집기 미리보기도 예외가 아니다 (CLAUDE.md) */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      targetRef.current = i
+                      fileRef.current?.click()
+                    }}
+                    disabled={busy === i}
+                    title={t.image ? '칭호 그림 바꾸기' : '칭호 그림 올리기'}
+                    aria-label={`${t.label} 칭호 그림`}
+                    style={{
+                      width: 34,
+                      height: 34,
+                      flexShrink: 0,
+                      display: 'grid',
+                      placeItems: 'center',
+                      border: '1px solid #dddddd',
+                      borderRadius: 4,
+                      background: '#fff',
+                      backgroundImage: t.image ? cssUrl(t.image) : undefined,
+                      backgroundSize: '76%',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
+                      color: '#a0a0a8',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {!t.image && (busy === i ? <Upload size={13} /> : <ImageIcon size={13} />)}
+                  </button>
+                  {t.image && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void dropImage(t.image!)
+                        setTitle(i, { image: undefined })
+                      }}
+                      aria-label={`${t.label} 칭호 그림 지우기`}
+                      title="칭호 그림 지우기"
+                      style={{ ...ICON, width: 18 }}
+                    >
+                      <X size={11} />
+                    </button>
+                  )}
                   <input
                     value={t.label}
                     onChange={(e) => setTitle(i, { label: e.target.value })}
                     placeholder="칭호 이름"
-                    style={{ ...CSS.input, flex: 1 }}
+                    style={{ ...CSS.input, flex: 1, minWidth: 80 }}
                   />
                   <button
                     type="button"
-                    onClick={() => patch({ titles: d.titles.filter((_, n) => n !== i) })}
+                    onClick={() => {
+                      if (t.image) void dropImage(t.image)
+                      patch({ titles: d.titles.filter((_, n) => n !== i) })
+                    }}
                     aria-label="칭호 삭제"
                     style={ICON}
                   >

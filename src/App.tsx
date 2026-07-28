@@ -73,6 +73,12 @@ const QuizApp = lazy(() => import('@/quiz/QuizApp'))
 const PhotocardApp = lazy(() => import('@/photocard/PhotocardApp'))
 
 /**
+ * 스태프 기기 — `/{slug}/staff`. **관리 화면 밖이다**: 부스에 세워두는 기기에 사이드바·
+ * 로그아웃이 같이 떠 있으면 손님이 누르고, 손님이 같이 보는 화면이라 슬롯 색을 써야 한다.
+ */
+const StaffApp = lazy(() => import('@/photocard/StaffApp'))
+
+/**
  * 서비스별 방문자 앱 — **`Record` 라 모든 서비스가 필수다.**
  *
  * 삼항 체인(`if (service === 'luckydraw') …`)이었을 땐 `SERVICES` 에 새 서비스를 넣어도
@@ -154,6 +160,9 @@ export function App() {
           <Route path=":slug" element={<SlotScope />}>
             {/* 주최자 관리 — 자기 슬롯만 */}
             <Route path="admin/*" element={<AdminRoutes />} />
+
+            {/* 스태프 기기 — 관리 셸(사이드바) 없이 전체화면. 로그인 확인은 화면 안에서 한다 */}
+            {StaffApp && <Route path="staff" element={<StaffApp />} />}
 
             <Route element={<SlotLayout />}>
               <Route index element={<Home />} />

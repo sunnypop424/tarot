@@ -13,6 +13,7 @@ import {
   GraduationCap,
   Sparkles,
   Layers,
+  Ticket as TicketIcon,
   ScanLine,
   Dices,
   Stamp,
@@ -36,6 +37,8 @@ interface NavItem {
   to: string
   label: string
   icon: LucideIcon
+  /** 관리 셸 밖으로 나가는 화면 — 새 탭으로 연다 (스태프 기기·전광판 같은 현장 화면) */
+  external?: boolean
 }
 
 /**
@@ -74,8 +77,12 @@ const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
   ],
   photocard: [
     { to: 'photocard', label: '카드', icon: Layers },
-    // 부스에서 스태프가 쓰는 화면 — 관리 도구가 아니라 현장 도구다 (럭드 '뽑기' 와 같다)
-    { to: 'draw', label: '뽑기', icon: Sparkles },
+    { to: 'tickets', label: '뽑기권', icon: TicketIcon },
+    /*
+     * 부스에서 스태프가 쓰는 화면 — **관리 셸 밖**이라 새 탭으로 연다.
+     * 태블릿을 카운터에 세워두면 손님이 같이 보는 화면이라 슬롯 색을 쓴다.
+     */
+    { to: 'staff', label: '스태프 화면', icon: Sparkles, external: true },
   ],
 }
 
@@ -160,13 +167,28 @@ export function AdminLayout() {
           {user && <SlotSwitcher current={slot.slug} slugs={user.slugs} />}
 
           <nav className="admin__nav" aria-label="관리 메뉴">
-            {NAV.map(({ to, label, icon: Icon }) => (
-              // 절대 경로로 — 상대 경로는 현재 URL 에 누적돼 /questions/questions… 로 늘어난다
-              <NavLink key={to} to={`/${slot.slug}/admin/${to}`} className="admin__navlink">
-                <Icon size={20} strokeWidth={2} aria-hidden="true" />
-                {label}
-              </NavLink>
-            ))}
+            {NAV.map(({ to, label, icon: Icon, external }) =>
+              external ? (
+                // 관리 셸 밖 화면 — 새 탭으로 연다 (부스 기기를 따로 띄워두고 쓴다)
+                <a
+                  key={to}
+                  className="admin__navlink"
+                  href={`/${slot.slug}/${to}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Icon size={20} strokeWidth={2} aria-hidden="true" />
+                  {label}
+                  <ExternalLink size={13} strokeWidth={2} aria-hidden="true" style={{ marginLeft: 'auto', opacity: 0.5 }} />
+                </a>
+              ) : (
+                // 절대 경로로 — 상대 경로는 현재 URL 에 누적돼 /questions/questions… 로 늘어난다
+                <NavLink key={to} to={`/${slot.slug}/admin/${to}`} className="admin__navlink">
+                  <Icon size={20} strokeWidth={2} aria-hidden="true" />
+                  {label}
+                </NavLink>
+              )
+            )}
             <a
               className="admin__navlink"
               href={`/${slot.slug}`}

@@ -1,0 +1,521 @@
+/*
+ * 스태프 기기 — 시안 "포토카드 뽑기 방문자.dc.html" 의 C②·C③·C④ (태블릿 1194×834).
+ *
+ * **관리 화면이 아니다.** `.admin` 의 고정 라이트를 안 쓰고 슬롯 색을 그대로 쓴다 —
+ * 카운터에 세워두면 손님이 같이 보는 화면이라, 손님 폰과 같은 이벤트 색이어야 한다.
+ * (실시간 투표의 전광판이 먼저 만든 자리와 같은 성격이다.)
+ */
+
+.root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--pc-bg);
+  color: var(--pc-head);
+  font-family: var(--pc-font);
+}
+
+/* ── 머리 ── */
+.bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 26px;
+  border-bottom: 1px solid var(--pc-line);
+  flex-wrap: wrap;
+}
+.badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--pc-btnFg);
+  background: var(--pc-btn);
+  border-radius: 4px;
+  padding: 4px 9px;
+  letter-spacing: 0.04em;
+  flex: none;
+}
+.barTitle {
+  font-size: 19px;
+  font-weight: 800;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.barRight {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 13px;
+  color: var(--pc-sub);
+  flex-wrap: wrap;
+}
+.barLink {
+  color: var(--pc-sub);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.barLink:hover {
+  color: var(--pc-head);
+}
+
+/* 연습·마감 알림 — 스태프가 놓치면 행사 내내 재고가 안 준다 */
+.notice {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 26px;
+  font-size: 13px;
+  line-height: 1.6;
+  background: var(--pc-wash);
+  border-bottom: 1px solid var(--pc-line);
+  color: var(--pc-head);
+}
+
+/* ── 본문: 왼쪽 무대 · 오른쪽 조작 ── */
+.body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 0;
+}
+@media (min-width: 900px) {
+  .body {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pc-deckBg);
+  background-image: radial-gradient(90% 60% at 50% 45%, var(--pc-deckGlow) 0%, var(--pc-deckBg) 62%, var(--pc-deckDeep) 100%);
+  padding: 34px 24px;
+  min-height: 320px;
+  position: relative;
+  overflow: hidden;
+}
+.stageCard {
+  position: relative;
+  width: min(240px, 46vw);
+  aspect-ratio: 55 / 85;
+  border-radius: 16px;
+  background:
+    var(--pc-face, none) center / cover no-repeat,
+    linear-gradient(
+      155deg,
+      color-mix(in srgb, var(--pc-deckGlow) 84%, #ffffff 16%),
+      color-mix(in srgb, var(--pc-deckBg) 68%, var(--pc-deckGlow) 32%)
+    );
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.45);
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.24);
+  overflow: hidden;
+}
+.stageCard[data-busy] {
+  animation: pcsFloat 2.4s ease-in-out infinite;
+}
+/*
+ * 섞기 — **명목상이다.** 결과는 서버가 정하고 이 연출은 아무 영향이 없다.
+ * 그래도 두는 이유: 카운터에서 손님이 보는 앞에 뽑기 전 한 박자가 필요하다.
+ * 뒤에 깔린 두 장(::before/::after)이 같이 흔들려 한 벌을 섞는 것처럼 보인다.
+ */
+.stageCard[data-shuffle] {
+  animation: pcsShuffle 700ms cubic-bezier(0.36, 0.1, 0.24, 1) both;
+}
+.stageCard::before,
+.stageCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  box-shadow: inherit;
+  opacity: 0;
+  pointer-events: none;
+}
+.stageCard[data-shuffle]::before {
+  opacity: 1;
+  animation: pcsShuffleA 700ms cubic-bezier(0.36, 0.1, 0.24, 1) both;
+}
+.stageCard[data-shuffle]::after {
+  opacity: 1;
+  animation: pcsShuffleB 700ms cubic-bezier(0.36, 0.1, 0.24, 1) both;
+}
+@keyframes pcsShuffle {
+  0%,
+  100% {
+    transform: none;
+  }
+  35% {
+    transform: translateX(-16%) rotate(-5deg);
+  }
+  65% {
+    transform: translateX(10%) rotate(3deg);
+  }
+}
+@keyframes pcsShuffleA {
+  0%,
+  100% {
+    transform: none;
+    opacity: 0;
+  }
+  35% {
+    transform: translateX(20%) translateY(-4%) rotate(7deg);
+    opacity: 0.75;
+  }
+  65% {
+    transform: translateX(-8%) rotate(-4deg);
+    opacity: 0.75;
+  }
+}
+@keyframes pcsShuffleB {
+  0%,
+  100% {
+    transform: none;
+    opacity: 0;
+  }
+  35% {
+    transform: translateX(-6%) translateY(5%) rotate(-9deg);
+    opacity: 0.6;
+  }
+  65% {
+    transform: translateX(16%) rotate(6deg);
+    opacity: 0.6;
+  }
+}
+.shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 90px;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: pcsShine 1.5s linear infinite;
+}
+.stageText {
+  position: absolute;
+  bottom: 26px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: #e6e5e1;
+  animation: pcsPulse 1.4s ease-in-out infinite;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 34px clamp(24px, 5vw, 64px);
+  min-width: 0;
+}
+.ask {
+  font-size: clamp(21px, 2.4vw, 26px);
+  font-weight: 800;
+  word-break: keep-all;
+}
+.askSub {
+  margin: -6px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--pc-sub);
+  word-break: keep-all;
+}
+
+/* 손으로 누르는 화면이라 전부 크다 */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--pc-wash);
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid var(--pc-line);
+}
+.stepBtn {
+  width: 74px;
+  height: 74px;
+  flex: none;
+  border: none;
+  border-radius: 12px;
+  background: var(--pc-bg);
+  color: var(--pc-head);
+  font-family: inherit;
+  font-size: 32px;
+  font-weight: 800;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.stepBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.stepValue {
+  flex: 1;
+  text-align: center;
+  font-size: 48px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.quick {
+  display: flex;
+  gap: 10px;
+}
+.quickBtn {
+  flex: 1;
+  height: 46px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--pc-wash);
+  color: var(--pc-sub);
+  border: 1px solid var(--pc-line);
+}
+.quickBtn[data-on] {
+  background: var(--pc-btn);
+  color: var(--pc-btnFg);
+  border-color: var(--pc-btn);
+  font-weight: 800;
+}
+.codeInput {
+  width: 100%;
+  height: 96px;
+  border-radius: 16px;
+  border: 1px solid var(--pc-line);
+  background: var(--pc-wash);
+  color: var(--pc-head);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: clamp(38px, 5vw, 52px);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-align: center;
+  text-transform: uppercase;
+  outline: none;
+}
+.codeInput:focus {
+  border-color: var(--pc-btn);
+}
+.go {
+  margin-top: 8px;
+  height: 78px;
+  border: none;
+  border-radius: 16px;
+  background: var(--pc-btn);
+  color: var(--pc-btnFg);
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.go:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.error {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--pc-head);
+  background: var(--pc-wash);
+  border: 1px solid var(--pc-line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  word-break: keep-all;
+}
+
+/* ── 결과 ── */
+.result {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  padding: 34px 24px;
+  min-height: 0;
+  background: var(--pc-bg);
+}
+.resultTitle {
+  font-size: clamp(18px, 2.2vw, 22px);
+  font-weight: 800;
+  text-align: center;
+  word-break: keep-all;
+}
+.cards {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+  overflow-y: auto;
+}
+.card {
+  width: clamp(112px, 15vw, 190px);
+}
+.face {
+  width: 100%;
+  aspect-ratio: 55 / 85;
+  border-radius: 14px;
+  background-color: var(--pc-wash);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border: 1px solid var(--pc-line);
+  box-shadow: 0 14px 34px rgba(20, 20, 20, 0.14);
+  display: grid;
+  place-items: center;
+  color: var(--pc-sub);
+  animation: pcsPop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.cardName {
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+  word-break: keep-all;
+}
+.cardRarity {
+  margin-top: 2px;
+  font-size: 12px;
+  text-align: center;
+  color: var(--pc-sub);
+}
+.doneBtn {
+  height: 68px;
+  padding: 0 56px;
+  border: none;
+  border-radius: 14px;
+  background: var(--pc-btn);
+  color: var(--pc-btnFg);
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+  flex: none;
+}
+
+/* ── 로그인·안내 ── */
+.center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 30px;
+  text-align: center;
+}
+.centerTitle {
+  font-size: 20px;
+  font-weight: 800;
+}
+.centerBody {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--pc-sub);
+  word-break: keep-all;
+}
+.linkBtn {
+  margin-top: 10px;
+  height: 52px;
+  padding: 0 26px;
+  border: none;
+  border-radius: 13px;
+  background: var(--pc-btn);
+  color: var(--pc-btnFg);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+@keyframes pcsFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes pcsShine {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+@keyframes pcsPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes pcsPop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* 섞기 버튼 — 뽑기 버튼 옆 보조 자리 */
+.shuffleBtn {
+  height: 56px;
+  border-radius: 13px;
+  background: var(--pc-wash);
+  color: var(--pc-head);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--pc-line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.shuffleBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.shuffleNote {
+  margin: 0;
+  font-size: 12px;
+  color: var(--pc-sub);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stageCard,
+  .stageCard::before,
+  .stageCard::after,
+  .shine,
+  .stageText,
+  .face {
+    animation: none;
+  }
+}

@@ -33,6 +33,15 @@
   place-items: center;
   color: var(--color-fg-3);
 }
+/* 번호가 주인공이라 크고 고정폭으로 — 손으로 대조하는 값이다 */
+.ticketCode {
+  flex: none;
+  width: 84px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
 .rowMain {
   flex: 1;
   min-width: 0;
