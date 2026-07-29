@@ -12,8 +12,8 @@ import type { ServiceId } from '@/data/services'
 
 export const KAKAO_URL = 'https://open.kakao.com/o/skxgV2Th'
 
-/** 오픈채팅 별명 규칙 — 방에 들어오자마자 하는 일이라 화면 첫 줄에 세운다 */
-export const NICKNAME_RULE = '행사기간 / 멤버이름'
+/** 오픈채팅 닉네임 규칙 — 방에 들어오자마자 하는 일이라 화면 첫 줄에 세운다 */
+export const NICKNAME_RULE = '행사기간 / 주인공 이름'
 export const NICKNAME_EXAMPLE = '8/12~8/14 / 디노'
 
 const LINE = '------------------------'

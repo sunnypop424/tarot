@@ -132,32 +132,35 @@ export default function Landing() {
       {/* 단 폭은 `landingData.PAGE_MAX` 가 원본이다 — 목업 크기가 여기서 나와 CSS 에 또 적으면 어긋난다 */}
       <div className={styles.page} style={{ maxWidth: PAGE_MAX }}>
         <div className={styles.top}>
-          <span className={styles.brand}>생일카페 페이지 커미션</span>
+          <span className={styles.brand}>생일카페 웹페이지 제작 커미션</span>
           <span className={styles.footerNote}>OLUCKY!</span>
         </div>
 
         <div className={styles.rv} data-rv>
           <h1 className={styles.h1}>
-            생일카페에서 쓸 페이지를
+            생일카페를 더 특별하게 만들어 줄
             <br />
-            행사 하나에 하나씩 만들어 드립니다
+            단 하나의 웹페이지를 제작합니다
           </h1>
           <p className={styles.p}>
-            카페에 오신 손님이 QR을 찍으면 폰에서 바로 열리는 페이지입니다. 앱을 깔지 않고,{' '}
-            <span className={styles.mk}>주소 하나가 그 행사 하나</span>입니다. 대기 줄에서 30초 안에
-            끝나도록 만들고, 기간이 끝나면 주소가 닫힙니다.
+            카페에 방문한 팬들이 QR 코드만 찍으면 스마트폰에서 바로 열리는 전용 웹페이지입니다.
+            번거로운 앱 설치 없이,{' '}
+            <span className={styles.mk}>웹 주소 하나가 곧 하나의 특별한 이벤트가 됩니다.</span> 대기
+            줄에서도 30초면 참여할 수 있도록 직관적으로 설계되며, 행사 기간이 끝나면 페이지는
+            안전하게 닫힙니다.
           </p>
           <p className={styles.p}>
-            주문을 받으면 그날의 컨셉에 맞춰 페이지를 새로 그려서, 주소와 관리 계정을 함께 넘겨
-            드립니다. 처음 여시는 분도 많아서 어떻게 쓰는지까지 같이 알려 드립니다.
+            행사의 컨셉과 분위기에 맞춰 맞춤형으로 페이지를 디자인한 후, 전용 웹 주소와 관리자
+            계정을 함께 전달해 드립니다. 생일카페 주최가 처음이신 분들도 쉽게 운영하실 수 있도록
+            꼼꼼하게 안내해 드립니다.
           </p>
           <p className={`${styles.p} ${styles.pLast}`}>
-            혼자 하는 일이라 한 번에 많이는 받지 못합니다. 그 대신 행사 동안에는 계속 붙어
-            있습니다. 궁금한 것이 있으시면{' '}
+            1인 체제로 운영되어 한 번에 많은 의뢰를 받지는 못합니다. 하지만 행사 기간 동안 문제가
+            생기거나 확인이 필요할 때 최대한 빠르게 대응해 드립니다. 궁금한 점이 있으시다면 언제든{' '}
             <button type="button" className={styles.link} onClick={openInquiry}>
               문의
-            </button>{' '}
-            쪽으로 말 걸어 주세요.
+            </button>
+            를 통해 편하게 말씀해 주세요.
           </p>
         </div>
 
@@ -170,8 +173,9 @@ export default function Landing() {
           만들 수 있는 것
         </h2>
         <p className={styles.lead} data-rv>
-          열 가지가 실제로 돌고 있습니다. 줄을 누르시면 아래 목업에 그 페이지가 바로 뜹니다. 눌러
-          보셔도 서버에는 아무것도 남지 않습니다.
+          현재 10가지의 이벤트 페이지가 준비되어 있습니다. 항목을 누르시면 아래 목업 화면에서
+          페이지가 바로 실행됩니다. 체험용이므로 마음껏 눌러보셔도 서버에 기록이 남지 않으니
+          안심하셔도 됩니다.
         </p>
 
         <div className={styles.list} data-rv>
@@ -202,11 +206,11 @@ export default function Landing() {
         </div>
 
         <p className={styles.tail} data-rv>
-          여기 없는 것을 생각하고 계시다면 그것도 만들 수 있습니다. 어떤 흐름이었으면 좋겠는지{' '}
+          목록에 없는 새로운 이벤트를 구상하고 계신가요? 원하시는 진행 방식을{' '}
           <button type="button" className={styles.link} onClick={openCustom}>
             적어 보내 주시면
           </button>{' '}
-          가능한지부터 알려 드립니다.
+          제작 가능 여부를 친절히 안내해 드립니다.
         </p>
 
         {/* ── 눌러 보기 ── */}
@@ -214,8 +218,8 @@ export default function Landing() {
           여기서 바로 눌러 보기
         </h2>
         <p className={styles.lead} data-rv>
-          스크린샷이 아니라 실제로 도는 페이지입니다. 지금 보고 계신 것은{' '}
-          <span className={styles.mk}>{service.name}</span>입니다.
+          단순한 스크린샷이 아닌, 실제로 구동되는 페이지입니다. 현재 선택하신{' '}
+          <span className={styles.mk}>{service.name}</span>을 직접 체험해 보세요.
         </p>
 
         <div className={styles.stage} data-rv>
@@ -278,11 +282,11 @@ export default function Landing() {
           </div>
 
           <p className={styles.stageNote}>
-            체험용이라 눌러도 저장되지 않습니다. 목업이 작으니 폰으로 보실 때는{' '}
+            체험용이므로 입력하신 내용은 저장되지 않습니다. 화면이 작아 불편하시다면 스마트폰에서{' '}
             <a className={styles.link} href={service.slug} target="_blank" rel="noreferrer">
               직접 열어 보시는 편
             </a>
-            이 낫습니다.
+            을 추천합니다.
           </p>
         </div>
 
@@ -315,8 +319,13 @@ export default function Landing() {
           누가 무엇을 하나
         </h2>
         <div data-rv>
-          <p className={styles.p}>{ROLE_MINE}</p>
-          <p className={`${styles.p} ${styles.pLast}`}>{ROLE_YOURS}</p>
+          {/* 앞머리를 굵게 떼어 두 문단이 '나 / 주최자' 로 갈린다는 걸 눈으로 알게 한다 */}
+          <p className={styles.p}>
+            <b>{ROLE_MINE.label}:</b> {ROLE_MINE.body}
+          </p>
+          <p className={`${styles.p} ${styles.pLast}`}>
+            <b>{ROLE_YOURS.label}:</b> {ROLE_YOURS.body}
+          </p>
           <div className={styles.note}>
             <p className={styles.noteText}>{ROLE_NOTE}</p>
           </div>
@@ -351,9 +360,9 @@ export default function Landing() {
         </h2>
         <div data-rv>
           <p className={`${styles.p} ${styles.pLast}`}>
-            카카오 오픈채팅으로 받고 있습니다. 아래를 누르시면 어떤 서비스를 쓰실지 고르는 창이
-            열리고, 거기서 고르시면 그에 맞는 문의 양식이 만들어집니다. 채팅에 붙여넣고 채워 보내
-            주시면 금액과 일정을 알려 드립니다.
+            카카오톡 오픈채팅으로 문의를 받고 있습니다. 아래 버튼을 누르시면 원하시는 서비스를
+            선택할 수 있는 창이 열리며, 선택에 맞춰 문의 양식이 자동 생성됩니다. 생성된 양식을
+            복사하여 채팅방에 남겨주시면 금액과 일정을 안내해 드립니다.
           </p>
           <button type="button" className={styles.cta} onClick={openInquiry}>
             문의하기

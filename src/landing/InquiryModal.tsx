@@ -9,10 +9,10 @@ import styles from './InquiryModal.module.css'
  * 문의 창 — **오픈채팅으로 보낼 글을 여기서 만들어 준다.**
  *
  * 폼을 서버로 받지 않는다. 우리가 저장하는 게 없으니 개인정보가 안 쌓이고, 손님은 이미 카톡을
- * 쓰고 있다. 이 창이 하는 일은 셋뿐이다 — **별명 규칙을 먼저 알리고**, 고른 서비스에 맞는
+ * 쓰고 있다. 이 창이 하는 일은 셋뿐이다 — **닉네임 규칙을 먼저 알리고**, 고른 서비스에 맞는
  * 양식을 만들고, 복사해서 채팅방을 열어 준다.
  *
- * 순서가 곧 설계다: 별명을 바꾸지 않으면 방에서 누가 누군지 몰라 문의가 섞인다.
+ * 순서가 곧 설계다: 닉네임을 바꾸지 않으면 방에서 누가 누군지 몰라 문의가 섞인다.
  */
 export function InquiryModal({
   open,
@@ -96,22 +96,26 @@ export function InquiryModal({
         </button>
 
         <p className={styles.kicker}>문의하기</p>
-        <h2 className={styles.title}>오픈채팅으로 받고 있습니다</h2>
+        <h2 className={styles.title}>카카오톡 오픈채팅으로 문의를 받고 있습니다</h2>
 
         <ol className={styles.steps}>
           <li>
-            <b>오픈채팅방 별명</b>을 <b>{NICKNAME_RULE}</b> 으로 바꿔 주세요 (예: {NICKNAME_EXAMPLE})
+            <b>오픈채팅방 닉네임</b>을 <b>[{NICKNAME_RULE}]</b> 형식으로 설정해 주세요. (예:{' '}
+            {NICKNAME_EXAMPLE})
           </li>
-          <li>쓰실 서비스(또는 주문 제작)를 고르시고 양식을 복사해 주세요</li>
-          <li>채팅방에 붙여넣어 채워 보내 주시면 금액과 일정을 알려 드립니다</li>
+          <li>원하시는 서비스(또는 주문 제작)를 선택하신 후, 하단의 양식을 복사해 주세요.</li>
+          <li>
+            복사한 양식을 채팅방에 붙여넣고 내용을 채워 보내주시면, 일정과 견적을 안내해 드립니다.
+          </li>
         </ol>
         {/* 긴급 여부는 고르는 값이 아니라 두 날짜에서 나오는 값이다 — 양식에도 같은 문장이 들어간다 */}
         <p className={styles.hint}>
-          <b>긴급 여부</b>는 <b>자료 전달 예정일</b>과 <b>시연/검수 희망일</b> 사이 기간으로 계산됩니다.
+          <b>긴급 작업 여부</b>는 <b>[자료 전달 예정일]</b>과 <b>[시연/검수 희망일]</b> 사이의
+          기간을 기준으로 산정됩니다.
         </p>
 
         <p className={styles.label}>
-          문의할 서비스 <span>여러 개 고르실 수 있습니다</span>
+          문의할 서비스 <span>중복 선택이 가능합니다</span>
         </p>
         <div className={styles.chips}>
           {FORM_ORDER.map((id) => (
@@ -147,7 +151,7 @@ export function InquiryModal({
           <span>
             {picked.length + (custom ? 1 : 0) > 0
               ? `${picked.length + (custom ? 1 : 0)}개 항목`
-              : '아직 못 정하셨어도 괜찮습니다'}
+              : '아직 구체적으로 정하지 못하셨어도 괜찮습니다.'}
           </span>
         </p>
         <pre className={styles.preview} data-preview>
@@ -159,13 +163,13 @@ export function InquiryModal({
           <div className={styles.actions}>
             <button type="button" className={styles.copyBtn} onClick={copy} data-copy>
               {copied ? <Check size={16} strokeWidth={2.2} /> : <Copy size={16} strokeWidth={1.8} />}
-              {copied ? '복사했습니다' : '양식 복사하기'}
+              {copied ? '복사되었습니다' : '양식 복사하기'}
             </button>
             <a className={styles.kakaoBtn} href={KAKAO_URL} target="_blank" rel="noreferrer noopener" data-kakao>
               오픈채팅 열기 <ExternalLink size={15} strokeWidth={1.8} aria-hidden="true" />
             </a>
           </div>
-          <p className={styles.foot}>복사하신 뒤 채팅방에 그대로 붙여넣으시면 됩니다.</p>
+          <p className={styles.foot}>복사하신 양식을 채팅방에 그대로 붙여넣어 주시면 됩니다.</p>
         </div>
       </div>
     </div>
