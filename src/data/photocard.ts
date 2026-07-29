@@ -1,3 +1,4 @@
+import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
 import type { CountPickerStyle } from './countPicker'
@@ -6,6 +7,11 @@ import type { CountPickerStyle } from './countPicker'
  * 포토카드 뽑기 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다.
  * 카드 목록·모드·재고 같은 **운영값은 주최자**가 `/{slug}/admin` 에서 정한다
  * (`photocards`·`photocard_settings`).
+ *
+ * **화면이 두 종류라 색도 두 벌이다.** 뽑기권·보관함·안내는 슬롯 색을 쓰고
+ * (`serviceTheme.ts` 파생), **덱·뽑는 중·결과만 어두운 무대로 고정**한다(`deckBg`·`deckGlow`).
+ * 카드가 주인공인 화면이라 주변이 밝으면 카드 그림이 죽는다 — 밝은 이벤트 색을 그 자리에
+ * 넣으면 뽑는 순간의 연출이 통째로 사라진다.
  */
 export interface PhotocardDisplay {
   title: string
@@ -104,12 +110,14 @@ export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
   counterBody: '포토카드 뽑기는 현장 스태프 기기에서 진행돼요. 카운터에 방문해 주세요.',
   counterHours: '',
   font: 'pretendard',
+  /* 덱 무대만 고정 다크 — 카드가 주인공이다 (파일 머리말) */
   deckBg: '#1c1d22',
   deckGlow: '#3b3d4c',
-  bg: '#ffffff',
-  headText: '#1f1f1f',
-  subText: '#7a7a78',
-  buttonColor: '#26262a',
+  /* 나머지는 비워 둔다 — 안 고르면 **슬롯 테마에서 파생한다** (`serviceTheme.ts`) */
+  bg: '',
+  headText: '',
+  subText: '',
+  buttonColor: '',
   logo: '',
   cardBack: '',
   picker: {},
@@ -135,6 +143,7 @@ export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
 /** 슬롯 설정 + 기본값 — **키 단위로 채운다** */
 export function photocardDisplay(slot: Slot): PhotocardDisplay {
   const saved = (slot.photocard ?? {}) as Partial<PhotocardDisplay>
+  const base = serviceTheme(slot)
   return {
     title: saved.title || DEFAULT_PHOTOCARD.title,
     showTitle: saved.showTitle ?? DEFAULT_PHOTOCARD.showTitle,
@@ -149,12 +158,14 @@ export function photocardDisplay(slot: Slot): PhotocardDisplay {
     counterBody: saved.counterBody ?? DEFAULT_PHOTOCARD.counterBody,
     counterHours: saved.counterHours ?? DEFAULT_PHOTOCARD.counterHours,
     font: saved.font || DEFAULT_PHOTOCARD.font,
+    // 덱 무대는 테마를 안 받는다 (파일 머리말)
     deckBg: saved.deckBg || DEFAULT_PHOTOCARD.deckBg,
     deckGlow: saved.deckGlow || DEFAULT_PHOTOCARD.deckGlow,
-    bg: saved.bg || DEFAULT_PHOTOCARD.bg,
-    headText: saved.headText || DEFAULT_PHOTOCARD.headText,
-    subText: saved.subText || DEFAULT_PHOTOCARD.subText,
-    buttonColor: saved.buttonColor || DEFAULT_PHOTOCARD.buttonColor,
+    // 나머지는 고른 값이 늘 이기고, 안 골랐으면 슬롯 테마를 따른다 (`serviceTheme.ts`)
+    bg: saved.bg || base.bg,
+    headText: saved.headText || base.headText,
+    subText: saved.subText || base.subText,
+    buttonColor: saved.buttonColor || base.button,
     logo: saved.logo ?? DEFAULT_PHOTOCARD.logo,
     cardBack: saved.cardBack ?? DEFAULT_PHOTOCARD.cardBack,
     // 저장값만 든다 — 안 고른 색의 기본값은 화면이 자기 팔레트로 채운다

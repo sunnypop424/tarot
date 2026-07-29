@@ -1,3 +1,4 @@
+import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
 
@@ -43,11 +44,12 @@ export const DEFAULT_POLL: PollDisplay = {
   subtitle: '참여하고 싶은 설문을 골라 주세요',
   showSubtitle: true,
   font: 'pretendard',
-  headText: '#1f1f1f',
-  subText: '#7a7a78',
-  buttonColor: '#26262a',
-  bg: '#ffffff',
-  barColor: '#26262a',
+  /* 색은 비워 둔다 — 안 고르면 **슬롯 테마에서 파생한다** (`serviceTheme.ts`) */
+  headText: '',
+  subText: '',
+  buttonColor: '',
+  bg: '',
+  barColor: '',
   logo: '',
   logoAlign: 'left',
   resultMode: 'afterVote',
@@ -60,17 +62,20 @@ export const DEFAULT_POLL: PollDisplay = {
 /** 슬롯 설정 + 기본값 — **키 단위로 채운다** (`rollingDisplay` 와 같은 이유) */
 export function pollDisplay(slot: Slot): PollDisplay {
   const saved = (slot.poll ?? {}) as Partial<PollDisplay>
+  const base = serviceTheme(slot)
   return {
     title: saved.title || DEFAULT_POLL.title,
     showTitle: saved.showTitle ?? DEFAULT_POLL.showTitle,
     subtitle: saved.subtitle ?? DEFAULT_POLL.subtitle,
     showSubtitle: saved.showSubtitle ?? DEFAULT_POLL.showSubtitle,
     font: saved.font || DEFAULT_POLL.font,
-    headText: saved.headText || DEFAULT_POLL.headText,
-    subText: saved.subText || DEFAULT_POLL.subText,
-    buttonColor: saved.buttonColor || DEFAULT_POLL.buttonColor,
-    bg: saved.bg || DEFAULT_POLL.bg,
-    barColor: saved.barColor || DEFAULT_POLL.barColor,
+    // 색은 고른 값이 늘 이기고, 안 골랐으면 슬롯 테마를 따른다 (`serviceTheme.ts`)
+    headText: saved.headText || base.headText,
+    subText: saved.subText || base.subText,
+    buttonColor: saved.buttonColor || base.button,
+    bg: saved.bg || base.bg,
+    // 막대·하트가 차오르는 색 — 버튼과 같은 강조색에서 온다
+    barColor: saved.barColor || base.button,
     logo: saved.logo ?? DEFAULT_POLL.logo,
     logoAlign: saved.logoAlign || DEFAULT_POLL.logoAlign,
     resultMode: saved.resultMode || DEFAULT_POLL.resultMode,

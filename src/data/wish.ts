@@ -1,8 +1,16 @@
+import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
 
 /**
  * 소원 나무 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다 (주최자는 못 건드린다).
+ *
+ * **색은 이 서비스만 슬롯 테마를 거의 안 받는다** — 다른 서비스는 `serviceTheme.ts` 로
+ * 파생하지만 여기는 `buttonColor` 하나뿐이다. 밤하늘이 이 서비스의 연출 그 자체라서다:
+ * 등불은 **어두운 배경 위에서만** 빛나 보이고, 밝은 캔버스를 받으면 그냥 색종이가 된다.
+ * 글자색(`headText`·`subText`)도 그 밤하늘 위에 얹히고, 소원 글자(`wishBody`·`wishName`)는
+ * 연한 한지색 등불 위에 얹히므로 **둘 다 테마가 아니라 자기 배경을 따라야 한다.**
+ * 배경 이미지를 올리면 그게 하늘을 덮는다 — 그때 색을 맞추는 건 편집기에서 한다.
  *
  * ── 이 서비스가 다른 서비스와 다른 점 ──
  *
@@ -121,7 +129,8 @@ export const DEFAULT_WISH: WishDisplay = {
   wishBody: '#3b3830',
   wishName: '#7a7461',
   skyBg: '#1b1c22',
-  buttonColor: '#f2f1ee',
+  /* 소원 걸기 버튼만 비워 둔다 — 안 고르면 **슬롯 테마의 강조색**을 받는다 (파일 머리말) */
+  buttonColor: '',
   lanterns: DEFAULT_LANTERNS,
   charms: [],
   treeBg: '',
@@ -142,6 +151,7 @@ export const DEFAULT_WISH: WishDisplay = {
  */
 export function wishDisplay(slot: Slot): WishDisplay {
   const saved = (slot.wish ?? {}) as Partial<WishDisplay>
+  const base = serviceTheme(slot)
   return {
     treeTitle: saved.treeTitle || DEFAULT_WISH.treeTitle,
     showTitle: saved.showTitle ?? DEFAULT_WISH.showTitle,
@@ -156,7 +166,8 @@ export function wishDisplay(slot: Slot): WishDisplay {
     wishBody: saved.wishBody || DEFAULT_WISH.wishBody,
     wishName: saved.wishName || DEFAULT_WISH.wishName,
     skyBg: saved.skyBg || DEFAULT_WISH.skyBg,
-    buttonColor: saved.buttonColor || DEFAULT_WISH.buttonColor,
+    // 버튼만 슬롯 테마를 받는다 — 나머지 색이 왜 고정인지는 파일 머리말에
+    buttonColor: saved.buttonColor || base.button,
     // 빈 배열은 "색 선택 없음"·"장식 없음" 이라는 뜻이라 살린다
     lanterns: saved.lanterns ?? DEFAULT_WISH.lanterns,
     charms: saved.charms ?? DEFAULT_WISH.charms,

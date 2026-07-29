@@ -1,12 +1,19 @@
+import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
 
 /**
  * 롤링페이퍼 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다 (주최자는 못 건드린다).
  *
- * 럭키드로우(`luckydrawDisplay`)와 같은 짝이다: 서비스별 룩은 여기, 색은 hex 로 직접 든다
- * (포스트잇 파스텔은 테마 토큰이 아니라 이 서비스만의 색이라 — 럭드 모달색과 같은 예외).
- * 화면은 이 값들을 `--rp-*` CSS 변수로 주입해 그린다. 이미지(벽 배경·로고·스티커)는 업로드 URL.
+ * 럭키드로우(`luckydrawDisplay`)와 같은 짝이다. 화면은 이 값들을 `--rp-*` CSS 변수로 주입해
+ * 그린다. 이미지(벽 배경·로고·스티커)는 업로드 URL.
+ *
+ * **벽 색은 슬롯 테마에서 파생한다** (`serviceTheme.ts`) — 안 그러면 최고관리자가 고른 색이
+ * 이 서비스에 안 닿는다.
+ *
+ * **쪽지 위 색만 예외로 고정한다** (`noteBody`·`noteName`, 그리고 파스텔 `papers`):
+ * 쪽지는 벽이 아니라 **자기 종이색 위에** 글자를 얹는다. 테마 글자색을 그대로 쓰면 다크 슬롯의
+ * 흰 글자가 연한 한지색 쪽지 위로 올라가 **한 글자도 안 읽힌다.** 종이와 잉크는 짝이라 같이 간다.
  */
 export interface RollingDisplay {
   /** 벽 제목 — 방문자 화면 맨 위 (편집 가능, 고정 아님) */
@@ -75,12 +82,14 @@ export const DEFAULT_ROLLING: RollingDisplay = {
   prompt: '축하하는 마음을 자유롭게 적어 주세요',
   postLabel: '남기기',
   font: 'pretendard',
-  headText: '#3b3833',
-  subText: '#8c877e',
+  /* 벽 색은 비워 둔다 — 안 고르면 **슬롯 테마에서 파생한다** (`serviceTheme.ts`) */
+  headText: '',
+  subText: '',
+  /* 쪽지 위 잉크만 고정 — 파스텔 종이색과 짝이라 테마를 안 받는다 (파일 머리말) */
   noteBody: '#3b3833',
   noteName: '#8c877e',
-  boardBg: '#efeae0',
-  buttonColor: '#7d7364',
+  boardBg: '',
+  buttonColor: '',
   papers: DEFAULT_PAPERS,
   stickers: [],
   wallBg: '',
@@ -97,6 +106,7 @@ export const DEFAULT_ROLLING: RollingDisplay = {
  */
 export function rollingDisplay(slot: Slot): RollingDisplay {
   const saved = (slot.rolling ?? {}) as Partial<RollingDisplay>
+  const base = serviceTheme(slot)
   return {
     wallTitle: saved.wallTitle || DEFAULT_ROLLING.wallTitle,
     showTitle: saved.showTitle ?? DEFAULT_ROLLING.showTitle,
@@ -105,12 +115,14 @@ export function rollingDisplay(slot: Slot): RollingDisplay {
     prompt: saved.prompt || DEFAULT_ROLLING.prompt,
     postLabel: saved.postLabel || DEFAULT_ROLLING.postLabel,
     font: saved.font || DEFAULT_ROLLING.font,
-    headText: saved.headText || DEFAULT_ROLLING.headText,
-    subText: saved.subText || DEFAULT_ROLLING.subText,
+    // 벽 색은 고른 값이 늘 이기고, 안 골랐으면 슬롯 테마를 따른다 (`serviceTheme.ts`)
+    headText: saved.headText || base.headText,
+    subText: saved.subText || base.subText,
+    // 쪽지 잉크는 종이색과 짝이라 테마를 안 받는다 (파일 머리말)
     noteBody: saved.noteBody || DEFAULT_ROLLING.noteBody,
     noteName: saved.noteName || DEFAULT_ROLLING.noteName,
-    boardBg: saved.boardBg || DEFAULT_ROLLING.boardBg,
-    buttonColor: saved.buttonColor || DEFAULT_ROLLING.buttonColor,
+    boardBg: saved.boardBg || base.bg,
+    buttonColor: saved.buttonColor || base.button,
     // 빈 배열은 "색 선택 없음" 이라는 뜻이라 살린다
     papers: saved.papers ?? DEFAULT_ROLLING.papers,
     stickers: saved.stickers ?? DEFAULT_ROLLING.stickers,

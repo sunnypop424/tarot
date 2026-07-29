@@ -1,3 +1,4 @@
+import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
 
@@ -91,10 +92,15 @@ export const DEFAULT_PHOTOZONE: PhotozoneDisplay = {
   shootLabel: '바로 찍기',
   uploadLabel: '사진 올리기',
   font: 'pretendard',
-  headText: '#2f2b28',
-  subText: '#857e75',
-  buttonColor: '#7d7364',
-  bg: '#f2eee7',
+  /*
+   * 색은 비워 둔다 — 안 고르면 **슬롯 테마에서 파생한다** (`serviceTheme.ts`).
+   * **촬영·실패 화면은 여기 없다** — 그 둘은 어느 이벤트든 검다(프리뷰가 주인공이라 주변이
+   * 밝으면 눈이 그리로 간다). 그 고정색은 `Photozone.module.css` 의 `[data-stage='live']` 에 있다.
+   */
+  headText: '',
+  subText: '',
+  buttonColor: '',
+  bg: '',
   bgImage: '',
   bgRepeat: false,
   logo: '',
@@ -107,6 +113,7 @@ export const DEFAULT_PHOTOZONE: PhotozoneDisplay = {
  */
 export function photozoneDisplay(slot: Slot): PhotozoneDisplay {
   const saved = (slot.photozone ?? {}) as Partial<PhotozoneDisplay>
+  const base = serviceTheme(slot)
   return {
     title: saved.title || DEFAULT_PHOTOZONE.title,
     showTitle: saved.showTitle ?? DEFAULT_PHOTOZONE.showTitle,
@@ -125,10 +132,11 @@ export function photozoneDisplay(slot: Slot): PhotozoneDisplay {
     shootLabel: saved.shootLabel || DEFAULT_PHOTOZONE.shootLabel,
     uploadLabel: saved.uploadLabel || DEFAULT_PHOTOZONE.uploadLabel,
     font: saved.font || DEFAULT_PHOTOZONE.font,
-    headText: saved.headText || DEFAULT_PHOTOZONE.headText,
-    subText: saved.subText || DEFAULT_PHOTOZONE.subText,
-    buttonColor: saved.buttonColor || DEFAULT_PHOTOZONE.buttonColor,
-    bg: saved.bg || DEFAULT_PHOTOZONE.bg,
+    // 색은 고른 값이 늘 이기고, 안 골랐으면 슬롯 테마를 따른다 (`serviceTheme.ts`)
+    headText: saved.headText || base.headText,
+    subText: saved.subText || base.subText,
+    buttonColor: saved.buttonColor || base.button,
+    bg: saved.bg || base.bg,
     bgImage: saved.bgImage ?? DEFAULT_PHOTOZONE.bgImage,
     bgRepeat: saved.bgRepeat ?? DEFAULT_PHOTOZONE.bgRepeat,
     logo: saved.logo ?? DEFAULT_PHOTOZONE.logo,

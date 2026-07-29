@@ -1,3 +1,4 @@
+import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
 
@@ -53,11 +54,12 @@ export const DEFAULT_STAMP: StampDisplay = {
   showSubtitle: true,
   stamps: [],
   font: 'pretendard',
-  headText: '#1f1f1f',
-  subText: '#7a7a78',
-  buttonColor: '#26262a',
-  bg: '#ffffff',
-  stampColor: '#3a3a3f',
+  /* 색은 비워 둔다 — 안 고르면 **슬롯 테마에서 파생한다** (`serviceTheme.ts`) */
+  headText: '',
+  subText: '',
+  buttonColor: '',
+  bg: '',
+  stampColor: '',
   logo: '',
   logoAlign: 'left',
   codeLabel: '암호 입력',
@@ -67,6 +69,7 @@ export const DEFAULT_STAMP: StampDisplay = {
 /** 슬롯 설정 + 기본값 — **키 단위로 채운다** */
 export function stampDisplay(slot: Slot): StampDisplay {
   const saved = (slot.stamp ?? {}) as Partial<StampDisplay>
+  const base = serviceTheme(slot)
   return {
     title: saved.title || DEFAULT_STAMP.title,
     showTitle: saved.showTitle ?? DEFAULT_STAMP.showTitle,
@@ -75,11 +78,13 @@ export function stampDisplay(slot: Slot): StampDisplay {
     // 빈 배열은 "아직 칸을 안 만들었다" — 살린다
     stamps: saved.stamps ?? DEFAULT_STAMP.stamps,
     font: saved.font || DEFAULT_STAMP.font,
-    headText: saved.headText || DEFAULT_STAMP.headText,
-    subText: saved.subText || DEFAULT_STAMP.subText,
-    buttonColor: saved.buttonColor || DEFAULT_STAMP.buttonColor,
-    bg: saved.bg || DEFAULT_STAMP.bg,
-    stampColor: saved.stampColor || DEFAULT_STAMP.stampColor,
+    // 색은 고른 값이 늘 이기고, 안 골랐으면 슬롯 테마를 따른다 (`serviceTheme.ts`)
+    headText: saved.headText || base.headText,
+    subText: saved.subText || base.subText,
+    buttonColor: saved.buttonColor || base.button,
+    bg: saved.bg || base.bg,
+    // 찍히는 도장 — 판에서 제일 강한 자국이라 강조색을 그대로 쓴다
+    stampColor: saved.stampColor || base.button,
     logo: saved.logo ?? DEFAULT_STAMP.logo,
     logoAlign: saved.logoAlign || DEFAULT_STAMP.logoAlign,
     codeLabel: saved.codeLabel || DEFAULT_STAMP.codeLabel,

@@ -1,3 +1,4 @@
+import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
 
@@ -71,11 +72,12 @@ export const DEFAULT_QUIZ: QuizDisplay = {
     { min: 90, label: '찐팬 인증' },
   ],
   font: 'pretendard',
-  headText: '#1f1f1f',
-  subText: '#7a7a78',
-  buttonColor: '#26262a',
-  bg: '#ffffff',
-  resultBg: '#f2f1ee',
+  /* 색은 비워 둔다 — 안 고르면 **슬롯 테마에서 파생한다** (`serviceTheme.ts`) */
+  headText: '',
+  subText: '',
+  buttonColor: '',
+  bg: '',
+  resultBg: '',
   logo: '',
   logoAlign: 'center',
   startLabel: '시작하기',
@@ -89,6 +91,7 @@ export const DEFAULT_QUIZ: QuizDisplay = {
 /** 슬롯 설정 + 기본값 — **키 단위로 채운다** */
 export function quizDisplay(slot: Slot): QuizDisplay {
   const saved = (slot.quiz ?? {}) as Partial<QuizDisplay>
+  const base = serviceTheme(slot)
   return {
     title: saved.title || DEFAULT_QUIZ.title,
     showTitle: saved.showTitle ?? DEFAULT_QUIZ.showTitle,
@@ -97,11 +100,12 @@ export function quizDisplay(slot: Slot): QuizDisplay {
     // 빈 배열은 "칭호를 안 쓴다" — 살린다
     titles: saved.titles ?? DEFAULT_QUIZ.titles,
     font: saved.font || DEFAULT_QUIZ.font,
-    headText: saved.headText || DEFAULT_QUIZ.headText,
-    subText: saved.subText || DEFAULT_QUIZ.subText,
-    buttonColor: saved.buttonColor || DEFAULT_QUIZ.buttonColor,
-    bg: saved.bg || DEFAULT_QUIZ.bg,
-    resultBg: saved.resultBg || DEFAULT_QUIZ.resultBg,
+    // 색은 고른 값이 늘 이기고, 안 골랐으면 슬롯 테마를 따른다 (`serviceTheme.ts`)
+    headText: saved.headText || base.headText,
+    subText: saved.subText || base.subText,
+    buttonColor: saved.buttonColor || base.button,
+    bg: saved.bg || base.bg,
+    resultBg: saved.resultBg || base.wash,
     logo: saved.logo ?? DEFAULT_QUIZ.logo,
     logoAlign: saved.logoAlign || DEFAULT_QUIZ.logoAlign,
     startLabel: saved.startLabel || DEFAULT_QUIZ.startLabel,

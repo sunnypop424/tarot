@@ -1,3 +1,4 @@
+import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
 
@@ -8,6 +9,13 @@ import type { FontId } from './fonts'
  * `/{slug}/admin` 에서 정한다 (`cheer_settings`). 행사 중에 보고 조정하는 값이라서다.
  *
  * **한마디 자체는 롤링페이퍼 테이블에 산다** (`rolling_messages`) — 0029 주석.
+ *
+ * **색은 `buttonColor` 만 슬롯 테마에서 받는다** (`serviceTheme.ts`). 나머지가 고정인 이유는
+ * 화면 셋이 전부 **불 끈 상영관**에 있기 때문이다:
+ *  · 입력(손님 폰) — 어두운 객석에서 폰을 든다. 밝은 캔버스를 받으면 손님 눈이 부시고
+ *    옆자리까지 환해진다. 상영 중에 켜는 화면이라 밝기가 취향이 아니라 매너다
+ *  · 오버레이·엔딩크레딧 — 프로젝터로 쏘는 화면이라 슬롯 캔버스와 아무 상관이 없다.
+ *    말풍선(`bubble*`)은 예능 자막바 문법이고 크레딧은 검은 바탕이 기본이다
  */
 export interface CheerDisplay {
   /** 입력 화면 제목 */
@@ -74,7 +82,8 @@ export const DEFAULT_CHEER: CheerDisplay = {
   bg: '#12121a',
   headText: '#f4f3ff',
   subText: '#a5a3c0',
-  buttonColor: '#816bff',
+  /* 보내기 버튼만 비워 둔다 — 안 고르면 **슬롯 테마의 강조색**을 받는다 (파일 머리말) */
+  buttonColor: '',
   logo: '',
   bgImage: '',
   bgRepeat: false,
@@ -92,6 +101,7 @@ export const DEFAULT_CHEER: CheerDisplay = {
 /** 슬롯 설정 + 기본값 — **키 단위로 채운다** */
 export function cheerDisplay(slot: Slot): CheerDisplay {
   const saved = (slot.cheer ?? {}) as Partial<CheerDisplay>
+  const base = serviceTheme(slot)
   return {
     /*
      * **문구는 지울 수 있어야 한다.** `||` 로 두면 빈 문자열이 "값 없음" 으로 읽혀 기본 문구가
@@ -111,7 +121,8 @@ export function cheerDisplay(slot: Slot): CheerDisplay {
     bg: saved.bg || DEFAULT_CHEER.bg,
     headText: saved.headText || DEFAULT_CHEER.headText,
     subText: saved.subText || DEFAULT_CHEER.subText,
-    buttonColor: saved.buttonColor || DEFAULT_CHEER.buttonColor,
+    // 버튼만 슬롯 테마를 받는다 — 나머지 색이 왜 고정인지는 파일 머리말에
+    buttonColor: saved.buttonColor || base.button,
     logo: saved.logo ?? DEFAULT_CHEER.logo,
     bgImage: saved.bgImage ?? DEFAULT_CHEER.bgImage,
     bgRepeat: saved.bgRepeat ?? DEFAULT_CHEER.bgRepeat,
