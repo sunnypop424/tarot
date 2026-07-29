@@ -257,6 +257,26 @@ for (const key of targets) {
         },
       }),
     })
+
+    /**
+     * **현장 암호** — 이게 없으면 체험에서 도장을 하나도 못 찍는다. 실제 행사에서는
+     * 주최자가 카페에 붙여 두는 값이라 seed 가 만들 일이 없지만, 체험은 붙여 둘 벽이 없다.
+     *
+     * 칸 번호를 그대로 네 자리로 쓴다(1111·2222…). 외우기 쉬운 게 목적이고, 체험 슬롯의
+     * 암호는 숨길 값이 아니다 — 랜딩이 대놓고 알려 준다(`landingData.ts` 의 `tip`).
+     */
+    await rest(`stamp_codes?slug=eq.${slug}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } })
+    await rest('stamp_codes', {
+      method: 'POST',
+      headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify(
+        Array.from({ length: 6 }, (_, i) => ({
+          slug,
+          stamp_id: `s${i + 1}`,
+          code: String(i + 1).repeat(4),
+        }))
+      ),
+    })
   }
 
   if (service === 'quiz') {

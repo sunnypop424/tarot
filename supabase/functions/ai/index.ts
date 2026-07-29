@@ -106,6 +106,12 @@ async function can(
   return !error && data === true
 }
 
+/** 체험 슬롯인가 — 돈이 나가는 문 앞에서만 본다 (0034·0035 의 `demo` 플래그) */
+async function isDemo(slug: string): Promise<boolean> {
+  const { data } = await admin.from('slots').select('demo').eq('slug', slug).maybeSingle()
+  return Boolean(data?.demo)
+}
+
 /**
  * 레이트리밋 — 누구 기준으로 셀 것인가.
  * 로그인한 사람은 uid, 방문자는 IP. 둘 다 없으면 슬롯 전체로 묶어 센다(최후의 방어).
@@ -195,6 +201,15 @@ async function handleReading(req: Request, body: Record<string, unknown>, origin
     question?: string
   }
   if (typeof slug !== 'string' || !slug) return bad(400, '슬롯이 없어요', origin)
+
+  /**
+   * **체험 슬롯은 리딩을 안 만든다.** 랜딩이 링크하는 공개 주소라 3장을 뽑을 때마다
+   * 실제로 돈이 나간다 — 화면도 안 부르지만(`screens/Draw.tsx`), 요청을 직접 보내는
+   * 길이 남아 있으면 막은 게 아니다. 앱은 카드별 해석으로 그대로 돌아간다.
+   */
+  if (await isDemo(slug)) {
+    return bad(403, '체험 슬롯에서는 AI 리딩을 쓰지 않아요', origin)
+  }
 
   const invalid = validateDrawn(drawn)
   if (invalid) return bad(400, invalid, origin)

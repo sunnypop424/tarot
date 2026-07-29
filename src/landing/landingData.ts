@@ -61,6 +61,14 @@ export interface LandingService {
   /** 목록에서 "여기서 열어 보기" 로 걸리는 대표 주소 */
   slug: string
   devices: DemoDevice[]
+  /**
+   * 체험에만 필요한 한 줄 — **없으면 눌러 볼 수가 없는 것**만 적는다.
+   *
+   * 스탬프 현장 암호가 그렇다. 실제 행사에서는 주최자가 카페에 붙여 두는 값이라
+   * 화면 어디에도 안 나오는데, 체험에는 붙여 둘 벽이 없어 여기 적는다.
+   * "이런 것도 됩니다" 류의 자랑은 여기 넣지 않는다 — 설명은 위 `desc` 의 몫이다.
+   */
+  tip?: string
 }
 
 /**
@@ -77,6 +85,8 @@ export const SERVICES: LandingService[] = [
     desc: '궁금한 질문을 고르면 카드를 뽑고 해석을 보여줍니다.',
     slug: '/demo-tarot',
     devices: [{ kind: 'phone', label: '방문자 폰', path: '/demo-tarot' }],
+    // AI 종합 리딩은 체험에서 꺼 뒀다 — 뽑을 때마다 실제 비용이 나가는 자리다
+    tip: '3장 뽑기의 AI 종합 리딩은 체험에서는 꺼 뒀습니다. 카드별 해석은 그대로 나옵니다.',
   },
   {
     key: 'luckydraw',
@@ -85,6 +95,7 @@ export const SERVICES: LandingService[] = [
     desc: '스태프가 직접 경품을 뽑습니다. 등수, 잔여 재고 확인, 스크래치 연출까지 모두 지원합니다.',
     slug: '/demo-luckydraw',
     devices: [{ kind: 'tablet', label: '스태프 기기', path: '/demo-luckydraw' }],
+    tip: '상품 넷에 재고 3·20·120·300으로 채워 뒀습니다. 관리 화면도 열려 있어 수량을 직접 바꿔 보실 수 있습니다.',
   },
   {
     key: 'photocard',
@@ -95,6 +106,7 @@ export const SERVICES: LandingService[] = [
       { kind: 'phone', label: '방문자 폰', path: '/demo-photocard' },
       { kind: 'tablet', label: '스태프 기기 (판매)', path: '/demo-photocard-sale/staff' },
     ],
+    tip: '방문자 폰은 저장용(1인 3장), 스태프 기기는 판매용(한 번에 10장)으로 맞춰 뒀습니다.',
   },
   {
     key: 'rolling',
@@ -147,6 +159,8 @@ export const SERVICES: LandingService[] = [
     desc: '현장 암호를 통해 스탬프를 모으고, 완성 시 선물로 교환할 수 있습니다.',
     slug: '/demo-stamp',
     devices: [{ kind: 'phone', label: '방문자 폰', path: '/demo-stamp' }],
+    // 암호가 없으면 도장을 하나도 못 찍는다 — 체험에는 붙여 둘 벽이 없어 여기 적는다
+    tip: '체험 암호는 칸 순서대로 1111 · 2222 · 3333 · 4444 · 5555 · 6666 입니다.',
   },
   {
     key: 'quiz',

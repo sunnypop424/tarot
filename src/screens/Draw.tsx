@@ -82,7 +82,13 @@ function DrawFlow({ category }: { category: Category }) {
         )
       }
 
-      if (picked.length > 1 && (await repo.ai.ready())) {
+      /**
+       * **체험 슬롯은 AI 를 안 부른다.** 여기는 랜딩이 링크하는 공개 주소라, 3장을 뽑을
+       * 때마다 실제 API 가 돌고 그만큼 돈이 나간다. AI 가 빠져도 앱은 카드별 해석으로
+       * 그대로 돈다(`CLAUDE.md` — `ready()` 가 false 일 때와 같은 길이라 화면이 이미 안다).
+       * 서버도 같은 판정을 한다 — 화면만 막으면 요청을 직접 보내는 걸 못 막는다.
+       */
+      if (picked.length > 1 && !slot.demo && (await repo.ai.ready())) {
         setReading(true)
         try {
           const positions = positionsFor(category, picked.length)

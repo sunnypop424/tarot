@@ -304,6 +304,15 @@ export default function Landing() {
             링크를 문장 끝에 몰아 두는 건 조사 때문이다 — 이름이 '스태프 기기 (판매)' 처럼
             괄호로 끝나면 뒤에 을/를 을 붙일 수가 없다.
           */}
+          {/*
+            체험에만 필요한 한 줄. 스탬프 암호처럼 **없으면 눌러 볼 수가 없는 것**을 적는다 —
+            실제 행사에서는 주최자가 카페 벽에 붙여 두는 값이라 화면 어디에도 안 나온다.
+          */}
+          {service.tip && (
+            <p className={styles.stageTip} data-tip>
+              {service.tip}
+            </p>
+          )}
           <p className={styles.stageNote}>
             체험용이므로 입력하신 내용은 저장되지 않습니다.{' '}
             {service.devices.length > 1 ? (
