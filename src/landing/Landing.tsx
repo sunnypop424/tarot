@@ -233,7 +233,7 @@ export default function Landing() {
           여기서 바로 눌러 보기
         </h2>
         <p className={styles.lead} data-rv>
-          체험해 보실 수 있도록 실제로 구동되는 페이지를 그대로 띄웠습니다. 현재 선택하신{' '}
+          실제로 구동되는 페이지입니다. 현재 선택하신{' '}
           {/* 조사는 이름 끝 받침에 따라 갈린다 — 박아 두면 "포토카드 뽑기을" 이 된다 */}
           <span className={styles.mk}>{service.name}</span>
           {josa(service.name, '을', '를')} 직접 눌러 보세요.
