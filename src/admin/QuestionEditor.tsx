@@ -66,7 +66,12 @@ export function QuestionEditor() {
    * 주최자는 플랜을 못 바꾼다 (최고관리자가 슬롯 편집기에서 정한다).
    */
   const plan = getPlan(slot)
-  const canGenerate = aiReady && plan.answerGenLimit > 0
+  /**
+   * **체험 슬롯에서는 안 만든다.** 이 화면은 로그인 없이 열리는데(0034), 78장 한 번이
+   * 183원이라 누르는 만큼 실제 돈이 나간다. 서버도 같은 판정을 한다 —
+   * AI 함수는 `manages_slot_strict` 를 봐서 체험 슬롯을 거절한다. 화면은 그걸 미리 알릴 뿐이다.
+   */
+  const canGenerate = aiReady && plan.answerGenLimit > 0 && !slot.demo
 
   // 편집 즉시 저장 — 별도 저장 버튼 없이 (주최자가 저장을 잊어 날리는 게 더 나쁘다)
   const patch = useCallback(
@@ -299,7 +304,13 @@ export function QuestionEditor() {
             )}
           </div>
 
-          {plan.answerGenLimit === 0 ? (
+          {/* 막힌 이유를 말한다 — 이유 없는 disabled 는 버그로 취급한다 (docs/DESIGN.md 「화법」) */}
+          {slot.demo ? (
+            <p className="ad-sub" style={{ marginBottom: 14 }}>
+              체험 화면이라 AI 생성은 꺼 뒀어요. 실제 슬롯에서는 이 버튼으로 {cards.length}장을
+              한 번에 만들어 검수할 수 있어요.
+            </p>
+          ) : plan.answerGenLimit === 0 ? (
             <p className="ad-sub" style={{ marginBottom: 14 }}>
               {plan.label} 플랜은 답변을 <b>직접 입력</b>해요. AI 일괄 생성은 라이트 플랜부터예요.
             </p>

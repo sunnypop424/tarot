@@ -173,6 +173,19 @@ const slots: SlotRepo = {
     if (error) throw new Error(error.message)
     publishSlotChange(slug)
   },
+
+  async snapshotDemo(groupName) {
+    // 함수는 표마다 한 줄씩 돌려준다 — 화면엔 "슬롯 n개 · 행 m개" 로 요약해 보여준다
+    const { data, error } = await (await db()).rpc('snapshot_demo', { grp: groupName })
+    if (error) throw new Error(error.message)
+    // 출력 이름이 `slug`·`tbl` 이면 함수 안에서 표의 컬럼과 겹쳐 터진다 (0036)
+    const rows = (data ?? []) as { demo_slug: string; demo_tbl: string; rows_n: number }[]
+    return {
+      slug: [...new Set(rows.map((r) => r.demo_slug))].join(', '),
+      tables: rows.length,
+      rows: rows.reduce((a, r) => a + (r.rows_n ?? 0), 0),
+    }
+  },
 }
 
 interface QuestionRow {

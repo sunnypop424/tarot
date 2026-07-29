@@ -35,6 +35,17 @@ export interface SlotRepo {
    */
   save(slot: Slot, prevSlug?: string): Promise<void>
   remove(slug: string): Promise<void>
+  /**
+   * **체험 묶음의 기준을 지금 상태로 뜬다** (`0035_demo_reset.sql`).
+   *
+   * 체험 슬롯은 로그인 없이 열려 있어 아무나 상품 수량을 바꾼다. 매일 새벽 되돌리는데,
+   * **무엇으로 되돌릴지가 이 함수가 찍는 순간**이다. 그래서 기본값을 seed 코드가 아니라
+   * 관리 화면에서 만든다 — 럭키드로우 상품·수량처럼 기본 설정이 곧 보여줄 내용인 서비스가 있다.
+   *
+   * 최고관리자만 부른다(DB 가 `is_owner()` 로 다시 판정한다). `demo` 인 슬롯만 도므로
+   * 고객 묶음 이름으로 불러도 아무 일도 일어나지 않는다.
+   */
+  snapshotDemo(groupName: string): Promise<{ slug: string; tables: number; rows: number }>
 }
 
 export interface QuestionRepo {

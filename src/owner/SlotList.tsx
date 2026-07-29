@@ -122,6 +122,15 @@ export function SlotList() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [query, setQuery] = useState('')
+  /**
+   * 체험 묶음의 **기준 뜨기** — 지금 상태가 매일 새벽 돌아올 모습이 된다 (`0035_demo_reset.sql`).
+   *
+   * 여기에 두는 이유: 체험 관리 화면은 로그인 없이 열려 있어(0034) 거기 버튼을 두면 아무나
+   * 기준을 덮어쓴다. **최고관리자 도구에만 있어야 한다.** 묶음 단위인 이유는 체험 슬롯이
+   * 열한 개가 한 벌로 움직여서다 — 하나만 다시 뜨면 어느 게 최신인지 알 수 없게 된다.
+   */
+  const [snapping, setSnapping] = useState<string | null>(null)
+  const [snapDone, setSnapDone] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -570,6 +579,40 @@ export function SlotList() {
                   >
                     {groupName || '묶음 없음'}
                     <span style={{ color: INK3, fontWeight: 500 }}> · {rows.length}</span>
+                    {/* 체험 묶음에만 보인다 — 고객 묶음엔 되돌릴 기준도, 되돌릴 이유도 없다 */}
+                    {groupName && rows.every((s) => s.demo) && (
+                      <>
+                        <button
+                          type="button"
+                          className="owner-btn owner-btn--ghost"
+                          style={{ marginLeft: 10, height: 24, padding: '0 10px', fontSize: 11.5 }}
+                          disabled={snapping !== null}
+                          data-snapshot={groupName}
+                          onClick={() => {
+                            void (async () => {
+                              setSnapping(groupName)
+                              setSnapDone(null)
+                              setError(null)
+                              try {
+                                const r = await repo.slots.snapshotDemo(groupName)
+                                setSnapDone(`${groupName} · 슬롯 ${r.slug.split(', ').length}개 · ${r.rows}행`)
+                              } catch (e) {
+                                setError(e instanceof Error ? e.message : '기준을 못 떴어요')
+                              } finally {
+                                setSnapping(null)
+                              }
+                            })()
+                          }}
+                        >
+                          {snapping === groupName ? '뜨는 중…' : '지금 상태를 기준으로'}
+                        </button>
+                        <span style={{ color: INK3, fontWeight: 500, marginLeft: 8 }}>
+                          {snapDone?.startsWith(`${groupName} ·`)
+                            ? `기준을 떴어요 — ${snapDone.slice(groupName.length + 3)}`
+                            : '매일 새벽 이 기준으로 되돌아와요'}
+                        </span>
+                      </>
+                    )}
                   </div>
                 )}
                 {rows.map((s) => {

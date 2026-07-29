@@ -103,6 +103,11 @@ const slots: SlotRepo = {
     )
     publishSlotChange(slug)
   },
+
+  /** 기준 뜨기는 DB 함수다 — 로컬 어댑터엔 되돌릴 대상(서버 데이터)이 아예 없다 */
+  async snapshotDemo() {
+    throw new Error('기준 뜨기는 Supabase 가 붙은 빌드에서만 돼요')
+  },
 }
 
 /** 편집분이 없으면 번들된 씨앗 질문으로 시작한다 */

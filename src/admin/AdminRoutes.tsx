@@ -160,11 +160,20 @@ export default function AdminRoutes() {
   )
 }
 
-/** 로그인 + 슬롯 일치를 함께 본다 */
+/**
+ * 로그인 + 슬롯 일치를 함께 본다.
+ *
+ * **체험 슬롯은 로그인을 안 묻는다** (`0034_demo_admin.sql`). 랜딩이 보여주는 열 가지 중
+ * 절반은 주최자가 하는 일이 값어치인데(뽑기·수령 확인·설문 만들기) 그게 전부 이 문 뒤에
+ * 있어 반쪽만 보여주고 있었다. 계정을 만들어 공개하는 대신 **서버 판정을 슬롯 단위로**
+ * 열었다 — 화면을 열어주는 것과 실제로 쓰게 해주는 것은 다른 문이고, 뒷문은 DB 가 지킨다.
+ * 스태프 화면이 0032 에서 먼저 같은 방식으로 열렸다.
+ */
 function RequireAuth() {
   const slot = useSlotOrNull()!
   const { status } = useAdminAuth(slot.slug)
 
+  if (slot.demo) return <Outlet />
   if (status === 'checking') return null
   if (status === 'out') return <Navigate to={`/${slot.slug}/admin/login`} replace />
   return <Outlet />

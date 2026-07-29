@@ -82,14 +82,27 @@ async function callerId(req: Request): Promise<string | null> {
   return data.user?.id ?? null
 }
 
-/** 그 슬롯 주최자인가 / 최고관리자인가 — 판정은 DB(RLS 헬퍼)가 한다 */
-async function can(req: Request, fn: 'is_owner' | 'manages_slot', slug?: string): Promise<boolean> {
+/**
+ * 그 슬롯 주최자인가 / 최고관리자인가 — 판정은 DB(RLS 헬퍼)가 한다.
+ *
+ * **`manages_slot` 이 아니라 `manages_slot_strict` 를 부른다.** 0034 로 일반판은 체험
+ * 슬롯이면 그냥 통과한다(관리 화면을 로그인 없이 열려고). 그 판정을 여기서 쓰면
+ * **아무나 78장 = 183원짜리 버튼을 누를 수 있다** — 돈이 나가는 문은 따로 잠근다.
+ */
+async function can(
+  req: Request,
+  fn: 'is_owner' | 'manages_slot_strict',
+  slug?: string
+): Promise<boolean> {
   const auth = req.headers.get('authorization')
   if (!auth?.startsWith('Bearer ')) return false
   const client = createSupabase(SUPABASE_URL, ANON_KEY, {
     global: { headers: { authorization: auth } },
   })
-  const { data, error } = await client.rpc(fn, fn === 'manages_slot' ? { target: slug } : {})
+  const { data, error } = await client.rpc(
+    fn,
+    fn === 'manages_slot_strict' ? { target: slug } : {}
+  )
   return !error && data === true
 }
 
@@ -282,9 +295,10 @@ async function handleAnswers(req: Request, body: Record<string, unknown>, origin
 
   /**
    * **78장 = 183원짜리 버튼이다.** 개발 미들웨어에선 누구나 부를 수 있었다.
-   * 주최자는 어차피 로그인하니 여기서 막는다 — 판정은 DB 의 manages_slot() 이 한다.
+   * 주최자는 어차피 로그인하니 여기서 막는다 — 판정은 DB 의 manages_slot_strict() 가 한다
+   * (체험 슬롯은 관리 화면이 열려 있어도 여기서 거절된다 — 0034).
    */
-  if (!(await can(req, 'manages_slot', slug)) && !(await can(req, 'is_owner'))) {
+  if (!(await can(req, 'manages_slot_strict', slug)) && !(await can(req, 'is_owner'))) {
     return bad(403, '이 슬롯의 주최자만 답변을 생성할 수 있어요', origin)
   }
 
