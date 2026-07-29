@@ -50,7 +50,7 @@
 .title {
   margin: 0;
   font-size: 19px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.3;
   word-break: keep-all;
 }
@@ -98,7 +98,7 @@
 }
 .badge {
   font-size: 10px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   padding: 3px 8px;
   border-radius: var(--radius-full);
   background: var(--pl-btn);
@@ -114,7 +114,7 @@
 }
 .cardQ {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.4;
   word-break: keep-all;
 }
@@ -131,7 +131,7 @@
 }
 .cardCta {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--pl-head);
 }
 .cardCta[data-done] {
@@ -200,7 +200,7 @@
 .q {
   margin: 0;
   font-size: 23px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.35;
   word-break: keep-all;
 }
@@ -215,7 +215,7 @@
 }
 .pickCount {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--pl-head);
   background: color-mix(in srgb, var(--pl-head) 7%, transparent);
   border-radius: var(--radius-full);
@@ -254,7 +254,7 @@
   background: var(--pl-btn);
   border-color: var(--pl-btn);
   color: var(--pl-btnFg);
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .optDot {
   width: 22px;
@@ -342,7 +342,7 @@
   color: var(--pl-sub);
 }
 .imgBtn[data-on] .imgLabel {
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--pl-head);
 }
 
@@ -361,7 +361,7 @@
   color: var(--pl-btnFg);
   font-family: inherit;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   cursor: pointer;
 }
 .submit:disabled {
@@ -402,11 +402,11 @@
   color: var(--pl-head);
 }
 .resRow[data-mine] .resLabel {
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .mineTag {
   font-size: 10px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--pl-btnFg);
   background: var(--pl-btn);
   border-radius: var(--radius-full);
@@ -416,7 +416,7 @@
 .pct {
   margin-left: auto;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   flex: none;
 }
 .track {
@@ -482,7 +482,7 @@
 }
 .doneTitle {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .doneSub {
   font-size: 12px;

@@ -178,7 +178,7 @@
   color: var(--cp-fg, var(--color-fg-1));
   font-family: ui-monospace, Menlo, monospace;
   font-size: 38px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.18em;
   text-align: center;
   text-transform: uppercase;

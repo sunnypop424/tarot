@@ -59,7 +59,7 @@
 .title {
   margin: 0;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.35;
   text-wrap: pretty;
   word-break: keep-all;
@@ -267,7 +267,7 @@
 }
 .drawingText {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: #e6e5e1;
   animation: pcPulse 1.4s ease-in-out infinite;
 }
@@ -285,7 +285,7 @@
 }
 .kicker {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: #a9abb6;
   letter-spacing: 0.04em;
   margin-bottom: 20px;
@@ -312,7 +312,7 @@
   background: #fff;
   padding: 9px 10px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: #33332f;
   white-space: nowrap;
   overflow: hidden;
@@ -321,7 +321,7 @@
 .resultName {
   margin-top: 20px;
   font-size: 20px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: #f2f1ee;
   text-align: center;
   word-break: keep-all;
@@ -360,7 +360,7 @@
   color: #1f1f1f;
   font-family: inherit;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -425,12 +425,12 @@
 }
 .lockerTitle {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .lockerCount {
   margin-left: auto;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--pc-head);
   background: var(--pc-wash);
   border-radius: var(--radius-full);
@@ -538,7 +538,7 @@
 .ticketHead {
   margin-top: 26px;
   font-size: 19px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.4;
   text-wrap: pretty;
   word-break: keep-all;
@@ -583,7 +583,7 @@
   color: var(--pc-btnFg);
   font-family: inherit;
   font-size: 17px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -613,7 +613,7 @@
   margin-top: 20px;
   font-size: clamp(52px, 19vw, 76px);
   line-height: 1;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.14em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -644,7 +644,7 @@
 }
 .waitingText {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .ghostBtn {
   margin-top: 20px;
@@ -682,7 +682,7 @@
 .counterTitle {
   margin-top: 14px;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .counterBody {
   margin: 10px 0 0;
@@ -724,7 +724,7 @@
 .counterHeadline {
   margin: 22px 0 0;
   font-size: 22px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.35;
   text-wrap: pretty;
   word-break: keep-all;

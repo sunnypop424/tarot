@@ -44,7 +44,7 @@
 .title {
   margin: 0;
   font-size: 22px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.3;
   word-break: keep-all;
 }
@@ -107,7 +107,7 @@
   color: #fff;
   font-family: inherit;
   font-size: 17px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -144,7 +144,7 @@
 }
 .doneText {
   font-size: 19px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   word-break: keep-all;
 }
 /* 체험용 안내 — 저장되지 않는다는 사실을 숨기지 않는다 */
@@ -232,7 +232,7 @@
    * 같은 사람 이름이 옆 말풍선에서 다른 크기로 떠 있었다 — 이름은 이름이지 장식이 아니다.
    */
   --ch-name: 16px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   font-size: 20px;
   line-height: 1.35;
   /* 기본은 종이색 글자 — 진한 색 판 위에 올라가는 모양이 더 많다 */
@@ -463,7 +463,7 @@
   color: #fff;
   font-family: var(--ch-font);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   pointer-events: auto;
 }
 .countdown button {
@@ -475,7 +475,7 @@
   color: #121212;
   font-family: inherit;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   cursor: pointer;
 }
 
@@ -508,7 +508,7 @@
 .creditsTitle {
   margin: 0 0 40px;
   font-size: clamp(28px, 4vw, 54px);
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .creditsLine {
   margin: 0 0 22px;

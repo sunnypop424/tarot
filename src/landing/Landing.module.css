@@ -134,7 +134,7 @@
 }
 .brand {
   font-size: 17px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   /* 라틴 브랜드명이라 한글 기준의 음수 자간을 쓰면 글자가 붙는다 */
   letter-spacing: 0.01em;
   color: var(--fg);
@@ -214,7 +214,7 @@
   font-size: clamp(38px, 7.2vw, 76px);
   line-height: 1.14;
   letter-spacing: -0.035em;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   max-width: 16em;
   text-wrap: balance;
 }
@@ -278,7 +278,7 @@
 }
 .factK {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.06em;
   color: var(--fg-dim);
 }
@@ -313,7 +313,7 @@
 }
 .eyebrow {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.1em;
   color: var(--accent);
   margin-bottom: 16px;
@@ -323,7 +323,7 @@
   font-size: clamp(26px, 3.6vw, 40px);
   line-height: 1.24;
   letter-spacing: -0.03em;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .sub {
   margin: 16px 0 0;
@@ -351,7 +351,7 @@
 }
 .groupName {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.02em;
   color: var(--fg);
 }
@@ -402,13 +402,13 @@
 }
 .cardNo {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.06em;
   color: var(--fg-dim);
 }
 .cardName {
   font-size: 17px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: -0.01em;
 }
 .cardDesc {
@@ -460,7 +460,7 @@
 }
 .customTitle {
   font-size: 17px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: -0.01em;
 }
 .customBody {
@@ -537,7 +537,7 @@
   background: var(--accent-soft);
   color: var(--accent);
   border-color: var(--accent-soft);
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .tabDot {
   width: 6px;
@@ -576,7 +576,7 @@
 }
 .demoName {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: -0.01em;
 }
 .demoChip {
@@ -758,7 +758,7 @@
   color: var(--fg);
   border: 1px solid var(--line-strong);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   flex: none;
 }
 .step:first-child .stepNode {
@@ -768,7 +768,7 @@
 }
 .stepName {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: -0.015em;
 }
 .stepDesc {
@@ -846,14 +846,14 @@
   justify-content: space-between;
   gap: 12px;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.02em;
   opacity: 0.7;
 }
 .roleTitle {
   margin-top: 14px;
   font-size: 24px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: -0.02em;
 }
 .roleList {
@@ -875,7 +875,7 @@
 }
 .roleNo {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   opacity: 0.5;
   width: 20px;
   flex: none;
@@ -902,7 +902,7 @@
   background: var(--bg);
   border: 1px solid var(--line-strong);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.06em;
   color: var(--fg-dim);
 }
@@ -946,7 +946,7 @@
 }
 .faqNo {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.04em;
   color: var(--fg-dim);
   width: 24px;
@@ -995,7 +995,7 @@
   font-size: clamp(28px, 4.6vw, 52px);
   line-height: 1.2;
   letter-spacing: -0.032em;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   text-wrap: balance;
 }
 .contactBody {

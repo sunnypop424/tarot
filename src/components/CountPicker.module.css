@@ -59,7 +59,7 @@
   color: var(--cp-fg);
   font-family: inherit;
   font-size: var(--cp-value-size, 40px);
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   text-align: center;
   font-variant-numeric: tabular-nums;
   outline: none;
@@ -94,7 +94,7 @@
   background: var(--cp-on-bg);
   color: var(--cp-on-fg);
   border-color: var(--cp-on-bg);
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .quickBtn:disabled {
   opacity: 0.35;
@@ -110,7 +110,7 @@
   color: var(--cp-go-fg);
   font-family: inherit;
   font-size: var(--cp-go-size, 19px);
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.02em;
   cursor: pointer;
   width: 100%;

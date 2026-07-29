@@ -188,7 +188,7 @@ export default function Landing() {
           </h1>
           <p className={`${styles.lead} ${styles.rv}`} data-rv>
             QR 하나면 카페에 온 팬들이 카드를 뽑고, 한마디를 남기고, 인증샷을 챙겨 가요.
-            페이지는 그날의 컨셉에 맞춰 새로 그려집니다.
+            페이지는 그날의 컨셉에 맞춰 새로 그려져요.
           </p>
           <div className={`${styles.ctaRow} ${styles.rv}`} data-rv>
             <a className={styles.ctaDark} href="#services">

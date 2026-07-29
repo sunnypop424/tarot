@@ -50,14 +50,14 @@
 .kicker {
   margin: 0;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.12em;
   color: var(--accent);
 }
 .title {
   margin: 8px 0 0;
   font-size: clamp(21px, 3.4vw, 25px);
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: -0.02em;
 }
 

@@ -15,7 +15,7 @@ export interface DemoDevice {
 }
 
 export const DEVICES = {
-  phone: { label: '방문자 폰', w: 390, h: 844, radius: 42 },
+  phone: { label: '손님 폰', w: 390, h: 844, radius: 42 },
   tablet: { label: '스태프 태블릿', w: 1194, h: 834, radius: 26 },
   board: { label: '현장 스크린', w: 1194, h: 834, radius: 22 },
   screen: { label: '상영 화면', w: 1280, h: 720, radius: 12 },
@@ -67,9 +67,9 @@ export const SERVICES: LandingService[] = [
     key: 'tarot',
     name: '타로카드',
     desc: '궁금한 걸 고르면 카드를 뽑고 해석이 나와요.',
-    deviceNote: '방문자 폰',
+    deviceNote: '손님 폰',
     group: 0,
-    screens: [{ label: '방문자', device: 'phone', variants: [{ label: '방문자', path: '/demo-tarot' }] }],
+    screens: [{ label: '손님', device: 'phone', variants: [{ label: '손님', path: '/demo-tarot' }] }],
   },
   {
     key: 'luckydraw',
@@ -83,7 +83,7 @@ export const SERVICES: LandingService[] = [
     key: 'photocard',
     name: '포토카드 뽑기',
     desc: '레어도 뽑기. 저장용·1장 증정·판매 세 가지로 굴려요.',
-    deviceNote: '방문자 폰 + 스태프 기기',
+    deviceNote: '손님 폰 + 스태프 기기',
     group: 0,
     /**
      * 운영 방식마다 **뽑는 사람이 다르다** — 저장용은 손님 폰, 판매는 스태프 기기다.
@@ -98,7 +98,7 @@ export const SERVICES: LandingService[] = [
     key: 'rolling',
     name: '롤링페이퍼',
     desc: '팬들이 남긴 응원이 벽에 한 장씩 붙어요.',
-    deviceNote: '스크린 + 방문자 폰',
+    deviceNote: '스크린 + 손님 폰',
     group: 1,
     screens: [
       { label: '벽', device: 'board', variants: [{ label: '벽', path: '/demo-rolling' }] },
@@ -109,7 +109,7 @@ export const SERVICES: LandingService[] = [
     key: 'wish',
     name: '소원 나무',
     desc: '소원을 적어 등불로 매달아요. 밤하늘 버전 롤링페이퍼.',
-    deviceNote: '스크린 + 방문자 폰',
+    deviceNote: '스크린 + 손님 폰',
     group: 1,
     screens: [
       { label: '나무', device: 'board', variants: [{ label: '나무', path: '/demo-wish' }] },
@@ -120,15 +120,15 @@ export const SERVICES: LandingService[] = [
     key: 'photozone',
     name: '포토존 프레임',
     desc: '사진에 그날의 프레임을 씌워 저장해요.',
-    deviceNote: '방문자 폰',
+    deviceNote: '손님 폰',
     group: 1,
-    screens: [{ label: '방문자', device: 'phone', variants: [{ label: '방문자', path: '/demo-photozone' }] }],
+    screens: [{ label: '손님', device: 'phone', variants: [{ label: '손님', path: '/demo-photozone' }] }],
   },
   {
     key: 'cheer',
     name: '영상회 응원',
     desc: '한마디가 상영 화면에 말풍선으로 떠요.',
-    deviceNote: '방문자 폰 + 상영 화면',
+    deviceNote: '손님 폰 + 상영 화면',
     group: 1,
     screens: [
       { label: '한마디', device: 'phone', variants: [{ label: '한마디', path: '/demo-cheer' }] },
@@ -148,25 +148,25 @@ export const SERVICES: LandingService[] = [
     key: 'poll',
     name: '실시간 투표',
     desc: '즉석 투표. 결과가 그 자리에서 차올라요.',
-    deviceNote: '방문자 폰 · 스크린',
+    deviceNote: '손님 폰 · 스크린',
     group: 2,
-    screens: [{ label: '방문자', device: 'phone', variants: [{ label: '방문자', path: '/demo-poll' }] }],
+    screens: [{ label: '손님', device: 'phone', variants: [{ label: '손님', path: '/demo-poll' }] }],
   },
   {
     key: 'stamp',
     name: '방문 스탬프',
     desc: '현장 암호로 도장을 모으고 다 모으면 선물로 바꿔요.',
-    deviceNote: '방문자 폰 · 스태프 기기',
+    deviceNote: '손님 폰 · 스태프 기기',
     group: 2,
-    screens: [{ label: '방문자', device: 'phone', variants: [{ label: '방문자', path: '/demo-stamp' }] }],
+    screens: [{ label: '손님', device: 'phone', variants: [{ label: '손님', path: '/demo-stamp' }] }],
   },
   {
     key: 'quiz',
     name: '최애 모의고사',
     desc: '문제를 풀고 점수와 칭호를 받아요. 칭호 카드는 저장·공유까지.',
-    deviceNote: '방문자 폰',
+    deviceNote: '손님 폰',
     group: 2,
-    screens: [{ label: '방문자', device: 'phone', variants: [{ label: '방문자', path: '/demo-quiz' }] }],
+    screens: [{ label: '손님', device: 'phone', variants: [{ label: '손님', path: '/demo-quiz' }] }],
   },
 ]
 

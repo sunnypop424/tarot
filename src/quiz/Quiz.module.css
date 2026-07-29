@@ -52,7 +52,7 @@
 .startTitle {
   margin: 0;
   font-size: 26px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.3;
   text-wrap: pretty;
   word-break: keep-all;
@@ -87,7 +87,7 @@
 .factValue {
   margin-top: 5px;
   font-size: 22px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .bottom {
   flex: none;
@@ -102,7 +102,7 @@
   color: var(--qz-btnFg);
   font-family: inherit;
   font-size: 17px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -134,14 +134,14 @@
 }
 .step {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .clock {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--qz-sub);
 }
 /* 1분 남으면 눈에 띄어야 한다 — 색이 아니라 굵기·깜빡임으로 (슬롯 색을 모르므로) */
@@ -167,7 +167,7 @@
 .qBody {
   margin: 0;
   font-size: 22px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.45;
   text-wrap: pretty;
   word-break: keep-all;
@@ -211,7 +211,7 @@
   transition: background-color 140ms var(--ease, ease), color 140ms var(--ease, ease);
 }
 .choice[data-on] {
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--qz-btnFg);
   background: var(--qz-btn);
   border-color: var(--qz-btn);
@@ -225,7 +225,7 @@
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   background: var(--qz-line);
   color: var(--qz-sub);
 }
@@ -284,7 +284,7 @@
 }
 .gradingText {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   animation: qzPulse 1.4s ease-in-out infinite;
 }
 
@@ -353,7 +353,7 @@
 }
 .kicker {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.14em;
   color: var(--qz-sub);
 }
@@ -363,7 +363,7 @@
   overflow-wrap: anywhere;
   margin-top: 12px;
   font-size: clamp(28px, 10vw, 40px);
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.2;
   text-wrap: pretty;
   word-break: keep-all;
@@ -407,7 +407,7 @@
   border-radius: 12px;
   font-family: inherit;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -437,7 +437,7 @@
 }
 .reviewTitle {
   font-size: 14px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .reviewCount {
   font-size: 12px;
@@ -522,7 +522,7 @@
 .centerTitle {
   margin-top: 20px;
   font-size: 22px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .centerBody {
   margin: 10px 0 0;
@@ -573,7 +573,7 @@
   margin-top: 18px;
   font-size: clamp(28px, 9.4vw, 44px);
   line-height: 1.15;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -591,7 +591,7 @@
   border-radius: 10px;
   padding: 10px 22px;
   font-size: 26px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.06em;
   background: color-mix(in srgb, var(--qz-bg) 72%, transparent);
   white-space: nowrap;
@@ -615,14 +615,14 @@
 }
 .formKicker {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--qz-sub);
   letter-spacing: 0.04em;
 }
 .formTitle {
   margin: 8px 0 0;
   font-size: 24px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.35;
   text-wrap: pretty;
 }
@@ -647,7 +647,7 @@
   align-items: center;
   gap: 5px;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   margin-bottom: 8px;
 }
 .req {
@@ -703,7 +703,7 @@
 }
 .consentTitle {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--qz-head);
   margin-bottom: 7px;
 }
@@ -770,7 +770,7 @@
   color: var(--qz-sub);
 }
 .summaryRow span:last-child {
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 
 /* 모양은 전역 `.empty` 에 있다 (components.css) — 여기선 색만 준다 */

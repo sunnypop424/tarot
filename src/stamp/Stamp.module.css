@@ -58,7 +58,7 @@
 .title {
   margin: 0;
   font-size: 19px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   line-height: 1.3;
   word-break: keep-all;
 }
@@ -88,11 +88,11 @@
 }
 .boardLabel {
   font-size: 14px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .boardCount {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 /**
  * 칸 수가 이벤트마다 다르다 (4·6·9…). **열 수를 개수에서 파생**시켜 어떤 수여도 성립하게 한다 —
@@ -201,7 +201,7 @@
   background: color-mix(in srgb, var(--st-head) 5%, transparent);
   color: color-mix(in srgb, var(--st-head) 28%, transparent);
   font-size: var(--numFont);
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .cellName {
   font-size: var(--nameFont);
@@ -252,7 +252,7 @@
   color: var(--st-btnFg);
   font-family: inherit;
   font-size: 17px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -295,7 +295,7 @@
 }
 .toastTitle {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .toastSub {
   font-size: 12px;
@@ -334,7 +334,7 @@
 }
 .codeTitle {
   font-size: 21px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   word-break: keep-all;
 }
 .codeHint {
@@ -383,7 +383,7 @@
   align-items: center;
   justify-content: center;
   font-size: clamp(26px, 8vw, 34px);
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   background: color-mix(in srgb, var(--st-head) 4%, transparent);
   border: 1px solid color-mix(in srgb, var(--st-head) 11%, transparent);
   color: var(--st-head);
@@ -403,7 +403,7 @@
   align-items: center;
   gap: 7px;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--st-head);
 }
 
@@ -419,14 +419,14 @@
 }
 .doneKicker {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.1em;
   color: var(--st-sub);
 }
 .doneTitle {
   margin-top: 10px;
   font-size: 26px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 .doneText {
   margin: 26px 0 0;
@@ -460,7 +460,7 @@
   margin-top: 18px;
   font-size: clamp(28px, 9.4vw, 44px);
   line-height: 1.15;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -478,7 +478,7 @@
   border-radius: 10px;
   padding: 10px 22px;
   font-size: 26px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.06em;
   background: color-mix(in srgb, var(--st-bg) 72%, transparent);
 }
@@ -496,7 +496,7 @@
 }
 .prizeName {
   font-size: 14px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   margin-top: 3px;
 }
 
@@ -514,7 +514,7 @@
   align-items: center;
   gap: 5px;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   margin-bottom: 8px;
 }
 .req {
@@ -566,7 +566,7 @@
 }
 .privacyTitle {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--st-sub);
   margin-bottom: 7px;
 }

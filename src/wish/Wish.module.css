@@ -104,7 +104,7 @@
 .title {
   margin: 0;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--wt-head);
   line-height: 1.35;
   word-break: keep-all;
@@ -382,7 +382,7 @@
 .emptyTitle {
   margin-top: 22px;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--wt-head);
 }
 .emptyText {
@@ -406,7 +406,7 @@
   color: var(--wt-btnFg);
   font-family: inherit;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -463,7 +463,7 @@
     color: var(--wt-btnFg);
     font-family: inherit;
     font-size: 15px;
-    font-weight: 800;
+    font-weight: var(--weight-heavy);
     cursor: pointer;
   }
   .count {
@@ -546,7 +546,7 @@
 }
 .backLabel {
   font-size: 14px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   color: var(--wt-head);
 }
 
@@ -719,7 +719,7 @@
   color: var(--wt-btnFg);
   font-family: inherit;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   cursor: pointer;
 }
 .submit:disabled {
