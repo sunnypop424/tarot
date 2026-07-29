@@ -136,7 +136,7 @@
 .doneMark {
   width: 66px;
   height: 66px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ch-btn);
   color: #fff;
   display: grid;
@@ -157,7 +157,7 @@
 .again {
   height: 42px;
   padding: 0 18px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--ch-sub) 45%, transparent);
   background: none;
   color: var(--ch-sub);
@@ -186,7 +186,7 @@
   bottom: 6%;
   transform: translateX(-50%);
   padding: 10px 16px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: rgb(0 0 0 / 0.55);
   color: #fff;
   font-size: 14px;
@@ -247,7 +247,7 @@
   display: inline-flex;
   align-items: stretch;
   border: var(--lw) solid var(--line);
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   overflow: hidden;
   /* 종이색 판 + 먹색 글자 (참고 이미지의 '이름 칩 + 흰 본문 바') */
   background: var(--ch-paper);
@@ -278,7 +278,7 @@
   gap: 8px;
   padding: 9px 18px;
   border: var(--lw) solid var(--line);
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--bubble);
   color: var(--ch-paper);
 }
@@ -286,7 +286,7 @@
   display: inline-block;
   flex-shrink: 0;
   padding: 2px 8px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--ch-paper) 85%, transparent);
   color: var(--ch-ink);
   font-size: var(--ch-name);
@@ -458,7 +458,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px 18px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: rgb(0 0 0 / 0.78);
   color: #fff;
   font-family: var(--ch-font);
@@ -470,7 +470,7 @@
   height: 34px;
   padding: 0 16px;
   border: none;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: #fff;
   color: #121212;
   font-family: inherit;

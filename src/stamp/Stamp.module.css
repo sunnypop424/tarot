@@ -170,7 +170,7 @@
   position: absolute;
   width: 76%;
   aspect-ratio: 1;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: 3px solid var(--st-stamp);
   animation: stRing 0.9s ease-out;
   pointer-events: none;
@@ -197,7 +197,7 @@
   justify-content: center;
   width: var(--numSize);
   height: var(--numSize);
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--st-head) 5%, transparent);
   color: color-mix(in srgb, var(--st-head) 28%, transparent);
   font-size: var(--numFont);
@@ -315,7 +315,7 @@
   width: 34px;
   height: 34px;
   border: none;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--st-head) 7%, transparent);
   color: var(--st-head);
   display: flex;
@@ -648,13 +648,8 @@
   color: var(--st-sub);
   word-break: keep-all;
 }
+/* 모양은 전역 `.empty` 에 있다 (components.css) — 여기선 색만 준다 */
 .empty {
-  flex: 1;
-  display: grid;
-  place-items: center;
-  padding: 40px 24px;
-  text-align: center;
+  composes: empty from global;
   color: var(--st-sub);
-  font-size: 13px;
-  line-height: 1.7;
 }

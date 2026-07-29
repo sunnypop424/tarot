@@ -5,9 +5,8 @@ import { SearchBox } from '../SearchBox'
 import type { IssuedReward, RewardEntry } from '@/lib/repo/types'
 import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
+import { downloadCsv, when } from '../csv'
 
-/** CSV 한 칸 — 쉼표·따옴표·줄바꿈이 들어가면 깨지므로 감싸고 따옴표는 두 번 쓴다 */
-const cell = (v: string) => `"${String(v ?? '').replaceAll('"', '""')}"`
 
 /**
  * 응모자 명단 — **개인정보를 다루는 화면.** 럭드 배송 목록과 같은 급으로 다룬다.
@@ -95,27 +94,16 @@ export function Entries() {
   function download() {
     if (!list?.length) return
     const header = ['닉네임', '트위터', '연락처', '주소', '점수', '당첨', '응모시각']
-    const lines = list.map((r) =>
-      [
-        cell(r.nickname),
-        cell(r.handle ?? ''),
-        cell(r.contact ?? ''),
-        cell(r.address ?? ''),
-        cell(r.score === null ? '' : String(r.score)),
-        cell(r.won ? 'O' : ''),
-        cell(new Date(r.createdAt).toLocaleString('ko-KR')),
-      ].join(',')
-    )
-    // ﻿ = BOM. 엑셀은 이게 없으면 UTF-8 을 못 알아본다
-    const blob = new Blob(['﻿' + [header.map(cell).join(','), ...lines].join('\r\n')], {
-      type: 'text/csv;charset=utf-8',
-    })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${slug}-응모자.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+    const rows = list.map((r) => [
+      r.nickname,
+      r.handle ?? '',
+      r.contact ?? '',
+      r.address ?? '',
+      r.score === null ? '' : String(r.score),
+      r.won ? 'O' : '',
+      when(r.createdAt),
+    ])
+    downloadCsv(`${slug}-응모자.csv`, header, rows)
   }
 
   return (

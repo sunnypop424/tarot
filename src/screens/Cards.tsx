@@ -62,7 +62,7 @@ export function Cards() {
               className={styles.item}
               onClick={() => go(`cards/${card.id}`)}
             >
-              <span className={`tarot-card ${styles.itemCard}`}>
+              <span className={`play-card ${styles.itemCard}`}>
                 <CardFace card={card} orientation="upright" />
               </span>
               <span className={`t-text-xs ${styles.itemName}`}>{card.name}</span>

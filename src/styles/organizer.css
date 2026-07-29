@@ -176,7 +176,7 @@
   align-items: center;
   height: 22px;
   padding: 0 8px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-key-wash);
   color: var(--ad-key);
   font-size: 11px;
@@ -221,7 +221,7 @@
 .ad-proxy__dot {
   width: 7px;
   height: 7px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: #fff;
   animation: ad-pulse 1.6s ease-in-out infinite;
   flex-shrink: 0;
@@ -430,7 +430,7 @@
   align-items: center;
   height: 26px;
   padding: 0 11px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-surface);
   border: 1px solid var(--ad-line);
   font-size: 13px;
@@ -621,7 +621,7 @@
   gap: 7px;
   height: 30px;
   padding: 0 12px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   font-size: 13px;
   font-weight: 700;
   background: var(--ad-key-wash);
@@ -638,7 +638,7 @@
 .ad-state__dot {
   width: 7px;
   height: 7px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: currentColor;
   animation: ad-pulse 1.8s ease-in-out infinite;
 }
@@ -696,7 +696,7 @@
   align-items: center;
   gap: 7px;
   padding: 8px 13px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-key-wash-2);
   border: 1px solid var(--ad-key-line-2);
   font-size: 12px;
@@ -707,7 +707,7 @@
   content: '';
   width: 6px;
   height: 6px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-key);
 }
 /* 동그란 표시 (개인정보 안내의 ! 처럼) */
@@ -715,7 +715,7 @@
   flex-shrink: 0;
   width: 22px;
   height: 22px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-key-wash);
   color: var(--ad-key);
   font-size: 12px;
@@ -771,7 +771,7 @@
   flex-shrink: 0;
   width: 5px;
   height: 5px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-key);
   margin-top: 8px;
 }
@@ -977,14 +977,14 @@
   display: inline-flex;
   gap: 4px;
   background: var(--ad-off);
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   padding: 4px;
 }
 .ad-seg__btn {
   height: 34px;
   padding: 0 18px;
   border: none;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: transparent;
   color: var(--ad-ink-3);
   font-family: inherit;
@@ -1006,7 +1006,7 @@
   height: 32px;
   padding: 0 12px;
   border: none;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-mute-bg);
   color: var(--ad-ink-3);
   font-family: inherit;
@@ -1034,7 +1034,7 @@
   align-items: center;
   height: 24px;
   padding: 0 10px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-mute-bg);
   color: var(--ad-ink-3);
   font-size: 12px;
@@ -1064,7 +1064,7 @@
   align-items: center;
   height: 32px;
   padding: 0 13px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-key-wash-2);
   border: 1px solid var(--ad-key-line-2);
   font-size: 14px;
@@ -1294,7 +1294,7 @@
   flex-shrink: 0;
   width: 48px;
   height: 28px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: none;
   background: var(--ad-line-2);
   cursor: pointer;
@@ -1310,7 +1310,7 @@
   left: 3px;
   width: 22px;
   height: 22px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: #fff;
   transition: left 0.2s ease;
 }
@@ -1424,7 +1424,7 @@
   width: 22px;
   height: 22px;
   flex-shrink: 0;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: 1px solid var(--ad-line-2);
   background: var(--ad-surface);
   color: #fff;
@@ -1486,7 +1486,7 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: 1px solid var(--ad-line-2);
   background: var(--ad-surface);
 }
@@ -1610,7 +1610,7 @@
   flex-shrink: 0;
   width: 34px;
   height: 24px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-mute-bg);
   color: var(--ad-ink-3);
   font-size: 11px;
@@ -1689,7 +1689,7 @@
   flex-shrink: 0;
   width: 26px;
   height: 26px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-mute-bg);
   color: var(--ad-ink-3);
   font-size: 12px;
@@ -1852,7 +1852,7 @@
 }
 .ad-bar__track {
   height: 8px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-track);
   overflow: hidden;
 }
@@ -1860,7 +1860,7 @@
   display: block;
   height: 100%;
   width: var(--ad-pct, 0%);
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-key);
 }
 .ad-bar[data-tone='low'] .ad-bar__fill {
@@ -1997,7 +1997,7 @@
   flex-shrink: 0;
   width: 52px;
   height: 52px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--ad-key-wash);
   color: var(--ad-key);
   font-size: 19px;

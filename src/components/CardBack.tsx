@@ -6,7 +6,7 @@ import { cssUrl, useImageAsset } from '@/lib/image'
 /**
  * 타로 카드 뒷면.
  * 이벤트 테마가 뒷면 이미지를 주면 그 이미지를, 없으면 내장 SVG(방사형 바탕 + 포인트색 별 문양)를 쓴다.
- * 프레임(비율·테두리·그림자)은 감싸는 쪽의 .tarot-card 가 담당한다.
+ * 프레임(비율·테두리·그림자)은 감싸는 쪽의 .play-card 가 담당한다.
  *
  * 이미지는 background-image 로만 그린다 (lib/image.ts) — 카페에서 길게 눌러 저장되면 안 된다.
  */

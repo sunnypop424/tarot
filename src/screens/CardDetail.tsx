@@ -32,7 +32,7 @@ export function CardDetail() {
         {card.nameEn} · {arcanaLabel(card)}
       </p>
 
-      <div className={`tarot-card ${styles.detailCard}`}>
+      <div className={`play-card ${styles.detailCard}`}>
         <CardFace card={card} orientation="upright" />
       </div>
 

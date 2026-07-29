@@ -57,7 +57,7 @@
 .dot {
   width: 10px;
   height: 10px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: #f4f3f0;
   animation: liveDot 1.6s ease-in-out infinite;
 }
@@ -127,7 +127,7 @@
 
 .track {
   height: clamp(16px, 2.1vw, 24px);
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: rgb(255 255 255 / 0.08);
   overflow: hidden;
 }
@@ -136,7 +136,7 @@
 }
 .bar {
   height: 100%;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--live-bar, #f4f3f0) 45%, transparent);
   transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -153,7 +153,7 @@
 .pageDot {
   width: 8px;
   height: 8px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: rgb(255 255 255 / 0.22);
 }
 .pageDot[data-on] {

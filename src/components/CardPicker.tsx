@@ -114,7 +114,7 @@ export function CardPicker({
               <div className={styles.slotBox} ref={(el) => void (slotRefs.current[i] = el)}>
                 {landed ? (
                   <>
-                    <span className={`tarot-card tarot-card--fill ${styles.slotCard}`}>
+                    <span className={`play-card play-card--fill ${styles.slotCard}`}>
                       <CardBack />
                     </span>
                     <button
@@ -156,7 +156,7 @@ export function CardPicker({
           }
           aria-hidden="true"
         >
-          <span className="tarot-card tarot-card--fill" style={{ display: 'block' }}>
+          <span className="play-card play-card--fill" style={{ display: 'block' }}>
             <CardBack />
           </span>
         </div>

@@ -393,7 +393,7 @@
   align-items: center;
   gap: 8px;
   background: rgba(255, 255, 255, 0.09);
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   padding: 10px 18px;
   font-size: 13px;
   font-weight: 700;
@@ -415,7 +415,7 @@
   height: 34px;
   flex: none;
   border: none;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--pc-wash);
   color: var(--pc-head);
   display: flex;
@@ -433,19 +433,19 @@
   font-weight: 800;
   color: var(--pc-head);
   background: var(--pc-wash);
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   padding: 5px 12px;
 }
 .track {
   height: 6px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--pc-line);
   overflow: hidden;
   margin: 14px 20px 0;
 }
 .bar {
   height: 100%;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--pc-btn);
   transition: width 320ms var(--ease, ease);
 }
@@ -638,7 +638,7 @@
 .dot {
   width: 9px;
   height: 9px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--pc-btn);
   animation: pcPulse 1.5s ease-in-out infinite;
 }
@@ -730,18 +730,10 @@
   word-break: keep-all;
 }
 
+/* 모양은 전역 `.empty` 에 있다 (components.css) — 여기선 색만 준다 */
 .empty {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 40px 30px;
-  text-align: center;
-  font-size: 14px;
+  composes: empty from global;
   color: var(--pc-sub);
-  line-height: 1.7;
 }
 .error {
   font-size: 13px;

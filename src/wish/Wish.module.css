@@ -204,7 +204,7 @@
   width: calc(var(--w) + 26px);
   height: calc(var(--h) + 20px);
   margin-left: calc((var(--w) + 26px) / -2);
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--lantern);
   filter: blur(22px);
   /**
@@ -536,7 +536,7 @@
   height: 34px;
   flex: none;
   border: none;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: rgb(255 255 255 / 0.1);
   color: var(--wt-head);
   display: flex;
@@ -660,7 +660,7 @@
 .swatch {
   width: 34px;
   height: 34px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: none;
   cursor: pointer;
   padding: 0;

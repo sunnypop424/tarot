@@ -24,7 +24,7 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--pager-fg, currentColor) 10%, transparent);
   color: var(--pager-fg, currentColor);
   cursor: pointer;
@@ -44,7 +44,7 @@
   height: 8px;
   padding: 0;
   border: none;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--pager-fg, currentColor) 28%, transparent);
   cursor: pointer;
 }

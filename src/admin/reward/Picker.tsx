@@ -5,9 +5,8 @@ import type { RewardEntry } from '@/lib/repo/types'
 import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
+import { downloadCsv, when } from '../csv'
 
-/** CSV 한 칸 — 쉼표·따옴표·줄바꿈이 들어가면 깨지므로 감싸고 따옴표는 두 번 쓴다 */
-const cell = (v: string) => `"${String(v ?? '').replaceAll('"', '""')}"`
 
 /**
  * 응모 추첨 — **세 서비스가 같은 화면을 쓴다** (`source` 만 다르다).
@@ -118,30 +117,22 @@ export function Picker() {
     }
   }
 
-  function downloadCsv(rows: RewardEntry[], name: string) {
+  function exportRows(rows: RewardEntry[], name: string) {
     if (!rows.length) return
     const header = ['닉네임', '트위터', '연락처', '주소', '점수', '교환코드', '응모시각']
-    const lines = rows.map((r) =>
-      [
-        cell(r.nickname),
-        cell(r.handle ?? ''),
-        cell(r.contact ?? ''),
-        cell(r.address ?? ''),
-        cell(r.score === null ? '' : String(r.score)),
-        cell(r.code),
-        cell(new Date(r.createdAt).toLocaleString('ko-KR')),
-      ].join(',')
+    downloadCsv(
+      `${slug}-${name}.csv`,
+      header,
+      rows.map((r) => [
+        r.nickname,
+        r.handle ?? '',
+        r.contact ?? '',
+        r.address ?? '',
+        r.score === null ? '' : String(r.score),
+        r.code,
+        when(r.createdAt),
+      ])
     )
-    // ﻿ = BOM. 엑셀은 이게 없으면 UTF-8 을 못 알아본다
-    const blob = new Blob(['﻿' + [header.map(cell).join(','), ...lines].join('\r\n')], {
-      type: 'text/csv;charset=utf-8',
-    })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${slug}-${name}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
   }
 
   async function copy(rows: RewardEntry[], msg: string) {
@@ -281,7 +272,7 @@ export function Picker() {
                 <button
                   type="button"
                   className="ad-btn ad-btn--line ad-btn--lg"
-                  onClick={() => downloadCsv(picked, '당첨자')}
+                  onClick={() => exportRows(picked, '당첨자')}
                 >
                   CSV
                 </button>
@@ -345,7 +336,7 @@ export function Picker() {
                         <button
                           type="button"
                           className="ad-btn ad-btn--line ad-btn--xs"
-                          onClick={() => downloadCsv(rows, `${r}회차`)}
+                          onClick={() => exportRows(rows, `${r}회차`)}
                         >
                           CSV
                         </button>

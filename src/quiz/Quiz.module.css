@@ -151,13 +151,13 @@
 }
 .track {
   height: 6px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--qz-line);
   overflow: hidden;
 }
 .bar {
   height: 100%;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--qz-btn);
   transition: width 320ms var(--ease, ease);
 }
@@ -220,7 +220,7 @@
   width: 26px;
   height: 26px;
   flex: none;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -277,7 +277,7 @@
 .spinner {
   width: 48px;
   height: 48px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: 3px solid var(--qz-line);
   border-top-color: var(--qz-btn);
   animation: qzSpin 0.9s linear infinite;
@@ -491,7 +491,7 @@
   composes: tap-min from global;
   width: 38px;
   height: 38px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: none;
   background: var(--qz-wash);
   color: var(--qz-head);
@@ -512,7 +512,7 @@
 .bigIcon {
   width: 66px;
   height: 66px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--qz-wash);
   display: flex;
   align-items: center;
@@ -773,18 +773,10 @@
   font-weight: 800;
 }
 
+/* 모양은 전역 `.empty` 에 있다 (components.css) — 여기선 색만 준다 */
 .empty {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 40px 30px;
-  text-align: center;
-  font-size: 14px;
+  composes: empty from global;
   color: var(--qz-sub);
-  line-height: 1.7;
 }
 
 @keyframes qzSpin {

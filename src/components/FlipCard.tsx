@@ -13,7 +13,7 @@ interface FlipCardProps {
   className?: string
 }
 
-/** 뒷면 → 앞면 rotateY 플립. 프레임은 .tarot-card 가 담당한다. */
+/** 뒷면 → 앞면 rotateY 플립. 프레임은 .play-card 가 담당한다. */
 export function FlipCard({ drawn, flipped, delay = 0, className }: FlipCardProps) {
   return (
     <div className={`${styles.scene} ${className ?? ''}`}>
@@ -21,14 +21,14 @@ export function FlipCard({ drawn, flipped, delay = 0, className }: FlipCardProps
         className={`${styles.inner} ${flipped ? styles['inner--flipped'] : ''}`}
         style={{ '--flip-delay': `${delay}ms` } as CSSProperties}
       >
-        {/* 면(.face)은 배치, 프레임(.tarot-card)은 안쪽에 — 같은 요소에 겹치면 position 이 충돌한다 */}
+        {/* 면(.face)은 배치, 프레임(.play-card)은 안쪽에 — 같은 요소에 겹치면 position 이 충돌한다 */}
         <div className={styles.face}>
-          <div className="tarot-card tarot-card--fill">
+          <div className="play-card play-card--fill">
             <CardBack />
           </div>
         </div>
         <div className={`${styles.face} ${styles['face--back']}`}>
-          <div className="tarot-card tarot-card--fill">
+          <div className="play-card play-card--fill">
             <CardFace {...drawn} />
           </div>
         </div>

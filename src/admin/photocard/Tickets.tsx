@@ -7,9 +7,9 @@ import type { PhotocardSettings, PhotocardTicketRow } from '@/lib/repo/types'
 import { cssUrl } from '@/lib/image'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
+/* 화면 표의 `when` 은 연도 없는 짧은 형식이라 별개다 — CSV 는 전체 표기를 쓴다 */
+import { downloadCsv, when as csvWhen } from '../csv'
 
-/** CSV 한 칸 — 쉼표·따옴표·줄바꿈이 들어가면 깨지므로 감싸고 따옴표는 두 번 쓴다 */
-const cell = (v: string) => `"${String(v ?? '').replaceAll('"', '""')}"`
 
 const when = (iso: string) =>
   new Date(iso).toLocaleString('ko-KR', {
@@ -107,26 +107,15 @@ export function Tickets() {
   function download() {
     if (!rows?.length) return
     const header = ['번호', '상태', '뽑힌 카드', '레어도', '발급시각', '뽑은시각']
-    const lines = rows.map((r) =>
-      [
-        cell(r.code),
-        cell(r.status === 'drawn' ? '뽑음' : '대기'),
-        cell(r.cardName ?? ''),
-        cell(r.rarity ? (RARITY_LABEL[r.rarity] ?? String(r.rarity)) : ''),
-        cell(new Date(r.issuedAt).toLocaleString('ko-KR')),
-        cell(r.drawnAt ? new Date(r.drawnAt).toLocaleString('ko-KR') : ''),
-      ].join(',')
-    )
-    // ﻿ = BOM. 엑셀은 이게 없으면 UTF-8 을 못 알아본다
-    const blob = new Blob(['﻿' + [header.map(cell).join(','), ...lines].join('\r\n')], {
-      type: 'text/csv;charset=utf-8',
-    })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${slug}-뽑기권.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+    const body = rows.map((r) => [
+      r.code,
+      r.status === 'drawn' ? '뽑음' : '대기',
+      r.cardName ?? '',
+      r.rarity ? (RARITY_LABEL[r.rarity] ?? String(r.rarity)) : '',
+      csvWhen(r.issuedAt),
+      csvWhen(r.drawnAt),
+    ])
+    downloadCsv(`${slug}-뽑기권.csv`, header, body)
   }
 
   const tableVars = {

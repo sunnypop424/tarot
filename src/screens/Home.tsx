@@ -95,7 +95,7 @@ function PeriodEmpty({ category }: { category: Category }) {
     <div className={styles.empty}>
       <button
         type="button"
-        className={`tarot-card tarot-card--lifted ${styles.emptyCard}`}
+        className={`play-card play-card--lifted ${styles.emptyCard}`}
         aria-label={`${category.label} 카드 뽑기`}
         onClick={go}
       >

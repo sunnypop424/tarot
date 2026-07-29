@@ -157,7 +157,7 @@ export function DeckSpread({ count, taken, onPick, disabled, phase }: DeckSpread
                 aria-label={`${i + 1}번 카드 고르기`}
                 onClick={handleClick(i)}
               >
-                <span className="tarot-card" style={{ display: 'block' }}>
+                <span className="play-card" style={{ display: 'block' }}>
                   <CardBack />
                 </span>
               </button>

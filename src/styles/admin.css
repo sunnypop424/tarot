@@ -180,7 +180,7 @@
   padding: 0 16px;
   gap: 6px;
   /* 시안 버튼은 전부 알약 */
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   font-size: 12.5px;
 }
 .admin .btn--sm,
@@ -201,7 +201,7 @@
 .owner .btn-icon {
   width: 28px;
   height: 28px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
 }
 /* 버튼 안 아이콘도 시안 크기로 (인라인 size 지정을 덮진 않지만 기본을 맞춘다) */
 .admin .btn svg,

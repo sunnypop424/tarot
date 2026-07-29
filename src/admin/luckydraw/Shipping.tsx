@@ -5,11 +5,8 @@ import { SearchBox } from '../SearchBox'
 import type { ShippingEntry } from '@/lib/repo'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
+import { downloadCsv, when } from '../csv'
 
-/** CSV 한 칸 — 쉼표·따옴표·줄바꿈이 들어가면 깨지므로 감싸고 따옴표는 두 번 쓴다 */
-function cell(value: string): string {
-  return `"${String(value ?? '').replaceAll('"', '""')}"`
-}
 
 /**
  * 배송 목록 — **개인정보를 다루는 유일한 주최자 화면.**
@@ -37,26 +34,14 @@ export function Shipping() {
   function download() {
     if (!list?.length) return
     const header = ['이름', '연락처', '주소', '상품', '제출시각']
-    const lines = list.map((e) =>
-      [
-        cell(e.name),
-        cell(e.phone),
-        cell(e.address),
-        cell(e.prizes.map((p) => `${p.rank}등 ${p.name} ${p.count}개`).join(' / ')),
-        cell(new Date(e.createdAt).toLocaleString('ko-KR')),
-      ].join(',')
-    )
-    // ﻿ = BOM. 엑셀은 이게 없으면 UTF-8 을 못 알아본다
-    const blob = new Blob(['﻿' + [header.map(cell).join(','), ...lines].join('\r\n')], {
-      type: 'text/csv;charset=utf-8',
-    })
-
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${slug}-배송정보.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+    const rows = list.map((e) => [
+      e.name,
+      e.phone,
+      e.address,
+      e.prizes.map((p) => `${p.rank}등 ${p.name} ${p.count}개`).join(' / '),
+      when(e.createdAt),
+    ])
+    downloadCsv(`${slug}-배송정보.csv`, header, rows)
   }
 
   async function clearAll() {
