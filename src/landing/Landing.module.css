@@ -70,8 +70,8 @@
 }
 
 /* 글 한 편이라 폭을 좁게 — 읽는 흐름이 그리드보다 우선이다 */
+/* 폭(`max-width`)은 여기 없다 — `landingData.PAGE_MAX` 가 원본이고 인라인으로 들어온다 */
 .page {
-  max-width: 690px;
   margin: 0 auto;
   padding: clamp(26px, 5vw, 50px) 22px clamp(60px, 10vw, 110px);
   font-size: 16.5px;
@@ -304,6 +304,11 @@
   flex-wrap: nowrap;
   gap: 22px;
   align-items: flex-start;
+}
+/* 나란히 두면 너무 작아지는 폭에선 세로로 쌓는다 — 판단은 `Landing.tsx` 가 한다 */
+.devices[data-stacked] {
+  flex-direction: column;
+  align-items: center;
 }
 .device {
   display: flex;

@@ -24,6 +24,28 @@ export const DEVICE_SIZE: Record<DeviceKind, [number, number]> = {
   overlay: [1280, 720],
 }
 
+/**
+ * 글 단 최대 폭 — **`Landing.module.css` 가 아니라 여기가 원본이다.**
+ *
+ * 목업 크기가 이 폭에서 나오기 때문에 두 군데 적으면 반드시 어긋난다(한쪽만 고치게 된다).
+ * 그래서 CSS 는 폭을 안 갖고 `Landing.tsx` 가 인라인으로 준다.
+ *
+ * 시안은 690 이었는데 목업이 그 안에서 잘렸다. 키우면 목업이 커지는 대신 글 한 줄이 길어져
+ * 눈이 다음 줄을 찾기 어려워진다 — 한글 45자 언저리가 한계라 그 안에서 고른 값이다.
+ */
+export const PAGE_MAX = 780
+
+/** 나란히 둔 기기가 이 높이 밑으로 내려가면 화면 안이 안 읽힌다 → 세로로 쌓는다 */
+export const SIDE_MIN_H = 180
+
+/** 쌓았을 때 기기별 높이 상한 — 폭을 다 쓰되 폰이 화면을 독차지하지 않게 */
+export const STACK_MAX_H: Record<DeviceKind, number> = {
+  phone: 380,
+  tablet: 260,
+  screen: 220,
+  overlay: 220,
+}
+
 export interface DemoDevice {
   kind: DeviceKind
   label: string

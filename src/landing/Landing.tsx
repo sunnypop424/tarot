@@ -6,7 +6,10 @@ import {
   ROLE_MINE,
   ROLE_NOTE,
   ROLE_YOURS,
+  PAGE_MAX,
   SERVICES,
+  SIDE_MIN_H,
+  STACK_MAX_H,
   STEPS,
 } from './landingData'
 import { InquiryModal } from './InquiryModal'
@@ -68,28 +71,49 @@ export default function Landing() {
   const service = useMemo(() => SERVICES.find((s) => s.key === cur) ?? SERVICES[0], [cur])
 
   /**
-   * 목업 크기 — **어느 탭을 눌러도 기기 높이가 같아야 한다.**
+   * 목업 크기.
    *
-   * 탭마다 따로 계산하면 폰만 있는 서비스에서 목업이 커졌다가 가로 스크린이 붙는 서비스에서
-   * 작아져, 탭을 옮길 때마다 판이 출렁인다. 그래서 **가장 넓은 조합(폰 + 가로 스크린)** 하나로
-   * 높이를 한 번만 정하고 모든 탭이 그걸 쓴다.
+   * **① 나란히 놓을 땐 어느 탭이든 높이가 같다.** 탭마다 따로 계산하면 폰만 있는 서비스에서
+   * 커졌다가 가로 스크린이 붙는 서비스에서 작아져 판이 출렁인다. 그래서 **가장 넓은
+   * 조합(폰 + 가로 스크린)** 하나로 높이를 한 번만 정하고 모든 탭이 그걸 쓴다.
+   *
+   * **② 자리가 모자라면 세로로 쌓는다.** 시안엔 높이에 `max(180, …)` 바닥이 있었는데,
+   * 그러면 **자리가 부족해도 높이를 못 내려 폭이 넘친다** — 폰(390)에서 기기가 둘인 탭이
+   * 실제로 417px 을 308px 자리에 밀어 넣어 잘려 있었다. 바닥을 없애면 이번엔 목업이
+   * 130px 짜리로 쪼그라들어 화면 안이 안 읽힌다. 그래서 **그 밑으로 내려갈 상황이면
+   * 나란히 두기를 포기하고 세로로 쌓고**, 쌓을 땐 기기마다 제 폭을 다 쓴다.
    */
-  const { height, gap } = useMemo(() => {
+  const layout = useMemo(() => {
     const narrow = w < 620
-    const g = narrow ? 14 : 22
-    const stagePad = narrow ? 18 : 26
-    const avail = Math.min(w, 690) - 44 - 2 * stagePad - 10
+    const gap = narrow ? 14 : 22
+    const pad = narrow ? 18 : 26
+    /** 목업 판은 글 단과 같은 폭이다 — 판만 넓히면 글에서 떨어져 나온 것처럼 보인다 */
+    const stageW = Math.min(w, PAGE_MAX) - 44
+    const inner = stageW - 2 * pad
     const worstSum = 390 / 844 + 1280 / 720
-    const h = Math.max(180, Math.min(narrow ? 280 : 320, Math.floor((avail - g) / worstSum)))
-    return { height: h, gap: g }
+    const sideH = Math.min(narrow ? 280 : 320, Math.floor((inner - gap) / worstSum))
+    return { stacked: sideH < SIDE_MIN_H, height: sideH, gap, inner }
   }, [w])
+
+  /** 쌓았을 때 기기별 크기 — 폭을 다 쓰되 종류마다 키가 너무 커지지 않게 막는다 */
+  const sizeOf = useCallback(
+    (kind: keyof typeof DEVICE_SIZE) => {
+      const [bw, bh] = DEVICE_SIZE[kind]
+      const h = layout.stacked
+        ? Math.min(STACK_MAX_H[kind], Math.floor(layout.inner / (bw / bh)))
+        : layout.height
+      return { h, w: Math.round(bw * (h / bh)), scale: h / bh }
+    },
+    [layout]
+  )
 
   const openInquiry = useCallback(() => setInquiry('any'), [])
   const openCustom = useCallback(() => setInquiry('custom'), [])
 
   return (
     <div className={styles.root} ref={rootRef}>
-      <div className={styles.page}>
+      {/* 단 폭은 `landingData.PAGE_MAX` 가 원본이다 — 목업 크기가 여기서 나와 CSS 에 또 적으면 어긋난다 */}
+      <div className={styles.page} style={{ maxWidth: PAGE_MAX }}>
         <div className={styles.top}>
           <span className={styles.brand}>생일카페 페이지 커미션</span>
           <span className={styles.footerNote}>OLUCKY!</span>
@@ -193,19 +217,19 @@ export default function Landing() {
             ))}
           </div>
 
-          <div className={styles.devices} style={{ gap }}>
+          <div
+            className={styles.devices}
+            style={{ gap: layout.gap }}
+            data-stacked={layout.stacked || undefined}
+          >
             {service.devices.map((d) => {
               const [bw, bh] = DEVICE_SIZE[d.kind]
-              const scale = height / bh
+              const { h, w: fw, scale } = sizeOf(d.kind)
               return (
                 <div className={styles.device} key={d.path}>
                   <div
                     className={styles.frame}
-                    style={{
-                      width: Math.round(bw * scale),
-                      height,
-                      borderRadius: height < 240 ? 12 : 18,
-                    }}
+                    style={{ width: fw, height: h, borderRadius: h < 240 ? 12 : 18 }}
                   >
                     {d.kind === 'overlay' && (
                       <div className={styles.backdrop} aria-hidden="true">
