@@ -48,7 +48,28 @@ export function applyPwaHead(slot: Slot, area: PwaArea = 'visitor'): () => void 
    * (SlotProvider 가 이미 채워 넘기지만, 부르는 곳이 늘면 그 보장이 깨진다).
    */
   const theme = filledTheme(slot.theme)
-  const icon = theme.assets.appIcon ? abs(theme.assets.appIcon) : null
+  /**
+   * 슬롯이 앱 아이콘을 안 올렸으면 **기본 아이콘으로 떨어진다.**
+   *
+   * 없으면 그냥 안 붙였었는데, 아이콘이 없는 매니페스트는 크롬이 '설치' 를 아예 안 띄우고
+   * iOS 는 홈 화면에 **화면 캡처**를 박아 넣는다 — 스태프 기기를 붙여 두라고 안내하는
+   * 마당에 그건 안 된다. 파일은 `scripts/make-app-icon.mjs` 가 만든다(손으로 만든
+   * 바이너리를 두지 않는다).
+   */
+  const custom = theme.assets.appIcon ? abs(theme.assets.appIcon) : null
+  const icon = custom ?? abs('/app-icon-192.png')
+  const icons = custom
+    ? [
+        { src: custom, sizes: '192x192', purpose: 'any' },
+        { src: custom, sizes: '512x512', purpose: 'any' },
+        { src: custom, sizes: '512x512', purpose: 'maskable' },
+      ]
+    : [
+        { src: abs('/app-icon-192.png'), sizes: '192x192', type: 'image/png', purpose: 'any' },
+        { src: abs('/app-icon-512.png'), sizes: '512x512', type: 'image/png', purpose: 'any' },
+        // 기본 아이콘은 가장자리까지 배경이라 마스크로 잘려도 마크가 안 잘린다
+        { src: abs('/app-icon-512.png'), sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      ]
   const { path, suffix } = AREA[area]
   const name = `${slot.name || '이벤트'}${suffix}`
   const canvas = theme.colors.canvas || '#0f1020'
@@ -61,13 +82,7 @@ export function applyPwaHead(slot: Slot, area: PwaArea = 'visitor'): () => void 
     display: 'standalone',
     background_color: canvas,
     theme_color: canvas,
-    ...(icon && {
-      icons: [
-        { src: icon, sizes: '192x192', purpose: 'any' },
-        { src: icon, sizes: '512x512', purpose: 'any' },
-        { src: icon, sizes: '512x512', purpose: 'maskable' },
-      ],
-    }),
+    icons,
   }
 
   const created: Element[] = []
@@ -81,13 +96,12 @@ export function applyPwaHead(slot: Slot, area: PwaArea = 'visitor'): () => void 
   document.head.appendChild(manifestLink)
   created.push(manifestLink)
 
-  if (icon) {
-    const appleIcon = document.createElement('link')
-    appleIcon.rel = 'apple-touch-icon'
-    appleIcon.href = icon
-    document.head.appendChild(appleIcon)
-    created.push(appleIcon)
-  }
+  // iOS 는 이게 없으면 홈 화면에 화면 캡처를 박는다 — 기본 아이콘이라도 반드시 건다
+  const appleIcon = document.createElement('link')
+  appleIcon.rel = 'apple-touch-icon'
+  appleIcon.href = icon
+  document.head.appendChild(appleIcon)
+  created.push(appleIcon)
 
   const appleTitle = document.createElement('meta')
   appleTitle.name = 'apple-mobile-web-app-title'

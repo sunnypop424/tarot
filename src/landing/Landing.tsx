@@ -124,6 +124,20 @@ export default function Landing() {
     [layout]
   )
 
+  /**
+   * 목록에서 고르면 **목업까지 데려간다.**
+   *
+   * 안내가 "누르시면 아래 목업에서 바로 실행됩니다" 인데 탭만 바뀌고 화면은 그대로였다 —
+   * 목록이 길어 목업이 접힌 아래에 있으면 아무 일도 안 일어난 것처럼 보인다.
+   * 무대 안의 탭에는 안 건다(이미 보고 있는 자리라 누를 때마다 화면이 튄다).
+   */
+  const stageRef = useRef<HTMLDivElement>(null)
+  const pick = useCallback((key: string) => {
+    setCur(key)
+    const soft = !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    stageRef.current?.scrollIntoView({ behavior: soft ? 'smooth' : 'auto', block: 'center' })
+  }, [])
+
   const openInquiry = useCallback(() => setInquiry('any'), [])
   const openCustom = useCallback(() => setInquiry('custom'), [])
 
@@ -185,7 +199,7 @@ export default function Landing() {
               key={s.key}
               className={styles.row}
               data-on={s.key === cur || undefined}
-              onClick={() => setCur(s.key)}
+              onClick={() => pick(s.key)}
             >
               <span className={styles.rowNo}>{String(i + 1).padStart(2, '0')}</span>
               <span className={styles.rowBody}>
@@ -222,7 +236,7 @@ export default function Landing() {
           <span className={styles.mk}>{service.name}</span>을 직접 체험해 보세요.
         </p>
 
-        <div className={styles.stage} data-rv>
+        <div className={styles.stage} ref={stageRef} data-rv>
           <span className={styles.tape} aria-hidden="true" />
           <div className={styles.tabs}>
             {SERVICES.map((s) => (
