@@ -203,16 +203,18 @@
   margin-top: 14px;
 }
 /*
- * 관리자 링크 — 손님 눈엔 안 띄고 스태프는 찾을 수 있어야 한다.
+ * 관리자 링크 — 생김새는 전역 `.admin-entry` 에 있다 (components.css). 여기선 색만 준다.
  * 색은 슬롯이 정한다 (스태프 화면의 같은 링크와 **같은 값**을 쓴다).
  */
 .adminLink {
-  font-size: 11px;
   color: var(--pc-adminLink, #494b56);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  /*
+   * **여기만 opacity 를 되돌린다.** 다른 서비스는 자기 본문 색(`--pl-sub` 등)을 그대로 쓰고
+   * 전역 `.admin-entry` 의 opacity 로 흐리게 만드는데, 포카는 **흐림이 색 안에 이미 들어 있다**
+   * (`adminLinkColor` 기본값이 `rgba(0,0,0,0.45)` — 슬롯이 고르는 값이다). 둘이 겹치면
+   * 어두운 덱 화면에서 글자가 사라진다.
+   */
+  opacity: 1;
 }
 .adminLinkLight {
   color: var(--pc-adminLink, color-mix(in srgb, var(--pc-sub) 60%, transparent));

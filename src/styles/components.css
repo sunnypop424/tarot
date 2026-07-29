@@ -264,3 +264,27 @@
 .icon-muted {
   color: var(--color-fg-3);
 }
+
+/* ══ 관리자 진입 ═══════════════════════════════════
+ *
+ * 방문자 화면 구석의 한 줄 (`components/AdminEntry.tsx`). **생김새만 여기 있다** —
+ * 색은 서비스 토큰(`--pl-sub` 등)이라 자기 모듈 클래스로 덮고, 자리는 감싸는 쪽이 정한다.
+ * 서비스마다 11개 모듈이 이 여덟 줄을 각자 선언하고 있었다 (`docs/REVIEW_COMMON.md` 3번).
+ */
+.admin-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 11px;
+  text-decoration: none;
+  cursor: pointer;
+  /* 손님 눈엔 안 띄게. 찾는 사람은 눌러 보고 진해지는 걸로 확인한다 */
+  opacity: 0.55;
+  transition: opacity var(--dur-micro) var(--ease);
+}
+.admin-entry:hover {
+  opacity: 1;
+}

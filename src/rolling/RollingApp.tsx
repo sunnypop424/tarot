@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Pencil, Settings } from 'lucide-react'
+import { ArrowLeft, Pencil } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
 import { rollingDisplay, type RollingDisplay } from '@/data/rolling'
@@ -10,6 +10,7 @@ import { Pager, usePaged } from '@/components/Pager'
 import { cssUrl } from '@/lib/image'
 import type { RollingMessage } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
+import { AdminEntry } from '@/components/AdminEntry'
 import styles from './Rolling.module.css'
 
 /**
@@ -186,10 +187,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
 
         {/* 관리자 진입 — 방문자 눈엔 잘 안 띄게 */}
         <div className={styles.adminRow}>
-          <button type="button" className={styles.adminLink} onClick={() => navigate(`/${slug}/admin`)}>
-            <Settings size={13} aria-hidden="true" />
-            관리자
-          </button>
+          <AdminEntry slug={slug} className={styles.adminLink} />
         </div>
       </main>
 

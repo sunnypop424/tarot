@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lamp, Settings } from 'lucide-react'
+import { ChevronLeft, Lamp } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
 import { wishDisplay, type WishDisplay } from '@/data/wish'
@@ -11,6 +11,7 @@ import { isLight } from '@/lib/color'
 import { cssUrl } from '@/lib/image'
 import type { RollingMessage } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
+import { AdminEntry } from '@/components/AdminEntry'
 import styles from './Wish.module.css'
 
 /**
@@ -520,10 +521,7 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
           {display.hangLabel}
         </button>
         <div className={styles.adminRow}>
-          <button type="button" className={styles.adminLink} onClick={() => navigate(`/${slug}/admin`)}>
-            <Settings size={12} strokeWidth={1.6} aria-hidden="true" />
-            관리자
-          </button>
+          <AdminEntry slug={slug} className={styles.adminLink} />
         </div>
       </div>
     </div>

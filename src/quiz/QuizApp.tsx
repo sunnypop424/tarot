@@ -6,7 +6,6 @@ import {
   Clock,
   Download,
   Info,
-  Settings,
   Share2,
 } from 'lucide-react'
 
@@ -23,6 +22,7 @@ import { SavableImage } from '@/components/SavableImage'
 import type { MyReward, QuizQuestion, QuizResult, QuizSettings } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import { drawTitleCard } from './titleCard'
+import { AdminEntry } from '@/components/AdminEntry'
 import styles from './Quiz.module.css'
 
 /**
@@ -353,10 +353,7 @@ function Start({
           </button>
         )}
         <div className={styles.adminRow}>
-          <a className={styles.adminLink} href={`/${slug}/admin`}>
-            <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-            관리자
-          </a>
+          <AdminEntry slug={slug} className={styles.adminLink} />
         </div>
       </div>
     </>

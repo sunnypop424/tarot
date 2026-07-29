@@ -6,7 +6,6 @@ import {
   Heart,
   Info,
   KeyRound,
-  Settings,
   Stamp as StampIcon,
   Star,
   TriangleAlert,
@@ -23,6 +22,7 @@ import { cssUrl } from '@/lib/image'
 import { visitorId } from '@/lib/visitor'
 import type { MyReward, StampSettings } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
+import { AdminEntry } from '@/components/AdminEntry'
 import styles from './Stamp.module.css'
 
 /**
@@ -261,10 +261,7 @@ function Board({ slot }: { slot: Slot }) {
                 </>
               )}
               <div className={styles.adminRow}>
-                <a className={styles.adminLink} href={`/${slug}/admin`}>
-                  <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-                  관리자
-                </a>
+                <AdminEntry slug={slug} className={styles.adminLink} />
               </div>
             </div>
           </>

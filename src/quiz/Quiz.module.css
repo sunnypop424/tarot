@@ -117,14 +117,9 @@
   text-align: center;
   margin-top: 14px;
 }
+/* 생김새는 전역 `.admin-entry` 에 있다 (components.css) — 여기선 색만 준다 */
 .adminLink {
-  font-size: 11px;
   color: var(--qz-sub);
-  opacity: 0.6;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
 }
 
 /* ── ② 문항 ── */

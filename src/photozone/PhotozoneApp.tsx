@@ -10,7 +10,6 @@ import {
   Info,
   Pointer,
   RotateCcw,
-  Settings,
   Share2,
   SwitchCamera,
   User,
@@ -35,6 +34,7 @@ import {
 } from '@/lib/compose'
 import type { Slot } from '@/types/slot'
 import { CAMERA_MESSAGE, useCamera } from './useCamera'
+import { AdminEntry } from '@/components/AdminEntry'
 import styles from './Photozone.module.css'
 
 /**
@@ -517,10 +517,7 @@ function Ready({
 
       {/* 방문자 눈엔 안 띄게 — 주최자만 찾아 누른다 */}
       <div className={styles.adminRow}>
-        <a className={styles.adminLink} href={`/${slug}/admin`}>
-          <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-          관리자
-        </a>
+        <AdminEntry slug={slug} className={styles.adminLink} />
       </div>
     </>
   )

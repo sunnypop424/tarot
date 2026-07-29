@@ -230,21 +230,9 @@
   text-align: center;
   padding: var(--space-lg) 0 var(--space-sm);
 }
+/* 생김새는 전역 `.admin-entry` 에 있다 (components.css) — 여기선 색만 준다 */
 .adminLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: transparent;
-  border: none;
   color: var(--rp-sub);
-  font-family: inherit;
-  font-size: var(--text-xs);
-  cursor: pointer;
-  opacity: 0.5;
-  transition: opacity var(--dur-micro) var(--ease);
-}
-.adminLink:hover {
-  opacity: 1;
 }
 
 /* ── 모바일 하단 고정 CTA ── */

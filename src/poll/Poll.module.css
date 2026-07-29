@@ -510,16 +510,7 @@
   padding: 6px var(--layout-pad) 22px;
   text-align: center;
 }
+/* 생김새는 전역 `.admin-entry` 에 있다 (components.css) — 여기선 색만 준다 */
 .adminLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border: none;
-  background: none;
-  font-family: inherit;
-  font-size: 11px;
   color: var(--pl-sub);
-  opacity: 0.5;
-  text-decoration: none;
-  cursor: pointer;
 }

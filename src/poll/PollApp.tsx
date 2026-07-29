@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Check, ChevronLeft, CircleCheck, Crown, Heart, Image as ImageIcon, Settings } from 'lucide-react'
+import { Check, ChevronLeft, CircleCheck, Crown, Heart, Image as ImageIcon } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
 import { useLivePreview } from '@/slot/preview'
@@ -11,6 +11,7 @@ import { cssUrl } from '@/lib/image'
 import { visitorId } from '@/lib/visitor'
 import type { MyVote, Poll } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
+import { AdminEntry } from '@/components/AdminEntry'
 import styles from './Poll.module.css'
 
 /**
@@ -198,10 +199,7 @@ function PollHome({ slot }: { slot: Slot }) {
             )}
 
             <div className={styles.adminRow}>
-              <a className={styles.adminLink} href={`/${slug}/admin`}>
-                <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-                관리자
-              </a>
+              <AdminEntry slug={slug} className={styles.adminLink} />
             </div>
           </>
         )}

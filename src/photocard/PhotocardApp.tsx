@@ -7,7 +7,6 @@ import {
   Layers,
   Lock,
   RotateCw,
-  Settings,
   Share2,
   Shuffle,
   Sparkles,
@@ -29,6 +28,7 @@ import { fromUrl, releaseResult, saveResult, shareResult, type ResultImage } fro
 import { SavableImage } from '@/components/SavableImage'
 import type { PhotocardDrawn, PhotocardMine, PhotocardSettings, PhotocardTicket } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
+import { AdminEntry } from '@/components/AdminEntry'
 import styles from './Photocard.module.css'
 
 /**
@@ -522,10 +522,7 @@ function Deck({
               : '카드를 눌러 한 장을 골라 주세요'}
         </div>
         <div className={styles.adminRow}>
-          <a className={styles.adminLink} href={`/${slug}/admin`}>
-            <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-            관리자 페이지로 이동
-          </a>
+          <AdminEntry slug={slug} className={styles.adminLink} />
         </div>
       </div>
     </>
@@ -826,10 +823,7 @@ function TicketIntro({
           {closed ? '마감됐어요' : busy ? '받는 중…' : display.drawLabel}
         </button>
         <div className={styles.adminRow} style={{ textAlign: 'center' }}>
-          <a className={`${styles.adminLink} ${styles.adminLinkLight}`} href={`/${slug}/admin`}>
-            <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-            관리자 페이지로 이동
-          </a>
+          <AdminEntry slug={slug} className={`${styles.adminLink} ${styles.adminLinkLight}`} />
         </div>
       </div>
     </>
@@ -898,10 +892,7 @@ function TicketView({
         발급 {new Date(ticket.issuedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
       </div>
       <div className={styles.adminRow} style={{ textAlign: 'center' }}>
-        <a className={`${styles.adminLink} ${styles.adminLinkLight}`} href={`/${slug}/admin`}>
-          <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-          관리자 페이지로 이동
-        </a>
+        <AdminEntry slug={slug} className={`${styles.adminLink} ${styles.adminLinkLight}`} />
       </div>
     </>
   )
@@ -929,10 +920,7 @@ function Counter({ display, slug }: { display: PhotocardDisplay; slug: string })
         {display.counterHours && <div className={styles.counterHours}>{display.counterHours}</div>}
       </div>
       <div className={styles.bottom} style={{ textAlign: 'center' }}>
-        <a className={`${styles.adminLink} ${styles.adminLinkLight}`} href={`/${slug}/admin`}>
-          <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-          관리자 페이지로 이동
-        </a>
+        <AdminEntry slug={slug} className={`${styles.adminLink} ${styles.adminLinkLight}`} />
       </div>
     </>
   )
