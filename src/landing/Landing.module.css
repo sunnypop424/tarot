@@ -303,6 +303,8 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 22px;
+  /* 폰만 있는 탭은 기기가 판을 다 못 채운다 — 왼쪽에 붙으면 오른쪽만 비어 한쪽으로 쏠린다 */
+  justify-content: center;
   align-items: flex-start;
 }
 /* 나란히 두면 너무 작아지는 폭에선 세로로 쌓는다 — 판단은 `Landing.tsx` 가 한다 */
