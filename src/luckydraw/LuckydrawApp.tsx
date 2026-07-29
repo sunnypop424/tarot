@@ -332,11 +332,18 @@ export default function LuckydrawApp() {
                     label="몇 개를 뽑을까요?"
                     goLabel={display.drawLabel}
                     busy={drawing}
-                    disabled={authStatus !== 'in' && !previewing}
+                    /**
+                     * **체험 슬롯은 로그인 없이 뽑는다** (`0034_demo_admin.sql`).
+                     * 이 화면 자체가 스태프 화면이라(럭드는 방문자 화면이 곧 뽑기 화면),
+                     * 잠겨 있으면 랜딩에서 보여줄 게 "경품 목록" 뿐이다.
+                     * 서버도 같은 판정을 한다 — `draw_prizes` 가 `manages_slot` 을 보고,
+                     * 그게 체험 슬롯이면 통과한다.
+                     */
+                    disabled={authStatus !== 'in' && !previewing && !slot.demo}
                     className={styles.picker}
                   />
 
-                  {authStatus !== 'in' && !previewing && (
+                  {authStatus !== 'in' && !previewing && !slot.demo && (
                     <p className={styles.staffHint}>
                       <Lock size={13} aria-hidden="true" /> 스태프가 로그인해야 뽑을 수 있어요.
                     </p>
@@ -374,7 +381,8 @@ export default function LuckydrawApp() {
            * 여기로 들어가야 한다.
            */
           <Link to={`/${slot.slug}/admin`} className={styles.adminLink}>
-            {authStatus === 'in'
+            {/* 체험 슬롯은 로그인이 없으니 "로그인" 이라 쓰면 거짓말이다 — 그냥 가는 문이다 */}
+            {authStatus === 'in' || slot.demo
               ? '관리자 페이지로 이동'
               : authStatus === 'checking'
                 ? '확인 중…'

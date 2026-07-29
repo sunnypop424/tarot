@@ -34,14 +34,14 @@ export function ShowStaff({ slot }: { slot: Slot }) {
   }, [slug])
 
   useEffect(() => {
-    if (status === 'in') void load()
-  }, [load, status])
+    if (status === 'in' || slot.demo) void load()
+  }, [load, status, slot.demo])
 
   /** 다른 기기에서 눌렀을 수도 있다 (제어판이 둘일 수 있다) */
   useEffect(() => {
-    if (status !== 'in' || !repo.cheer.ready()) return
+    if ((status !== 'in' && !slot.demo) || !repo.cheer.ready()) return
     return repo.cheer.watch(slug, () => void load())
-  }, [slug, status, load])
+  }, [slug, status, load, slot.demo])
 
   /** 경과 시간을 1초마다 새로 그린다 (상영 중엔 이 숫자가 유일한 기준이다) */
   useEffect(() => {
@@ -66,8 +66,9 @@ export function ShowStaff({ slot }: { slot: Slot }) {
     </div>
   )
 
-  if (status === 'checking') return shell(<div className={styles.center} aria-busy="true" />)
-  if (status === 'out')
+  if (status === 'checking' && !slot.demo) return shell(<div className={styles.center} aria-busy="true" />)
+  // 체험 슬롯은 로그인을 안 묻는다 (0034) — 상영 제어도 눌러 봐야 무엇인지 안다
+  if (status === 'out' && !slot.demo)
     return shell(
       <div className={styles.center}>
         <Lock size={32} strokeWidth={1.6} aria-hidden="true" />

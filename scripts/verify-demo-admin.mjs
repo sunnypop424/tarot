@@ -149,5 +149,21 @@ console.log('\n[5] 기준 → 훼손 → 되돌리기 (최고관리자로)')
   }
 }
 
-console.log(fail ? `\n실패 ${fail}건` : '\n전부 통과')
+// ── 6. 스태프 RPC 가 실제로 눌린다 (0038) ──────────
+//
+// **GRANT 와 함수 안 판정은 다른 겹이다.** 0034 는 판정만 열었고 anon 은 GRANT 에서
+// 걸려 판정까지 가지도 못했다 — 화면의 버튼은 멀쩡히 켜져 있어서 눌러보기 전엔 몰랐다.
+console.log('\n[6] 스태프 RPC — 체험은 되고 고객 슬롯은 안 된다')
+{
+  const d = await rpc('draw_prizes', { target: 'demo-luckydraw', draw_count: 1 })
+  check('체험 슬롯에서 뽑기가 된다', d.ok, `HTTP ${d.status}`)
+  if (real) {
+    const x = await rpc('draw_prizes', { target: real.slug, draw_count: 1 })
+    check('고객 슬롯에서는 거절된다', !x.ok, `HTTP ${x.status}`)
+  }
+  const q = await rpc('quiz_regrade', { target: 'demo-quiz' })
+  check('체험 재채점이 된다', q.ok, `HTTP ${q.status}`)
+}
+
+console.log(fail ? `\n실패 ${fail}건 (위 결과 포함)` : '\n6번까지 전부 통과')
 process.exit(fail ? 1 : 0)

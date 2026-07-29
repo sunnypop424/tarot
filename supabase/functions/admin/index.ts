@@ -75,9 +75,14 @@ async function isOwner(req: Request): Promise<boolean> {
  * **주최자도 자기 슬롯의 스태프 계정을 만든다** — 부스에 사람이 여럿이면 한 계정을 돌려 쓰게 되고,
  * 그건 누가 무엇을 처리했는지 영영 모르게 된다는 뜻이다.
  *
- * 열어주는 범위는 **자기 슬롯 하나뿐**이다: `manages_slot(target)` 이 DB 에서 판정하고,
- * 아래 각 처리는 다시 "그 계정이 이 슬롯 주최자인가" 를 확인한다. 슬롯 삭제(`purge`)와
- * 만료 청소는 그대로 최고관리자만이다 — 되돌릴 수 없는 일이라 파는 사람의 몫이다.
+ * 열어주는 범위는 **자기 슬롯 하나뿐**이다: DB 가 판정하고, 아래 각 처리는 다시 "그 계정이
+ * 이 슬롯 주최자인가" 를 확인한다. 슬롯 삭제(`purge`)와 만료 청소는 그대로 최고관리자만이다 —
+ * 되돌릴 수 없는 일이라 파는 사람의 몫이다.
+ *
+ * **`manages_slot` 이 아니라 엄격판을 부른다.** 0034 로 일반판은 체험 슬롯이면 통과한다
+ * (관리 화면을 로그인 없이 열려고). 그 판정을 여기서 쓰면 **아무나 진짜 계정을 만들 수 있다** —
+ * `auth.users` 는 매시간 되돌리기의 대상도 아니라(그건 데이터 표만 되돌린다) 만들어진 계정이
+ * 그대로 남는다. 체험에서 열어야 할 것은 "운영해 보기" 지 "계정 만들기" 가 아니다.
  */
 async function managesSlot(req: Request, slug: string): Promise<boolean> {
   const auth = req.headers.get('authorization')
@@ -85,7 +90,7 @@ async function managesSlot(req: Request, slug: string): Promise<boolean> {
   const client = createClient(SUPABASE_URL, ANON_KEY, {
     global: { headers: { authorization: auth } },
   })
-  const { data, error } = await client.rpc('manages_slot', { target: slug })
+  const { data, error } = await client.rpc('manages_slot_strict', { target: slug })
   return !error && data === true
 }
 

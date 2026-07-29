@@ -104,7 +104,7 @@ function rewardNav(service: ServiceId): NavItem[] {
   return USES_REWARDS.includes(service) ? REWARD_NAV : []
 }
 
-function useNav(service: ServiceId): NavGroup[] {
+function useNav(service: ServiceId, demo: boolean): NavGroup[] {
   const rewards = rewardNav(service)
   return [
     {
@@ -119,7 +119,13 @@ function useNav(service: ServiceId): NavGroup[] {
     { title: serviceLabel(service), items: SERVICE_NAV[service] },
     /* 노출어는 "선물" 이다 — "보상"(`rewardMode`)은 코드에만 둔다 (`docs/DESIGN.md` 「용어」) */
     ...(rewards.length ? [{ title: '선물', items: rewards }] : []),
-    ...(hasSupabase
+    /*
+     * **체험 슬롯엔 계정 묶음이 없다.** 이 화면은 로그인 없이 열리는데(0034),
+     * '내 계정' 은 바꿀 비밀번호가 있는 세션이 전제라 빈 화면이 되고, '스태프 계정' 은
+     * 진짜 Supabase 계정을 만든다 — 매시간 되돌리기는 데이터 표만 되돌려서
+     * 만들어진 계정은 그대로 남는다. 서버도 같은 판정을 한다(admin 함수가 엄격판을 본다).
+     */
+    ...(hasSupabase && !demo
       ? [
           {
             title: '계정',
@@ -139,7 +145,7 @@ export function AdminLayout() {
   const navigate = useNavigate()
   const { user, signOut } = useAdminAuth(slot.slug)
   const service = getSlotService(slot)
-  const GROUPS = useNav(service)
+  const GROUPS = useNav(service, Boolean(slot.demo))
   const [menuOpen, setMenuOpen] = useState(false)
   const [proxyShown, setProxyShown] = useState(true)
 

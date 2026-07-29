@@ -21,6 +21,11 @@ import styles from './Staff.module.css'
  *
  * 게이트는 두 겹이다 — 여기서 로그인을 보고 `reward_redeem` 이 `manages_slot` 을 다시 본다.
  * 화면만 막는 건 아무것도 막지 못한다.
+ *
+ * **체험 슬롯은 로그인을 안 묻는다** (`0034_demo_admin.sql`). 랜딩이 스탬프·모의고사를
+ * 보여주는데 정작 "다 모으면 어떻게 받나" 가 이 화면이라, 잠겨 있으면 그 서비스의 절반이
+ * 안 보인다. 안쪽 게이트(`manages_slot`)도 체험 슬롯이면 통과하므로 실제로 눌러진다 —
+ * 두 겹 중 하나만 열어 놓고 "열었다" 고 착각하지 않기 위해 여기 같이 적어 둔다.
  */
 export function RedeemStaff({ slot }: { slot: Slot }) {
   const { slug } = slot
@@ -55,9 +60,9 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
     </div>
   )
 
-  if (status === 'checking') return shell(<div className={styles.center} aria-busy="true" />)
+  if (status === 'checking' && !slot.demo) return shell(<div className={styles.center} aria-busy="true" />)
 
-  if (status === 'out') {
+  if (status === 'out' && !slot.demo) {
     return shell(
       <div className={styles.center}>
         <Lock size={32} strokeWidth={1.6} aria-hidden="true" />
