@@ -96,22 +96,22 @@ export function InquiryModal({
         </button>
 
         <p className={styles.kicker}>문의하기</p>
-        <h2 className={styles.title}>오픈채팅으로 받고 있어요</h2>
+        <h2 className={styles.title}>오픈채팅으로 받고 있습니다</h2>
 
         <ol className={styles.steps}>
           <li>
             <b>오픈채팅방 별명</b>을 <b>{NICKNAME_RULE}</b> 으로 바꿔 주세요 (예: {NICKNAME_EXAMPLE})
           </li>
-          <li>쓰고 싶은 서비스(또는 주문 제작)를 고르고 양식을 복사해 주세요</li>
-          <li>채팅방에 붙여넣어 채워 보내 주시면 금액과 일정을 확정해 드려요</li>
+          <li>쓰실 서비스(또는 주문 제작)를 고르시고 양식을 복사해 주세요</li>
+          <li>채팅방에 붙여넣어 채워 보내 주시면 금액과 일정을 알려 드립니다</li>
         </ol>
         {/* 긴급 여부는 고르는 값이 아니라 두 날짜에서 나오는 값이다 — 양식에도 같은 문장이 들어간다 */}
         <p className={styles.hint}>
-          <b>긴급 여부</b>는 <b>자료 전달 예정일</b>과 <b>시연/검수 희망일</b> 사이 기간으로 계산돼요.
+          <b>긴급 여부</b>는 <b>자료 전달 예정일</b>과 <b>시연/검수 희망일</b> 사이 기간으로 계산됩니다.
         </p>
 
         <p className={styles.label}>
-          문의할 서비스 <span>여러 개 고를 수 있어요</span>
+          문의할 서비스 <span>여러 개 고르실 수 있습니다</span>
         </p>
         <div className={styles.chips}>
           {FORM_ORDER.map((id) => (
@@ -147,7 +147,7 @@ export function InquiryModal({
           <span>
             {picked.length + (custom ? 1 : 0) > 0
               ? `${picked.length + (custom ? 1 : 0)}개 항목`
-              : '아직 못 정하셨어도 괜찮아요'}
+              : '아직 못 정하셨어도 괜찮습니다'}
           </span>
         </p>
         <pre className={styles.preview} data-preview>
@@ -159,13 +159,13 @@ export function InquiryModal({
           <div className={styles.actions}>
             <button type="button" className={styles.copyBtn} onClick={copy} data-copy>
               {copied ? <Check size={16} strokeWidth={2.2} /> : <Copy size={16} strokeWidth={1.8} />}
-              {copied ? '복사됐어요' : '양식 복사하기'}
+              {copied ? '복사했습니다' : '양식 복사하기'}
             </button>
             <a className={styles.kakaoBtn} href={KAKAO_URL} target="_blank" rel="noreferrer noopener" data-kakao>
               오픈채팅 열기 <ExternalLink size={15} strokeWidth={1.8} aria-hidden="true" />
             </a>
           </div>
-          <p className={styles.foot}>복사한 뒤 채팅방에 그대로 붙여넣으면 돼요.</p>
+          <p className={styles.foot}>복사하신 뒤 채팅방에 그대로 붙여넣으시면 됩니다.</p>
         </div>
       </div>
     </div>
