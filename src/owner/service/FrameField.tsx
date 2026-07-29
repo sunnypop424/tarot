@@ -135,7 +135,7 @@ export function FrameField({
         />
       </label>
       <span style={CSS.hint}>
-        가운데가 뚫린 <b>투명 PNG</b> 로 올려 주세요. 사진이 그 구멍으로 비칩니다. 프레임 비율이
+        가운데가 뚫린 <b>투명 PNG</b> 로 올려 주세요. 사진이 그 구멍으로 비쳐요. 프레임 비율이
         곧 결과 사진 비율이에요.
       </span>
       {/**
@@ -145,7 +145,7 @@ export function FrameField({
        */}
       {value.length > 0 && (
         <span style={{ ...CSS.hint, color: '#a15c17' }}>
-          올린 프레임은 <b>저장하기</b>를 눌러야 손님 화면에 나가요. 저장 전에 나가면 목록이 사라집니다.
+          올린 프레임은 <b>저장하기</b>를 눌러야 손님 화면에 나가요. 저장 전에 나가면 목록이 사라져요.
         </span>
       )}
       {error && <span className="field__error">{error}</span>}

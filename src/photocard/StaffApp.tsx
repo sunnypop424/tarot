@@ -169,7 +169,7 @@ function Staff({ slot }: { slot: Slot }) {
         <div className={styles.centerTitle}>이 이벤트는 손님이 직접 뽑아요</div>
         <p className={styles.centerBody}>
           운영 방식이 '저장용' 이라 스태프가 뽑을 일이 없어요. 방식은 관리 화면의 '카드' 에서
-          바꿀 수 있습니다.
+          바꿀 수 있어요.
         </p>
         <Link className={styles.linkBtn} to={`/${slug}/admin/photocard`}>
           관리 화면 열기
@@ -311,7 +311,7 @@ function Staff({ slot }: { slot: Slot }) {
                 <div className={styles.banner} data-demo>
                   <Info size={17} strokeWidth={2} aria-hidden="true" />
                   <span>
-                    <b>체험용 화면이에요.</b> 실제로는 스태프가 로그인한 기기에서만 열립니다.
+                    <b>체험용 화면이에요.</b> 실제로는 스태프가 로그인한 기기에서만 열려요.
                   </span>
                 </div>
               )}

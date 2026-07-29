@@ -47,7 +47,7 @@ export function Picker() {
           </span>
         )}
       </div>
-      <p className="ad-head__desc">응모자 중에서 당첨자를 뽑고, 회차별로 관리합니다.</p>
+      <p className="ad-head__desc">응모자 중에서 당첨자를 뽑고, 회차별로 관리해요.</p>
     </header>
   )
 
@@ -81,7 +81,7 @@ export function Picker() {
     if (busy || !canDraw) return
     const ok = await confirmAction({
       title: `지금 ${picking}명을 뽑을까요?`,
-      desc: `남은 후보 ${pool.length}명 중에서 ${picking}명을 뽑습니다. 뽑힌 사람은 후보에서 빠지고, 회차 단위로만 되돌릴 수 있어요.`,
+      desc: `남은 후보 ${pool.length}명 중에서 ${picking}명을 뽑아요. 뽑힌 사람은 후보에서 빠지고, 회차 단위로만 되돌릴 수 있어요.`,
       okLabel: `${picking}명 뽑기`,
     })
     if (!ok) return
@@ -101,7 +101,7 @@ export function Picker() {
   async function undo(round: number, names: string[]) {
     const ok = await confirmAction({
       title: `${round}회차를 되돌릴까요?`,
-      desc: `이 회차에서 뽑힌 ${names.length}명이 다시 후보로 돌아갑니다. 이미 안내를 보냈다면 혼선이 생길 수 있어요.`,
+      desc: `이 회차에서 뽑힌 ${names.length}명이 다시 후보로 돌아가요. 이미 안내를 보냈다면 혼선이 생길 수 있어요.`,
       okLabel: '되돌리기',
       danger: true,
     })
@@ -227,7 +227,7 @@ export function Picker() {
                 <p className="ad-field__hint">
                   {method === 'random'
                     ? '남은 후보 중에서 무작위로 뽑아요.'
-                    : '점수가 높은 순으로 뽑고, 커트라인 동점자 안에서만 무작위로 갈려요 — 정원은 정확히 맞습니다.'}
+                    : '점수가 높은 순으로 뽑고, 커트라인 동점자 안에서만 무작위로 갈려요 — 정원은 정확히 맞아요.'}
                 </p>
               </div>
             )}
@@ -245,7 +245,7 @@ export function Picker() {
           </button>
           {!canDraw && (
             <p className="ad-fine" style={{ marginTop: 12 }}>
-              뽑을 후보가 없어요. 응모를 낸 사람만 후보가 됩니다.
+              뽑을 후보가 없어요. 응모를 낸 사람만 후보가 돼요.
             </p>
           )}
         </div>

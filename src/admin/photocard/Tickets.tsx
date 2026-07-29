@@ -52,7 +52,7 @@ export function Tickets() {
         <h1 className="ad-head__title">뽑기권</h1>
         {extra && <span className="ad-head__count tnum">{extra}</span>}
       </div>
-      <p className="ad-head__desc">발급된 번호와 뽑힌 카드를 봅니다.</p>
+      <p className="ad-head__desc">발급된 번호와 뽑힌 카드를 봐요.</p>
     </header>
   )
 
@@ -86,8 +86,8 @@ export function Tickets() {
       title: '이 번호를 지울까요?',
       desc:
         row.status === 'drawn'
-          ? `${row.code} 는 이미 ${row.cardName || '카드'} 를 뽑은 번호예요. 지우면 그 손님이 한 번 더 뽑게 됩니다. 뽑은 기록과 재고는 그대로예요.`
-          : `${row.code} 를 지웁니다. 손님이 이 번호로는 뽑을 수 없게 돼요.`,
+          ? `${row.code} 는 이미 ${row.cardName || '카드'} 를 뽑은 번호예요. 지우면 그 손님이 한 번 더 뽑게 돼요. 뽑은 기록과 재고는 그대로예요.`
+          : `${row.code} 를 지워요. 손님이 이 번호로는 뽑을 수 없게 돼요.`,
       okLabel: '지우기',
       danger: true,
     })
@@ -132,7 +132,7 @@ export function Tickets() {
           <div className="ad-banner ad-banner--mute ad-banner--pad" style={{ fontWeight: 400 }}>
             <div className="ad-banner__title">이 운영 방식에서는 뽑기권을 쓰지 않아요</div>
             <div className="ad-banner__body">
-              저장용은 손님이 자기 폰에서 바로 뽑아요. 아래 목록은 예전에 발급된 기록입니다.
+              저장용은 손님이 자기 폰에서 바로 뽑아요. 아래 목록은 예전에 발급된 기록이에요.
             </div>
           </div>
         )}
@@ -183,7 +183,7 @@ export function Tickets() {
           </div>
           <p className="ad-fine" style={{ marginBottom: 14 }}>
             발급 수가 손님 수보다 훨씬 많다면, 브라우저 기록을 지우고 다시 받은 경우예요. 번호를
-            지우면 그 손님이 새로 받을 수 있게 됩니다.
+            지우면 그 손님이 새로 받을 수 있게 돼요.
           </p>
 
           {rows.length === 0 ? (

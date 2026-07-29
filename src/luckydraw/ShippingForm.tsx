@@ -123,7 +123,7 @@ export function ShippingForm({ slug, prizes, onClose }: Props) {
                 <span className={styles.agreeText}>
                   <b className="t-text-s">개인정보 수집·이용 동의</b>
                   <span className="t-text-xs t-muted">
-                    목적: 경품 배송 · 이벤트가 끝나면 즉시 폐기됩니다.
+                    목적: 경품 배송 · 이벤트가 끝나면 즉시 폐기돼요.
                   </span>
                 </span>
               </label>

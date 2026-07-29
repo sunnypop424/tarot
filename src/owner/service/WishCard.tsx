@@ -28,7 +28,7 @@ export function WishCard({
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
         손님이 소원을 적으면 등불로 나무에 매달려요. 건 즉시 보이고, 부적절한 건 주최자가 숨겨요.
         아래 색·글꼴은 소원나무 전용이에요 (위 테마와 별개).{' '}
-        <b>메시지는 롤링페이퍼와 같은 저장소를 써요</b> — 주최자 검수 화면도 같습니다.
+        <b>메시지는 롤링페이퍼와 같은 저장소를 써요</b> — 주최자 검수 화면도 같아요.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
@@ -65,7 +65,7 @@ export function WishCard({
         <Field label="글씨체 예시 텍스트" hint="작성 화면 글씨체 고르기에 이 문구로 미리보기가 떠요.">
           <input value={d.fontSample} onChange={(e) => patch({ fontSample: e.target.value })} style={CSS.input} />
         </Field>
-        <Field label="등불 흔들림" hint="끄면 정적으로 둡니다. 움직임에 민감한 분들을 위한 설정이에요.">
+        <Field label="등불 흔들림" hint="끄면 정적으로 둬요. 움직임에 민감한 분들을 위한 설정이에요.">
           <select
             value={d.sway ? 'on' : 'off'}
             onChange={(e) => patch({ sway: e.target.value === 'on' })}
@@ -101,7 +101,7 @@ export function WishCard({
       <Divided>
         <PaletteField
           label="등불 색"
-          hint="손님이 소원을 쓸 때 이 중에서 골라요. 비우면 색 선택이 없고 전부 첫 색으로 나갑니다."
+          hint="손님이 소원을 쓸 때 이 중에서 골라요. 비우면 색 선택이 없고 전부 첫 색으로 나가요."
           value={d.lanterns}
           onChange={(lanterns) => patch({ lanterns })}
         />
@@ -157,7 +157,7 @@ export function WishCard({
           repeat={d.treeBgRepeat}
           onImage={(v) => patch({ treeBg: v ?? '' })}
           onRepeat={(on) => patch({ treeBgRepeat: on })}
-          hint="나무·밤하늘 이미지예요. 비우면 배경색을 씁니다."
+          hint="나무·밤하늘 이미지예요. 비우면 배경색을 써요."
         />
         <ImageField
           slug={slot.slug}
@@ -165,7 +165,7 @@ export function WishCard({
           name="wish-lantern"
           value={d.lanternShape || null}
           onChange={(v) => patch({ lanternShape: v ?? '' })}
-          hint="실루엣 PNG 를 올리면 그 모양으로 그려요. 색은 위 팔레트가 채웁니다 — 한 장으로 여섯 색이 나와요."
+          hint="실루엣 PNG 를 올리면 그 모양으로 그려요. 색은 위 팔레트가 채워요 — 한 장으로 여섯 색이 나와요."
         />
       </Divided>
 
@@ -180,11 +180,11 @@ export function WishCard({
         <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid #ededf2' }}>
           <span style={CSS.label}>실루엣 안 글자 자리</span>
           <p style={{ margin: '6px 0 12px', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
-            등불 크기의 <b>%</b> 로 잡습니다. 올리신 그림 모양에 맞춰 <b>오른쪽 미리보기를 보면서</b>{' '}
-            조절해 주세요 — 글자가 실루엣 안쪽에 앉으면 됩니다.
+            등불 크기의 <b>%</b> 로 잡아요. 올리신 그림 모양에 맞춰 <b>오른쪽 미리보기를 보면서</b>{' '}
+            조절해 주세요 — 글자가 실루엣 안쪽에 앉으면 돼요.
             <br />
-            <b>본문과 이름을 따로 잡습니다.</b> 실루엣이 아래로 좁아지면 본문은 멀쩡한데 이름만
-            삐지는 일이 흔해서요 (이름은 <b>닉네임을 적은 소원에만</b> 나옵니다).
+            <b>본문과 이름을 따로 잡아요.</b> 실루엣이 아래로 좁아지면 본문은 멀쩡한데 이름만
+            삐지는 일이 흔해서요 (이름은 <b>닉네임을 적은 소원에만</b> 나와요).
           </p>
           {(
             [

@@ -51,7 +51,7 @@ export function Staff() {
         <h1 className="ad-head__title">스태프 계정</h1>
         {list && list.length > 0 && <span className="ad-head__count tnum">계정 {list.length}개</span>}
       </div>
-      <p className="ad-head__desc">현장에서 이 도구를 쓸 계정을 사람마다 따로 만듭니다.</p>
+      <p className="ad-head__desc">현장에서 이 도구를 쓸 계정을 사람마다 따로 만들어요.</p>
     </header>
   )
 
@@ -100,7 +100,7 @@ export function Staff() {
     if (
       !(await confirmAction({
         title: `${o.email} 의 비밀번호를 새로 만들까요?`,
-        desc: '지금 쓰던 비밀번호는 바로 못 쓰게 돼요. 새 비밀번호는 이 화면에 한 번만 보입니다.',
+        desc: '지금 쓰던 비밀번호는 바로 못 쓰게 돼요. 새 비밀번호는 이 화면에 한 번만 보여요.',
         okLabel: '재발급',
         danger: true,
       }))
@@ -121,7 +121,7 @@ export function Staff() {
     if (
       !(await confirmAction({
         title: `${o.email} 을 이 이벤트에서 뺄까요?`,
-        desc: '이 이벤트 관리 화면에 못 들어오게 됩니다. 이 계정이 남긴 처리 기록은 그대로 남아요.',
+        desc: '이 이벤트 관리 화면에 못 들어오게 돼요. 이 계정이 남긴 처리 기록은 그대로 남아요.',
         okLabel: '빼기',
         danger: true,
       }))
@@ -148,7 +148,7 @@ export function Staff() {
           <div className="ad-banner__title">계정은 사람마다 따로 만들어 주세요</div>
           <div className="ad-banner__body">
             누가 어떤 처리를 했는지 기록에 남아요. 하나를 돌려 쓰면 문제가 생겼을 때 확인할 수
-            없습니다.
+            없어요.
           </div>
         </div>
 

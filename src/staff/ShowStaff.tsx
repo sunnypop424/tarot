@@ -199,11 +199,11 @@ export function ShowStaff({ slot }: { slot: Slot }) {
           <div className={styles.banner}>
             <Info size={16} aria-hidden="true" />
             <span>
-              상영 화면은 <b>{`/${slug}/show`}</b> 한 주소예요 — 여기서 누르면 그 화면이 바뀝니다.
+              상영 화면은 <b>{`/${slug}/show`}</b> 한 주소예요 — 여기서 누르면 그 화면이 바뀌어요.
               {s.runtimeSec > 0 ? (
                 <>
                   {' '}
-                  영상 길이를 적어두셔서 <b>끝나면 크레딧이 자동으로</b> 뜹니다 (10초 안에 취소할 수 있어요).
+                  영상 길이를 적어두셔서 <b>끝나면 크레딧이 자동으로</b> 떠요 (10초 안에 취소할 수 있어요).
                 </>
               ) : (
                 <> 관리 화면에서 영상 길이를 적어두시면 크레딧이 자동으로 떠요.</>

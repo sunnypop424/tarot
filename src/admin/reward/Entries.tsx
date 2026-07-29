@@ -41,7 +41,7 @@ export function Entries() {
         <h1 className="ad-head__title">응모자 명단</h1>
         {list && <span className="ad-head__count tnum">응모 {list.length}명</span>}
       </div>
-      <p className="ad-head__desc">보상을 받을 자격을 얻고 응모까지 마친 손님 명단입니다.</p>
+      <p className="ad-head__desc">보상을 받을 자격을 얻고 응모까지 마친 손님 명단이에요.</p>
     </header>
   )
 
@@ -122,7 +122,7 @@ export function Entries() {
                 {cols.contact || cols.address
                   ? '연락처·주소가 들어 있어요. 선물을 다 보내고 나면 지워 주세요 — '
                   : ''}
-                이벤트가 끝나고 14일이 지나면 이 화면이 잠기고, 슬롯을 지우면 함께 삭제됩니다. 화면을
+                이벤트가 끝나고 14일이 지나면 이 화면이 잠기고, 슬롯을 지우면 함께 삭제돼요. 화면을
                 켜 둔 채 자리를 비우지 말아 주세요.
               </div>
             </div>
@@ -164,7 +164,7 @@ export function Entries() {
               자격은 얻었는데 아직 응모 폼을 안 내신 분이 {raffle.length - list.length}명 있어요
             </div>
             <div className="ad-banner__body">
-              그분들은 연락할 방법이 없어서 추첨 후보에도 들어가지 않습니다.
+              그분들은 연락할 방법이 없어서 추첨 후보에도 들어가지 않아요.
             </div>
           </div>
         )}
@@ -201,7 +201,7 @@ export function Entries() {
               </div>
               <div className="ad-empty__sub">
                 {raffle.length === 0
-                  ? '보상 방식을 ‘응모’ 로 바꾸시면 손님이 응모하고 여기 명단이 쌓여요. 지난 응모 기록이 있으면 방식과 상관없이 여기 그대로 남습니다.'
+                  ? '보상 방식을 ‘응모’ 로 바꾸시면 손님이 응모하고 여기 명단이 쌓여요. 지난 응모 기록이 있으면 방식과 상관없이 여기 그대로 남아요.'
                   : '자격을 얻은 분이 응모 폼을 내면 여기 한 줄씩 쌓여요.'}
               </div>
             </div>

@@ -29,7 +29,7 @@ export function PhotozoneCard({
     <Card title="포토존">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
         손님이 찍거나 올린 사진에 프레임을 씌워 자기 폰에 저장해 가요.{' '}
-        <b>사진은 손님 폰 안에서 합성되고 서버로 오지 않아요</b> — 주최자도 저희도 볼 수 없습니다.
+        <b>사진은 손님 폰 안에서 합성되고 서버로 오지 않아요</b> — 주최자도 저희도 볼 수 없어요.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
@@ -66,7 +66,7 @@ export function PhotozoneCard({
       <Divided>
         <Field
           label="사진 받는 방법"
-          hint="카메라가 막힌 손님에겐 어느 값이든 '사진 올리기' 가 대신 뜹니다 — 막다른 골목은 없어요."
+          hint="카메라가 막힌 손님에겐 어느 값이든 '사진 올리기' 가 대신 떠요 — 막다른 골목은 없어요."
         >
           <select
             value={d.captureMode}
@@ -145,7 +145,7 @@ export function PhotozoneCard({
           name="photozone-watermark"
           value={d.watermark || null}
           onChange={(v) => patch({ watermark: v ?? '' })}
-          hint="합성된 사진 구석에 얹혀요. 손님이 공유할 때 출처가 됩니다."
+          hint="합성된 사진 구석에 얹혀요. 손님이 공유할 때 출처가 돼요."
         />
         <Field label="워터마크 자리">
           <select

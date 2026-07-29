@@ -21,7 +21,7 @@ export function PollCard({
     <Card title="실시간 투표">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
         손님이 자기 폰으로 찍으면 결과가 그 자리에서 차올라요.{' '}
-        <b>설문과 선택지는 주최자가 관리 화면에서 만듭니다</b> — 여기서는 색·문구만 정해요.
+        <b>설문과 선택지는 주최자가 관리 화면에서 만들어요</b> — 여기서는 색·문구만 정해요.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
@@ -54,7 +54,7 @@ export function PollCard({
       <Divided>
         <Field
           label="결과를 언제 보여줄지"
-          hint="투표 전에 결과가 보이면 초반에 표가 한쪽으로 쏠려요. 기본은 '내가 찍은 뒤' 입니다."
+          hint="투표 전에 결과가 보이면 초반에 표가 한쪽으로 쏠려요. 기본은 '내가 찍은 뒤' 이에요."
         >
           <select
             value={d.resultMode}

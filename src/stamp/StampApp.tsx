@@ -261,7 +261,7 @@ function Board({ slot }: { slot: Slot }) {
                     {settings?.closed
                       ? '마감됐어요'
                       : complete && reward
-                        ? '내 보상 보기'
+                        ? '내 선물 보기'
                         : display.codeLabel}
                   </button>
                 </>

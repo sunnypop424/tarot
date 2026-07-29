@@ -117,7 +117,8 @@ function useNav(service: ServiceId): NavGroup[] {
     },
     // 묶음 제목이 곧 이 슬롯이 파는 서비스다 — 슬롯을 오갈 때 여기가 바뀐다
     { title: serviceLabel(service), items: SERVICE_NAV[service] },
-    ...(rewards.length ? [{ title: '보상', items: rewards }] : []),
+    /* 노출어는 "선물" 이다 — "보상"(`rewardMode`)은 코드에만 둔다 (`docs/DESIGN.md` 「용어」) */
+    ...(rewards.length ? [{ title: '선물', items: rewards }] : []),
     ...(hasSupabase
       ? [
           {

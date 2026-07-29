@@ -104,7 +104,7 @@ export function StampCard({
     <Card title="방문 스탬프">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
         손님이 현장 암호를 입력하면 도장이 찍혀요.{' '}
-        <b>암호와 보상 방식은 주최자가 관리 화면에서 정합니다</b> — 여기서는 칸과 겉모습만 정해요.
+        <b>암호와 선물 방식은 주최자가 관리 화면에서 정해요</b> — 여기서는 칸과 겉모습만 정해요.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
@@ -144,11 +144,11 @@ export function StampCard({
         </div>
         <p style={{ margin: '0 0 12px', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
           <b>이벤트가 시작된 뒤에는 칸을 늘리거나 줄이지 마세요</b> — 이미 다 모은 손님의 판이
-          미완성으로 되돌아가요. 이름만 고치는 건 안전합니다.
+          미완성으로 되돌아가요. 이름만 고치는 건 안전해요.
           {d.stamps.length > 0 && d.stamps.length <= 4 && ' · 4칸 이하는 2줄로, 5칸부터는 3줄로 그려져요.'}
           <br />
           칸마다 <b>도장 그림(투명 PNG)</b>을 올릴 수 있어요. 안 올리면 기본 도장 아이콘이
-          들어가고 <b>도장색</b>을 따릅니다 (그림을 올리면 그림의 색이 그대로 나와요).
+          들어가고 <b>도장색</b>을 따라요 (그림을 올리면 그림의 색이 그대로 나와요).
         </p>
         {error && <p style={{ margin: '0 0 10px', fontSize: 11.5, color: '#b4443c' }}>{error}</p>}
         <input
@@ -170,7 +170,7 @@ export function StampCard({
               textAlign: 'center',
             }}
           >
-            아직 칸이 없어요. 칸을 만들어야 손님 화면에 판이 그려집니다.
+            아직 칸이 없어요. 칸을 만들어야 손님 화면에 판이 그려져요.
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }} data-stamp-cells>

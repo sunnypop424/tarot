@@ -31,20 +31,20 @@ export function Guide() {
             프레임 {display.frames.length}종이 올라가 있어요
           </div>
           <p className="ad-card__desc">
-            따로 설정할 것이 없는 서비스예요. 손님은 프레임을 골라 사진을 찍고 저장하면 끝입니다.
+            따로 설정할 것이 없는 서비스예요. 손님은 프레임을 골라 사진을 찍고 저장하면 끝이에요.
           </p>
 
           <div className="ad-banner ad-banner--info ad-banner--pad" style={{ marginTop: 20 }}>
             <div className="ad-banner__title">손님 사진은 서버에 저장되지 않아요</div>
             <div className="ad-banner__body">
-              합성은 손님 폰 안에서 끝나고, 결과 이미지도 그 기기에만 남습니다. 그래서 주최자가 볼
-              사진도, 지울 사진도 없어요. 손님이 물어보면 이대로 답해 주시면 됩니다.
+              합성은 손님 폰 안에서 끝나고, 결과 이미지도 그 기기에만 남아요. 그래서 주최자가 볼
+              사진도, 지울 사진도 없어요. 손님이 물어보면 이대로 답해 주시면 돼요.
             </div>
           </div>
 
           <p className="ad-sub" style={{ marginTop: 16 }}>
             프레임을 바꾸고 싶으면 담당자에게 말씀해 주세요. 원본 이미지를 보내 주시면 교체해
-            드립니다.
+            드려요.
           </p>
 
           <a

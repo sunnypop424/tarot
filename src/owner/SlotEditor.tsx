@@ -1273,7 +1273,7 @@ export function SlotEditor() {
                   * 묶음 — **한 행사가 슬롯 여러 개를 쓴다** (포토카드 + 스탬프 + 모의고사).
                   * 목록에서만 쓰는 정리용 이름이라 권한과 무관하다. 이미 쓴 이름은 골라 쓴다.
                   */}
-                <Field label="묶음 (선택)" hint="같은 행사의 슬롯끼리 목록에서 묶여요. 손님에겐 안 보입니다.">
+                <Field label="묶음 (선택)" hint="같은 행사의 슬롯끼리 목록에서 묶여요. 손님에겐 안 보여요.">
                   <input
                     value={draft.group ?? ''}
                     onChange={(e) => patchSlot({ group: e.target.value })}
@@ -1347,7 +1347,7 @@ export function SlotEditor() {
                     새 서비스가 조용히 타로 문장을 받는다 (그 함정을 여기서도 안 만든다) */}
                 <div style={{ fontSize: 11.5, color: '#8a8a8a', marginTop: 10, lineHeight: 1.55 }}>
                   이 슬롯이 파는 것 — 아래 <b>{serviceLabel(getSlotService(draft))}</b> 칸에서 그 서비스의
-                  문구·색·이미지를 정해요. 색·형태는 위 테마를 따라갑니다.
+                  문구·색·이미지를 정해요. 색·형태는 위 테마를 따라가요.
                 </div>
               </div>
             </div>
@@ -1400,7 +1400,7 @@ export function SlotEditor() {
           {tarot && (
             <Card title="색 만들기">
               <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-                대표 색 하나와 밝기만 정하면 나머지 색을 다 만들어요. 마음에 안 드는 색은 아래에서 손으로 고치면 됩니다. 읽히는지는 자동으로 맞춰요 — 안 읽히는 색은 대비를 넘게 조정해서 넣습니다.
+                대표 색 하나와 밝기만 정하면 나머지 색을 다 만들어요. 마음에 안 드는 색은 아래에서 손으로 고치면 돼요. 읽히는지는 자동으로 맞춰요 — 안 읽히는 색은 대비를 넘게 조정해서 넣어요.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,230px),1fr))', gap: 16, alignItems: 'start' }}>
                 <Field label="대표 색" hint="팬이 아는 그 색. CTA 버튼에 쓰여요.">
@@ -1527,7 +1527,7 @@ export function SlotEditor() {
                   </select>
                 </div>
                 <p style={{ margin: '0 0 14px', fontSize: 11, color: '#8a8a8a', lineHeight: 1.6 }}>
-                  이 슬롯 전체의 카드 범위예요 — 도감·뽑기·질문 답변칸이 모두 이 값을 따릅니다. 선택한 범위만큼 앞면을 올리면 되고, 안 올린 카드는 이름 텍스트로 나옵니다.
+                  이 슬롯 전체의 카드 범위예요 — 도감·뽑기·질문 답변칸이 모두 이 값을 따라요. 선택한 범위만큼 앞면을 올리면 되고, 안 올린 카드는 이름 텍스트로 나와요.
                 </p>
                 <CardUploader
                   slug={saved.slug}
@@ -1547,8 +1547,8 @@ export function SlotEditor() {
                 <Card title="이벤트 설정">
                   <p style={{ margin: '0 0 13px', fontSize: 11, color: '#8a8a8a', lineHeight: 1.6 }}>
                     {plan.allowSpread
-                      ? '3장을 고르면 카드들을 순서대로 이어 읽는 AI 종합이 붙어요. 1장은 AI 를 안 씁니다.'
-                      : `${plan.label} 플랜은 전부 1장이에요 — 3장 스프레드(AI 종합)는 스탠다드부터입니다.`}
+                      ? '3장을 고르면 카드들을 순서대로 이어 읽는 AI 종합이 붙어요. 1장은 AI 를 안 써요.'
+                      : `${plan.label} 플랜은 전부 1장이에요 — 3장 스프레드(AI 종합)는 스탠다드부터예요.`}
                   </p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
                     {CATEGORIES.map((c) => {
@@ -1662,7 +1662,7 @@ export function SlotEditor() {
           {(poll || stamp || quiz) && (
             <Card title="배경 이미지">
               <p style={{ margin: '0 0 14px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-                올린 그대로 화면 뒤에 깔려요. <b>투명도 같은 건 안 씌웁니다</b> — 크기와 반복만 정해요.
+                올린 그대로 화면 뒤에 깔려요. <b>투명도 같은 건 안 씌워요</b> — 크기와 반복만 정해요.
               </p>
               <BackgroundField
                 slug={saved.slug}

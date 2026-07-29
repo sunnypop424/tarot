@@ -52,7 +52,7 @@ export function Shipping() {
      */
     const ok = await confirmAction({
       title: `배송 정보 ${list.length}건을 전부 지울까요?`,
-      desc: '다른 곳에 사본이 없어요. 손님도 자기가 넣은 내용을 다시 볼 수 없습니다. 먼저 CSV로 내려받으셨나요?',
+      desc: '다른 곳에 사본이 없어요. 손님도 자기가 넣은 내용을 다시 볼 수 없어요. 먼저 CSV로 내려받으셨나요?',
       okLabel: '전부 지우기',
       danger: true,
     })
@@ -92,7 +92,7 @@ export function Shipping() {
           <span className="ad-head__count tnum">배송 {list.length}건</span>
         </div>
         <p className="ad-head__desc">
-          당첨자가 직접 남긴 배송지입니다. 손님 개인정보가 나오는 유일한 화면이에요.
+          당첨자가 직접 남긴 배송지예요. 손님 개인정보가 나오는 유일한 화면이에요.
         </p>
       </header>
 
@@ -105,7 +105,7 @@ export function Shipping() {
           <div className="ad-banner__title">배송이 끝나면 반드시 지워 주세요</div>
           <div className="ad-banner__body">
             이름·연락처·주소가 그대로 들어 있는 화면이에요. 마감 +14일까지만 열람할 수 있고, +15일이
-            지나면 저절로 지워집니다.
+            지나면 저절로 지워져요.
           </div>
         </div>
 
@@ -183,7 +183,7 @@ export function Shipping() {
               >
                 <div className="ad-sub" style={{ maxWidth: '38em' }}>
                   지우면 되돌릴 수 없어요. 다른 곳에 사본이 없고, 손님도 자기가 넣은 내용을 다시 볼 수
-                  없습니다.
+                  없어요.
                 </div>
                 <button
                   type="button"

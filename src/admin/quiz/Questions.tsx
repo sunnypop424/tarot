@@ -123,7 +123,7 @@ export function Questions() {
             공개 {open.length}문항 · 만점 {maxScore}점
           </span>
         </div>
-        <p className="ad-head__desc">문항과 운영 방식을 관리합니다.</p>
+        <p className="ad-head__desc">문항과 운영 방식을 관리해요.</p>
       </header>
 
       <div className="ad-stack">
@@ -208,7 +208,7 @@ export function Questions() {
                       if (
                         !(await confirmAction({
                           title: '이 문항을 지울까요?',
-                          desc: '이미 응시한 분들의 점수는 그대로 남습니다. 문항만 사라져요.',
+                          desc: '이미 응시한 분들의 점수는 그대로 남아요. 문항만 사라져요.',
                           okLabel: '지우기',
                           danger: true,
                         }))
@@ -234,7 +234,7 @@ export function Questions() {
         <div className="ad-card ad-card--form">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
             {choice(
-              '보상',
+              '선물',
               '응모로 정하면 응모 때 받을 정보를 고를 수 있어요.',
               settings.rewardMode,
               [
@@ -311,14 +311,14 @@ export function Questions() {
 
             {choice(
               '다시 풀기',
-              rewardOn ? '보상이 있으면 켤 수 없어요. 될 때까지 풀면 모두가 당첨돼요.' : '',
+              rewardOn ? '선물이 있으면 켤 수 없어요. 될 때까지 풀면 모두가 당첨돼요.' : '',
               settings.allowRetry ? 'on' : 'off',
               [
                 { v: 'on' as const, n: '여러 번 풀 수 있어요' },
                 { v: 'off' as const, n: '한 번만' },
               ],
               (v) => void saveSettings({ ...settings, allowRetry: v === 'on' }),
-              rewardOn ? '보상이 있으면 다시 풀기를 켤 수 없어요' : undefined
+              rewardOn ? '선물이 있으면 다시 풀기를 켤 수 없어요' : undefined
             )}
 
             {choice(
@@ -368,7 +368,7 @@ export function Questions() {
                   })}
                 </div>
                 <p className="ad-fine" style={{ marginTop: 12 }}>
-                  안 켠 항목은 아예 받지 않아요. 닉네임은 항상 받습니다.
+                  안 켠 항목은 아예 받지 않아요. 닉네임은 항상 받아요.
                 </p>
               </div>
             )}
@@ -420,13 +420,13 @@ function Editor({
           <h1 className="ad-head__title">문항 {initial.body ? '고치기' : '추가'}</h1>
         </div>
         <p className="ad-head__desc">
-          정답은 손님 화면에 한 번도 내려가지 않아요. 채점은 서버가 합니다.
+          정답은 손님 화면에 한 번도 내려가지 않아요. 채점은 서버가 해요.
         </p>
       </header>
 
       <div className="ad-stack">
         <div className="ad-banner ad-banner--info">
-          정답은 손님 화면에 한 번도 내려가지 않아요. 채점은 서버가 합니다.
+          정답은 손님 화면에 한 번도 내려가지 않아요. 채점은 서버가 해요.
         </div>
 
         <div className="ad-card ad-card--form">

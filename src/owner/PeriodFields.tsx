@@ -93,7 +93,7 @@ export function PeriodFields({
       <RangeRow
         name="rent"
         label="대여 기간"
-        hint="실제로 여는 기간이에요. 이 날짜가 지나면 주최자도 못 들어옵니다."
+        hint="실제로 여는 기간이에요. 이 날짜가 지나면 주최자도 못 들어와요."
         value={period?.rent}
         onChange={(rent) => onChange({ ...period, rent })}
         disabled={disabled}

@@ -99,7 +99,7 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
     if (
       !confirm(
         // 겸업 주최자면 **다른 슬롯 로그인도 같이** 바뀐다 — 계정이 하나이기 때문이다
-        `${o.email} 의 비밀번호를 새로 발급할까요?\n지금 쓰던 비밀번호는 그 즉시 못 씁니다.\n그 계정이 맡은 다른 슬롯의 로그인도 같이 바뀝니다.`
+        `${o.email} 의 비밀번호를 새로 발급할까요?\n지금 쓰던 비밀번호는 그 즉시 못 써요.\n그 계정이 맡은 다른 슬롯의 로그인도 같이 바뀌어요.`
       )
     ) {
       return
@@ -155,7 +155,7 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
 
   function handleRemove(o: Organizer) {
     // 되돌릴 수 없다. 다른 슬롯도 맡고 있으면 이 슬롯에서만 빠지고 계정은 남는다 (서버가 판단한다)
-    if (!confirm(`${o.email} 을 이 슬롯에서 뺄까요?\n이 슬롯의 관리 화면에 더는 못 들어옵니다.`)) {
+    if (!confirm(`${o.email} 을 이 슬롯에서 뺄까요?\n이 슬롯의 관리 화면에 더는 못 들어와요.`)) {
       return
     }
     void run(() => repo.organizers.remove(slug, o.userId), '계정을 빼지 못했어요')
@@ -169,7 +169,7 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
       <h2 className="t-title-s owner-section__title">주최자 계정</h2>
       <p className="t-text-xs t-muted">
         이 슬롯의 <b>/{slug}/admin</b> 에 들어갈 계정이에요. 주최자는 운영 데이터만 만지고 테마는 못
-        건드립니다. <b>만들면 그 자리에서 반영돼요</b> — 저장하기를 누르지 않아도 바로 씁니다.
+        건드려요. <b>만들면 그 자리에서 반영돼요</b> — 저장하기를 누르지 않아도 바로 써요.
       </p>
 
       {/**
@@ -180,7 +180,7 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
       <p className="t-text-xs t-muted" style={{ marginTop: 'var(--space-xs)' }}>
         타로와 럭키드로우를 함께 하시는 주최자라면, 다른 슬롯에서 쓰던 <b>같은 이메일</b>을 넣어
         주세요. 새로 만들지 않고 그 계정에 이 슬롯을 더해 드려요 (이때 비밀번호 칸은 무시되고
-        쓰던 비밀번호가 그대로 유지됩니다).
+        쓰던 비밀번호가 그대로 유지돼요).
       </p>
 
       {slugPending && (
@@ -213,7 +213,7 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
             </span>
             <span className="t-text-xs t-muted">
               비밀번호(<b className={styles.issuedValue}>{issued.password}</b>)는 지금만 볼 수 있어요 —
-              닫으면 다시 못 봅니다.
+              닫으면 다시 못 봐요.
             </span>
           </div>
           <textarea

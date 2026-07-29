@@ -38,7 +38,7 @@ export function Board() {
         <span className="ad-head__count tnum">칸 {count}개</span>
       </div>
       <p className="ad-head__desc">
-        각 칸의 현장 암호와 운영 방식을 정합니다. 칸 구성은 담당자가 만들어 드려요.
+        각 칸의 현장 암호와 운영 방식을 정해요. 칸 구성은 담당자가 만들어 드려요.
       </p>
     </header>
   )
@@ -114,7 +114,7 @@ export function Board() {
           <div className="ad-banner__title">이 목록의 규칙</div>
           <div className="ad-banner__body">
             암호를 비워 두면 그 칸은 손님에게 잠긴 채로 보여요. 암호가 새면 새로 만들기로 바꾸세요 —
-            바꾸면 예전 암호는 바로 안 먹습니다. 칸 이름과 순서는 담당자가 정합니다.
+            바꾸면 예전 암호는 바로 안 먹어요. 칸 이름과 순서는 담당자가 정해요.
           </div>
         </div>
 
@@ -137,7 +137,7 @@ export function Board() {
             <div className="ad-empty">
               <div className="ad-empty__title">아직 스탬프 칸이 없어요</div>
               <div className="ad-empty__sub">
-                칸 구성은 담당자가 정합니다 — 필요하시면 말씀해 주세요.
+                칸 구성은 담당자가 정해요 — 필요하시면 말씀해 주세요.
               </div>
             </div>
           ) : (
@@ -189,7 +189,7 @@ export function Board() {
         </div>
 
         <div>
-          <span className="ad-note">바꾸면 바로 저장돼요 · 저장 버튼이 없습니다</span>
+          <span className="ad-note">바꾸면 바로 저장돼요 · 저장 버튼이 없어요</span>
         </div>
 
         <div className="ad-card ad-card--form">
@@ -199,7 +199,7 @@ export function Board() {
               '응모로 정하면 응모 때 받을 정보를 고를 수 있어요.',
               settings.rewardMode,
               [
-                { v: 'none' as const, n: '보상 없음 (축하 화면만)' },
+                { v: 'none' as const, n: '선물 없음 (축하 화면만)' },
                 { v: 'guaranteed' as const, n: '확정 선물 (교환권 발급)' },
                 { v: 'raffle' as const, n: '응모 (나중에 추첨)' },
               ],
@@ -219,14 +219,14 @@ export function Board() {
                   onBlur={() => void save(settings)}
                 />
                 <p className="ad-field__hint">
-                  확정이면 손님 폰에 교환코드가 뜨고, 스태프가 ‘수령 확인’ 에서 처리합니다.
+                  확정이면 손님 폰에 교환코드가 뜨고, 스태프가 ‘수령 확인’ 에서 처리해요.
                 </p>
               </div>
             )}
 
             {choice(
               '날짜별 참여',
-              '매일 새로면 하루 안에 다 모아야 해요. 여러 카페를 도는 랠리면 ‘한 번만’ 이 맞습니다.',
+              '매일 새로면 하루 안에 다 모아야 해요. 여러 카페를 도는 랠리면 ‘한 번만’ 이 맞아요.',
               settings.dailyReset ? 'on' : 'off',
               [
                 { v: 'off' as const, n: '한 번만 (계속 모아요)' },
@@ -282,8 +282,8 @@ export function Board() {
                   })}
                 </div>
                 <p className="ad-fine" style={{ marginTop: 12 }}>
-                  안 켠 항목은 아예 받지 않아요 — 쓰지 않을 개인정보를 모아두지 않는 게 안전합니다.
-                  닉네임은 항상 받습니다.
+                  안 켠 항목은 아예 받지 않아요 — 쓰지 않을 개인정보를 모아두지 않는 게 안전해요.
+                  닉네임은 항상 받아요.
                 </p>
               </div>
             )}

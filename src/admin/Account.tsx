@@ -54,7 +54,7 @@ export function Account() {
         <div className="ad-head__row">
           <h1 className="ad-head__title">내 계정</h1>
         </div>
-        <p className="ad-head__desc">이 행사에서 쓰는 내 비밀번호를 바꿉니다.</p>
+        <p className="ad-head__desc">이 행사에서 쓰는 내 비밀번호를 바꿔요.</p>
       </header>
 
       <div className="ad-stack">
@@ -85,7 +85,7 @@ export function Account() {
 
         <div className="ad-card ad-card--form">
           <div className="ad-card__title ad-card__title--lg">비밀번호 바꾸기</div>
-          <p className="ad-card__desc">바꾸면 다음 로그인부터 새 비밀번호를 씁니다.</p>
+          <p className="ad-card__desc">바꾸면 다음 로그인부터 새 비밀번호를 써요.</p>
 
           <div className="ad-formgrid" style={{ marginTop: 18 }}>
             <div>

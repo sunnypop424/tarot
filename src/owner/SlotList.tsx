@@ -164,10 +164,10 @@ export function SlotList() {
    */
   async function handleDuplicate(source: Slot) {
     const next = prompt(
-      `'${source.name}' 을 복제합니다.
+      `'${source.name}' 을 복제해요.
 색·이미지·서비스 설정만 가져오고 데이터(질문·카드·응모·기록)는 안 따라와요.
 ` +
-        `이미지는 원본과 같은 파일을 가리켜요 — 원본을 지우면 새 슬롯에서 다시 올려야 합니다.
+        `이미지는 원본과 같은 파일을 가리켜요 — 원본을 지우면 새 슬롯에서 다시 올려야 해요.
 
 새 슬러그를 적어 주세요:`,
       `${source.slug}-2`
@@ -199,8 +199,8 @@ export function SlotList() {
       !confirm(
         `${target.name} (/${target.slug}) 슬롯을 지울까요?\n` +
           (deep
-            ? `질문·답변, 주최자 계정, 올린 이미지까지 전부 지워집니다.\n되돌릴 수 없어요.`
-            : `질문·답변도 함께 지워집니다.\n올린 이미지 파일은 public/slots/${target.slug}/ 에 그대로 남습니다.`)
+            ? `질문·답변, 주최자 계정, 올린 이미지까지 전부 지워져요.\n되돌릴 수 없어요.`
+            : `질문·답변도 함께 지워져요.\n올린 이미지 파일은 public/slots/${target.slug}/ 에 그대로 남아요.`)
       )
     )
       return
@@ -370,8 +370,8 @@ export function SlotList() {
             <h1 style={{ margin: '0 0 5px', fontSize: 23, fontWeight: 700, letterSpacing: '-0.02em' }}>슬롯</h1>
             <p style={{ margin: 0, fontSize: 13, color: INK3 }}>
               {hasSupabase
-                ? '만들거나 고치면 바로 반영돼요 — 손님이 그 주소로 들어올 수 있습니다.'
-                : '지금은 이 브라우저에만 저장돼요 (Supabase 미설정). 내보낸 slots.json 을 레포에 넣어야 배포됩니다.'}
+                ? '만들거나 고치면 바로 반영돼요 — 손님이 그 주소로 들어올 수 있어요.'
+                : '지금은 이 브라우저에만 저장돼요 (Supabase 미설정). 내보낸 slots.json 을 레포에 넣어야 배포돼요.'}
             </p>
           </div>
           <div style={{ display: 'flex', gap: 14, fontSize: 12, color: INK3 }}>
@@ -412,7 +412,7 @@ export function SlotList() {
           >
             <Plus size={16} strokeWidth={2.2} color={PURPLE} aria-hidden="true" />
             <span style={{ fontSize: 14, fontWeight: 700, color: '#5a45c9' }}>새 슬롯 만들기</span>
-            <span style={{ fontSize: 11.5, color: '#9184e3' }}>만들면 바로 편집 화면으로 들어갑니다</span>
+            <span style={{ fontSize: 11.5, color: '#9184e3' }}>만들면 바로 편집 화면으로 들어가요</span>
           </div>
           <div style={{ padding: 20 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1.3fr 0.85fr', gap: 16 }}>

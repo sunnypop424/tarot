@@ -82,7 +82,7 @@ export const SERVICES: LandingService[] = [
   {
     key: 'photocard',
     name: '포토카드 뽑기',
-    desc: '레어도 가챠. 저장용·1장 증정·판매 세 가지로 굴려요.',
+    desc: '레어도 뽑기. 저장용·1장 증정·판매 세 가지로 굴려요.',
     deviceNote: '방문자 폰 + 스태프 기기',
     group: 0,
     /**

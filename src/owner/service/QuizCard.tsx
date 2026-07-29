@@ -76,8 +76,8 @@ export function QuizCard({
   return (
     <Card title="최애 모의고사">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-        문제를 풀면 점수대별 <b>칭호 카드</b>가 나오고, 손님이 그걸 저장해 자랑합니다.{' '}
-        <b>문항과 정답은 주최자가 관리 화면에서 만듭니다</b> — 여기서는 칭호와 겉모습만 정해요.
+        문제를 풀면 점수대별 <b>칭호 카드</b>가 나오고, 손님이 그걸 저장해 자랑해요.{' '}
+        <b>문항과 정답은 주최자가 관리 화면에서 만들어요</b> — 여기서는 칭호와 겉모습만 정해요.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
@@ -121,13 +121,13 @@ export function QuizCard({
           </button>
         </div>
         <p style={{ margin: '0 0 12px', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
-          기준은 <b>백분율</b>이에요 — 문항 수가 바뀌어도 칭호가 그대로 맞습니다. (절대 점수로 두면
+          기준은 <b>백분율</b>이에요 — 문항 수가 바뀌어도 칭호가 그대로 맞아요. (절대 점수로 두면
           문항 하나만 지워도 아무도 최고 칭호를 못 받아요.)
           <br />
-          가장 낮은 칭호는 <b>0%</b> 로 두세요. 그래야 모든 손님이 무언가는 받습니다.
+          가장 낮은 칭호는 <b>0%</b> 로 두세요. 그래야 모든 손님이 무언가는 받아요.
           <br />
           칭호마다 <b>그림(투명 PNG)</b>을 올릴 수 있어요 &mdash; 칭호 <b>위</b>에 뜨고,{' '}
-          <b>손님이 저장하는 칭호 카드에도 같이 들어갑니다.</b>
+          <b>손님이 저장하는 칭호 카드에도 같이 들어가요.</b>
         </p>
         {error && <p style={{ margin: '0 0 10px', fontSize: 11.5, color: '#b4443c' }}>{error}</p>}
         <input
@@ -230,7 +230,7 @@ export function QuizCard({
         <Field label="칭호 카드 위 작은 글씨" hint="시안 기본값은 MY TITLE 이에요.">
           <input value={d.resultKicker} onChange={(e) => patch({ resultKicker: e.target.value })} style={CSS.input} />
         </Field>
-        <Field label="칭호 카드 아래 한 줄" hint="보통 이벤트 주소를 적어요 — 저장된 이미지가 퍼질 때 출처가 됩니다.">
+        <Field label="칭호 카드 아래 한 줄" hint="보통 이벤트 주소를 적어요 — 저장된 이미지가 퍼질 때 출처가 돼요.">
           <input
             value={d.cardFooter}
             onChange={(e) => patch({ cardFooter: e.target.value })}
@@ -280,7 +280,7 @@ export function QuizCard({
           name="quiz-logo"
           value={d.logo || null}
           onChange={(v) => patch({ logo: v ?? '' })}
-          hint="시작 화면과 칭호 카드에 함께 떠요 (저장되는 이미지에도 들어갑니다)."
+          hint="시작 화면과 칭호 카드에 함께 떠요 (저장되는 이미지에도 들어가요)."
         />
         <Field label="시작 화면 정렬">
           <select

@@ -103,7 +103,7 @@ export function Overview() {
     }
     const ok = await confirmAction({
       title: '이 상품을 지울까요?',
-      desc: `“${target.name || '이름 없는 상품'}” 을 목록에서 뺍니다. 아래 등수가 하나씩 당겨지며 다시 매겨져요. 이미 뽑힌 기록은 남습니다.`,
+      desc: `“${target.name || '이름 없는 상품'}” 을 목록에서 빼요. 아래 등수가 하나씩 당겨지며 다시 매겨져요. 이미 뽑힌 기록은 남아요.`,
       okLabel: '지우기',
       danger: true,
     })
@@ -120,7 +120,7 @@ export function Overview() {
     if (key === 'rehearsal' && settings.rehearsal) {
       const ok = await confirmAction({
         title: '실제 운영으로 바꿀까요?',
-        desc: '지금부터 뽑을 때마다 재고가 실제로 줄어듭니다. 리허설에서 뽑은 기록은 재고에 반영되지 않아요.',
+        desc: '지금부터 뽑을 때마다 재고가 실제로 줄어들어요. 리허설에서 뽑은 기록은 재고에 반영되지 않아요.',
         okLabel: '실제 운영으로',
         danger: true,
       })
@@ -131,7 +131,7 @@ export function Overview() {
     if (key === 'closed' && !settings.closed) {
       const ok = await confirmAction({
         title: '행사를 마감할까요?',
-        desc: '손님이 더 이상 뽑을 수 없게 됩니다. 다시 열 수 있지만, 마감 안내가 손님 화면에 바로 뜹니다.',
+        desc: '손님이 더 이상 뽑을 수 없게 돼요. 다시 열 수 있지만, 마감 안내가 손님 화면에 바로 떠요.',
         okLabel: '마감하기',
         danger: true,
       })
@@ -149,7 +149,7 @@ export function Overview() {
     if (!settings.batchCapEnabled) {
       const ok = await confirmAction({
         title: '묶음 뽑기 제한을 켤까요?',
-        desc: '흔한 상품이 덜 나오는 만큼 비싼 상품이 더 빨리 소진됩니다. 상품 표에 “5개당 최대” 열이 생겨요.',
+        desc: '흔한 상품이 덜 나오는 만큼 비싼 상품이 더 빨리 소진돼요. 상품 표에 “5개당 최대” 열이 생겨요.',
         okLabel: '켜기',
       })
       if (!ok) return
@@ -181,7 +181,7 @@ export function Overview() {
     if (!anyDirty) return
     const ok = await confirmAction({
       title: '바꾼 내용을 버릴까요?',
-      desc: '저장하지 않은 변경이 모두 사라집니다.',
+      desc: '저장하지 않은 변경이 모두 사라져요.',
       okLabel: '버리기',
       danger: true,
     })
@@ -228,7 +228,7 @@ export function Overview() {
           <span className="ad-head__count tnum">상품 {rows.length}종</span>
         </div>
         <p className="ad-head__desc">
-          재고와 운영 방식을 함께 봅니다. 이 화면만 아래 저장을 눌러야 반영돼요.
+          재고와 운영 방식을 함께 봐요. 이 화면만 아래 저장을 눌러야 반영돼요.
         </p>
       </header>
 
@@ -426,7 +426,7 @@ export function Overview() {
               <div className="ad-switchrow__text">
                 <div className="ad-switchrow__name">설정 잠금</div>
                 <div className="ad-switchrow__hint">
-                  상품과 수량만 못 고치게 잠가요. 뽑기는 그대로 됩니다.
+                  상품과 수량만 못 고치게 잠가요. 뽑기는 그대로 돼요.
                 </div>
               </div>
               <button
@@ -442,7 +442,7 @@ export function Overview() {
 
         <div className="ad-card">
           <div className="ad-card__title">당첨 결과 표시</div>
-          <p className="ad-card__desc">뽑은 손님 화면에 무엇으로 보일지 정합니다.</p>
+          <p className="ad-card__desc">뽑은 손님 화면에 무엇으로 보일지 정해요.</p>
           <div className="ad-choices" style={{ marginTop: 12 }}>
             {(
               [

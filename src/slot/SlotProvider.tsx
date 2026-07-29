@@ -134,7 +134,7 @@ export function SlotProvider({ children }: { children: ReactNode }) {
 // eslint-disable-next-line react-refresh/only-export-components
 export function useSlot(): Slot {
   const state = useContext(SlotContext)
-  if (state.status !== 'ready') throw new Error('useSlot 은 슬롯이 준비된 뒤에만 쓸 수 있습니다')
+  if (state.status !== 'ready') throw new Error('useSlot 은 슬롯이 준비된 뒤에만 쓸 수 있어요')
   return state.slot
 }
 

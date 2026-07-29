@@ -88,7 +88,7 @@ export function Polls() {
     const total = p.options.reduce((n, o) => n + o.votes, 0)
     const ok = await confirmAction({
       title: '이 설문을 지울까요?',
-      desc: total > 0 ? `받은 ${total.toLocaleString()}표도 함께 사라집니다.` : '아직 받은 표가 없어요.',
+      desc: total > 0 ? `받은 ${total.toLocaleString()}표도 함께 사라져요.` : '아직 받은 표가 없어요.',
       okLabel: '지우기',
       danger: true,
     })
@@ -121,7 +121,7 @@ export function Polls() {
     if (!dirty) return
     const ok = await confirmAction({
       title: '바꾼 내용을 버릴까요?',
-      desc: '저장하지 않은 변경이 모두 사라집니다.',
+      desc: '저장하지 않은 변경이 모두 사라져요.',
       okLabel: '버리기',
       danger: true,
     })
@@ -138,14 +138,14 @@ export function Polls() {
           <span className="ad-head__count tnum">설문 {drafts.length}개</span>
         </div>
         <p className="ad-head__desc">
-          공개하면 손님 화면에 바로 나오고 표는 실시간으로 쌓입니다.
+          공개하면 손님 화면에 바로 나오고 표는 실시간으로 쌓이에요.
         </p>
       </header>
 
       <div className="ad-stack">
         <div className="ad-banner ad-banner--info">
           공개하면 손님 화면에 바로 나오고 표는 실시간으로 쌓여요. 여러 줄을 고치는 동안 손님이 중간
-          상태를 보지 않도록, 이 화면은 저장을 눌러야 반영됩니다.
+          상태를 보지 않도록, 이 화면은 저장을 눌러야 반영돼요.
         </div>
 
         <div className="ad-card__head" style={{ marginBottom: 0 }}>

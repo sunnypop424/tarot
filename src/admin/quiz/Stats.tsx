@@ -33,7 +33,7 @@ export function Stats() {
         {data && <span className="ad-head__count tnum">응시 {data.attempts}명</span>}
       </div>
       <p className="ad-head__desc">
-        어느 문항이 어려웠는지 보고, 인정할 답을 더한 뒤 다시 채점합니다.
+        어느 문항이 어려웠는지 보고, 인정할 답을 더한 뒤 다시 채점해요.
       </p>
     </header>
   )
@@ -59,7 +59,7 @@ export function Stats() {
   async function rescore() {
     const ok = await confirmAction({
       title: '다시 채점할까요?',
-      desc: '이미 응시한 분들의 점수도 함께 고쳐집니다. 인정할 답을 더한 뒤에 눌러 주세요.',
+      desc: '이미 응시한 분들의 점수도 함께 고쳐져요. 인정할 답을 더한 뒤에 눌러 주세요.',
       okLabel: '다시 채점',
     })
     if (!ok) return
@@ -118,7 +118,7 @@ export function Stats() {
           </div>
           <p className="ad-sub" style={{ marginBottom: 18 }}>
             정답률이 낮은 주관식은 표현 차이일 때가 많아요. 인정할 답을 더한 뒤 다시 채점하면 이미
-            응시하신 분들의 점수도 함께 고쳐집니다.
+            응시하신 분들의 점수도 함께 고쳐져요.
           </p>
 
           {data.questions.length === 0 ? (

@@ -97,7 +97,7 @@ export function Dashboard() {
           <span className="ad-head__count">{serviceName}</span>
         </div>
         <p className="ad-head__desc">
-          오늘 이 행사에서 무엇이 얼마나 돌고 있는지 한눈에 봅니다.
+          오늘 이 행사에서 무엇이 얼마나 돌고 있는지 한눈에 봐요.
         </p>
       </header>
 

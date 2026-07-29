@@ -280,7 +280,7 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   coverMark: '♥',
   lowStockThreshold: 50,
   drawLabel: 'DRAW!',
-  closedText: '럭키드로우가 마감되었습니다',
+  closedText: '럭키드로우가 마감됐어요',
   footerNote: '',
   // 원본 빌더의 기본값 그대로 (160px / 2rem)
   boxTopMargin: 160,

@@ -142,7 +142,7 @@ export function Redeem() {
             발급 {guaranteed.length}건 · 수령 {done.length}건
           </span>
         </div>
-        <p className="ad-head__desc">손님이 보여준 코드를 입력해 실물 수령을 처리합니다.</p>
+        <p className="ad-head__desc">손님이 보여준 코드를 입력해 실물 수령을 처리해요.</p>
       </header>
 
       <div className="ad-stack">
@@ -167,7 +167,7 @@ export function Redeem() {
         <form className="ad-card ad-card--form" onSubmit={(e) => void ask(e)} data-redeem-form>
           <div className="ad-card__title ad-card__title--lg">코드 확인하고 수령 처리</div>
           <p className="ad-card__desc">
-            손님 폰에 뜬 코드를 그대로 입력하세요. 소문자·하이픈·공백은 알아서 맞춰집니다.
+            손님 폰에 뜬 코드를 그대로 입력하세요. 소문자·하이픈·공백은 알아서 맞춰져요.
           </p>
 
           <div className="ad-inline" style={{ marginTop: 16 }}>

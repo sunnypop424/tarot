@@ -43,7 +43,7 @@ export function Cards() {
         {rows && <span className="ad-head__count tnum">{rows.length}종</span>}
       </div>
       <p className="ad-head__desc">
-        카드마다 레어도와 재고를 정합니다. 줄 안에서 바로 고칠 수 있어요.
+        카드마다 레어도와 재고를 정해요. 줄 안에서 바로 고칠 수 있어요.
       </p>
     </header>
   )
@@ -112,7 +112,7 @@ export function Cards() {
             <div className="ad-banner__title">연습 모드가 켜져 있어요</div>
             <div className="ad-banner__body">
               지금 뽑아도 재고가 줄지 않아요 — 전날 시연에서 한정 카드를 태우는 사고를 막으려고
-              기본으로 켜 둡니다. 행사 전에 꼭 꺼 주세요.
+              기본으로 켜 둬요. 행사 전에 꼭 꺼 주세요.
             </div>
           </div>
         )}
@@ -126,7 +126,7 @@ export function Cards() {
             </div>
           </div>
           <p className="ad-sub" style={{ marginBottom: 16 }}>
-            줄 안에서 바로 고칠 수 있어요. 고르면 바로 저장됩니다. 카드 이름과 이미지는 담당자가
+            줄 안에서 바로 고칠 수 있어요. 고르면 바로 저장돼요. 카드 이름과 이미지는 담당자가
             올려 드려요.
           </p>
 
@@ -134,7 +134,7 @@ export function Cards() {
             <div className="ad-empty">
               <div className="ad-empty__title">아직 카드가 없어요</div>
               <div className="ad-empty__sub">
-                이미지 등록은 담당자가 합니다. 원본을 보내 주시면 올려 드려요.
+                이미지 등록은 담당자가 해요. 원본을 보내 주시면 올려 드려요.
               </div>
             </div>
           ) : (
@@ -216,7 +216,7 @@ export function Cards() {
             <div className="ad-bullets">
               <div className="ad-bullet">재고를 비우면 무제한이에요.</div>
               <div className="ad-bullet">0이면 그 카드는 더 나오지 않아요.</div>
-              <div className="ad-bullet">레어도가 곧 확률이에요 — 숫자가 클수록 자주 나옵니다.</div>
+              <div className="ad-bullet">레어도가 곧 확률이에요 — 숫자가 클수록 자주 나와요.</div>
               <div className="ad-bullet">재고는 나올지 말지만 정하고 확률은 건드리지 않아요.</div>
               <div className="ad-bullet">
                 럭키는 스태프 화면 라인업에 별이 붙는 표시일 뿐, 확률이 아니에요.
@@ -248,7 +248,7 @@ export function Cards() {
                   if (settings.mode === mode) return
                   const ok = await confirmAction({
                     title: '운영 방식을 바꿀까요?',
-                    desc: `“${label}” 으로 바꾸면 손님 화면이 통째로 달라집니다. 행사 중에는 바꾸지 마세요.`,
+                    desc: `“${label}” 으로 바꾸면 손님 화면이 통째로 달라져요. 행사 중에는 바꾸지 마세요.`,
                     okLabel: '바꾸기',
                     danger: true,
                   })
@@ -288,7 +288,7 @@ export function Cards() {
                   <span className="ad-unit">회</span>
                 </div>
                 <p className="ad-field__hint">
-                  기기 기준이에요 — 브라우저 기록을 지우면 다시 뽑을 수 있습니다.
+                  기기 기준이에요 — 브라우저 기록을 지우면 다시 뽑을 수 있어요.
                 </p>
               </div>
             )}
@@ -374,7 +374,7 @@ export function Cards() {
                   <div className="ad-switchrow__name">묶음 상한</div>
                   <div className="ad-switchrow__hint">
                     켜면 한 묶음에 같은 카드가 몰리는 걸 막아요 — “10연차에 스페셜 5장” 같은 사고를
-                    막습니다.
+                    막아요.
                   </div>
                 </div>
                 <button

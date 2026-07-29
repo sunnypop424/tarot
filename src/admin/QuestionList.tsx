@@ -58,7 +58,7 @@ export function QuestionList() {
   async function handleRemove(q: Question) {
     const ok = await confirmAction({
       title: '이 질문을 지울까요?',
-      desc: `“${q.question.trim() || '제목 없음'}” 과 여기에 적어 둔 답변이 모두 사라집니다.`,
+      desc: `“${q.question.trim() || '제목 없음'}” 과 여기에 적어 둔 답변이 모두 사라져요.`,
       okLabel: '지우기',
       danger: true,
     })
@@ -83,7 +83,7 @@ export function QuestionList() {
           )}
         </div>
         <p className="ad-head__desc">
-          손님이 고를 질문과, 카드가 나왔을 때 보여줄 답변을 관리합니다.
+          손님이 고를 질문과, 카드가 나왔을 때 보여줄 답변을 관리해요.
         </p>
       </header>
 

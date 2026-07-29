@@ -102,7 +102,7 @@ export function Qr() {
         <div className="ad-head__row">
           <h1 className="ad-head__title">QR 만들기</h1>
         </div>
-        <p className="ad-head__desc">현장에 붙일 QR을 만들어 내려받습니다.</p>
+        <p className="ad-head__desc">현장에 붙일 QR을 만들어 내려받아요.</p>
       </header>
 
       <div className="ad-split">
@@ -166,7 +166,7 @@ export function Qr() {
               </div>
               <div className="ad-bullet">가로 5cm보다 작게 인쇄하면 잘 안 읽혀요.</div>
               <div className="ad-bullet">
-                손님용과 스태프·관리용을 같이 붙이면 손님이 관리 화면으로 들어옵니다.
+                손님용과 스태프·관리용을 같이 붙이면 손님이 관리 화면으로 들어와요.
               </div>
               {service === 'photocard' && (
                 <div className="ad-bullet">

@@ -36,7 +36,7 @@ const FIELDS = [
     range: '3–15',
     min: 3,
     max: 15,
-    hint: '말풍선마다 이 값의 ±30% 로 흩어져 하나씩 바뀝니다 (한꺼번에 안 바뀌어요).',
+    hint: '말풍선마다 이 값의 ±30% 로 흩어져 하나씩 바뀌어요 (한꺼번에 안 바뀌어요).',
   },
   {
     k: 'perPerson' as const,
@@ -45,7 +45,7 @@ const FIELDS = [
     range: '1–10',
     min: 1,
     max: 10,
-    hint: '3개면 대부분 만족하고, 10개면 한 사람 글이 화면을 채웁니다.',
+    hint: '3개면 대부분 만족하고, 10개면 한 사람 글이 화면을 채워요.',
   },
   {
     k: 'maxLength' as const,
@@ -54,7 +54,7 @@ const FIELDS = [
     range: '10–60',
     min: 10,
     max: 60,
-    hint: '40자가 말풍선에 예쁘게 들어가요. 60자는 글씨가 작아집니다.',
+    hint: '40자가 말풍선에 예쁘게 들어가요. 60자는 글씨가 작아져요.',
   },
 ]
 
@@ -99,14 +99,14 @@ export function Settings() {
           </span>
         </div>
         <p className="ad-head__desc">
-          상영 중에 바꿔도 그 자리에서 반영돼요. 고치면 바로 저장됩니다.
+          상영 중에 바꿔도 그 자리에서 반영돼요. 고치면 바로 저장돼요.
         </p>
       </header>
 
       <div className="ad-stack">
         <div>
           <span className="ad-note">
-            고치면 바로 저장돼요 · 상영 중에 바꿔도 그 자리에서 반영됩니다
+            고치면 바로 저장돼요 · 상영 중에 바꿔도 그 자리에서 반영돼요
           </span>
         </div>
 
@@ -159,7 +159,7 @@ export function Settings() {
               </button>
             ))}
           </div>
-          <p className="ad-field__hint">가운데를 이 비율만큼 비워 둡니다 — 영상이 뜨는 자리예요.</p>
+          <p className="ad-field__hint">가운데를 이 비율만큼 비워 둬요 — 영상이 뜨는 자리예요.</p>
 
           <div style={{ marginTop: 6 }}>
             <div className="ad-switchrow">
@@ -225,7 +225,7 @@ export function Settings() {
             </a>
           </div>
           <p className="ad-sub" style={{ marginTop: 16 }}>
-            검수는 왼쪽 ‘한마디’ 메뉴에서 합니다.
+            검수는 왼쪽 ‘한마디’ 메뉴에서 해요.
           </p>
         </div>
       </div>

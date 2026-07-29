@@ -362,7 +362,7 @@ function Write({
             )}
             {left > 0 && !closed && (
               <button type="button" className={styles.again} onClick={() => setDone(false)} data-again>
-                한마디 더 남기기 ({left}번 남음)
+                한마디 더 남기기 ({left}회 남음)
               </button>
             )}
           </div>

@@ -34,7 +34,7 @@ export function PickerFields({
     <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid #ededf2' }}>
       <span style={CSS.label}>수량 고르기</span>
       <p style={{ margin: '6px 0 12px', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
-        {hint} <b>비워두면 이 이벤트 색을 그대로 따라갑니다</b> — 따로 맞추고 싶을 때만 채우세요.
+        {hint} <b>비워두면 이 이벤트 색을 그대로 따라가요</b> — 따로 맞추고 싶을 때만 채우세요.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,180px),1fr))', gap: 14 }}>

@@ -191,7 +191,7 @@ export default function LuckydrawApp() {
       setPrizes(next.prizes)
     } catch (e) {
       // 마감·재고 부족·권한 없음 — 서버가 한국어로 답한다
-      setError(e instanceof Error ? e.message : '추첨하지 못했어요')
+      setError(e instanceof Error ? e.message : '뽑지 못했어요')
     } finally {
       setDrawing(false)
     }
@@ -284,7 +284,7 @@ export default function LuckydrawApp() {
                   </span>
                   <p className={styles.closedTitle}>{display.closedText}</p>
                   <p className={styles.closedSub}>
-                    참여해 주셔서 고맙습니다. 다음 이벤트에서 만나요!
+                    참여해 주셔서 고마워요. 다음 이벤트에서 만나요!
                   </p>
                 </div>
               ) : (

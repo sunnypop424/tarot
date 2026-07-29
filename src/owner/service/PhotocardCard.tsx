@@ -120,7 +120,7 @@ export function PhotocardCard({
     <Card title="포토카드 뽑기">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
         레어도에 따라 카드가 뽑히고, 운영 방식에 따라 손님 화면이 통째로 달라져요.{' '}
-        <b>레어도·재고·운영 방식은 주최자가 관리 화면에서 정합니다</b> — 여기서는 카드 이미지와
+        <b>레어도·재고·운영 방식은 주최자가 관리 화면에서 정해요</b> — 여기서는 카드 이미지와
         겉모습만 정해요.
       </p>
 
@@ -135,7 +135,7 @@ export function PhotocardCard({
         <Field label="덱 안내 문구">
           <input value={d.deckGuide} onChange={(e) => patch({ deckGuide: e.target.value })} style={CSS.input} />
         </Field>
-        <Field label="덱에 깔 뒷면 장수" hint="연출용이에요 — 실제 카드 종류와 상관없습니다 (3~21장).">
+        <Field label="덱에 깔 뒷면 장수" hint="연출용이에요 — 실제 카드 종류와 상관없어요 (3~21장).">
           <input
             type="number"
             min={3}
@@ -172,18 +172,18 @@ export function PhotocardCard({
           />
         </div>
         <p style={{ margin: '0 0 12px', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
-          여러 장을 한 번에 올릴 수 있어요. 파일 이름이 카드 이름이 됩니다.
+          여러 장을 한 번에 올릴 수 있어요. 파일 이름이 카드 이름이 돼요.
           <br />
           <b>이 목록은 저장하기와 무관하게 바로 반영돼요</b> (색·문구와 저장되는 곳이 달라서요).
           <br />
           <b style={{ color: '#8a5c17' }}>사용 권리를 확인한 이미지만 올려 주세요</b> — 초상권·저작권은
-          올리는 쪽의 책임입니다.
+          올리는 쪽의 책임이에요.
         </p>
         {error && <p style={{ margin: '0 0 10px', fontSize: 11.5, color: '#b4443c' }}>{error}</p>}
 
         {!cards ? null : cards.length === 0 ? (
           <div style={{ padding: '18px 14px', borderRadius: 8, border: '1px dashed #dcdce4', fontSize: 11.5, color: '#9a9a9a', textAlign: 'center' }}>
-            아직 카드가 없어요. 이미지를 올리면 여기에 줄이 생깁니다.
+            아직 카드가 없어요. 이미지를 올리면 여기에 줄이 생겨요.
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }} data-photocards>
@@ -217,7 +217,7 @@ export function PhotocardCard({
               </div>
             ))}
             <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
-              <b>레어도·재고·럭키는 주최자 관리 화면에서 정합니다</b> — 행사 중에 바뀌는 값이라
+              <b>레어도·재고·럭키는 주최자 관리 화면에서 정해요</b> — 행사 중에 바뀌는 값이라
               주최자가 직접 만질 수 있어야 해서요. 여기서는 이미지와 이름만 정해요.
             </p>
           </div>
@@ -316,7 +316,7 @@ export function PhotocardCard({
         <span style={CSS.label}>포토카드 미리보기 창</span>
         <p style={{ margin: '6px 0 12px', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
           스태프 화면에서 '포토카드 미리보기' 를 눌렀을 때 뜨는 창이에요.{' '}
-          <b>비워두면 이 이벤트 색을 그대로 따라갑니다.</b>
+          <b>비워두면 이 이벤트 색을 그대로 따라가요.</b>
         </p>
         <Divided min={230} gap={12}>
           <AlphaColor label="배경색" value={d.modalBg || slot.theme.colors.surface} onChange={(v) => patch({ modalBg: v })} />

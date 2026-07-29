@@ -12,7 +12,7 @@ import type { Slot } from '@/types/slot'
  */
 export const SERVICES = [
   { id: 'tarot', label: '타로', hint: '카드를 뽑고 해석을 본다' },
-  { id: 'luckydraw', label: '럭키드로우', hint: '스태프가 경품을 추첨한다' },
+  { id: 'luckydraw', label: '럭키드로우', hint: '스태프가 경품을 뽑는다' },
   { id: 'rolling', label: '롤링페이퍼', hint: '손님이 응원 메시지를 남긴다' },
   { id: 'photozone', label: '포토존', hint: '이벤트 프레임을 씌워 인증샷을 저장한다' },
   // 데이터는 롤링페이퍼와 공유한다 (같은 테이블·같은 repo) — 겉모습만 다르다. src/data/wish.ts
@@ -20,7 +20,7 @@ export const SERVICES = [
   { id: 'poll', label: '실시간 투표', hint: '즉석 투표하고 결과가 그 자리에서 차오른다' },
   { id: 'stamp', label: '방문 스탬프', hint: '현장 암호로 도장을 모으고 다 모으면 선물' },
   { id: 'quiz', label: '최애 모의고사', hint: '문제를 풀고 점수·칭호를 받는다' },
-  { id: 'photocard', label: '포토카드 뽑기', hint: '레어도 가챠 — 저장용·1장 증정·판매' },
+  { id: 'photocard', label: '포토카드 뽑기', hint: '레어도 뽑기 — 저장용·1장 증정·판매' },
   {
     id: 'cheer',
     label: '영상회 응원',

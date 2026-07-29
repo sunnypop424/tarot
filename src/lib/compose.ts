@@ -200,7 +200,7 @@ export function mint(canvas: HTMLCanvasElement, type = 'image/png'): Promise<Res
     } catch (e) {
       reject(
         new Error(
-          `캔버스가 오염돼 이미지를 만들지 못했어요 — 원격 이미지는 loadForCanvas() 로 받아야 합니다. (${String(e)})`
+          `캔버스가 오염돼 이미지를 만들지 못했어요 — 원격 이미지는 loadForCanvas() 로 받아야 해요. (${String(e)})`
         )
       )
     }

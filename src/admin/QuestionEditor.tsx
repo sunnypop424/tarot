@@ -146,8 +146,8 @@ export function QuestionEditor() {
       title: '생성한 답변을 저장할까요?',
       desc:
         overwrites > 0
-          ? `이미 써 두신 답변 ${overwrites}장이 덮어써집니다.`
-          : '검수한 내용 그대로 손님에게 나갑니다.',
+          ? `이미 써 두신 답변 ${overwrites}장이 덮어써져요.`
+          : '검수한 내용 그대로 손님에게 나가요.',
       okLabel: '저장',
       danger: overwrites > 0,
     })
@@ -225,7 +225,7 @@ export function QuestionEditor() {
               범위는 슬롯 설정이라 최고관리자만 바꾼다 — 여긴 결과만 알려준다 */}
           <p className="ad-card__desc">
             이 슬롯의 카드 범위({effDeck === 'major' ? '메이저 22장' : '전체 78장'})는 여기서 바꿀 수
-            없어요 · 한 장 뽑고 역방향 50%로 나옵니다.
+            없어요 · 한 장 뽑고 역방향 50%로 나와요.
           </p>
 
           <div style={{ marginTop: 18 }}>
@@ -327,7 +327,7 @@ export function QuestionEditor() {
                   className="ad-banner__body"
                   style={{ color: 'var(--ad-bad)', fontWeight: 700 }}
                 >
-                  이미 써 두신 답변 {overwrites}장이 덮어써집니다. 아래 표시된 줄에서 그 자리에서 고칠
+                  이미 써 두신 답변 {overwrites}장이 덮어써져요. 아래 표시된 줄에서 그 자리에서 고칠
                   수 있어요.
                 </div>
               )}
