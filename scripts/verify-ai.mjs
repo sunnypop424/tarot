@@ -27,7 +27,6 @@ try {
 } catch {
   /* .env.local 이 없으면 local 어댑터 */
 }
-const ADMIN_EMAIL = 'demo@example.com'
 const OWNER_EMAIL = 'owner@example.com'
 const ADMIN_PASSWORD = env.SEED_PASSWORD ?? 'tarot1234'
 
@@ -38,11 +37,11 @@ const ADMIN_PASSWORD = env.SEED_PASSWORD ?? 'tarot1234'
 const AI_BASE = env.VITE_AI_BASE ?? ''
 
 /** 씨앗 계정 토큰 — 답변 생성·색 만들기는 권한이 있어야 부를 수 있다 */
-const tokenFor = async (email) => {
+const tokenFor = async (email, password = ADMIN_PASSWORD) => {
   const r = await fetch(`${env.VITE_SUPABASE_URL}/auth/v1/token?grant_type=password`, {
     method: 'POST',
     headers: { apikey: env.VITE_SUPABASE_ANON_KEY, 'content-type': 'application/json' },
-    body: JSON.stringify({ email, password: ADMIN_PASSWORD }),
+    body: JSON.stringify({ email, password }),
   })
   return r.ok ? (await r.json()).access_token : null
 }
@@ -105,9 +104,116 @@ if (!status.ready) {
   process.exit(0)
 }
 
+/**
+ * ── 픽스처 — **이 검증이 직접 만들고 지운다** ──────────────────
+ *
+ * 예전엔 `demo`(프리미엄)·`sample-pink`(스탠다드) 슬롯이 DB 에 있다고 **가정**했다.
+ * 체험 슬롯이 `demo-*` 로 갈리면서 그 둘이 사라졌고, 그러자 이 스크립트는
+ * **"AI 리딩이 0자" 로 무너졌다** — 제품이 멀쩡한데 고장난 것처럼 보였다.
+ * (`demo-tarot` 은 무료 플랜이라 리딩을 정상적으로 거절한다.)
+ *
+ * 그래서 다른 verify 들처럼 **자기 픽스처를 자기가 만든다.** 이름도 `demo` 를 피한다 —
+ * DB 에 `demo` 를 되살리면 `/demo` 가 실제 주소가 되어 배포에 열린 문이 하나 생긴다.
+ *
+ * 설정값은 `src/data/slots.json` 의 그 두 슬롯에서 그대로 가져온다 (플랜·한도·애정운 3장).
+ */
+const SEED = (await import('../src/data/slots.json', { with: { type: 'json' } })).default
+const PAID = SEED.find((s) => s.slug === 'demo') // 프리미엄 — 리딩·답변 생성
+const LITE = SEED.find((s) => s.slug === 'sample-pink') // 스탠다드 — 애정운 3장 (폴백 확인용)
+const SLUG = 'aitest'
+const SLUG_LITE = 'aitest-lite'
+const ORGANIZER = 'aitest-organizer@example.com'
+const ORG_PASSWORD = 'verify-1234'
+
+const { VITE_SUPABASE_URL: sbUrl, VITE_SUPABASE_ANON_KEY: sbKey } = env
+if (!sbUrl || !sbKey) {
+  console.log('⚠ 이 검증은 Supabase 가 붙은 빌드를 전제로 해요 (.env.local 의 VITE_SUPABASE_*).')
+  console.log('  슬롯을 직접 심었다 지우기 때문입니다. 회귀가 아니라 설정이 없는 겁니다.')
+  process.exit(0)
+}
+
+const ownerAuth = await fetch(`${sbUrl}/auth/v1/token?grant_type=password`, {
+  method: 'POST',
+  headers: { apikey: sbKey, 'content-type': 'application/json' },
+  body: JSON.stringify({ email: OWNER_EMAIL, password: ADMIN_PASSWORD }),
+})
+const { access_token: ownerToken } = await ownerAuth.json()
+if (!ownerToken) {
+  console.error('최고관리자 로그인 실패 — SEED_PASSWORD 를 확인하세요')
+  process.exit(1)
+}
+const OWNER = { apikey: sbKey, authorization: `Bearer ${ownerToken}`, 'content-type': 'application/json' }
+const rest = (p, i = {}) => fetch(`${sbUrl}/rest/v1/${p}`, { ...i, headers: { ...OWNER, ...(i.headers ?? {}) } })
+/** 슬롯·주최자 계정·질문까지 통째로 — 수동 삭제와 같은 경로 (verify-admin 과 동일) */
+const adminFn = (p, body) =>
+  fetch(`${sbUrl}/functions/v1/admin/${p}`, { method: 'POST', headers: OWNER, body: JSON.stringify(body) })
+
+async function dropFixtures() {
+  for (const slug of [SLUG, SLUG_LITE]) {
+    await adminFn('purge', { slug }).catch(() => {})
+    await rest(`slots?slug=eq.${slug}`, { method: 'DELETE' }).catch(() => {})
+  }
+}
+
+await dropFixtures() // 지난 실행이 죽으며 남긴 게 있으면 먼저 치운다
+for (const [slug, src] of [
+  [SLUG, PAID],
+  [SLUG_LITE, LITE],
+]) {
+  const r = await rest('slots', {
+    method: 'POST',
+    headers: { prefer: 'return=minimal' },
+    body: JSON.stringify({
+      slug,
+      name: `AI 검증 · ${slug}`,
+      service: 'tarot',
+      plan: src.plan,
+      limits: src.limits,
+      /* 메이저 22장으로 줄인다 — 화면 절이 '전체 생성' 을 실제로 눌러 보는데,
+         78장이면 오래 걸리고 실제 비용이 든다. 검사는 덱 크기를 동적으로 읽는다 */
+      deck: 'major',
+      period: {},
+      theme: src.theme,
+      event: src.event,
+    }),
+  })
+  check(`픽스처 슬롯을 만든다 (${slug})`, r.ok, r.ok ? `${src.plan}` : await r.text())
+}
+
+/**
+ * 답변 생성은 **그 슬롯 주최자만** 부를 수 있다 (`manages_slot`). 그래서 계정도 만든다 —
+ * `slot_admins.user_id` 가 PK 라 한 계정은 한 슬롯만 맡는다. 그게 곧 "남의 슬롯은 못 만든다"
+ * 를 확인할 수 있는 이유다(이 계정은 `SLUG` 만 맡으므로 `SLUG_LITE` 에는 403 이 떨어진다).
+ */
+const madeOrg = await adminFn('organizers', { slug: SLUG, email: ORGANIZER, password: ORG_PASSWORD })
+check('픽스처 주최자 계정을 만든다', madeOrg.ok, madeOrg.ok ? '' : await madeOrg.text())
+
+/** 질문 하나 — 화면에서 "AI로 전체 생성" 을 눌러보는 절이 이걸 연다 (`/admin/questions/q-001`) */
+const madeQ = await rest('questions', {
+  method: 'POST',
+  headers: { prefer: 'return=minimal' },
+  body: JSON.stringify({
+    id: 'q-001',
+    slug: SLUG,
+    published: true,
+    data: {
+      id: 'q-001',
+      question: '올해 안에 좋은 일이 생길까요?',
+      published: true,
+      cardCount: 1,
+      deck: 'major',
+      spreadCount: null,
+      allowReversed: true,
+      fallbackAspect: 'general',
+      answers: {},
+    },
+  }),
+})
+check('픽스처 질문을 만든다', madeQ.ok, madeQ.ok ? '' : await madeQ.text())
+
 // ── 3장 리딩 — 순서대로 이어지는가 ──────────────────
 const spread = {
-  slug: 'demo',
+  slug: SLUG,
   category: '애정운',
   aspect: 'love',
   // 캐시(이제 DB에 산다)를 피해 실제로 생성시킨다 — 안 그러면 토큰을 못 잰다
@@ -204,8 +310,8 @@ check('플랜 없는 슬롯(=무료)은 AI 리딩 거부', freeSlot.status === 4
  * 개발 서버 미들웨어 시절엔 누구나 curl 로 부를 수 있었다 (docs/BACKEND.md §4-3 이 지목한 구멍).
  * 이제 그 슬롯 주최자만 부른다. 판정은 DB 의 manages_slot() 이 한다 — 서버가 우기는 게 아니라.
  */
-const adminToken = await tokenFor(ADMIN_EMAIL)
-const ownerToken = await tokenFor(OWNER_EMAIL)
+/* 픽스처 주최자로 — 이 계정이 SLUG 하나만 맡는다 (위 픽스처 절) */
+const adminToken = await tokenFor(ORGANIZER, ORG_PASSWORD)
 
 const genBody = (slug) => ({
   slug,
@@ -222,10 +328,10 @@ const postAs = (path, body, tok) =>
     body: JSON.stringify(body),
   })
 
-const genNoAuth = await postAs('answers', genBody('demo'))
+const genNoAuth = await postAs('answers', genBody(SLUG))
 check('로그인 없이는 답변 생성 거부', genNoAuth.status === 403, `${genNoAuth.status}`)
 
-const genOther = await postAs('answers', genBody('sample-pink'), adminToken)
+const genOther = await postAs('answers', genBody(SLUG_LITE), adminToken)
 check('남의 슬롯 답변은 못 만든다', genOther.status === 403, `${genOther.status}`)
 
 const themeNoAuth = await postAs('theme', { baseColor: '#FF6BA8', mode: 'dark' })
@@ -233,7 +339,6 @@ check('로그인 없이는 색 만들기 거부', themeNoAuth.status === 403, `$
 
 const themeAsAdmin = await postAs('theme', { baseColor: '#FF6BA8', mode: 'dark' }, adminToken)
 check('주최자는 색을 못 만든다 (최고관리자 전용)', themeAsAdmin.status === 403, `${themeAsAdmin.status}`)
-void ownerToken
 
 /**
  * **예산 상한 — 돈이 새는 걸 막는 유일한 자리.**
@@ -245,16 +350,11 @@ void ownerToken
  * 사용량은 **DB 에서 원자적으로** 깎인다 (claim_ai_usage) — 프로세스 메모리였을 땐
  * 재시작마다 예산이 리셋됐고, 읽고-검사-쓰기라 새로고침 연타에 뚫렸다.
  */
-const { VITE_SUPABASE_URL: sbUrl, VITE_SUPABASE_ANON_KEY: sbKey } = env
-if (sbUrl && sbKey) {
-  const auth = await fetch(`${sbUrl}/auth/v1/token?grant_type=password`, {
-    method: 'POST',
-    headers: { apikey: sbKey, 'content-type': 'application/json' },
-    body: JSON.stringify({ email: 'owner@example.com', password: ADMIN_PASSWORD }),
-  })
-  const { access_token: token } = await auth.json()
+{
+  // 최고관리자 토큰·sbUrl·sbKey 는 위 픽스처 절에서 이미 받았다
+  const token = ownerToken
   const setLimits = (limits) =>
-    fetch(`${sbUrl}/rest/v1/slots?slug=eq.demo`, {
+    fetch(`${sbUrl}/rest/v1/slots?slug=eq.${SLUG}`, {
       method: 'PATCH',
       headers: {
         apikey: sbKey,
@@ -264,7 +364,7 @@ if (sbUrl && sbKey) {
       body: JSON.stringify({ limits }),
     })
 
-  const before = (await (await fetch(`${sbUrl}/rest/v1/slots?slug=eq.demo&select=limits`, {
+  const before = (await (await fetch(`${sbUrl}/rest/v1/slots?slug=eq.${SLUG}&select=limits`, {
     headers: { apikey: sbKey, authorization: `Bearer ${token}` },
   })).json())[0].limits
 
@@ -275,16 +375,15 @@ if (sbUrl && sbKey) {
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ ...spread, question: `한도 ${RUN}`, drawn: spread.drawn.slice(0, 1) }),
   })
-  const seed = (await import('../src/data/slots.json', { with: { type: 'json' } })).default
   check(
     '한도를 DB 에서 읽는다 (slots.json 이 아니라)',
     capped.status === 402,
-    `${capped.status} — DB 한도 0, slots.json 은 ${seed.find((s) => s.slug === 'demo').limits.reading}`
+    `${capped.status} — DB 한도 0, 심은 값은 ${PAID.limits.reading}`
   )
 
   // 뒷정리 — 검증이 실제 슬롯의 한도를 바꿔놓고 가면 안 된다
   await setLimits(before)
-  const restored = (await (await fetch(`${sbUrl}/rest/v1/slots?slug=eq.demo&select=limits`, {
+  const restored = (await (await fetch(`${sbUrl}/rest/v1/slots?slug=eq.${SLUG}&select=limits`, {
     headers: { apikey: sbKey, authorization: `Bearer ${token}` },
   })).json())[0].limits
   check('뒷정리: 한도를 되돌림', restored.reading === before.reading, `reading=${restored.reading}`)
@@ -295,7 +394,7 @@ if (sbUrl && sbKey) {
 const answersRes = await postAs(
   'answers',
   {
-    slug: 'demo',
+    slug: SLUG,
     question: '지금 이직해도 괜찮을까요?',
     aspect: 'career',
     allowReversed: true,
@@ -338,7 +437,7 @@ if (!answersRes.ok) {
 }
 
 // ── 실제 화면 — 뽑고 나서 종합이 뜨는가 ──────────────
-// sample-pink 슬롯은 애정운이 3장으로 설정돼 있다 (slots.json)
+// 픽스처 LITE 슬롯은 애정운이 3장으로 설정돼 있다 (slots.json 의 sample-pink 를 복사)
 const outDir = process.argv[2] ?? '.'
 const chrome = [
   'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -371,7 +470,7 @@ page.on('request', async (req) => {
   void req.continue()
 })
 
-await page.goto(`${BASE}/sample-pink/draw/love`, { waitUntil: 'networkidle0' })
+await page.goto(`${BASE}/${SLUG_LITE}/draw/love`, { waitUntil: 'networkidle0' })
 await wait(400)
 
 const slots = await page.$$eval('[class*="slotEmpty"]', (e) => e.length)
@@ -429,7 +528,7 @@ page.on('request', (req) => {
   // AI 는 이제 Edge Function 이다 — 옛 주소(/__ai)를 보면 무조건 통과하는 가짜 검사가 된다
   if (req.url().startsWith(`${AI_BASE}/reading`)) calledAi = true
 })
-await page.goto(`${BASE}/sample-pink/draw/money`, { waitUntil: 'networkidle0' })
+await page.goto(`${BASE}/${SLUG_LITE}/draw/money`, { waitUntil: 'networkidle0' })
 await wait(400)
 const oneCard = await page.$$eval('[class*="slotEmpty"]', (e) => e.length)
 const cards1 = await page.$$('button[aria-label$="카드 고르기"]:not([disabled])')
@@ -451,13 +550,13 @@ check('1장 뽑기는 AI 를 아예 안 부름', !calledAi)
  */
 if (sbUrl && sbKey && ownerToken) {
   const patch = (limits) =>
-    fetch(`${sbUrl}/rest/v1/slots?slug=eq.sample-pink`, {
+    fetch(`${sbUrl}/rest/v1/slots?slug=eq.${SLUG_LITE}`, {
       method: 'PATCH',
       headers: { apikey: sbKey, authorization: `Bearer ${ownerToken}`, 'content-type': 'application/json' },
       body: JSON.stringify({ limits }),
     })
   const read = async () =>
-    (await (await fetch(`${sbUrl}/rest/v1/slots?slug=eq.sample-pink&select=limits`, {
+    (await (await fetch(`${sbUrl}/rest/v1/slots?slug=eq.${SLUG_LITE}&select=limits`, {
       headers: { apikey: sbKey, authorization: `Bearer ${ownerToken}` },
     })).json())[0].limits
 
@@ -465,13 +564,13 @@ if (sbUrl && sbKey && ownerToken) {
   await patch({ ...kept, reading: 0 })
 
   /**
-   * **반드시 되돌린다.** 여기서 죽으면 sample-pink 는 한도 0 인 채로 남고,
+   * **반드시 되돌린다.** 여기서 죽으면 픽스처는 한도 0 인 채로 남고,
    * 그 다음 실행은 "종합이 안 뜬다"로 엉뚱하게 무너진다 — 실제로 그렇게 무너져서 이 try 가 생겼다.
    */
   try {
   const fail = await browser.newPage()
   await fail.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true })
-  await fail.goto(`${BASE}/sample-pink/draw/love`, { waitUntil: 'networkidle0' })
+  await fail.goto(`${BASE}/${SLUG_LITE}/draw/love`, { waitUntil: 'networkidle0' })
   await wait(600)
   // 카드는 겹쳐 있다 — 맨 뒤(=맨 위) 것부터 집는다 (위 3장 흐름과 같은 규칙)
   for (let i = 0; i < 3; i++) {
@@ -496,7 +595,7 @@ if (sbUrl && sbKey && ownerToken) {
   } finally {
     await patch(kept)
     const back = await read()
-    check('뒷정리: sample-pink 한도 되돌림', back.reading === kept.reading, `reading=${back.reading}`)
+    check('뒷정리: 픽스처 한도 되돌림', back.reading === kept.reading, `reading=${back.reading}`)
   }
 }
 
@@ -517,27 +616,27 @@ const savedAnswers = async () => {
     const db = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY, {
       auth: { persistSession: false },
     })
-    await db.auth.signInWithPassword({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD })
+    await db.auth.signInWithPassword({ email: ORGANIZER, password: ORG_PASSWORD })
     const { data } = await db.from('questions').select('data').eq('id', 'q-001').maybeSingle()
     return Object.keys(data?.data?.answers ?? {}).length
   }
   return admin.evaluate(() => {
-    const raw = localStorage.getItem('tarot-pocket:admin:questions:demo')
+    const raw = localStorage.getItem(`tarot-pocket:admin:questions:${SLUG}`)
     if (!raw) return 0
     const q = JSON.parse(raw).find((x) => x.id === 'q-001')
     return Object.keys(q?.answers ?? {}).length
   })
 }
 
-await admin.goto(`${BASE}/demo/admin/login`, { waitUntil: 'networkidle0' })
+await admin.goto(`${BASE}/${SLUG}/admin/login`, { waitUntil: 'networkidle0' })
 // 인증이 진짜라 씨앗 계정으로 들어간다 (supabase/seed.sql · .env.local 의 SEED_PASSWORD)
-await admin.type('#admin-email', ADMIN_EMAIL)
-await admin.type('#admin-password', ADMIN_PASSWORD)
+await admin.type('#admin-email', ORGANIZER)
+await admin.type('#admin-password', ORG_PASSWORD)
 await admin.click('button[type=submit]')
 // 진짜 인증은 왕복이 있다 — 로컬 어댑터 때보다 넉넉히 기다린다
 await wait(2500)
 
-await admin.goto(`${BASE}/demo/admin/questions/q-001`, { waitUntil: 'networkidle0' })
+await admin.goto(`${BASE}/${SLUG}/admin/questions/q-001`, { waitUntil: 'networkidle0' })
 await wait(900)
 
 const genBtn = await admin.$('[data-generate]')
@@ -599,7 +698,7 @@ await admin.screenshot({ path: join(outDir, 'ai-admin-saved.png') })
 // 새 탭으로 — 앞의 탭은 요청 가로채기가 걸려 있어 섞이면 안 된다
 const visitor = await browser.newPage()
 await visitor.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true })
-await visitor.goto(`${BASE}/demo/question/q-001`, { waitUntil: 'networkidle0' })
+await visitor.goto(`${BASE}/${SLUG}/question/q-001`, { waitUntil: 'networkidle0' })
 await wait(500)
 
 const qCards = await visitor.$$('button[aria-label$="카드 고르기"]:not([disabled])')
@@ -616,12 +715,12 @@ const generatedTexts = await (async () => {
     const db = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY, {
       auth: { persistSession: false },
     })
-    await db.auth.signInWithPassword({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD })
+    await db.auth.signInWithPassword({ email: ORGANIZER, password: ORG_PASSWORD })
     const { data } = await db.from('questions').select('data').eq('id', 'q-001').maybeSingle()
     return Object.values(data?.data?.answers ?? {}).flatMap((a) => Object.values(a))
   }
   return admin.evaluate(() => {
-    const raw = localStorage.getItem('tarot-pocket:admin:questions:demo')
+    const raw = localStorage.getItem(`tarot-pocket:admin:questions:${SLUG}`)
     const q = JSON.parse(raw).find((x) => x.id === 'q-001')
     return Object.values(q.answers).flatMap((a) => Object.values(a))
   })
@@ -643,7 +742,7 @@ if (env.VITE_SUPABASE_URL && env.VITE_SUPABASE_ANON_KEY) {
   const db = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY, {
     auth: { persistSession: false },
   })
-  await db.auth.signInWithPassword({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD })
+  await db.auth.signInWithPassword({ email: ORGANIZER, password: ORG_PASSWORD })
   const { data: row } = await db.from('questions').select('data').eq('id', 'q-001').maybeSingle()
   if (row) {
     await db
@@ -687,6 +786,16 @@ if (measured.answers.length) {
   console.log(`  → 78장 1회 생성 $${(perCard * 78).toFixed(4)} (약 ${Math.round(perCard * 78 * 1400)}원)`)
 }
 console.log('════════════════════════════════════')
+
+/**
+ * 뒷정리 — **심은 걸 두고 가면 다음 실행이 엉뚱하게 무너진다.**
+ * (한도를 0 으로 낮춘 채 죽었던 적이 있어서 그 자리엔 이미 try/finally 가 있다.)
+ */
+await dropFixtures()
+const left = await Promise.all(
+  [SLUG, SLUG_LITE].map((slug) => rest(`slots?slug=eq.${slug}&select=slug`).then((r) => r.json()))
+)
+check('검증이 남긴 게 없다', left.every((rows) => rows.length === 0))
 
 const failed = checks.filter(([, ok]) => !ok).length + (errors.length ? 1 : 0)
 console.log(`\n${checks.length - checks.filter(([, ok]) => !ok).length} / ${checks.length} 통과`)
