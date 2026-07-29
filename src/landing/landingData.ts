@@ -81,7 +81,8 @@ export const SERVICES: LandingService[] = [
   {
     key: 'luckydraw',
     name: '럭키드로우',
-    desc: '스태프가 직접 경품을 추첨합니다. 등수, 잔여 재고 확인, 스크래치 연출까지 모두 지원합니다.',
+    // 노출어는 '뽑기' 다 — '추첨'·'가챠' 는 코드에만 (`docs/DESIGN.md` 「용어」)
+    desc: '스태프가 직접 경품을 뽑습니다. 등수, 잔여 재고 확인, 스크래치 연출까지 모두 지원합니다.',
     slug: '/demo-luckydraw',
     devices: [{ kind: 'tablet', label: '스태프 기기', path: '/demo-luckydraw' }],
   },
@@ -142,7 +143,8 @@ export const SERVICES: LandingService[] = [
   {
     key: 'stamp',
     name: '방문 스탬프',
-    desc: '현장 암호를 통해 스탬프를 모으고, 완성 시 리워드로 교환할 수 있습니다.',
+    // 노출어는 '선물' 이다 — '리워드'·'보상' 은 코드에만 (`docs/DESIGN.md` 「용어」)
+    desc: '현장 암호를 통해 스탬프를 모으고, 완성 시 선물로 교환할 수 있습니다.',
     slug: '/demo-stamp',
     devices: [{ kind: 'phone', label: '손님 폰', path: '/demo-stamp' }],
   },
@@ -208,7 +210,7 @@ export const ROLE_MINE = {
 }
 export const ROLE_YOURS = {
   label: '주최자께서 준비해 주실 일',
-  body: '페이지에 들어갈 텍스트(문항, 카드 내용 등) 작성, 디자인에 활용될 원본 로고 및 배경 이미지 제공, 경품 준비 및 재고 관리, 그리고 현장에서의 암호 안내와 실제 추첨 진행입니다.',
+  body: '페이지에 들어갈 텍스트(문항, 카드 내용 등) 작성, 디자인에 활용될 원본 로고 및 배경 이미지 제공, 경품 준비 및 재고 관리, 그리고 현장에서의 암호 안내와 실제 뽑기 진행입니다.',
 }
 /** 이 한 줄이 없으면 시안 단계에서 멈춘다 — 그래서 따로 세워 둔다 */
 export const ROLE_NOTE =
