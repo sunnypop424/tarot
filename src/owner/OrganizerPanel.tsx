@@ -302,7 +302,7 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
             className="input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="dino@example.com"
+            placeholder="rian@example.com"
             disabled={busy || slugPending}
             autoComplete="off"
             data-organizer-email

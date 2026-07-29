@@ -88,7 +88,7 @@ export interface ThemeAssets {
 
   /**
    * 카드 앞면 이미지 경로 규칙 — `{base}/{cardId}.webp` 로 조합한다.
-   * 예: '/themes/twice-2026/cards' → '/themes/twice-2026/cards/major-0.webp'
+   * 예: '/themes/moonset-2026/cards' → '/themes/moonset-2026/cards/major-0.webp'
    * null 이면 앞면 이미지 없이 텍스트로 표시한다.
    */
   cardFrontBase: string | null

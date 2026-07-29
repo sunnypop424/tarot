@@ -17,9 +17,9 @@ export default defineConfig(() => {
       slotAssets(),
     ],
     /**
-     * **절대 경로여야 한다.** 이 앱은 슬러그로 직접 들어온다(QR 이 곧 `/seventeen-dino`).
+     * **절대 경로여야 한다.** 이 앱은 슬러그로 직접 들어온다(QR 이 곧 `/starlit-rian`).
      * SPA 리라이트가 그 주소에 index.html 을 주는데, 자산이 `./assets/…` 면 브라우저는
-     * `/seventeen-dino/assets/…` 를 찾아 404 → 빈 화면이다. `/` 면 어느 깊이에서 들어와도 맞는다.
+     * `/starlit-rian/assets/…` 를 찾아 404 → 빈 화면이다. `/` 면 어느 깊이에서 들어와도 맞는다.
      */
     base: '/',
     server: {

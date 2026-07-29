@@ -524,7 +524,7 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
 }
 
 const SAMPLE: [string, string][] = [
-  ['민지', '오래오래 건강하게 노래해 줘'],
+  ['별하나', '오래오래 건강하게 노래해 줘'],
   ['', '올해도 무대에서 만나요'],
   ['해달', '생일 축하해 진심으로'],
   ['', '늘 웃는 하루만 가득하길'],

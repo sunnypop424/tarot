@@ -145,12 +145,12 @@ export default function Landing() {
           <p className={styles.p}>
             카페에 방문한 팬들이 QR 코드만 찍으면 스마트폰에서 바로 열리는 전용 웹페이지입니다.
             번거로운 앱 설치 없이,{' '}
-            <span className={styles.mk}>웹 주소 하나가 곧 하나의 특별한 이벤트가 됩니다.</span> 대기
+            <span className={styles.mk}>웹 페이지 하나가 곧 하나의 특별한 이벤트가 됩니다.</span> 대기
             줄에서도 30초면 참여할 수 있도록 직관적으로 설계되며, 행사 기간이 끝나면 페이지는
             안전하게 닫힙니다.
           </p>
           <p className={styles.p}>
-            행사의 컨셉과 분위기에 맞춰 맞춤형으로 페이지를 디자인한 후, 전용 웹 주소와 관리자
+            행사의 컨셉과 분위기에 맞춰 맞춤형으로 페이지를 디자인한 후, 전용 웹 페이지와 관리자
             계정을 함께 전달해 드립니다. 생일카페 주최가 처음이신 분들도 쉽게 운영하실 수 있도록
             꼼꼼하게 안내해 드립니다.
           </p>
@@ -282,7 +282,7 @@ export default function Landing() {
           </div>
 
           <p className={styles.stageNote}>
-            체험용이므로 입력하신 내용은 저장되지 않습니다. 화면이 작아 불편하시다면 스마트폰에서{' '}
+            체험용이므로 입력하신 내용은 저장되지 않습니다. 화면이 작아 불편하시다면{' '}
             <a className={styles.link} href={service.slug} target="_blank" rel="noreferrer">
               직접 열어 보시는 편
             </a>

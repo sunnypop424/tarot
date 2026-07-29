@@ -65,12 +65,12 @@ export interface SlotPeriod {
 /**
  * 슬롯 — 배포 하나에 여러 이벤트가 얹힌다.
  *
- * `/seventeen-dino` 가 그 슬롯의 루트가 되고, `/seventeen-dino/admin` 은
+ * `/starlit-rian` 가 그 슬롯의 루트가 되고, `/starlit-rian/admin` 은
  * 그 슬롯 주최자만 관리한다. 슬러그·테마·이벤트 설정은 **소유자가 정해서 배포**하고,
  * 주최자는 질문과 답변만 만진다.
  */
 export interface Slot {
-  /** URL 경로 — 소유자가 정한다. 예: 'seventeen-dino' */
+  /** URL 경로 — 소유자가 정한다. 예: 'starlit-rian' */
   slug: string
   /** 이벤트명 — 관리 화면에서 슬롯을 고를 때 보인다 */
   name: string

@@ -433,7 +433,7 @@ export function SlotList() {
                   <input
                     id="new-slug"
                     value={slug}
-                    placeholder="seventeen-dino"
+                    placeholder="starlit-rian"
                     onChange={(e) => {
                       setSlug(e.target.value)
                       setError(null)
@@ -447,7 +447,7 @@ export function SlotList() {
                 <input
                   id="new-name"
                   value={name}
-                  placeholder="세븐틴 디노 생일카페"
+                  placeholder="스타릿 리안 생일카페"
                   onChange={(e) => {
                     setName(e.target.value)
                     setError(null)

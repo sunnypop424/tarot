@@ -14,7 +14,7 @@ export const KAKAO_URL = 'https://open.kakao.com/o/skxgV2Th'
 
 /** 오픈채팅 닉네임 규칙 — 방에 들어오자마자 하는 일이라 화면 첫 줄에 세운다 */
 export const NICKNAME_RULE = '행사기간 / 주인공 이름'
-export const NICKNAME_EXAMPLE = '8/12~8/14 / 디노'
+export const NICKNAME_EXAMPLE = '8/12~8/14 / 리안'
 
 const LINE = '------------------------'
 
@@ -191,6 +191,11 @@ export function buildInquiry(picked: ServiceId[], custom = false): string {
    */
   out.push('※ 긴급 여부(일반 / 10일 이내 / 3일 이내)는 자료 전달 예정일과')
   out.push('　시연/검수 희망일 사이 기간으로 계산됩니다.')
+  out.push('')
+  // 검수일에 완성본을 처음 보시게 된다 — 여기서 여유가 없으면 수정 두 번이 안 돌아간다
+  out.push('※ 검수일에 완성된 사이트를 전달해 드립니다. 그날 처음 보시고 수정 사항을')
+  out.push('　말씀해 주시는 흐름이라, 고칠 시간이 남도록 검수일은 행사일보다')
+  out.push('　여유 있게 잡아 주시는 편을 권해 드립니다.')
   out.push('')
   out.push(LINE)
   out.push('')

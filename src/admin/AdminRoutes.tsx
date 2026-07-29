@@ -122,7 +122,7 @@ const ADMIN_ROUTES: Record<ServiceId, ReactNode> = {
 
 /**
  * 주최자 관리 — `/{slug}/admin/*`.
- * 슬롯 안에서만 존재하므로 디노 관리자는 나연 슬롯 관리 화면을 열 수 없다
+ * 슬롯 안에서만 존재하므로 리안 관리자는 하온 슬롯 관리 화면을 열 수 없다
  * (열어도 `useAdminAuth` 가 슬러그 불일치로 로그인 화면으로 보낸다).
  */
 export default function AdminRoutes() {

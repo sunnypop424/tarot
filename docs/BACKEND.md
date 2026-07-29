@@ -33,7 +33,7 @@
 
 | 서비스 | 맡는 것 |
 |---|---|
-| **Vercel** | 정적 앱 배포, 슬러그 라우팅(`/seventeen-dino`), 도메인 |
+| **Vercel** | 정적 앱 배포, 슬러그 라우팅(`/starlit-rian`), 도메인 |
 | **Supabase** | 슬롯 · 질문 · 답변 DB, 최고관리자/주최자 인증, 슬롯 이미지 저장, **Edge Function 이 Claude 호출** |
 | **Claude API** | 3장 리딩 종합, 질문×카드 답변 일괄 생성 (`claude-haiku-4-5`) |
 
@@ -82,7 +82,7 @@ create table owners (
 
 ### 1-2. RLS — 격리를 DB 가 강제하게
 
-**이게 이 작업의 핵심이다.** 지금은 "디노 관리자가 나연 슬롯을 못 건드린다"를 프론트가 지킨다(`useAdminAuth` 의 slug 비교). 프론트는 얼마든지 우회된다 — RLS 를 켜야 진짜가 된다.
+**이게 이 작업의 핵심이다.** 지금은 "리안 관리자가 하온 슬롯을 못 건드린다"를 프론트가 지킨다(`useAdminAuth` 의 slug 비교). 프론트는 얼마든지 우회된다 — RLS 를 켜야 진짜가 된다.
 
 ```sql
 alter table slots enable row level security;
@@ -164,7 +164,7 @@ create policy "owner manages slots" on slots for all
 
 ### 2-2. SPA 라우팅 — 빠뜨리면 슬러그가 죽는다
 
-`/seventeen-dino` 로 **직접 들어오면**(QR 이 바로 그 주소다) Vercel 은 그런 파일이 없다고 404 를 준다. 리라이트를 걸어야 한다:
+`/starlit-rian` 로 **직접 들어오면**(QR 이 바로 그 주소다) Vercel 은 그런 파일이 없다고 404 를 준다. 리라이트를 걸어야 한다:
 
 ```json
 // vercel.json — 파일이 있으면 그게 먼저고, 없을 때만 index.html 로 간다
@@ -173,7 +173,7 @@ create policy "owner manages slots" on slots for all
 }
 ```
 
-**같이 필요한 것: `base: '/'`** (vite.config.ts). 상대 경로(`'./'`)면 자산이 `./assets/…` 로 나가고, `/seventeen-dino` 로 **직접** 들어온 브라우저는 `/seventeen-dino/assets/…` 를 찾아 404 — **빈 화면**이 된다. 리라이트만 걸고 이걸 빠뜨리면 정확히 QR 경로만 죽는다.
+**같이 필요한 것: `base: '/'`** (vite.config.ts). 상대 경로(`'./'`)면 자산이 `./assets/…` 로 나가고, `/starlit-rian` 로 **직접** 들어온 브라우저는 `/starlit-rian/assets/…` 를 찾아 404 — **빈 화면**이 된다. 리라이트만 걸고 이걸 빠뜨리면 정확히 QR 경로만 죽는다.
 ### 2-3. 슬롯 편집기를 프로덕션에 열려면
 
 **✅ 열렸다.** 막고 있던 세 가지가 다 풀렸다:

@@ -228,7 +228,7 @@ await setSettings({})
   check('응모 모드에서도 보상 행이 생긴다', !!code, code ?? '없음')
 
   const r = await rpc('reward_enter', {
-    target: SLUG, raw_code: code, nick: '디노팬', tw: '@dino', ct: null, addr: null,
+    target: SLUG, raw_code: code, nick: '리안팬', tw: '@rian', ct: null, addr: null,
   })
   check('응모를 낸다', r.ok, `HTTP ${r.status}`)
 

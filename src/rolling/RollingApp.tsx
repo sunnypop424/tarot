@@ -201,12 +201,12 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
 
 /** 편집기 미리보기용 샘플 쪽지 — 팔레트 색·손글씨를 돌려 써서 종이색·글씨체가 보이게 한다 */
 const SAMPLE_TEXTS: [string, string][] = [
-  ['지민', '생일 축하해요! 늘 행복하길 바라요.'],
+  ['첫눈', '생일 축하해요! 늘 행복하길 바라요.'],
   ['', '오늘도 반짝반짝!'],
-  ['수현', '무대 위에서도 무대 밖에서도 응원해요.'],
+  ['바람', '무대 위에서도 무대 밖에서도 응원해요.'],
   ['', '늘 고마워요.'],
-  ['민서', '좋은 일만 가득한 한 해가 되길!'],
-  ['유나', '새 앨범 기다릴게요!'],
+  ['초록', '좋은 일만 가득한 한 해가 되길!'],
+  ['다래', '새 앨범 기다릴게요!'],
 ]
 function sampleNotes(display: RollingDisplay): RollingMessage[] {
   const papers = display.papers.length ? display.papers : ['#f4efe2']

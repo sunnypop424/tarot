@@ -1278,7 +1278,7 @@ export function SlotEditor() {
                     value={draft.group ?? ''}
                     onChange={(e) => patchSlot({ group: e.target.value })}
                     list="slot-groups"
-                    placeholder="예: 디노 생일카페 2026"
+                    placeholder="예: 리안 생일카페 2026"
                     /*
                      * **화살표를 select 와 똑같이 붙인다.** datalist 는 브라우저마다 표시가
                      * 달라(크롬은 아무 표시도 안 준다) 고를 수 있는 칸인 줄 모른다 —

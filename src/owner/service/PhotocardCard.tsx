@@ -84,7 +84,7 @@ export function PhotocardCard({
         const url = await uploadAsset(slug, name, file)
         await repo.photocard.saveCard(slug, {
           id: crypto.randomUUID(),
-          // 파일 이름을 그대로 카드 이름으로 — 대부분 "01 디노.png" 처럼 이미 정리돼서 온다
+          // 파일 이름을 그대로 카드 이름으로 — 대부분 "01 리안.png" 처럼 이미 정리돼서 온다
           name: file.name.replace(/\.[^.]+$/, ''),
           rarity: 1,
           image: url,

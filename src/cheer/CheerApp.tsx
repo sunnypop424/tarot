@@ -251,7 +251,7 @@ const SAMPLE: RollingMessage[] = [
   '영상회 최고',
 ].map((body, i) => ({
   id: `preview-${i}`,
-  nickname: ['디노', '', '민지', '팬1', '', '해린'][i] ?? '',
+  nickname: ['리안', '', '별하나', '팬1', '', '노을'][i] ?? '',
   body,
   color: '',
   font: '',

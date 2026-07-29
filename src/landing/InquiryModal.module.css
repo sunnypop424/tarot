@@ -30,7 +30,11 @@
 .box {
   position: relative;
   width: min(560px, 100%);
-  max-height: min(88vh, 860px);
+  /*
+   * **높이 상한은 화면뿐이다.** 예전엔 `min(88vh, 860px)` 이라 화면이 아무리 커도 860 에서
+   * 잘려, 세로가 1400 인 창에서도 스크롤이 94px 생겼다 — 스크롤할 이유가 없는데 생기는 스크롤.
+   */
+  max-height: 88vh;
   overflow-y: auto;
   background: var(--bg);
   color: var(--fg);
@@ -174,8 +178,15 @@
 
 .preview {
   margin: 0;
+  /*
+   * 양식은 고른 서비스 수만큼 길어진다(셋만 골라도 2000px 이 넘는다). 여기서 안 막으면 창이
+   * 끝없이 길어져 복사 버튼이 저 아래로 밀린다 — 그래서 이 스크롤은 **남겨 두는 쪽**이다.
+   * 대신 `overscroll-behavior` 로 여기서 끝까지 굴렸을 때 바깥 창이 딸려 움직이지 않게 한다
+   * (스크롤이 둘일 때 실제로 성가신 건 그 딸림이다).
+   */
   max-height: 240px;
   overflow: auto;
+  overscroll-behavior: contain;
   padding: 16px 18px;
   border: 1px solid var(--line);
   border-radius: 12px;

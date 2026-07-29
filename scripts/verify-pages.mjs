@@ -41,7 +41,7 @@ await page.goto(`${BASE}/${SLUG}/cards`, { waitUntil: 'networkidle0' })
 await wait(400)
 if (!(await page.$('[role="tab"]'))) {
   console.log(`타로 슬롯 '${SLUG}' 을 열 수 없습니다 — 슬러그를 두 번째 인자로 주세요.`)
-  console.log(`  예: node scripts/verify-pages.mjs shots dinotest`)
+  console.log(`  예: node scripts/verify-pages.mjs shots demotest`)
   await browser.close()
   process.exit(1)
 }
