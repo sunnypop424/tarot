@@ -1,5 +1,5 @@
 /**
- * 히어로 뒤 별 장식 — 정적 SVG, 애니메이션 없음 (DESIGN.md §6: 파티클 라이브러리 금지).
+ * 히어로 뒤 별 장식 — 정적 SVG, 애니메이션 없음 (DESIGN.md 「장식」: 파티클 라이브러리 금지).
  * 불투명도 0.3 이하로 카드보다 뒤에 머문다.
  */
 export function StarField({ className }: { className?: string }) {

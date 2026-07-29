@@ -8,7 +8,7 @@ export const VERDICT_LABEL: Record<Verdict, string> = {
   maybe: '글쎄요',
 }
 
-/** 판정 아래 붙는 한 줄 — 단정하지 않는 화법 (DESIGN.md §10) */
+/** 판정 아래 붙는 한 줄 — 단정하지 않는 화법 (DESIGN.md 「화법」) */
 export const VERDICT_NOTE: Record<Verdict, string> = {
   yes: '지금 흐름은 긍정 쪽으로 기울어 있어요.',
   no: '지금은 흐름이 받쳐주지 않는 편이에요.',

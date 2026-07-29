@@ -16,7 +16,7 @@ import { formatDateLabel, formatWeekLabel, formatMonthLabel } from '@/lib/date'
  * 뽑기 카테고리 (PLANNING.md §2).
  * 오늘·주간·월간도 결국 "직접 뽑는" 같은 플로우라 카테고리로 통합했다.
  * 다른 점은 기간마다 한 번만 뽑을 수 있다는 것뿐 — period 필드가 그 잠금을 건다.
- * 아이콘은 Lucide 만 사용한다 — 이모지 금지 (DESIGN.md §4 Iconography).
+ * 아이콘은 Lucide 만 사용한다 — 이모지 금지 (DESIGN.md 「컴포넌트·아이콘」).
  */
 export interface Category {
   id: string
