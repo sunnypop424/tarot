@@ -320,7 +320,8 @@
   flex-shrink: 0;
   overflow: hidden;
   background: var(--shell);
-  border: 6px solid var(--shell);
+  /* 두께는 여기 없다 — `Landing.tsx` 의 `BEZEL` 이 원본이다(화면 크기 계산에 같이 쓰인다) */
+  border: 0 solid var(--shell);
   box-shadow: 0 8px 22px rgb(27 26 23 / 0.13);
 }
 /* 오버레이는 **배경이 투명하다** — 뒤에 어두운 판을 깔아야 말풍선이 보인다 */

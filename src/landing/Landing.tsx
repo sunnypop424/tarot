@@ -27,6 +27,16 @@ import styles from './Landing.module.css'
  *
  * 어투는 **합니다체**다 — 앱(해요체)과 일부러 다르다. 이유는 `landingData.ts` 머리말에.
  */
+/**
+ * 목업 테두리(베젤) 두께.
+ *
+ * **CSS 가 아니라 여기가 원본이다.** `box-sizing: border-box` 라 틀에 준 크기 안에 테두리가
+ * 포함되는데, 화면을 그 바깥 크기로 확대하면 **테두리 밑으로 오른쪽·아래가 정확히 이만큼씩
+ * 잘린다** — 실제로 12px 씩 잘려 있었다. 두 군데 적으면 또 어긋나므로 CSS 는 두께를 안 갖고
+ * 여기서 인라인으로 받는다.
+ */
+const BEZEL = 6
+
 export default function Landing() {
   const [cur, setCur] = useState(SERVICES[0].key)
   const [openFaq, setOpenFaq] = useState<number | null>(0)
@@ -91,16 +101,23 @@ export default function Landing() {
     const stageW = Math.min(w, PAGE_MAX) - 44
     const inner = stageW - 2 * pad
     const worstSum = 390 / 844 + 1280 / 720
-    const sideH = Math.min(narrow ? 280 : 320, Math.floor((inner - gap) / worstSum))
+    // 빼는 값에 베젤이 들어간다 — 기기가 둘이면 테두리가 네 겹이다
+    const sideH = Math.min(narrow ? 280 : 320, Math.floor((inner - gap - 4 * BEZEL) / worstSum))
     return { stacked: sideH < SIDE_MIN_H, height: sideH, gap, inner }
   }, [w])
 
-  /** 쌓았을 때 기기별 크기 — 폭을 다 쓰되 종류마다 키가 너무 커지지 않게 막는다 */
+  /**
+   * 기기 하나의 크기 — **돌려주는 `w`·`h` 는 테두리 안쪽(화면) 크기다.**
+   * 틀은 여기에 베젤을 더해 그린다. 쌓았을 땐 폭을 다 쓰되 종류별 상한을 넘지 않는다.
+   */
   const sizeOf = useCallback(
     (kind: keyof typeof DEVICE_SIZE) => {
       const [bw, bh] = DEVICE_SIZE[kind]
       const h = layout.stacked
-        ? Math.min(STACK_MAX_H[kind], Math.floor(layout.inner / (bw / bh)))
+        ? Math.min(
+            STACK_MAX_H[kind] - 2 * BEZEL,
+            Math.floor((layout.inner - 2 * BEZEL) / (bw / bh))
+          )
         : layout.height
       return { h, w: Math.round(bw * (h / bh)), scale: h / bh }
     },
@@ -227,9 +244,15 @@ export default function Landing() {
               const { h, w: fw, scale } = sizeOf(d.kind)
               return (
                 <div className={styles.device} key={d.path}>
+                  {/* 틀 크기 = 화면 + 베젤. 화면 크기를 그대로 주면 테두리가 화면을 덮는다 */}
                   <div
                     className={styles.frame}
-                    style={{ width: fw, height: h, borderRadius: h < 240 ? 12 : 18 }}
+                    style={{
+                      width: fw + 2 * BEZEL,
+                      height: h + 2 * BEZEL,
+                      borderWidth: BEZEL,
+                      borderRadius: h < 240 ? 12 : 18,
+                    }}
                   >
                     {d.kind === 'overlay' && (
                       <div className={styles.backdrop} aria-hidden="true">
