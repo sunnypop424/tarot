@@ -3,6 +3,17 @@
  * 커스텀 프로퍼티는 상속되니 여기서 다시 정의하지 않는다 (두 벌이 되면 한쪽만 고치는 날이 온다).
  */
 
+/*
+ * ── 열릴 때 ──
+ *
+ * **뒤가 먼저 어두워지고 창이 뒤따라 올라온다.** 둘을 같이 띄우면 창이 그냥 "붙어" 있고,
+ * 눌러서 열렸다는 인과가 안 읽힌다. 결은 랜딩 본문의 `slUp` 과 같은 것을 쓴다
+ * (`Landing.module.css`) — 한 페이지 안에서 등장 곡선이 두 벌이면 다른 물건처럼 보인다.
+ *
+ * **닫힐 때는 애니메이션이 없다.** 창이 언마운트되는 구조라(`open` 이 false 면 `null`)
+ * 나가는 연출을 넣으려면 상태를 하나 더 들어야 한다 — 닫는 건 이미 자기가 누른 결과라
+ * 기다릴 이유가 없어서 그대로 둔다.
+ */
 .backdrop {
   position: fixed;
   inset: 0;
@@ -14,6 +25,7 @@
   justify-content: center;
   padding: 20px;
   overflow-y: auto;
+  animation: inqFade var(--dur-short) var(--ease) both;
 }
 .box {
   position: relative;
@@ -26,6 +38,33 @@
   border-radius: 18px;
   padding: 30px clamp(20px, 4vw, 34px) 26px;
   box-shadow: 0 30px 90px rgb(10 10 14 / 0.3);
+  /* 뒤가 어두워지기 시작한 뒤에 올라온다 — 살짝 늦게(80ms) 출발시켜 순서를 만든다 */
+  animation: inqUp 0.42s cubic-bezier(0.2, 0.7, 0.2, 1) 80ms both;
+}
+@keyframes inqFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes inqUp {
+  from {
+    opacity: 0;
+    /* 아래에서 올라오면서 아주 조금 작다 — 커지는 느낌이 "열린다" 로 읽힌다 */
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .box {
+    animation: none;
+  }
 }
 .close {
   position: absolute;
