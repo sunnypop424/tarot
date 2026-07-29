@@ -10,7 +10,7 @@ import { toast } from './AdminFeedback'
  *
  * 지금까지는 "외부 생성기에 주소를 넣으세요" 라고 안내만 했다. 그런데 QR 은 인쇄해서
  * 카페 벽에 붙는 물건이라, 해상도가 모자라면 현장에서 안 찍히고 그때는 이미 늦다.
- * 여기서 만들면 **주소를 옮겨 적다 틀릴 일도 없다** (오타 하나면 손님 전원이 404 를 본다).
+ * 여기서 만들면 **주소를 옮겨 적다 틀릴 일도 없다** (오타 하나면 방문자 전원이 404 를 본다).
  *
  * **캔버스로 그린다.** `<img>` 로 그리면 이 레포의 규칙(슬롯 이미지는 전부 background-image,
  * 예외는 `SavableImage` 하나)을 어기게 되고, 캔버스면 인쇄용 큰 PNG 를 그대로 저장할 수 있다.
@@ -92,7 +92,7 @@ export function Qr() {
   }
 
   const TARGETS = [
-    { id: 'visitor', name: '손님용 주소', hint: '포스터·테이블에 붙이는 QR' },
+    { id: 'visitor', name: '방문자용 주소', hint: '포스터·테이블에 붙이는 QR' },
     { id: 'admin', name: '스태프·관리용 주소', hint: '카운터 기기에서만 쓰는 QR' },
   ] as const
 
@@ -166,7 +166,7 @@ export function Qr() {
               </div>
               <div className="ad-bullet">가로 5cm보다 작게 인쇄하면 잘 안 읽혀요.</div>
               <div className="ad-bullet">
-                손님용과 스태프·관리용을 같이 붙이면 손님이 관리 화면으로 들어와요.
+                방문자용과 스태프·관리용을 같이 붙이면 방문자가 관리 화면으로 들어와요.
               </div>
               {service === 'photocard' && (
                 <div className="ad-bullet">

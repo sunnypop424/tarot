@@ -23,8 +23,8 @@ const when = (iso: string) =>
  * 뽑기권 목록 — **발급된 번호와 그 번호로 뽑힌 카드를 한 줄씩** 본다.
  *
  * 실제로 쓰는 자리는 둘이다:
- *  - 손님이 "제 번호로 뽑은 게 뭐였죠?" 라고 물을 때
- *  - 발급 수가 손님 수보다 훨씬 많을 때 (브라우저를 지우고 다시 받은 경우)
+ *  - 방문자가 "제 번호로 뽑은 게 뭐였죠?" 라고 물을 때
+ *  - 발급 수가 방문자 수보다 훨씬 많을 때 (브라우저를 지우고 다시 받은 경우)
  *
  * **`subject` 는 안 보여준다** — 그건 그 폰을 가리키는 값이고, 번호와 짝지어 뿌릴 이유가 없다.
  */
@@ -72,7 +72,7 @@ export function Tickets() {
 
   const usesTicket = photocardRules(settings.mode).usesTicket
 
-  /** 번호·카드 이름으로 찾는다 (손님이 번호를 보여주면 그걸로 바로 짚는다) */
+  /** 번호·카드 이름으로 찾는다 (방문자가 번호를 보여주면 그걸로 바로 짚는다) */
   const q = query.trim().toLowerCase()
   const shown = q
     ? rows.filter((r) => [r.code, r.cardName ?? ''].some((v) => v.toLowerCase().includes(q)))
@@ -86,8 +86,8 @@ export function Tickets() {
       title: '이 번호를 지울까요?',
       desc:
         row.status === 'drawn'
-          ? `${row.code} 는 이미 ${row.cardName || '카드'} 를 뽑은 번호예요. 지우면 그 손님이 한 번 더 뽑게 돼요. 뽑은 기록과 재고는 그대로예요.`
-          : `${row.code} 를 지워요. 손님이 이 번호로는 뽑을 수 없게 돼요.`,
+          ? `${row.code} 는 이미 ${row.cardName || '카드'} 를 뽑은 번호예요. 지우면 그 방문자가 한 번 더 뽑게 돼요. 뽑은 기록과 재고는 그대로예요.`
+          : `${row.code} 를 지워요. 방문자가 이 번호로는 뽑을 수 없게 돼요.`,
       okLabel: '지우기',
       danger: true,
     })
@@ -132,7 +132,7 @@ export function Tickets() {
           <div className="ad-banner ad-banner--mute ad-banner--pad" style={{ fontWeight: 400 }}>
             <div className="ad-banner__title">이 운영 방식에서는 뽑기권을 쓰지 않아요</div>
             <div className="ad-banner__body">
-              저장용은 손님이 자기 폰에서 바로 뽑아요. 아래 목록은 예전에 발급된 기록이에요.
+              저장용은 방문자가 자기 폰에서 바로 뽑아요. 아래 목록은 예전에 발급된 기록이에요.
             </div>
           </div>
         )}
@@ -182,15 +182,15 @@ export function Tickets() {
             </div>
           </div>
           <p className="ad-fine" style={{ marginBottom: 14 }}>
-            발급 수가 손님 수보다 훨씬 많다면, 브라우저 기록을 지우고 다시 받은 경우예요. 번호를
-            지우면 그 손님이 새로 받을 수 있게 돼요.
+            발급 수가 방문자 수보다 훨씬 많다면, 브라우저 기록을 지우고 다시 받은 경우예요. 번호를
+            지우면 그 방문자가 새로 받을 수 있게 돼요.
           </p>
 
           {rows.length === 0 ? (
             <div className="ad-empty">
               <div className="ad-empty__title">아직 발급된 뽑기권이 없어요</div>
               <div className="ad-empty__sub">
-                손님이 이벤트 페이지에서 ‘뽑기권 받기’ 를 누르면 여기 나와요.
+                방문자가 이벤트 페이지에서 ‘뽑기권 받기’ 를 누르면 여기 나와요.
               </div>
             </div>
           ) : shown.length === 0 ? (

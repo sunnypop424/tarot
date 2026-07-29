@@ -42,7 +42,7 @@ import styles from './Photozone.module.css'
  * 포토존 프레임 — 카페 포토존에서 찍은 사진에 **이벤트 프레임을 씌워 저장해 가는** 인증샷.
  * 화면은 claude.ai/design 시안 '포토존 프레임 방문자' 를 옮긴 것이다.
  *
- * **서버에 아무것도 안 남는다.** 합성은 이 화면의 캔버스가 하고 결과는 곧장 손님 폰으로 간다.
+ * **서버에 아무것도 안 남는다.** 합성은 이 화면의 캔버스가 하고 결과는 곧장 방문자 폰으로 간다.
  * 방문자 사진을 서버에 두는 순간 이건 미성년 팬의 얼굴 사진을 호스팅하는 서비스가 된다
  * (`0016_photozone.sql`). Storage 는 `is_owner()` 만 쓰기가 되므로 그 정책을 **안 건드리는
  * 것이 곧 설계다.**
@@ -155,7 +155,7 @@ function Photozone({ slot }: { slot: Slot }) {
     setBusy(true)
     setNotice(null)
     try {
-      // 전면 카메라는 화면에서 거울로 보여주므로 **찍힌 것도 거울이어야** 손님이 본 그대로다
+      // 전면 카메라는 화면에서 거울로 보여주므로 **찍힌 것도 거울이어야** 방문자가 본 그대로다
       await publish(photo, facing === 'user')
     } catch (e) {
       setNotice(e instanceof Error ? e.message : '사진을 만들지 못했어요.')

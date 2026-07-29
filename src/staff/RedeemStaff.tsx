@@ -15,7 +15,7 @@ import styles from './Staff.module.css'
  * 교환 확인 스태프 화면 — `/{slug}/staff` (스탬프 · 모의고사).
  *
  * **관리 화면 안에 있던 걸 밖으로 뺐다.** 카운터에 세워두는 기기에 관리 사이드바가 같이 뜨면
- * 손님이 누른다 — 다른 메뉴로 들어가 설정을 건드릴 수 있는 화면을 부스에 세워둘 수는 없다.
+ * 방문자가 누른다 — 다른 메뉴로 들어가 설정을 건드릴 수 있는 화면을 부스에 세워둘 수는 없다.
  * (주최자 화면의 '수령 확인' 은 그대로 둔다. 거기엔 발급 목록·CSV 가 같이 있고,
  * 그건 사무 작업이지 카운터 작업이 아니다.)
  *
@@ -168,14 +168,14 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
                   onClick={() => setResult(null)}
                   data-next
                 >
-                  다음 손님
+                  다음 방문자
                 </button>
               </div>
             </div>
           ) : (
             <form className={styles.controls} onSubmit={(e) => void go(e)}>
               <p className={styles.label}>교환권 번호</p>
-              <p className={styles.hint}>손님 폰에 뜬 번호를 그대로 입력해 주세요.</p>
+              <p className={styles.hint}>방문자 폰에 뜬 번호를 그대로 입력해 주세요.</p>
               <input
                 className={styles.codeInput}
                 value={code}

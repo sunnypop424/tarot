@@ -70,8 +70,8 @@ export interface PhotocardDisplay {
   boxShadowColor: string
   boxShadowBlur: number
   boxShadowY: number
-  /** '관리자 페이지로 이동' 링크 색 — 손님 눈엔 안 띄고 스태프는 찾을 수 있어야 한다.
-   * **스태프 화면과 손님 화면이 같은 값을 쓴다** (같은 성격의 링크다) */
+  /** '관리자 페이지로 이동' 링크 색 — 방문자 눈엔 안 띄고 스태프는 찾을 수 있어야 한다.
+   * **스태프 화면과 방문자 화면이 같은 값을 쓴다** (같은 성격의 링크다) */
   adminLinkColor: string
 
   /** 마감됐을 때 스태프 화면에 뜨는 문구 */
@@ -228,7 +228,7 @@ export function photocardRules(mode: PhotocardMode): PhotocardRules {
   }
 }
 
-/** 레어도 이름 — 숫자만 보이면 손님에게 아무 뜻이 없다 */
+/** 레어도 이름 — 숫자만 보이면 방문자에게 아무 뜻이 없다 */
 export const RARITY_LABEL: Record<number, string> = {
   1: '기본',
   2: '레어',

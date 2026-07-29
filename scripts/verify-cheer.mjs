@@ -5,7 +5,7 @@
  *
  * 개발 서버(5174)가 떠 있어야 한다 (화면 확인 때문).
  *
- *  · anon 은 상영 상태를 못 바꾼다        ← 손님이 크레딧을 올려버리면 사고다
+ *  · anon 은 상영 상태를 못 바꾼다        ← 방문자가 크레딧을 올려버리면 사고다
  *  · '상영 시작' 이 시작 시각을 박는다
  *  · **감췄다 다시 띄워도 시작 시각이 안 되감긴다** — 되감기면 자동 크레딧이 영영 안 온다
  *  · `/show` 화면이 상태를 따라간다 (idle 이면 비고, live 면 말풍선이 뜬다)
@@ -65,7 +65,7 @@ const setShow = (state, headers) =>
 
 // ── 권한 ───────────────────────────────────────────
 const bad = await setShow('credits', anon)
-check('**손님(anon)은 상영 상태를 못 바꾼다**', !bad.ok || (await bad.json()).length === 0, `HTTP ${bad.status}`)
+check('**방문자(anon)은 상영 상태를 못 바꾼다**', !bad.ok || (await bad.json()).length === 0, `HTTP ${bad.status}`)
 
 // ── 시작 ───────────────────────────────────────────
 const live = await setShow('live', owner)

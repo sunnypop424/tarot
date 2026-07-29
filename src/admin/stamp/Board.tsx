@@ -68,7 +68,7 @@ export function Board() {
     }
   }
 
-  /** 4자리 — 혼동 문자(I·L·O·U·0·1)를 뺀다. 현장에 붙여두고 손님이 손으로 친다 */
+  /** 4자리 — 혼동 문자(I·L·O·U·0·1)를 뺀다. 현장에 붙여두고 방문자가 손으로 친다 */
   const makeCode = () => {
     const A = '23456789ABCDEFGHJKMNPQRSTVWXYZ'
     return Array.from({ length: 4 }, () => A[Math.floor(Math.random() * A.length)]).join('')
@@ -113,7 +113,7 @@ export function Board() {
         <div className="ad-banner ad-banner--info ad-banner--pad">
           <div className="ad-banner__title">이 목록의 규칙</div>
           <div className="ad-banner__body">
-            암호를 비워 두면 그 칸은 손님에게 잠긴 채로 보여요. 암호가 새면 새로 만들기로 바꾸세요 —
+            암호를 비워 두면 그 칸은 방문자에게 잠긴 채로 보여요. 암호가 새면 새로 만들기로 바꾸세요 —
             바꾸면 예전 암호는 바로 안 먹어요. 칸 이름과 순서는 담당자가 정해요.
           </div>
         </div>
@@ -178,7 +178,7 @@ export function Board() {
                     </div>
                     {!code.trim() && (
                       <span className="ad-tag ad-tag--sm" data-tone="warn">
-                        암호 없음 · 손님에게 잠긴 칸이에요
+                        암호 없음 · 방문자에게 잠긴 칸이에요
                       </span>
                     )}
                   </div>
@@ -219,7 +219,7 @@ export function Board() {
                   onBlur={() => void save(settings)}
                 />
                 <p className="ad-field__hint">
-                  확정이면 손님 폰에 교환코드가 뜨고, 스태프가 ‘수령 확인’ 에서 처리해요.
+                  확정이면 방문자 폰에 교환코드가 뜨고, 스태프가 ‘수령 확인’ 에서 처리해요.
                 </p>
               </div>
             )}

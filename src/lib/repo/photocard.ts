@@ -189,7 +189,7 @@ export const supabasePhotocard: PhotocardRepo = {
   async lineup(slug) {
     const { data, error } = await (await db())
       .from('photocards')
-      // **레어도를 안 읽는다** — 손님이 같이 보는 화면으로 가는 값이라 확률이 새면 안 된다
+      // **레어도를 안 읽는다** — 방문자가 같이 보는 화면으로 가는 값이라 확률이 새면 안 된다
       .select('id, name, image, lucky, remaining, "order"')
       .eq('slug', slug)
       .order('order')

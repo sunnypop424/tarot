@@ -1,6 +1,6 @@
 -- 0032_demo_photocard_staff.sql — 체험 슬롯의 스태프 뽑기
 --
--- 랜딩에서 포토카드를 보여줄 때 **손님 폰만으로는 절반만 보여주는 것**이다. 이 서비스의
+-- 랜딩에서 포토카드를 보여줄 때 **방문자 폰만으로는 절반만 보여주는 것**이다. 이 서비스의
 -- 값어치는 "판매·1장 증정에서 스태프가 뽑는다" 쪽에 있고, 그 화면(`/{slug}/staff`)은
 -- 로그인 뒤에 있다. 체험 슬롯에 계정을 만들어 공개할 수는 없다(그 계정으로 다른 걸 만질 수 있다).
 --
@@ -9,7 +9,7 @@
 --   · `slots.demo = true` 인 슬롯에서만
 --   · 뽑기 자체는 그대로 서버가 한다(확률·재고·레이트리밋 전부 유효)
 --   · 체험 슬롯의 카드는 재고가 무제한이라 **깎일 재고가 없다**
---   · 뽑기권 소각(gift)은 열지 않는다 — 그건 손님이 만든 뽑기권을 태우는 일이라
+--   · 뽑기권 소각(gift)은 열지 않는다 — 그건 방문자가 만든 뽑기권을 태우는 일이라
 --     공개 슬롯에서 남이 남의 뽑기권을 태울 수 있게 된다
 --
 -- 화면도 같이 연다: `/staff` 는 체험 슬롯이면 로그인을 묻지 않는다 (staff/StaffApp.tsx).
@@ -45,6 +45,6 @@ begin
 end;
 $$;
 
--- 체험 슬롯에서 손님이 직접 눌러 보므로 anon 에도 준다 (판정은 함수 안의 demo 검사가 한다)
+-- 체험 슬롯에서 방문자가 직접 눌러 보므로 anon 에도 준다 (판정은 함수 안의 demo 검사가 한다)
 revoke execute on function public.photocard_draw_batch(text, int) from public;
 grant execute on function public.photocard_draw_batch(text, int) to anon, authenticated, service_role;

@@ -147,7 +147,7 @@ export function QuestionEditor() {
       desc:
         overwrites > 0
           ? `이미 써 두신 답변 ${overwrites}장이 덮어써져요.`
-          : '검수한 내용 그대로 손님에게 나가요.',
+          : '검수한 내용 그대로 방문자에게 나가요.',
       okLabel: '저장',
       danger: overwrites > 0,
     })
@@ -203,7 +203,7 @@ export function QuestionEditor() {
             id="q-text"
             className="ad-input ad-input--lg"
             value={draft.question}
-            placeholder="손님에게 보일 문구"
+            placeholder="방문자에게 보일 문구"
             onChange={(e) => patch({ question: e.target.value })}
           />
           <button
@@ -215,7 +215,7 @@ export function QuestionEditor() {
             <span className="ad-check__box" data-on={draft.published || undefined}>
               {draft.published ? '✓' : ''}
             </span>
-            <span className="ad-checkbare__label">손님에게 공개</span>
+            <span className="ad-checkbare__label">방문자에게 공개</span>
           </button>
         </div>
 

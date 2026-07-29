@@ -29,7 +29,7 @@ const ICON: React.CSSProperties = {
  *
  * 칸이 왜 최고관리자 쪽이냐면, **칸 수가 곧 판의 모양**이라 겉모습에 가깝고
  * 서버(`stamp_checkin` 의 완성 판정)도 이 수를 읽기 때문이다. 주최자가 이벤트 중간에
- * 칸을 늘리면 이미 다 모은 손님의 판이 미완성으로 되돌아간다.
+ * 칸을 늘리면 이미 다 모은 방문자의 판이 미완성으로 되돌아간다.
  *
  * 반대로 **현장 암호·보상 방식·일일 리셋은 주최자**가 `/{slug}/admin` 에서 정한다
  * (`stamp_settings` 테이블) — 운영 중에 바뀌는 값이라 배포를 기다릴 수 없다.
@@ -103,7 +103,7 @@ export function StampCard({
   return (
     <Card title="방문 스탬프">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-        손님이 현장 암호를 입력하면 도장이 찍혀요.{' '}
+        방문자가 현장 암호를 입력하면 도장이 찍혀요.{' '}
         <b>암호와 선물 방식은 주최자가 관리 화면에서 정해요</b> — 여기서는 칸과 겉모습만 정해요.
       </p>
 
@@ -143,7 +143,7 @@ export function StampCard({
           </button>
         </div>
         <p style={{ margin: '0 0 12px', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
-          <b>이벤트가 시작된 뒤에는 칸을 늘리거나 줄이지 마세요</b> — 이미 다 모은 손님의 판이
+          <b>이벤트가 시작된 뒤에는 칸을 늘리거나 줄이지 마세요</b> — 이미 다 모은 방문자의 판이
           미완성으로 되돌아가요. 이름만 고치는 건 안전해요.
           {d.stamps.length > 0 && d.stamps.length <= 4 && ' · 4칸 이하는 2줄로, 5칸부터는 3줄로 그려져요.'}
           <br />
@@ -170,7 +170,7 @@ export function StampCard({
               textAlign: 'center',
             }}
           >
-            아직 칸이 없어요. 칸을 만들어야 손님 화면에 판이 그려져요.
+            아직 칸이 없어요. 칸을 만들어야 방문자 화면에 판이 그려져요.
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }} data-stamp-cells>

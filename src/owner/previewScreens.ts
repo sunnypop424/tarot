@@ -19,7 +19,7 @@ import type { ServiceId } from '@/data/services'
  * "미리보기에 화면을 안 넣었다" 를 조용히 지나가지 않게.
  *
  * **주최자 화면은 안 넣는다.** 그건 고정 라이트라 슬롯 색과 무관하고, 편집기에서 볼 이유가
- * 없다. 반대로 **스태프 화면은 넣는다** — 슬롯 색을 쓰고 손님이 같이 보는 화면이라
+ * 없다. 반대로 **스태프 화면은 넣는다** — 슬롯 색을 쓰고 방문자가 같이 보는 화면이라
  * 색을 고르는 자리에서 확인해야 한다.
  */
 export interface PreviewScreen {
@@ -31,7 +31,7 @@ export interface PreviewScreen {
   /**
    * 이 화면을 볼 **기기** (`SlotEditor` 의 DEVICES id). 없으면 서비스 기본값.
    *
-   * 한 서비스 안에서도 화면마다 기기가 다르다 — 영상회는 손님이 폰으로 적고 **상영은 16:9 스크린**이다.
+   * 한 서비스 안에서도 화면마다 기기가 다르다 — 영상회는 방문자가 폰으로 적고 **상영은 16:9 스크린**이다.
    * 서비스 하나에 기기 하나로 묶으면 둘 중 하나는 늘 틀린 크기로 본다.
    */
   device?: string
@@ -75,7 +75,7 @@ export const PREVIEW_SCREENS: Record<ServiceId, PreviewScreen[]> = {
     { state: 'entered', label: '응모 완료' },
   ],
   cheer: [
-    // 손님은 폰으로 적고, 상영은 16:9 스크린이다 — 화면마다 기기가 다르다
+    // 방문자는 폰으로 적고, 상영은 16:9 스크린이다 — 화면마다 기기가 다르다
     { state: 'write', label: '한마디 입력', device: 'phone' },
     { state: 'overlay', label: '오버레이', path: '/overlay', device: 'screen-169' },
     { state: 'credits', label: '엔딩크레딧', path: '/credits', device: 'screen-169' },

@@ -53,7 +53,7 @@ const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
   wish: [{ to: 'messages', label: '소원나무' }],
   poll: [
     { to: 'polls', label: '설문' },
-    // 부스에 세워두는 화면 — 관리 도구가 아니라 손님에게 보여주는 것이다
+    // 부스에 세워두는 화면 — 관리 도구가 아니라 방문자에게 보여주는 것이다
     { to: 'live', label: '스크린' },
   ],
   // 보상 메뉴(수령확인·추첨·응모자)는 여기 없다 — 아래 REWARD_NAV 가 설정값으로 붙인다
@@ -74,7 +74,7 @@ const SERVICE_NAV: Record<ServiceId, NavItem[]> = {
     { to: 'tickets', label: '뽑기권' },
     /*
      * 부스에서 스태프가 쓰는 화면 — **관리 셸 밖**이라 새 탭으로 연다.
-     * 태블릿을 카운터에 세워두면 손님이 같이 보는 화면이라 슬롯 색을 쓴다.
+     * 태블릿을 카운터에 세워두면 방문자가 같이 보는 화면이라 슬롯 색을 쓴다.
      */
     { to: 'staff', label: '스태프 화면', external: true },
   ],
@@ -255,7 +255,7 @@ export function AdminLayout() {
           <div className="ad-proxy" data-owner-view>
             <span className="ad-proxy__dot" aria-hidden="true" />
             <span className="ad-proxy__text">
-              최고관리자로 이 슬롯을 대신 보고 있어요. 고치면 손님 화면에 바로 반영돼요.
+              최고관리자로 이 슬롯을 대신 보고 있어요. 고치면 방문자 화면에 바로 반영돼요.
             </span>
             <button
               type="button"

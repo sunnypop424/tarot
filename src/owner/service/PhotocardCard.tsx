@@ -119,7 +119,7 @@ export function PhotocardCard({
   return (
     <Card title="포토카드 뽑기">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-        레어도에 따라 카드가 뽑히고, 운영 방식에 따라 손님 화면이 통째로 달라져요.{' '}
+        레어도에 따라 카드가 뽑히고, 운영 방식에 따라 방문자 화면이 통째로 달라져요.{' '}
         <b>레어도·재고·운영 방식은 주최자가 관리 화면에서 정해요</b> — 여기서는 카드 이미지와
         겉모습만 정해요.
       </p>
@@ -231,7 +231,7 @@ export function PhotocardCard({
         <Field label="뽑기권 안내">
           <input value={d.ticketGuide} onChange={(e) => patch({ ticketGuide: e.target.value })} style={CSS.input} />
         </Field>
-        <Field label="안내 화면 제목" hint="'판매' 방식에서 손님 폰에 뜨는 한 장이에요.">
+        <Field label="안내 화면 제목" hint="'판매' 방식에서 방문자 폰에 뜨는 한 장이에요.">
           <input value={d.counterTitle} onChange={(e) => patch({ counterTitle: e.target.value })} style={CSS.input} />
         </Field>
         <Field label="운영 시간 안내">

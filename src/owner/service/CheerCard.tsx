@@ -27,7 +27,7 @@ export function CheerCard({
   return (
     <Card title="영상회 응원">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-        손님이 남긴 한마디가 상영 화면에 말풍선으로 떠요.{' '}
+        방문자가 남긴 한마디가 상영 화면에 말풍선으로 떠요.{' '}
         <b>한 화면 개수·교체 간격·글자 수는 주최자가 관리 화면에서 정해요</b> — 여기서는 색과 문구만.
         <br />
         한마디는 <b>롤링페이퍼와 같은 곳</b>에 저장돼요 (검수 화면도 같아요).
@@ -128,7 +128,7 @@ export function CheerCard({
           repeat={d.bgRepeat}
           onImage={(v) => patch({ bgImage: v ?? '' })}
           onRepeat={(on) => patch({ bgRepeat: on })}
-          hint="손님이 한마디를 적는 화면의 배경이에요."
+          hint="방문자가 한마디를 적는 화면의 배경이에요."
         />
       </Divided>
     </Card>

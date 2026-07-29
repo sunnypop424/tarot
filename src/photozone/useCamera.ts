@@ -3,10 +3,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 /**
  * 카메라 스트림 — 포토존의 유일한 신규 브라우저 API.
  *
- * **실패를 세 가지로 구분해 말한다.** "카메라를 쓸 수 없어요" 하나로 뭉뚱그리면 손님은 뭘
- * 해야 할지 모른다. 권한을 거부한 사람은 다시 허용하면 되고, 비-secure origin 은 손님이
+ * **실패를 세 가지로 구분해 말한다.** "카메라를 쓸 수 없어요" 하나로 뭉뚱그리면 방문자는 뭘
+ * 해야 할지 모른다. 권한을 거부한 사람은 다시 허용하면 되고, 비-secure origin 은 방문자가
  * 할 수 있는 게 없다(주최자에게 알려야 한다). **어느 쪽이든 업로드로 떨어질 수 있어야 한다** —
- * 막다른 골목이 되면 카페에서 그 손님은 그냥 나간다.
+ * 막다른 골목이 되면 카페에서 그 방문자는 그냥 나간다.
  */
 export type CameraError =
   /** `navigator.mediaDevices` 자체가 없다 — 대개 http 로 열었다 (localhost 제외) */
@@ -45,7 +45,7 @@ function classify(e: unknown): CameraError {
  *
  * **끄는 걸 확실히 하는 게 이 훅의 절반이다.** `track.stop()` 을 빠뜨리면 결과 화면으로
  * 넘어가거나 화면을 떠난 뒤에도 **카메라 표시등이 계속 켜져 있다.** 카페에서 그건 즉시
- * 항의로 돌아온다 — 손님 입장에선 몰래 찍히고 있는 것처럼 보인다.
+ * 항의로 돌아온다 — 방문자 입장에선 몰래 찍히고 있는 것처럼 보인다.
  */
 export function useCamera(active: boolean, facing: 'user' | 'environment'): CameraState {
   const [state, setState] = useState<CameraState>({ stream: null, error: null, starting: false })

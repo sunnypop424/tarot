@@ -8,8 +8,8 @@ import { useSlot } from '@/slot/SlotProvider'
  * 아니라 **안내**다. 그럼에도 화면이 있어야 하는 이유는 `AdminRoutes` 의 홈이 어딘가로는
  * 보내야 하기 때문이고, 주최자가 로그인했는데 빈 화면을 보면 "고장났나" 로 읽히기 때문이다.
  *
- * 여기서 제일 중요한 문장은 **"손님 사진은 저희 서버에 저장되지 않아요"** 다.
- * 주최자가 이걸 알아야 손님에게 답할 수 있다 (얼굴 사진이라 실제로 묻는다).
+ * 여기서 제일 중요한 문장은 **"방문자 사진은 저희 서버에 저장되지 않아요"** 다.
+ * 주최자가 이걸 알아야 방문자에게 답할 수 있다 (얼굴 사진이라 실제로 묻는다).
  */
 export function Guide() {
   const slot = useSlot()
@@ -31,14 +31,14 @@ export function Guide() {
             프레임 {display.frames.length}종이 올라가 있어요
           </div>
           <p className="ad-card__desc">
-            따로 설정할 것이 없는 서비스예요. 손님은 프레임을 골라 사진을 찍고 저장하면 끝이에요.
+            따로 설정할 것이 없는 서비스예요. 방문자는 프레임을 골라 사진을 찍고 저장하면 끝이에요.
           </p>
 
           <div className="ad-banner ad-banner--info ad-banner--pad" style={{ marginTop: 20 }}>
-            <div className="ad-banner__title">손님 사진은 서버에 저장되지 않아요</div>
+            <div className="ad-banner__title">방문자 사진은 서버에 저장되지 않아요</div>
             <div className="ad-banner__body">
-              합성은 손님 폰 안에서 끝나고, 결과 이미지도 그 기기에만 남아요. 그래서 주최자가 볼
-              사진도, 지울 사진도 없어요. 손님이 물어보면 이대로 답해 주시면 돼요.
+              합성은 방문자 폰 안에서 끝나고, 결과 이미지도 그 기기에만 남아요. 그래서 주최자가 볼
+              사진도, 지울 사진도 없어요. 방문자가 물어보면 이대로 답해 주시면 돼요.
             </div>
           </div>
 

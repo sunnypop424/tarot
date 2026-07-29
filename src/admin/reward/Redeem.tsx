@@ -22,7 +22,7 @@ const when = (iso: string) =>
  * 수령 확인 — **스태프가 쓰는 화면. 세 서비스가 공유한다**
  * (스탬프 완성 / 모의고사 커트라인 / 포토카드 실물).
  *
- * **중복 수령을 실제로 막는 게 이 화면 하나다.** 손님 폰의 코드만으로는 "이미 받았는지" 를
+ * **중복 수령을 실제로 막는 게 이 화면 하나다.** 방문자 폰의 코드만으로는 "이미 받았는지" 를
  * 아무도 모른다 — 개발자도구로 고쳐도 서버는 모르기 때문이다. 그래서 `reward_redeem` 은
  * `manages_slot` 게이트가 걸려 있고 anon 은 아예 못 부른다.
  *
@@ -66,7 +66,7 @@ export function Redeem() {
     if (!v || busy) return
     const ok = await confirmAction({
       title: '이 코드를 수령 처리할까요?',
-      desc: `${v.toUpperCase()} · 처리하면 이 코드는 다시 쓸 수 없어요. 실물을 손님에게 건넨 뒤 눌러 주세요.`,
+      desc: `${v.toUpperCase()} · 처리하면 이 코드는 다시 쓸 수 없어요. 실물을 방문자에게 건넨 뒤 눌러 주세요.`,
       okLabel: '수령 처리',
       danger: true,
     })
@@ -100,7 +100,7 @@ export function Redeem() {
   }
 
   const guaranteed = (rows ?? []).filter((r) => r.kind === 'guaranteed')
-  /** 코드·내용으로 찾는다 — 손님이 보여준 번호를 목록에서 바로 짚는 자리다 */
+  /** 코드·내용으로 찾는다 — 방문자가 보여준 번호를 목록에서 바로 짚는 자리다 */
   const q = query.trim().toLowerCase()
   const shown = q ? guaranteed.filter((r) => [r.code, r.label].some((v) => v.toLowerCase().includes(q))) : guaranteed
   const done = guaranteed.filter((r) => r.redeemedAt)
@@ -142,7 +142,7 @@ export function Redeem() {
             발급 {guaranteed.length}건 · 수령 {done.length}건
           </span>
         </div>
-        <p className="ad-head__desc">손님이 보여준 코드를 입력해 실물 수령을 처리해요.</p>
+        <p className="ad-head__desc">방문자가 보여준 코드를 입력해 실물 수령을 처리해요.</p>
       </header>
 
       <div className="ad-stack">
@@ -167,7 +167,7 @@ export function Redeem() {
         <form className="ad-card ad-card--form" onSubmit={(e) => void ask(e)} data-redeem-form>
           <div className="ad-card__title ad-card__title--lg">코드 확인하고 수령 처리</div>
           <p className="ad-card__desc">
-            손님 폰에 뜬 코드를 그대로 입력하세요. 소문자·하이픈·공백은 알아서 맞춰져요.
+            방문자 폰에 뜬 코드를 그대로 입력하세요. 소문자·하이픈·공백은 알아서 맞춰져요.
           </p>
 
           <div className="ad-inline" style={{ marginTop: 16 }}>
@@ -216,7 +216,7 @@ export function Redeem() {
                         : '이전'
                     } 에 이미 처리됐어요. 같은 코드를 두 번 쓸 수 없어요.`}
                   {result.kind === 'none' &&
-                    `“${result.code}” 로 발급된 교환권이 없어요. 손님 화면의 코드를 다시 확인해 주세요.`}
+                    `“${result.code}” 로 발급된 교환권이 없어요. 방문자 화면의 코드를 다시 확인해 주세요.`}
                   {result.kind === 'error' && result.message}
                 </p>
               </div>
@@ -245,7 +245,7 @@ export function Redeem() {
             </div>
           </div>
           <p className="ad-fine" style={{ marginBottom: 14 }}>
-            손님 이름은 여기 안 나와요 — 카운터 화면은 계속 켜져 있으니까요. 응모하신 분들의 정보는
+            방문자 이름은 여기 안 나와요 — 카운터 화면은 계속 켜져 있으니까요. 응모하신 분들의 정보는
             ‘응모자’ 화면에서 보실 수 있어요.
           </p>
 
@@ -259,7 +259,7 @@ export function Redeem() {
             <div className="ad-empty">
               <div className="ad-empty__title">아직 발급된 교환권이 없어요</div>
               <div className="ad-empty__sub">
-                손님이 조건을 채우면 교환코드가 발급되고 여기 한 줄씩 쌓여요.
+                방문자가 조건을 채우면 교환코드가 발급되고 여기 한 줄씩 쌓여요.
               </div>
             </div>
           ) : shown.length === 0 ? (

@@ -225,7 +225,7 @@ try {
   await wait(400)
   // 공개 — 체크박스가 아니라 버튼이다 (조작 결과가 바로 저장된다)
   await page.$$eval('button', (bs) =>
-    bs.find((b) => b.textContent.trim() === '손님에게 공개')?.click()
+    bs.find((b) => b.textContent.trim() === '방문자에게 공개')?.click()
   )
   await wait(400)
   await page.$$eval('[aria-expanded]', (bs) => bs[0]?.click())

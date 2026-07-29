@@ -94,7 +94,7 @@ create policy "owner reads picks" on public.reward_picks for all
 
 -- ══ 3. 교환코드 ═══════════════════════════════════
 --
--- **스태프가 손님 폰을 보고 자기 기기에 손으로 입력하는 값이다.** 그래서 혼동 문자를
+-- **스태프가 방문자 폰을 보고 자기 기기에 손으로 입력하는 값이다.** 그래서 혼동 문자를
 -- 문자셋에서 아예 뺀다 (Crockford Base32 — I·L·O·U 없음). 0/O, 1/I/L 을 헷갈리는 순간
 -- 그건 현장 컴플레인이 된다.
 create or replace function public.reward_code()

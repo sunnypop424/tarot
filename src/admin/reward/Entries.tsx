@@ -41,7 +41,7 @@ export function Entries() {
         <h1 className="ad-head__title">응모자 명단</h1>
         {list && <span className="ad-head__count tnum">응모 {list.length}명</span>}
       </div>
-      <p className="ad-head__desc">보상을 받을 자격을 얻고 응모까지 마친 손님 명단이에요.</p>
+      <p className="ad-head__desc">보상을 받을 자격을 얻고 응모까지 마친 방문자 명단이에요.</p>
     </header>
   )
 
@@ -62,7 +62,7 @@ export function Entries() {
   // 응모 자격을 얻은 사람 = raffle 코드를 받은 사람. 그중 폼을 낸 사람이 `list` 다
   const raffle = issued.filter((r) => r.kind === 'raffle')
 
-  /** 닉네임·트위터·연락처·코드로 찾는다 — 줄 서 있는 손님 앞에서 스크롤은 느리다 */
+  /** 닉네임·트위터·연락처·코드로 찾는다 — 줄 서 있는 방문자 앞에서 스크롤은 느리다 */
   const q = query.trim().toLowerCase()
   const shown = q
     ? list.filter((e) =>
@@ -201,7 +201,7 @@ export function Entries() {
               </div>
               <div className="ad-empty__sub">
                 {raffle.length === 0
-                  ? '보상 방식을 ‘응모’ 로 바꾸시면 손님이 응모하고 여기 명단이 쌓여요. 지난 응모 기록이 있으면 방식과 상관없이 여기 그대로 남아요.'
+                  ? '보상 방식을 ‘응모’ 로 바꾸시면 방문자가 응모하고 여기 명단이 쌓여요. 지난 응모 기록이 있으면 방식과 상관없이 여기 그대로 남아요.'
                   : '자격을 얻은 분이 응모 폼을 내면 여기 한 줄씩 쌓여요.'}
               </div>
             </div>

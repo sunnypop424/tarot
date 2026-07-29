@@ -9,7 +9,7 @@
  *  · 데모 슬롯에 쪽지를 남긴다      → 막힌다 (RLS: 0행)
  *  · 데모 슬롯에 투표한다           → 막힌다 (cast_vote 가 거절)
  *  · **일반 슬롯은 그대로 된다**    → 데모 조건이 다른 슬롯을 막지 않았는지 (회귀)
- *  · 체험 슬롯에서 **손님이 스태프 뽑기를 부를 수 있다** (0032 — 랜딩이 그 화면을 띄운다)
+ *  · 체험 슬롯에서 **방문자가 스태프 뽑기를 부를 수 있다** (0032 — 랜딩이 그 화면을 띄운다)
  *  · **일반 슬롯에서는 여전히 못 부른다** ← 이게 열린 문의 폭을 정한다
  */
 import { readFileSync } from 'node:fs'
@@ -135,7 +135,7 @@ const drawDemo = await fetch(`${URL_}/rest/v1/rpc/photocard_draw_batch`, {
   headers: anon,
   body: JSON.stringify({ target: DEMO, cnt: 2 }),
 })
-check('체험 슬롯에서는 손님도 스태프 뽑기를 눌러 볼 수 있다', drawDemo.ok, `HTTP ${drawDemo.status}`)
+check('체험 슬롯에서는 방문자도 스태프 뽑기를 눌러 볼 수 있다', drawDemo.ok, `HTTP ${drawDemo.status}`)
 
 const drawReal = await fetch(`${URL_}/rest/v1/rpc/photocard_draw_batch`, {
   method: 'POST',

@@ -52,7 +52,7 @@ create policy "anyone reads visible messages"
     )
   );
 
--- 방문자: 행사 중인 슬롯에 남긴다 (스태프 게이트 없음 — 손님이 직접 쓴다)
+-- 방문자: 행사 중인 슬롯에 남긴다 (스태프 게이트 없음 — 방문자가 직접 쓴다)
 drop policy if exists "anyone posts to open slots" on public.rolling_messages;
 create policy "anyone posts to open slots"
   on public.rolling_messages for insert

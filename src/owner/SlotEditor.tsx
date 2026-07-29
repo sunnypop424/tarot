@@ -481,7 +481,7 @@ function LuckydrawExtra({
           <AlphaColor
             label="관리자 링크 색"
             value={d.adminLinkColor}
-            hint="손님 눈엔 안 띄고 스태프는 찾을 정도로"
+            hint="방문자 눈엔 안 띄고 스태프는 찾을 정도로"
             onChange={(v) => patchLd({ adminLinkColor: v })}
           />
         </>
@@ -599,7 +599,7 @@ function stableStringify(value: unknown): string {
  * 미리보기 기기 — **어느 서비스든 고를 수 있다.**
  *
  * 예전엔 럭키드로우만 아이패드를 골랐다. 그런데 부스에 세워두는 화면은 럭드만이 아니다 —
- * 포토카드 스태프 기기·투표 스크린도 태블릿이고, 손님 폰으로 여는 화면도 기기마다 다르다.
+ * 포토카드 스태프 기기·투표 스크린도 태블릿이고, 방문자 폰으로 여는 화면도 기기마다 다르다.
  * 실제로 쓸 기기로 맞춰 봐야 여백·글자 크기가 어긋나지 않는다.
  */
 const DEVICES = [
@@ -998,12 +998,12 @@ export function SlotEditor() {
 
     /**
      * **막지 않고 되묻는다.** 준비 중인 슬롯을 저장하는 건 정상이다(내일 카드를 올릴 수도 있다).
-     * 다만 손님이 못 쓰는 상태로 배포되는 걸 모르고 넘어가면 안 되니 한 번 묻는다.
+     * 다만 방문자가 못 쓰는 상태로 배포되는 걸 모르고 넘어가면 안 되니 한 번 묻는다.
      */
     const blockers = (issues ?? []).filter((i) => i.level === 'block')
     if (blockers.length > 0) {
       const list = blockers.map((b) => `· ${b.text}`).join('\n')
-      if (!confirm(`이대로 열면 손님이 못 쓰는 게 있어요:\n\n${list}\n\n그래도 저장할까요?`)) return
+      if (!confirm(`이대로 열면 방문자가 못 쓰는 게 있어요:\n\n${list}\n\n그래도 저장할까요?`)) return
     }
 
     try {
@@ -1196,7 +1196,7 @@ export function SlotEditor() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0 }}>
 
           {/*
-            * 출시 전 점검 — **비어 있으면 손님이 빈 화면을 본다.**
+            * 출시 전 점검 — **비어 있으면 방문자가 빈 화면을 본다.**
             * 문제가 없으면 아예 안 그린다 (늘 떠 있는 초록 배너는 곧 안 보이게 된다).
             */}
           {issues && issues.length > 0 && (
@@ -1233,7 +1233,7 @@ export function SlotEditor() {
                   </div>
                 ))}
                 <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
-                  빨간 점은 <b>이대로 열면 손님이 못 쓰는 것</b>, 노란 점은 확인만 하면 되는 거예요.
+                  빨간 점은 <b>이대로 열면 방문자가 못 쓰는 것</b>, 노란 점은 확인만 하면 되는 거예요.
                   저장은 막지 않아요 — 준비 중인 슬롯도 저장해 둘 수 있어야 하니까요.
                 </p>
               </div>
@@ -1273,7 +1273,7 @@ export function SlotEditor() {
                   * 묶음 — **한 행사가 슬롯 여러 개를 쓴다** (포토카드 + 스탬프 + 모의고사).
                   * 목록에서만 쓰는 정리용 이름이라 권한과 무관하다. 이미 쓴 이름은 골라 쓴다.
                   */}
-                <Field label="묶음 (선택)" hint="같은 행사의 슬롯끼리 목록에서 묶여요. 손님에겐 안 보여요.">
+                <Field label="묶음 (선택)" hint="같은 행사의 슬롯끼리 목록에서 묶여요. 방문자에겐 안 보여요.">
                   <input
                     value={draft.group ?? ''}
                     onChange={(e) => patchSlot({ group: e.target.value })}
@@ -1382,7 +1382,7 @@ export function SlotEditor() {
 
           <Card title="웹앱 아이콘">
             <p style={{ margin: '0 0 14px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-              손님이 브라우저에서 “홈 화면에 추가” 하면 이 아이콘과 행사명으로 앱처럼 열려요. 정사각형 PNG 를 권장해요 (512×512).
+              방문자가 브라우저에서 “홈 화면에 추가” 하면 이 아이콘과 행사명으로 앱처럼 열려요. 정사각형 PNG 를 권장해요 (512×512).
             </p>
             <ImageField slug={saved.slug} label="앱 아이콘" name="app-icon" title="앱 아이콘" value={draft.theme.assets.appIcon} onChange={(v) => patchAsset('appIcon', v)} thumbW={60} thumbH={60} thumbRadius={8} hint="없으면 홈 화면 아이콘이 기본으로 떠요." />
           </Card>
@@ -1707,7 +1707,7 @@ export function SlotEditor() {
             <>
               <Card title="롤링페이퍼">
                 <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-                  손님이 포스트잇으로 메시지를 남기면 벽에 쌓여요. 남긴 즉시 벽에 보이고, 부적절한 건 주최자가 숨겨요. 아래 색·글꼴은 롤페 전용이에요 (위 테마와 별개).
+                  방문자가 포스트잇으로 메시지를 남기면 벽에 쌓여요. 남긴 즉시 벽에 보이고, 부적절한 건 주최자가 숨겨요. 아래 색·글꼴은 롤페 전용이에요 (위 테마와 별개).
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
                   <div style={CSS.fieldCol}>
@@ -1738,7 +1738,7 @@ export function SlotEditor() {
                   </Field>
                 </div>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 16 }}>
-                  <Field label="기본 글꼴" hint="제목·UI 글꼴이에요. 쪽지 글씨체는 손님이 골라요.">
+                  <Field label="기본 글꼴" hint="제목·UI 글꼴이에요. 쪽지 글씨체는 방문자가 골라요.">
                     <select value={rd.font} onChange={(e) => patchRolling({ font: e.target.value as FontId })} style={CSS.select}>
                       {Object.entries(WEBFONTS).map(([id, f]) => (
                         <option key={id} value={id}>{f.label}</option>
@@ -1767,7 +1767,7 @@ export function SlotEditor() {
                   {/* 소원나무도 같은 위젯을 쓴다 (등불색) — service/PaletteField.tsx */}
                   <PaletteField
                     label="포스트잇 종이색"
-                    hint="손님이 쪽지마다 고르는 색이에요. 파스텔 여러 색이 벽을 알록달록하게 해요."
+                    hint="방문자가 쪽지마다 고르는 색이에요. 파스텔 여러 색이 벽을 알록달록하게 해요."
                     value={rd.papers}
                     onChange={(papers) => patchRolling({ papers })}
                   />
@@ -1816,7 +1816,7 @@ export function SlotEditor() {
                 </div>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee' }}>
                   <div style={{ ...CSS.label, marginBottom: 9 }}>스티커</div>
-                  <StickerField slug={saved.slug} label="스티커" value={rd.stickers} onChange={(next) => patchRolling({ stickers: next })} hint="손님이 쪽지에 붙일 수 있어요. 주최자에게 받은 이미지를 올려 주세요." />
+                  <StickerField slug={saved.slug} label="스티커" value={rd.stickers} onChange={(next) => patchRolling({ stickers: next })} hint="방문자가 쪽지에 붙일 수 있어요. 주최자에게 받은 이미지를 올려 주세요." />
                 </div>
               </Card>
 

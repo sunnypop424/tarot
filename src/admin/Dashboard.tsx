@@ -232,7 +232,7 @@ export function Dashboard() {
               </div>
               <div className="ad-hr" />
               <p className="ad-fine">
-                종료되면 손님 주소는 종료 안내로 바뀌고, 보관 기간이 지나면 자료가 파기돼요.
+                종료되면 방문자 주소는 종료 안내로 바뀌고, 보관 기간이 지나면 자료가 파기돼요.
               </p>
             </div>
 
@@ -333,7 +333,7 @@ const SHORTCUTS: Record<ServiceId, Shortcut[]> = {
 /** 서비스와 무관하게 늘 붙는 두 장 */
 const COMMON_SHORTCUTS: Shortcut[] = [
   { to: 'qr', label: 'QR 만들기', desc: '붙일 QR을 내려받아요' },
-  { to: '', label: '내 페이지 보기', desc: '손님에게 보이는 화면을 확인해요', external: true },
+  { to: '', label: '내 페이지 보기', desc: '방문자에게 보이는 화면을 확인해요', external: true },
 ]
 
 const n = (v: number) => v.toLocaleString('ko-KR')
@@ -347,7 +347,7 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
     const [all, open] = await Promise.all([repo.questions.listAll(slug), repo.questions.list(slug)])
     return [
       { label: '질문', value: n(all.length), unit: '개', note: '등록된 질문 수' },
-      { label: '공개', value: n(open.length), unit: '개', note: '손님에게 보이는 질문' },
+      { label: '공개', value: n(open.length), unit: '개', note: '방문자에게 보이는 질문' },
     ]
   },
   async luckydraw(slug) {
@@ -376,7 +376,7 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
     const all = await repo.rolling.listAll(slug)
     return messageStats(all, '소원')
   },
-  // 서버에 쌓이는 게 없다 — 사진은 손님 폰에서 합성되고 올라오지 않는다
+  // 서버에 쌓이는 게 없다 — 사진은 방문자 폰에서 합성되고 올라오지 않는다
   async photozone() {
     return []
   },

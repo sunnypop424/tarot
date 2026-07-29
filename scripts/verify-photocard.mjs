@@ -224,7 +224,7 @@ await setSettings({ mode: 'save', drawsPerVisitor: 3 })
 
   const mine = await rpc('photocard_ticket', { target: SLUG, raw_code: t1.code })
   const m = mine.ok ? await mine.json() : null
-  check('손님이 자기 번호로 결과를 확인한다', m?.status === 'drawn' && !!m?.cardName, JSON.stringify(m?.cardName))
+  check('방문자가 자기 번호로 결과를 확인한다', m?.status === 'drawn' && !!m?.cardName, JSON.stringify(m?.cardName))
 
   const nope = await rpc('photocard_ticket', { target: SLUG, raw_code: 'ZZZZ' })
   const nm = nope.ok ? await nope.json() : 'err'

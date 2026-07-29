@@ -127,7 +127,7 @@ function Photocard({ slot }: { slot: Slot }) {
     if (r.usesTicket) {
       /*
        * **없는 뽑기권을 여기서 만들지 않는다.** 화면을 열기만 해도 발급되면 "한 번만" 이
-       * 아무 뜻이 없어진다 — 손님이 버튼을 눌러야 만든다.
+       * 아무 뜻이 없어진다 — 방문자가 버튼을 눌러야 만든다.
        * 이미 있으면 코드로 조회한다(로컬에 사본을 둔다).
        */
       const saved = readList<{ id: string }>('photocard-ticket', slug)[0]
@@ -490,7 +490,7 @@ function Deck({
         )}
         {/**
           * 섞기·보관함은 **덱에서 항상 닿아야 한다.**
-          * 보관함을 결과 화면에서만 열 수 있으면, 뽑기를 다 쓴 뒤 새로고침한 손님이
+          * 보관함을 결과 화면에서만 열 수 있으면, 뽑기를 다 쓴 뒤 새로고침한 방문자가
           * 자기가 모은 카드로 돌아갈 길이 없다.
           */}
         <div className={styles.deckActions}>
@@ -801,7 +801,7 @@ function TicketIntro({
 
       <div className={styles.center}>
         {/*
-          * 뽑기권 화면의 카드 그림 — **덱 뒷면을 그대로 쓴다.** 손님이 카운터에서 받게 될
+          * 뽑기권 화면의 카드 그림 — **덱 뒷면을 그대로 쓴다.** 방문자가 카운터에서 받게 될
           * 그 카드의 뒷모습이라, 아이콘보다 이쪽이 "무엇을 받는지" 를 말해준다.
           * 뒷면을 안 올린 슬롯은 지금처럼 아이콘.
           */}
@@ -876,7 +876,7 @@ function TicketView({
           바뀌지 않으면 새로고침해 주세요.
         </p>
         {/**
-          * **폴링을 안 건다.** 실물을 건네받는 자리에서 손님이 직접 누르는 버튼이라
+          * **폴링을 안 건다.** 실물을 건네받는 자리에서 방문자가 직접 누르는 버튼이라
           * 사용자가 트리거다 — 수백 대가 몇 초마다 서버를 때릴 이유가 없다.
           */}
         <button type="button" className={styles.ghostBtn} disabled={busy} onClick={onRefresh} data-refresh>

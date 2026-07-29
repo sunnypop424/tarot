@@ -83,7 +83,7 @@ export function QuestionList() {
           )}
         </div>
         <p className="ad-head__desc">
-          손님이 고를 질문과, 카드가 나왔을 때 보여줄 답변을 관리해요.
+          방문자가 고를 질문과, 카드가 나왔을 때 보여줄 답변을 관리해요.
         </p>
       </header>
 
@@ -110,7 +110,7 @@ export function QuestionList() {
           <div className="ad-empty">
             <div className="ad-empty__title">아직 질문이 없어요</div>
             <div className="ad-empty__sub">
-              질문을 만들면 손님이 그 중 하나를 골라 카드를 뽑게 돼요.
+              질문을 만들면 방문자가 그 중 하나를 골라 카드를 뽑게 돼요.
             </div>
             <button
               type="button"

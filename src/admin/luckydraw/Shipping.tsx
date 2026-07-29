@@ -52,7 +52,7 @@ export function Shipping() {
      */
     const ok = await confirmAction({
       title: `배송 정보 ${list.length}건을 전부 지울까요?`,
-      desc: '다른 곳에 사본이 없어요. 손님도 자기가 넣은 내용을 다시 볼 수 없어요. 먼저 CSV로 내려받으셨나요?',
+      desc: '다른 곳에 사본이 없어요. 방문자도 자기가 넣은 내용을 다시 볼 수 없어요. 먼저 CSV로 내려받으셨나요?',
       okLabel: '전부 지우기',
       danger: true,
     })
@@ -92,7 +92,7 @@ export function Shipping() {
           <span className="ad-head__count tnum">배송 {list.length}건</span>
         </div>
         <p className="ad-head__desc">
-          당첨자가 직접 남긴 배송지예요. 손님 개인정보가 나오는 유일한 화면이에요.
+          당첨자가 직접 남긴 배송지예요. 방문자 개인정보가 나오는 유일한 화면이에요.
         </p>
       </header>
 
@@ -134,7 +134,7 @@ export function Shipping() {
             <div className="ad-empty">
               <div className="ad-empty__title">아직 배송 정보를 낸 사람이 없어요</div>
               <div className="ad-empty__sub">
-                배송이 필요한 상품에 당첨된 손님이 주소를 넣으면 여기에 쌓여요.
+                배송이 필요한 상품에 당첨된 방문자가 주소를 넣으면 여기에 쌓여요.
               </div>
             </div>
           ) : shown.length === 0 ? (
@@ -182,7 +182,7 @@ export function Shipping() {
                 }}
               >
                 <div className="ad-sub" style={{ maxWidth: '38em' }}>
-                  지우면 되돌릴 수 없어요. 다른 곳에 사본이 없고, 손님도 자기가 넣은 내용을 다시 볼 수
+                  지우면 되돌릴 수 없어요. 다른 곳에 사본이 없고, 방문자도 자기가 넣은 내용을 다시 볼 수
                   없어요.
                 </div>
                 <button

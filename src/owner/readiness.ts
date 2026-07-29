@@ -7,10 +7,10 @@ import { rangeInvalid } from './period'
 import type { Slot } from '@/types/slot'
 
 /**
- * 출시 전 점검 — **비어 있으면 손님이 빈 화면을 본다.**
+ * 출시 전 점검 — **비어 있으면 방문자가 빈 화면을 본다.**
  *
  * 편집기는 색·문구를 고르는 도구라, 정작 "카드가 한 장도 없다"·"현장 암호를 안 정했다" 는
- * 저장할 때까지 아무도 안 말해준다. 그 상태로 QR 을 인쇄해 붙이면 손님이 빈 화면을 만난다.
+ * 저장할 때까지 아무도 안 말해준다. 그 상태로 QR 을 인쇄해 붙이면 방문자가 빈 화면을 만난다.
  *
  * **막지 않고 말한다.** 준비 중인 슬롯을 저장하는 건 정상이다(내일 카드를 올릴 수도 있다) —
  * 그래서 저장을 막는 대신 무엇이 비었는지 보여주고, 치명적인 게 남아 있으면 저장 직전에
@@ -21,7 +21,7 @@ import type { Slot } from '@/types/slot'
  */
 
 export interface ReadyIssue {
-  /** blocker: 이대로 열면 손님이 못 쓴다 · warn: 열리긴 하지만 확인이 필요하다 */
+  /** blocker: 이대로 열면 방문자가 못 쓴다 · warn: 열리긴 하지만 확인이 필요하다 */
   level: 'block' | 'warn'
   text: string
 }
@@ -54,7 +54,7 @@ const BY_SERVICE: Record<ServiceId, (slot: Slot) => Promise<ReadyIssue[]>> = {
   async tarot(slot) {
     const open = await repo.questions.list(slot.slug)
     return open.length === 0
-      ? [{ level: 'block', text: '공개된 질문이 없어요 — 손님이 고를 게 없어요' }]
+      ? [{ level: 'block', text: '공개된 질문이 없어요 — 방문자가 고를 게 없어요' }]
       : []
   },
   async luckydraw(slot) {
@@ -66,14 +66,14 @@ const BY_SERVICE: Record<ServiceId, (slot: Slot) => Promise<ReadyIssue[]>> = {
     else if (stock === 0) out.push({ level: 'block', text: '경품 재고가 전부 0이에요' })
     return out
   },
-  // 벽은 손님이 채운다 — 비어 있는 게 정상이다
+  // 벽은 방문자가 채운다 — 비어 있는 게 정상이다
   async rolling() {
     return []
   },
   async wish() {
     return []
   },
-  /** 한마디는 손님이 채운다 — 비어 있는 게 정상이다. 상영 설정은 기본값이 이미 쓸 만하다 */
+  /** 한마디는 방문자가 채운다 — 비어 있는 게 정상이다. 상영 설정은 기본값이 이미 쓸 만하다 */
   async cheer() {
     return []
   },
@@ -89,7 +89,7 @@ const BY_SERVICE: Record<ServiceId, (slot: Slot) => Promise<ReadyIssue[]>> = {
     const open = polls.filter((p) => !p.hidden)
     const out: ReadyIssue[] = []
     if (polls.length === 0) out.push({ level: 'block', text: '설문이 하나도 없어요' })
-    else if (open.length === 0) out.push({ level: 'warn', text: '설문이 전부 숨김이에요 — 손님에겐 안 보여요' })
+    else if (open.length === 0) out.push({ level: 'warn', text: '설문이 전부 숨김이에요 — 방문자에겐 안 보여요' })
     return out
   },
   async stamp(slot) {

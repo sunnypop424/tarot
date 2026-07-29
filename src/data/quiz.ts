@@ -8,7 +8,7 @@ import type { FontId } from './fonts'
  * (`quiz_questions`·`quiz_settings`).
  *
  * 여기서 유일하게 겉모습이 아닌 게 **칭호(`titles`)** 다. 점수대별 이름은 이벤트의 톤 그
- * 자체("입덕 새싹" / "찐팬 인증")이고, 실제로 손님이 공유하는 건 점수가 아니라 칭호다 —
+ * 자체("입덕 새싹" / "찐팬 인증")이고, 실제로 방문자가 공유하는 건 점수가 아니라 칭호다 —
  * 그래서 문안을 만드는 사람 쪽에 뒀다.
  */
 export interface QuizDisplay {

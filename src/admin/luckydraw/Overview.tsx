@@ -131,7 +131,7 @@ export function Overview() {
     if (key === 'closed' && !settings.closed) {
       const ok = await confirmAction({
         title: '행사를 마감할까요?',
-        desc: '손님이 더 이상 뽑을 수 없게 돼요. 다시 열 수 있지만, 마감 안내가 손님 화면에 바로 떠요.',
+        desc: '방문자가 더 이상 뽑을 수 없게 돼요. 다시 열 수 있지만, 마감 안내가 방문자 화면에 바로 떠요.',
         okLabel: '마감하기',
         danger: true,
       })
@@ -210,12 +210,12 @@ export function Overview() {
   if (settings.rehearsal && !settings.closed)
     banners.push({ text: '지금은 리허설이에요. 행사 시작 전에 실제 운영으로 바꿔 주세요.', tone: 'warn' })
   if (settings.closed)
-    banners.push({ text: '행사가 마감됐어요. 다시 열면 손님이 이어서 뽑을 수 있어요.', tone: 'mute' })
+    banners.push({ text: '행사가 마감됐어요. 다시 열면 방문자가 이어서 뽑을 수 있어요.', tone: 'mute' })
 
   const stateTone = settings.closed ? 'mute' : settings.rehearsal ? 'warn' : 'key'
   const stateLabel = settings.closed ? '마감' : settings.rehearsal ? '리허설' : '실제 운영'
   const stateHint = settings.closed
-    ? '손님이 더 뽑을 수 없어요'
+    ? '방문자가 더 뽑을 수 없어요'
     : settings.rehearsal
       ? '뽑아도 재고가 줄지 않아요'
       : '뽑을 때마다 재고가 줄어요'
@@ -412,7 +412,7 @@ export function Overview() {
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
                 <div className="ad-switchrow__name">행사 마감</div>
-                <div className="ad-switchrow__hint">켜면 손님이 더 못 뽑아요. 언제든 다시 열 수 있어요.</div>
+                <div className="ad-switchrow__hint">켜면 방문자가 더 못 뽑아요. 언제든 다시 열 수 있어요.</div>
               </div>
               <button
                 type="button"
@@ -442,7 +442,7 @@ export function Overview() {
 
         <div className="ad-card">
           <div className="ad-card__title">당첨 결과 표시</div>
-          <p className="ad-card__desc">뽑은 손님 화면에 무엇으로 보일지 정해요.</p>
+          <p className="ad-card__desc">뽑은 방문자 화면에 무엇으로 보일지 정해요.</p>
           <div className="ad-choices" style={{ marginTop: 12 }}>
             {(
               [

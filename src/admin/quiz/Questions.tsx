@@ -10,7 +10,7 @@ import { confirmAction, toast } from '../AdminFeedback'
  *
  * 칭호·색·문구는 최고관리자가 편집기에서 정하고, 여기서는 **문제와 정답과 커트라인**을 만든다.
  *
- * **새 문항은 비공개로 시작한다.** 정답을 채우기 전에 손님에게 보이면 그 문항은 아무도 못
+ * **새 문항은 비공개로 시작한다.** 정답을 채우기 전에 방문자에게 보이면 그 문항은 아무도 못
  * 맞히고, 이미 푼 사람들의 점수가 통째로 어긋난다. 정답이 빈 문항은 목록에서 눈에 띄게 그린다.
  */
 export function Questions() {
@@ -420,13 +420,13 @@ function Editor({
           <h1 className="ad-head__title">문항 {initial.body ? '고치기' : '추가'}</h1>
         </div>
         <p className="ad-head__desc">
-          정답은 손님 화면에 한 번도 내려가지 않아요. 채점은 서버가 해요.
+          정답은 방문자 화면에 한 번도 내려가지 않아요. 채점은 서버가 해요.
         </p>
       </header>
 
       <div className="ad-stack">
         <div className="ad-banner ad-banner--info">
-          정답은 손님 화면에 한 번도 내려가지 않아요. 채점은 서버가 해요.
+          정답은 방문자 화면에 한 번도 내려가지 않아요. 채점은 서버가 해요.
         </div>
 
         <div className="ad-card ad-card--form">
@@ -544,7 +544,7 @@ function Editor({
             <div style={{ marginTop: 22 }}>
               <span className="ad-field__label">인정할 답</span>
               <p className="ad-fine" style={{ margin: '-2px 0 10px' }}>
-                띄어쓰기·문장부호·대소문자는 채점에서 무시돼요. 손님이 다르게 쓸 표현을 미리 넣어
+                띄어쓰기·문장부호·대소문자는 채점에서 무시돼요. 방문자가 다르게 쓸 표현을 미리 넣어
                 두면 문의가 줄어요.
               </p>
               <div className="ad-chips ad-chips--tight" style={{ marginBottom: 10 }} data-answers>
@@ -596,7 +596,7 @@ function Editor({
             <span className="ad-check__box" data-on={!q.hidden || undefined}>
               {q.hidden ? '' : '✓'}
             </span>
-            <span className="ad-checkbare__label">손님에게 공개</span>
+            <span className="ad-checkbare__label">방문자에게 공개</span>
           </button>
 
           {blockers.length > 0 && (

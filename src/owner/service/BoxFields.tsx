@@ -82,7 +82,7 @@ export function BoxFields({
         <AlphaColor
           label="관리자 링크 색"
           value={value.adminLinkColor}
-          hint="박스 아래 작은 글씨 — 손님 눈엔 안 띄고 스태프는 찾을 수 있게"
+          hint="박스 아래 작은 글씨 — 방문자 눈엔 안 띄고 스태프는 찾을 수 있게"
           onChange={(v) => onChange({ adminLinkColor: v })}
         />
       </Divided>

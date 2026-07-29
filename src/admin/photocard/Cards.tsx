@@ -228,7 +228,7 @@ export function Cards() {
         <div className="ad-card ad-card--form">
           <div className="ad-card__title">운영 방식</div>
           <p className="ad-card__desc">
-            바꾸면 손님 화면이 통째로 달라져요. 행사 중에는 바꾸지 마세요.
+            바꾸면 방문자 화면이 통째로 달라져요. 행사 중에는 바꾸지 마세요.
           </p>
           <div className="ad-choices" style={{ marginTop: 12 }}>
             {(
@@ -248,7 +248,7 @@ export function Cards() {
                   if (settings.mode === mode) return
                   const ok = await confirmAction({
                     title: '운영 방식을 바꿀까요?',
-                    desc: `“${label}” 으로 바꾸면 손님 화면이 통째로 달라져요. 행사 중에는 바꾸지 마세요.`,
+                    desc: `“${label}” 으로 바꾸면 방문자 화면이 통째로 달라져요. 행사 중에는 바꾸지 마세요.`,
                     okLabel: '바꾸기',
                     danger: true,
                   })
@@ -327,7 +327,7 @@ export function Cards() {
               <span className="ad-check__box" data-on={settings.allowSave || undefined}>
                 {settings.allowSave ? '✓' : ''}
               </span>
-              <span className="ad-checkbare__label">손님이 이미지를 저장할 수 있게 하기</span>
+              <span className="ad-checkbare__label">방문자가 이미지를 저장할 수 있게 하기</span>
             </button>
           )}
         </div>
@@ -357,7 +357,7 @@ export function Cards() {
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
                 <div className="ad-switchrow__name">마감</div>
-                <div className="ad-switchrow__hint">켜면 손님이 더 뽑을 수 없어요.</div>
+                <div className="ad-switchrow__hint">켜면 방문자가 더 뽑을 수 없어요.</div>
               </div>
               <button
                 type="button"

@@ -145,7 +145,7 @@ export function FrameField({
        */}
       {value.length > 0 && (
         <span style={{ ...CSS.hint, color: '#a15c17' }}>
-          올린 프레임은 <b>저장하기</b>를 눌러야 손님 화면에 나가요. 저장 전에 나가면 목록이 사라져요.
+          올린 프레임은 <b>저장하기</b>를 눌러야 방문자 화면에 나가요. 저장 전에 나가면 목록이 사라져요.
         </span>
       )}
       {error && <span className="field__error">{error}</span>}

@@ -228,7 +228,7 @@ export default function LuckydrawApp() {
   const lowStock =
     display.lowStockThreshold !== null && remaining <= display.lowStockThreshold && !unavailable
   const showCount = settings?.showPrizeCount ?? true
-  // 손님에게 경품 목록을 보여줄지 (주최자 설정) — 상품이 있고, 마감/품절이 아닐 때만
+  // 방문자에게 경품 목록을 보여줄지 (주최자 설정) — 상품이 있고, 마감/품절이 아닐 때만
   const canPreview =
     (settings?.showPrizePreview ?? true) && (prizes?.length ?? 0) > 0 && !unavailable
 
@@ -355,7 +355,7 @@ export default function LuckydrawApp() {
 
         {/**
          * 관리자 진입은 **박스 밖 아래**에 흐릿하게 (원본과 같은 자리).
-         * 손님 눈엔 안 띄고 스태프는 어디 있는지 안다 — 박스 안에 크게 두면
+         * 방문자 눈엔 안 띄고 스태프는 어디 있는지 안다 — 박스 안에 크게 두면
          * 추첨 화면의 주인공이 로그인 버튼이 돼 버린다.
          */}
         {/**

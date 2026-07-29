@@ -371,9 +371,13 @@
   border: 0;
   transform-origin: 0 0;
 }
+/* 기기 아래 이름표 — 틀 폭에 맞춰 가운데. 왼쪽에 붙으면 기기와 따로 노는 조각처럼 보인다 */
 .deviceLabel {
+  align-self: center;
+  max-width: 100%;
   font-size: 12px;
   color: var(--ink-dim);
+  text-align: center;
 }
 .stageNote {
   margin: 18px 0 0;

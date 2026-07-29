@@ -20,11 +20,11 @@ import styles from './Staff.module.css'
  * 스태프 기기 — `/{slug}/staff`. **관리 화면이 아니다.**
  *
  * 화면이 **럭키드로우와 같다** (`components/DrawStage.module.css` 를 같이 쓴다).
- * 두 화면은 하는 일이 같기 때문이다: 스태프가 수량을 정해 뽑고 결과를 손님에게 건넨다.
+ * 두 화면은 하는 일이 같기 때문이다: 스태프가 수량을 정해 뽑고 결과를 방문자에게 건넨다.
  * 다른 건 **결과** 하나뿐 — 포토카드는 그림과 이름을 보여줘야 한다.
  *
  * 관리 화면 밖에 둔 이유: 부스에 세워두는 기기에 사이드바·로그아웃이 같이 떠 있으면
- * 손님이 누른다. 게이트는 두 겹이다 — 여기서 로그인을 보고 RPC 가 `manages_slot` 을 다시 본다.
+ * 방문자가 누른다. 게이트는 두 겹이다 — 여기서 로그인을 보고 RPC 가 `manages_slot` 을 다시 본다.
  */
 export default function StaffApp() {
   const state = useSlotState()
@@ -67,7 +67,7 @@ function Staff({ slot }: { slot: Slot }) {
     const [st, cards, rows] = await Promise.all([
       repo.photocard.settings(slug),
       repo.photocard.lineup(slug).catch(() => []),
-      // 재고는 스태프에게 필요한 값이다 ("몇 장 남았어요?" 를 손님이 묻는다). 주최자 조회를 그대로 쓴다
+      // 재고는 스태프에게 필요한 값이다 ("몇 장 남았어요?" 를 방문자가 묻는다). 주최자 조회를 그대로 쓴다
       repo.photocard.report(slug).catch(() => []),
     ])
     setSettings(st)
@@ -83,7 +83,7 @@ function Staff({ slot }: { slot: Slot }) {
 
   /**
    * 색·형태는 **슬롯 테마 토큰을 그대로 쓴다** (럭드와 같다).
-   * 포토카드의 `deckBg` 계열은 손님 폰의 덱 화면 전용이라 여기서 안 쓴다 —
+   * 포토카드의 `deckBg` 계열은 방문자 폰의 덱 화면 전용이라 여기서 안 쓴다 —
    * 이 화면은 럭드와 같은 판이어야 한다.
    */
   const c = slot.theme.colors
@@ -166,7 +166,7 @@ function Staff({ slot }: { slot: Slot }) {
     return shell(
       <div className={styles.center}>
         <Sparkles size={32} strokeWidth={1.6} aria-hidden="true" />
-        <div className={styles.centerTitle}>이 이벤트는 손님이 직접 뽑아요</div>
+        <div className={styles.centerTitle}>이 이벤트는 방문자가 직접 뽑아요</div>
         <p className={styles.centerBody}>
           운영 방식이 '저장용' 이라 스태프가 뽑을 일이 없어요. 방식은 관리 화면의 '카드' 에서
           바꿀 수 있어요.
@@ -341,7 +341,7 @@ function Staff({ slot }: { slot: Slot }) {
               {rules.usesTicket ? (
                 <>
                   <p className={styles.codeLabel}>뽑기권 번호</p>
-                  <p className={styles.codeHint}>손님 폰에 뜬 네 자리를 그대로 입력해 주세요.</p>
+                  <p className={styles.codeHint}>방문자 폰에 뜬 네 자리를 그대로 입력해 주세요.</p>
                   <input
                     className={styles.codeInput}
                     value={code}
@@ -373,7 +373,7 @@ function Staff({ slot }: { slot: Slot }) {
                   onCount={setCount}
                   onGo={() => void go()}
                   label="몇 장을 뽑을까요?"
-                  /* `drawLabel` 은 손님 폰의 '뽑기권 받기' 라 여기선 안 쓴다 — 스태프가 누르는 건 뽑기다 */
+                  /* `drawLabel` 은 방문자 폰의 '뽑기권 받기' 라 여기선 안 쓴다 — 스태프가 누르는 건 뽑기다 */
                   goLabel="뽑기"
                   busy={busy}
                   disabled={settings.closed}

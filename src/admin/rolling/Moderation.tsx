@@ -47,7 +47,7 @@ export function Moderation() {
     try {
       await repo.rolling.setHidden(slug, m.id, !m.hidden)
       await load()
-      toast(m.hidden ? `다시 ${c.place}에 보여요` : `숨겼어요 · 손님 화면에 바로 반영돼요`)
+      toast(m.hidden ? `다시 ${c.place}에 보여요` : `숨겼어요 · 방문자 화면에 바로 반영돼요`)
     } finally {
       setBusy(false)
     }
@@ -56,7 +56,7 @@ export function Moderation() {
   async function remove(m: RollingMessage) {
     const ok = await confirmAction({
       title: `이 ${c.unit}를 지울까요?`,
-      desc: '숨기기만 해도 손님에겐 보이지 않아요.',
+      desc: '숨기기만 해도 방문자에겐 보이지 않아요.',
       okLabel: '지우기',
       danger: true,
     })
@@ -85,7 +85,7 @@ export function Moderation() {
           </span>
         </div>
         <p className="ad-head__desc">
-          남긴 즉시 손님 화면에 보여요. 부적절한 것만 숨기거나 지워 주세요.
+          남긴 즉시 방문자 화면에 보여요. 부적절한 것만 숨기거나 지워 주세요.
         </p>
       </header>
 
@@ -107,7 +107,7 @@ export function Moderation() {
           {list.length === 0 ? (
             <div className="ad-empty">
               <div className="ad-empty__title">아직 아무도 남기지 않았어요</div>
-              <div className="ad-empty__sub">손님이 남기면 여기에 바로 올라와요.</div>
+              <div className="ad-empty__sub">방문자가 남기면 여기에 바로 올라와요.</div>
             </div>
           ) : (
             <div className="ad-rows" data-rolling-mod>

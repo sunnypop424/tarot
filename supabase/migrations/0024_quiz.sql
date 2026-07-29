@@ -26,7 +26,7 @@ create table if not exists public.quiz_questions (
   -- 객관식 보기. 주관식이면 빈 배열
   choices jsonb not null default '[]'::jsonb,
   points int not null default 1,
-  hidden boolean not null default true,   -- **기본 비공개** — 정답을 채우기 전에 손님에게 보이면 안 된다
+  hidden boolean not null default true,   -- **기본 비공개** — 정답을 채우기 전에 방문자에게 보이면 안 된다
   created_at timestamptz not null default now()
 );
 create index if not exists quiz_questions_slug_idx on public.quiz_questions (slug, "order");

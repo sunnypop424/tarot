@@ -89,6 +89,6 @@ export function pickerVars(s: CountPickerStyle): Record<string, string> {
  * 프리셋 — **1·5·10 으로 통일한다.**
  *
  * 럭드는 1·5·10, 포토카드는 1·3·5·10 이었다. 같은 화면인데 숫자가 다르면 그건 그냥
- * 갈라진 것이고, 손님이 두 이벤트를 오가면 손이 헷갈린다. 상한(`max`)을 넘는 건 뺀다.
+ * 갈라진 것이고, 방문자가 두 이벤트를 오가면 손이 헷갈린다. 상한(`max`)을 넘는 건 뺀다.
  */
 export const COUNT_PRESETS = [1, 5, 10] as const

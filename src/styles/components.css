@@ -341,7 +341,7 @@
   font-size: 11px;
   text-decoration: none;
   cursor: pointer;
-  /* 손님 눈엔 안 띄게. 찾는 사람은 눌러 보고 진해지는 걸로 확인한다 */
+  /* 방문자 눈엔 안 띄게. 찾는 사람은 눌러 보고 진해지는 걸로 확인한다 */
   opacity: 0.55;
   transition: opacity var(--dur-micro) var(--ease);
 }

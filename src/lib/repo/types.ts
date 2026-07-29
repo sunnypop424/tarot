@@ -270,7 +270,7 @@ export interface LuckydrawSettings {
   rehearsal: boolean
   /** 다중 뽑기 출현 제한 마스터 스위치 — 기본 꺼짐. 원하는 주최자만 켠다 */
   batchCapEnabled: boolean
-  /** 뽑기 전 '경품 미리보기' 를 손님에게 보여줄지 — 상품명이 스포일러인 행사는 끈다 */
+  /** 뽑기 전 '경품 미리보기' 를 방문자에게 보여줄지 — 상품명이 스포일러인 행사는 끈다 */
   showPrizePreview: boolean
   /** 미리보기에서 남은 수량까지 보여줄지 — 수량이 민망하면 끈다 */
   showPrizeCount: boolean
@@ -335,7 +335,7 @@ export interface LuckydrawRepo {
    * 다른 기기의 변화를 **가만히 있어도** 받는다 — 되돌리는 함수를 준다.
    *
    * 부스에 태블릿을 두 대 놓는 행사가 있다. 옆 기기에서 마지막 하나가 나가도 이쪽 화면이
-   * "1개 남음" 을 띄우고 있으면, 손님 앞에서 눌렀다가 에러를 보게 된다 —
+   * "1개 남음" 을 띄우고 있으면, 방문자 앞에서 눌렀다가 에러를 보게 된다 —
    * 서버가 막아 주는 것과 **애초에 안 보이게 하는 것**은 다르다.
    *
    * 못 붙는 어댑터(local)에선 아무것도 안 하고 빈 함수를 준다. 화면은 그걸 몰라도 된다.
@@ -649,7 +649,7 @@ export interface Photocard {
   batchCapRatio: number | null
   /**
    * '럭키' 표시 — **레어도와 다르다.** 레어도는 확률이고 이건 연출이다.
-   * 스태프 화면에 별로 뜨고, 손님이 뽑기 전에 뭘 노리는지 보게 한다.
+   * 스태프 화면에 별로 뜨고, 방문자가 뽑기 전에 뭘 노리는지 보게 한다.
    * 레어도와 달리 **주최자가 켠다** (행사 중에 바뀔 수 있는 값이라 재고와 같은 자리).
    */
   lucky: boolean
@@ -678,7 +678,7 @@ export interface PhotocardDrawn {
 /**
  * 스태프 화면 왼쪽에 세워두는 라인업 한 장.
  *
- * **재고 숫자도 레어도도 안 준다** — 손님이 같이 보는 화면이라 확률이 노출되면 안 된다.
+ * **재고 숫자도 레어도도 안 준다** — 방문자가 같이 보는 화면이라 확률이 노출되면 안 된다.
  * 소진 여부(`soldOut`)만 준다: 없는 걸 노리게 두는 게 더 나쁘다.
  */
 export interface PhotocardLineupRow {
@@ -768,8 +768,8 @@ export interface PhotocardRepo {
    * 뽑기권 한 장을 지운다 (주최자).
    *
    * **지우면 그 폰이 뽑기권을 새로 받을 수 있게 된다** — `unique(slug, subject)` 가 풀리기
-   * 때문이다. 그게 이 기능의 쓸모다(잘못 발급했거나 손님이 못 받았을 때). 이미 뽑은
-   * 뽑기권을 지우면 그 손님이 한 번 더 뽑을 수 있게 되므로 화면이 그걸 경고해야 한다.
+   * 때문이다. 그게 이 기능의 쓸모다(잘못 발급했거나 방문자가 못 받았을 때). 이미 뽑은
+   * 뽑기권을 지우면 그 방문자가 한 번 더 뽑을 수 있게 되므로 화면이 그걸 경고해야 한다.
    * 뽑힌 기록(`photocard_draws`)과 재고는 그대로 둔다 — 그건 되돌리는 게 아니다.
    */
   removeTicket(slug: string, code: string): Promise<void>
@@ -839,7 +839,7 @@ export interface RewardsRepo {
   entries(slug: string, source: string): Promise<RewardEntry[]>
   /**
    * 교환코드 확인 — **중복 수령을 실제로 막는 유일한 자리.**
-   * `manages_slot` 게이트라 anon 은 못 부른다(부르면 손님이 자기 코드를 스스로 처리한다).
+   * `manages_slot` 게이트라 anon 은 못 부른다(부르면 방문자가 자기 코드를 스스로 처리한다).
    * 이미 처리된 코드면 `already` 와 그 시각을 돌려준다 — "이미 받으셨어요 (7/27 14:32)".
    */
   redeem(slug: string, code: string): Promise<RedeemResult>

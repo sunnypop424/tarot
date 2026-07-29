@@ -16,11 +16,11 @@ import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Poll.module.css'
 
 /**
- * 실시간 투표 — 손님이 자기 폰으로 찍고 결과가 그 자리에서 차오른다.
+ * 실시간 투표 — 방문자가 자기 폰으로 찍고 결과가 그 자리에서 차오른다.
  * 화면은 claude.ai/design 시안 '실시간 투표 방문자' 를 옮긴 것이다.
  *
  * **URL 로 안 가른다.** 목록 ↔ 설문을 상태로 오간다 — 투표 도중 뒤로가기가 고른 걸 날리는
- * 게 더 나쁘고, 설문 하나하나에 주소를 주면 손님이 그 주소를 공유해 마감된 설문으로 들어온다.
+ * 게 더 나쁘고, 설문 하나하나에 주소를 주면 방문자가 그 주소를 공유해 마감된 설문으로 들어온다.
  */
 export default function PollApp() {
   const state = useSlotState()

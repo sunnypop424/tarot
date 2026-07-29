@@ -76,7 +76,7 @@ export const SERVICES: LandingService[] = [
     name: '타로카드',
     desc: '궁금한 질문을 고르면 카드를 뽑고 해석을 보여줍니다.',
     slug: '/demo-tarot',
-    devices: [{ kind: 'phone', label: '손님 폰', path: '/demo-tarot' }],
+    devices: [{ kind: 'phone', label: '방문자 폰', path: '/demo-tarot' }],
   },
   {
     key: 'luckydraw',
@@ -92,7 +92,7 @@ export const SERVICES: LandingService[] = [
     desc: '랜덤 포토카드 뽑기입니다. 이미지 저장용, 실물 1장 증정용, 판매용 등 세 가지 방식으로 운영할 수 있습니다.',
     slug: '/demo-photocard',
     devices: [
-      { kind: 'phone', label: '손님 폰', path: '/demo-photocard' },
+      { kind: 'phone', label: '방문자 폰', path: '/demo-photocard' },
       { kind: 'tablet', label: '스태프 기기 (판매)', path: '/demo-photocard-sale/staff' },
     ],
   },
@@ -103,7 +103,7 @@ export const SERVICES: LandingService[] = [
     slug: '/demo-rolling',
     devices: [
       { kind: 'screen', label: '벽 스크린', path: '/demo-rolling' },
-      { kind: 'phone', label: '손님 폰', path: '/demo-rolling/write' },
+      { kind: 'phone', label: '방문자 폰', path: '/demo-rolling/write' },
     ],
   },
   {
@@ -113,7 +113,7 @@ export const SERVICES: LandingService[] = [
     slug: '/demo-wish',
     devices: [
       { kind: 'screen', label: '나무 스크린', path: '/demo-wish' },
-      { kind: 'phone', label: '손님 폰', path: '/demo-wish/write' },
+      { kind: 'phone', label: '방문자 폰', path: '/demo-wish/write' },
     ],
   },
   {
@@ -121,7 +121,7 @@ export const SERVICES: LandingService[] = [
     name: '포토존 프레임',
     desc: '촬영한 사진에 행사 전용 프레임을 씌워 저장할 수 있습니다.',
     slug: '/demo-photozone',
-    devices: [{ kind: 'phone', label: '손님 폰', path: '/demo-photozone' }],
+    devices: [{ kind: 'phone', label: '방문자 폰', path: '/demo-photozone' }],
   },
   {
     key: 'cheer',
@@ -129,7 +129,7 @@ export const SERVICES: LandingService[] = [
     desc: '팬들이 남긴 응원 문구가 상영 스크린에 말풍선으로 떠오릅니다.',
     slug: '/demo-cheer',
     devices: [
-      { kind: 'phone', label: '손님 폰', path: '/demo-cheer' },
+      { kind: 'phone', label: '방문자 폰', path: '/demo-cheer' },
       { kind: 'overlay', label: '상영 화면', path: '/demo-cheer/overlay' },
     ],
   },
@@ -138,7 +138,7 @@ export const SERVICES: LandingService[] = [
     name: '실시간 투표',
     desc: '현장에서 진행되는 즉석 투표입니다. 결과가 실시간으로 반영되어 나타납니다.',
     slug: '/demo-poll',
-    devices: [{ kind: 'phone', label: '손님 폰', path: '/demo-poll' }],
+    devices: [{ kind: 'phone', label: '방문자 폰', path: '/demo-poll' }],
   },
   {
     key: 'stamp',
@@ -146,14 +146,14 @@ export const SERVICES: LandingService[] = [
     // 노출어는 '선물' 이다 — '리워드'·'보상' 은 코드에만 (`docs/DESIGN.md` 「용어」)
     desc: '현장 암호를 통해 스탬프를 모으고, 완성 시 선물로 교환할 수 있습니다.',
     slug: '/demo-stamp',
-    devices: [{ kind: 'phone', label: '손님 폰', path: '/demo-stamp' }],
+    devices: [{ kind: 'phone', label: '방문자 폰', path: '/demo-stamp' }],
   },
   {
     key: 'quiz',
     name: '최애 모의고사',
     desc: '퀴즈를 풀고 점수에 따른 특별한 칭호를 획득합니다.',
     slug: '/demo-quiz',
-    devices: [{ kind: 'phone', label: '손님 폰', path: '/demo-quiz' }],
+    devices: [{ kind: 'phone', label: '방문자 폰', path: '/demo-quiz' }],
   },
 ]
 
@@ -172,7 +172,7 @@ export const STEPS: Step[] = [
     no: '01',
     name: '서비스 고르기',
     tag: '보통 24시간 내 답변',
-    desc: '10가지 서비스 중 이번 행사에 필요한 것을 선택합니다. 손님용 스마트폰만 사용할지, 현장 스크린이나 스태프 기기를 병행할지 함께 결정합니다.',
+    desc: '10가지 서비스 중 이번 행사에 필요한 것을 선택합니다. 방문자용 스마트폰만 사용할지, 현장 스크린이나 스태프 기기를 병행할지 함께 결정합니다.',
   },
   {
     no: '02',
@@ -234,7 +234,7 @@ export const FAQS = [
   {
     q: '별도의 앱을 설치해야 하나요?',
     /*
-     * **손님과 스태프의 답이 다르다.** 손님은 설치가 없는 게 이 서비스의 요점이고,
+     * **방문자와 스태프의 답이 다르다.** 방문자는 설치가 없는 게 이 서비스의 요점이고,
      * 스태프 기기는 반대로 전날 붙여 두는 편이 안전하다 — 현장에서 주소창에 타이핑하거나
      * 링크를 찾는 일이 실제로 사고가 난다.
      */
@@ -245,8 +245,8 @@ export const FAQS = [
     a: '접속 주소가 닫히며 페이지를 더 이상 찾을 수 없게 됩니다. 단, 럭키드로우처럼 행사 종료 후 확인이 필요한 데이터가 있는 서비스는 종료일 기준 14일 동안 다운로드하실 수 있으며, 그 이후에는 안전하게 영구 삭제됩니다.',
   },
   {
-    q: '손님이 촬영한 사진은 서버에 저장되나요?',
-    a: '포토존 서비스는 사진 촬영부터 프레임 합성, 기기 저장까지 모두 손님의 스마트폰 기기 내에서 처리됩니다. 따라서 손님의 사진은 저희 서버로 전송되거나 저장되지 않습니다.',
+    q: '방문자가 촬영한 사진은 서버에 저장되나요?',
+    a: '포토존 서비스는 사진 촬영부터 프레임 합성, 기기 저장까지 모두 방문자의 스마트폰 기기 내에서 처리됩니다. 따라서 방문자의 사진은 저희 서버로 전송되거나 저장되지 않습니다.',
   },
   {
     q: '여러 서비스를 동시에 사용할 수 있나요?',
