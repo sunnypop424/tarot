@@ -165,8 +165,8 @@ export function OrganizerPanel({ slot, slugPending }: { slot: Slot; slugPending:
     !busy && !slugPending && email.trim().length > 0 && password.length >= MIN_PASSWORD
 
   return (
-    <section className="admin-section">
-      <h2 className="t-title-s admin-section__title">주최자 계정</h2>
+    <section className="owner-section">
+      <h2 className="t-title-s owner-section__title">주최자 계정</h2>
       <p className="t-text-xs t-muted">
         이 슬롯의 <b>/{slug}/admin</b> 에 들어갈 계정이에요. 주최자는 운영 데이터만 만지고 테마는 못
         건드립니다. <b>만들면 그 자리에서 반영돼요</b> — 저장하기를 누르지 않아도 바로 씁니다.
