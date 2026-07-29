@@ -1,0 +1,121 @@
+import type { ReactNode } from 'react'
+
+import { cssUrl } from '@/lib/image'
+
+/**
+ * 방문자 화면 맨 위 **로고 + 제목 한 줄.**
+ *
+ * ── 왜 부품인가 ──
+ *
+ * **로고를 안 올린 슬롯에서 회색 네모가 떴다.** 투표·포토존이 로고 자리를 늘 그리고 그 안에
+ * 이미지 아이콘을 넣었는데, 캡처로 보면 **깨진 그림처럼 보인다.** 스탬프는 이미 고쳤고 이유도
+ * 남겨 뒀다 — "없는데도 타일을 그리면 '이미지가 깨졌다' 로 읽힌다(실제로 그렇게 보였다)".
+ * 그런데 그 판단이 스탬프 파일 안에만 있었다. 헤더가 서비스마다 복붙돼 있어서
+ * **고친 사람이 자기 파일만 고칠 수 있었기 때문**이다 (`docs/REVIEW_COMMON.md` 2번).
+ *
+ * 그래서 여기 가두는 건 딱 하나다: **로고가 없으면 로고 자리를 안 그린다.**
+ * 새 서비스가 이걸 다시 정할 일이 없게 기본값으로 못박는다.
+ *
+ * ── 무엇을 안 묶었나 ──
+ *
+ * 헤더의 **생김새는 서비스마다 진짜로 다르다.** 억지로 하나로 만들면 서비스가 죽는다:
+ *  · `tile` — 로고가 제목 **옆** 44px 타일 (투표·스탬프·포토존)
+ *  · `mark` — 로고가 제목 **위** 블록 (포카·응원)
+ *  · `mark` + `titleWithLogo={false}` — 로고가 **제목 자리를 대신한다** (롤페·소원나무).
+ *    이 둘은 로고가 곧 이벤트 제목이라 `logoAlign`·`logoMarginTop` 을 따로 갖는다
+ *
+ * **부제도 안 가져왔다.** 투표·스탬프·포토존은 부제(`.intro`)가 `<header>` **밖**에서
+ * 자기 여백(`margin: 12px var(--layout-pad) 0`)을 갖는다 — 헤더(flex row) 안으로 넣으면
+ * 그 여백이 깨진다. 부제는 각 서비스가 지금 자리에 그대로 둔다.
+ *
+ * 색·치수는 `classes` 로 받는다. 서비스 토큰(`--pl-head` 등)을 쓰는 값이라 여기서 못 고른다.
+ */
+export function ServiceHeader({
+  variant,
+  logo,
+  title,
+  showTitle,
+  align,
+  marginTop,
+  titleWithLogo = true,
+  classes,
+  below,
+  children,
+}: {
+  variant: 'tile' | 'mark'
+  logo: string
+  title: string
+  showTitle: boolean
+  /** 로고·제목 정렬 — `mark` 에서만 쓴다 (`tile` 은 늘 왼쪽) */
+  align?: 'left' | 'center' | 'right'
+  /** 배경 사진 위에서 헤더를 내려야 할 때 (롤페·소원나무) */
+  marginTop?: number
+  /** false 면 **로고가 제목을 대신한다** — 로고가 있으면 제목 글자를 안 그린다 */
+  titleWithLogo?: boolean
+  /**
+   * `text` 는 **있는 서비스만 준다.** 롤페·소원나무는 제목 덩어리를 감싸는 칸이 따로 있어야
+   * 그 옆에 CTA 가 붙고(flex row), 포카·응원은 헤더 자체가 세로 흐름이라 래퍼가 없다.
+   */
+  classes: { head: string; logo: string; title: string; text?: string }
+  /** 제목 **아래**, 제목 덩어리 **안**에 들어갈 것 (롤페·소원·응원의 부제) */
+  below?: ReactNode
+  /** 제목 덩어리 **밖**, 헤더 안에 들어갈 것 (롤페의 데스크톱 CTA) */
+  children?: ReactNode
+}) {
+  /**
+   * **여기가 이 부품의 전부다.** 로고가 없으면 로고 자리를 아예 안 그린다 —
+   * 빈 타일은 "이미지가 깨졌다" 로 읽힌다.
+   */
+  const mark = logo ? (
+    <div
+      className={classes.logo}
+      style={{
+        backgroundImage: cssUrl(logo),
+        ...(variant === 'mark' && align ? { backgroundPosition: `${align} center` } : {}),
+      }}
+      role="img"
+      aria-label={title}
+    />
+  ) : null
+
+  /** 로고가 제목을 대신하는 서비스에서는, 로고가 있으면 제목 글자를 안 그린다 */
+  const heading = showTitle && (titleWithLogo || !logo) ? <h1 className={classes.title}>{title}</h1> : null
+
+  if (variant === 'tile') {
+    return (
+      <header className={classes.head} data-align={align}>
+        {mark}
+        <div className={classes.text} style={{ minWidth: 0 }}>
+          {heading}
+          {below}
+        </div>
+        {children}
+      </header>
+    )
+  }
+
+  /** 래퍼가 없는 서비스(포카·응원)는 헤더가 곧 제목 덩어리다 */
+  const body = (
+    <>
+      {mark}
+      {heading}
+      {below}
+    </>
+  )
+  return (
+    <header className={classes.head} data-align={align}>
+      {classes.text ? (
+        <div
+          className={classes.text}
+          data-align={align}
+          style={{ textAlign: align, marginTop: marginTop || undefined }}
+        >
+          {body}
+        </div>
+      ) : (
+        body
+      )}
+      {children}
+    </header>
+  )
+}

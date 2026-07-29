@@ -12,6 +12,7 @@ import { visitorId } from '@/lib/visitor'
 import type { MyVote, Poll } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
+import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Poll.module.css'
 
 /**
@@ -138,19 +139,14 @@ function PollHome({ slot }: { slot: Slot }) {
           />
         ) : (
           <>
-            <header className={styles.head}>
-              <div
-                className={styles.logoTile}
-                style={display.logo ? { backgroundImage: cssUrl(display.logo) } : undefined}
-                role={display.logo ? 'img' : undefined}
-                aria-label={display.logo ? display.title : undefined}
-              >
-                {!display.logo && <ImageIcon size={22} strokeWidth={1.7} aria-hidden="true" />}
-              </div>
-              <div style={{ minWidth: 0 }}>
-                {display.showTitle && <h1 className={styles.title}>{display.title}</h1>}
-              </div>
-            </header>
+            <ServiceHeader
+              variant="tile"
+              logo={display.logo}
+              title={display.title}
+              showTitle={display.showTitle}
+              align={display.logoAlign}
+              classes={{ head: styles.head, logo: styles.logoTile, title: styles.title }}
+            />
             {display.showSubtitle && display.subtitle && <p className={styles.intro}>{display.subtitle}</p>}
 
             {polls === null ? (

@@ -23,6 +23,7 @@ import { visitorId } from '@/lib/visitor'
 import type { MyReward, StampSettings } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
+import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Stamp.module.css'
 
 /**
@@ -188,19 +189,14 @@ function Board({ slot }: { slot: Slot }) {
               * 헤더는 롤페·소원나무와 같은 규칙이다 — 로고가 있으면 로고, 없으면 제목 텍스트.
               * **없는데도 타일을 그리면 "이미지가 깨졌다" 로 읽힌다** (실제로 그렇게 보였다).
               */}
-            <header className={styles.head} data-align={display.logoAlign}>
-              {display.logo && (
-                <div
-                  className={styles.logoTile}
-                  style={{ backgroundImage: cssUrl(display.logo) }}
-                  role="img"
-                  aria-label={display.title}
-                />
-              )}
-              <div style={{ minWidth: 0 }}>
-                {display.showTitle && <h1 className={styles.title}>{display.title}</h1>}
-              </div>
-            </header>
+            <ServiceHeader
+              variant="tile"
+              logo={display.logo}
+              title={display.title}
+              showTitle={display.showTitle}
+              align={display.logoAlign}
+              classes={{ head: styles.head, logo: styles.logoTile, title: styles.title }}
+            />
             {display.showSubtitle && display.subtitle && <p className={styles.intro}>{display.subtitle}</p>}
 
             {cells.length === 0 ? (

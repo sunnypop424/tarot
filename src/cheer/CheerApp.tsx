@@ -12,6 +12,7 @@ import { readList, appendItem } from '@/lib/locker'
 import type { CheerSettings, RollingMessage } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import { Stage } from './Stage'
+import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Cheer.module.css'
 
 /**
@@ -337,18 +338,18 @@ function Write({
       }}
     >
       <div className={styles.phone}>
-        <header className={styles.head}>
-          {display.logo && (
-            <div
-              className={styles.logo}
-              style={{ backgroundImage: cssUrl(display.logo) }}
-              role="img"
-              aria-label={display.title}
-            />
-          )}
-          {display.showTitle && <h1 className={styles.title}>{display.title}</h1>}
-          {display.showSubtitle && display.subtitle && <p className={styles.subtitle}>{display.subtitle}</p>}
-        </header>
+        <ServiceHeader
+          variant="mark"
+          logo={display.logo}
+          title={display.title}
+          showTitle={display.showTitle}
+          classes={{ head: styles.head, logo: styles.logo, title: styles.title }}
+          below={
+            display.showSubtitle && display.subtitle ? (
+              <p className={styles.subtitle}>{display.subtitle}</p>
+            ) : null
+          }
+        />
 
         {done ? (
           <div className={styles.doneBox} data-done>

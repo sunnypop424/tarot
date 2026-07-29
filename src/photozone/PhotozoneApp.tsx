@@ -35,6 +35,7 @@ import {
 import type { Slot } from '@/types/slot'
 import { CAMERA_MESSAGE, useCamera } from './useCamera'
 import { AdminEntry } from '@/components/AdminEntry'
+import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Photozone.module.css'
 
 /**
@@ -445,19 +446,14 @@ function Ready({
 }) {
   return (
     <>
-      <header className={styles.head}>
-        <div
-          className={styles.logoTile}
-          style={display.logo ? { backgroundImage: cssUrl(display.logo) } : undefined}
-          role={display.logo ? 'img' : undefined}
-          aria-label={display.logo ? display.title : undefined}
-        >
-          {!display.logo && <ImageIcon size={26} strokeWidth={1.7} aria-hidden="true" />}
-        </div>
-        <div className={styles.headText}>
-          {display.showTitle && <h1 className={styles.title}>{display.title}</h1>}
-        </div>
-      </header>
+      <ServiceHeader
+        variant="tile"
+        logo={display.logo}
+        title={display.title}
+        showTitle={display.showTitle}
+        align={display.logoAlign}
+        classes={{ head: styles.head, logo: styles.logoTile, title: styles.title, text: styles.headText }}
+      />
 
       {display.showSubtitle && display.subtitle && <p className={styles.intro}>{display.subtitle}</p>}
 

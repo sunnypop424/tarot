@@ -11,6 +11,7 @@ import { cssUrl } from '@/lib/image'
 import type { RollingMessage } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
+import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Rolling.module.css'
 
 /**
@@ -130,26 +131,22 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
           : {}),
       }}
     >
-      <header className={styles.head} data-align={display.logoAlign}>
-        <div
-          className={styles.headText}
-          data-align={display.logoAlign}
-          style={{ textAlign: display.logoAlign, marginTop: display.logoMarginTop || undefined }}
-        >
-          {display.logo ? (
-            <div
-              className={styles.logo}
-              style={{ backgroundImage: cssUrl(display.logo), backgroundPosition: `${display.logoAlign} center` }}
-              role="img"
-              aria-label={display.wallTitle}
-            />
-          ) : (
-            display.showTitle && <h1 className={styles.title}>{display.wallTitle}</h1>
-          )}
-          {display.showSubtitle && display.wallSubtitle && (
+      <ServiceHeader
+        variant="mark"
+        logo={display.logo}
+        title={display.wallTitle}
+        showTitle={display.showTitle}
+        align={display.logoAlign}
+        marginTop={display.logoMarginTop}
+        /* 로고가 곧 이벤트 제목이다 — 로고를 올리면 제목 글자는 안 그린다 */
+        titleWithLogo={false}
+        classes={{ head: styles.head, logo: styles.logo, title: styles.title, text: styles.headText }}
+        below={
+          display.showSubtitle && display.wallSubtitle ? (
             <p className={styles.subtitle}>{display.wallSubtitle}</p>
-          )}
-        </div>
+          ) : null
+        }
+      >
         {/* 데스크톱: 헤더 CTA (모바일은 하단 고정) */}
         <button
           type="button"
@@ -159,7 +156,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
           <Pencil size={17} aria-hidden="true" />
           {display.postLabel}
         </button>
-      </header>
+      </ServiceHeader>
 
       <main ref={setBoard} className={`app__scroll ${styles.board}`}>
         {notes.length === 0 ? (

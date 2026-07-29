@@ -12,6 +12,7 @@ import { cssUrl } from '@/lib/image'
 import type { RollingMessage } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
+import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Wish.module.css'
 
 /**
@@ -433,28 +434,22 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
       <Sky hasImage={hasBg} />
 
       {/* 헤더 — 롤페와 같은 규칙: 로고가 제목을 대신하고 정렬은 슬롯이 정한다 */}
-      <header className={styles.head}>
-        <div
-          className={styles.headText}
-          style={{ textAlign: display.logoAlign, marginTop: display.logoMarginTop || undefined }}
-        >
-          {display.logo ? (
-            <div
-              className={styles.logo}
-              style={{
-                backgroundImage: cssUrl(display.logo),
-                backgroundPosition: `${display.logoAlign} center`,
-              }}
-              role="img"
-              aria-label={display.treeTitle}
-            />
-          ) : (
-            display.showTitle && <h1 className={styles.title}>{display.treeTitle}</h1>
-          )}
-          {display.showSubtitle && display.treeSubtitle && (
+      <ServiceHeader
+        variant="mark"
+        logo={display.logo}
+        title={display.treeTitle}
+        showTitle={display.showTitle}
+        align={display.logoAlign}
+        marginTop={display.logoMarginTop}
+        /* 롤페와 같은 규칙 — 로고가 제목을 대신한다 */
+        titleWithLogo={false}
+        classes={{ head: styles.head, logo: styles.logo, title: styles.title, text: styles.headText }}
+        below={
+          display.showSubtitle && display.treeSubtitle ? (
             <p className={styles.subtitle}>{display.treeSubtitle}</p>
-          )}
-        </div>
+          ) : null
+        }
+      >
         {wishes.length > 0 && (
           <span className={styles.count}>
             지금까지 걸린 소원 <b>{wishes.length}</b>
@@ -464,7 +459,7 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
           <Lamp size={19} strokeWidth={1.6} aria-hidden="true" />
           {display.hangLabel}
         </button>
-      </header>
+      </ServiceHeader>
 
       {list.length === 0 ? (
         <div className={styles.empty}>

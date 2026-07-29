@@ -696,6 +696,16 @@
   color: var(--pc-sub);
   line-height: 1.7;
 }
+/*
+ * 카운터 화면의 로고+제목 묶음 (`ServiceHeader` variant="mark").
+ * 원래는 `.center` 의 직계 자식 둘이었다 — 부품으로 감싸면서 한 겹이 생겼으니
+ * 그 겹이 세로 흐름·가운데 정렬을 그대로 잇는다 (여백은 아래 두 클래스가 갖는다).
+ */
+.counterHead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .bigLogo {
   width: 74px;
   height: 74px;

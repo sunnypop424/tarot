@@ -29,6 +29,7 @@ import { SavableImage } from '@/components/SavableImage'
 import type { PhotocardDrawn, PhotocardMine, PhotocardSettings, PhotocardTicket } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
+import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Photocard.module.css'
 
 /**
@@ -429,12 +430,13 @@ function Deck({
 
   return (
     <>
-      <header className={styles.head}>
-        {display.logo && (
-          <div className={styles.logo} style={{ backgroundImage: cssUrl(display.logo) }} role="img" aria-label={display.title} />
-        )}
-        {display.showTitle && <h1 className={styles.title}>{display.title}</h1>}
-      </header>
+      <ServiceHeader
+        variant="mark"
+        logo={display.logo}
+        title={display.title}
+        showTitle={display.showTitle}
+        classes={{ head: styles.head, logo: styles.logo, title: styles.title }}
+      />
       {display.deckGuide && <p className={styles.deckGuide}>{display.deckGuide}</p>}
 
       <div className={styles.fanWrap} ref={wrapRef}>
@@ -905,10 +907,14 @@ function Counter({ display, slug }: { display: PhotocardDisplay; slug: string })
     <>
       <div style={{ height: 32, flex: 'none' }} />
       <div className={styles.center}>
-        <div className={styles.bigLogo} style={display.logo ? { backgroundImage: cssUrl(display.logo) } : undefined}>
-          {!display.logo && <ImageIcon size={30} strokeWidth={1.6} aria-hidden="true" />}
-        </div>
-        {display.showTitle && <h1 className={styles.counterHeadline}>{display.title}</h1>}
+        {/* 로고가 없으면 자리를 안 그린다 — 빈 타일은 "그림이 깨졌다" 로 읽힌다 (ServiceHeader) */}
+        <ServiceHeader
+          variant="mark"
+          logo={display.logo}
+          title={display.title}
+          showTitle={display.showTitle}
+          classes={{ head: styles.counterHead, logo: styles.bigLogo, title: styles.counterHeadline }}
+        />
 
         <div className={styles.counterBox}>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
