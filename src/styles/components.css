@@ -265,6 +265,31 @@
   color: var(--color-fg-3);
 }
 
+/* ══ 누르는 면적 ═══════════════════════════════════
+ *
+ * **보이는 크기는 그대로 두고 누르는 면적만 `--tap-min`(44px) 까지 넓힌다.**
+ *
+ * 뒤로가기 버튼이 서비스마다 34×34·38×38 로 만들어져 있었다 — 셋 다 44px 미만이라
+ * 카페에서 한 손으로 쓸 때 잘 안 눌린다. 그렇다고 동그라미를 44px 로 키우면 시안의
+ * 인상이 바뀐다(작고 얌전한 게 의도다). 그래서 **투명한 판을 가운데 겹쳐** 손가락만
+ * 받는다 (`docs/REVIEW_COMMON.md` 7번).
+ *
+ * 쓰는 쪽은 CSS 모듈에서 끌어온다:
+ *   .backBtn { composes: tap-min from global; … }
+ */
+.tap-min {
+  position: relative;
+}
+.tap-min::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  transform: translate(-50%, -50%);
+}
+
 /* ══ 관리자 진입 ═══════════════════════════════════
  *
  * 방문자 화면 구석의 한 줄 (`components/AdminEntry.tsx`). **생김새만 여기 있다** —

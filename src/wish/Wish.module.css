@@ -517,12 +517,21 @@
 }
 .composeTop {
   position: relative;
+  /*
+   * 바로 아래 `.composeScroll` 이 DOM 에서 뒤에 와서, 겹치는 자리는 그쪽이 이긴다.
+   * 그래서 뒤로가기의 **누르는 면적**(`.tap-min`, 보이는 34px 밖으로 나간다)의 아래쪽이
+   * 스크롤 영역에 먹혔다 — 44px 를 맞춰 놓고도 실제로는 39px 만 눌렸다.
+   * `1` 로는 안 된다 — `.app__scroll`(layout.css)이 이미 `z-index: 1` 이라 비기면 뒤가 이긴다.
+   */
+  z-index: 2;
   padding: var(--space-lg) 18px 0;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 .backBtn {
+  /* 보이는 크기는 그대로, 누르는 면적만 44px (components.css) */
+  composes: tap-min from global;
   width: 34px;
   height: 34px;
   flex: none;

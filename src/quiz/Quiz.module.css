@@ -487,6 +487,8 @@
   padding: 14px var(--layout-pad) 0;
 }
 .backBtn {
+  /* 보이는 크기는 그대로, 누르는 면적만 44px (components.css) */
+  composes: tap-min from global;
   width: 38px;
   height: 38px;
   border-radius: 9999px;
