@@ -2,11 +2,30 @@ import { filledTheme } from '@/lib/theme'
 import type { Slot } from '@/types/slot'
 
 /**
+ * 홈 화면에 추가했을 때 **무엇으로 열릴지**를 가르는 축.
+ *
+ * 손님은 QR 로 들어와 한 번 쓰고 말지만, **스태프는 기기를 들고 하루를 난다** — 그래서
+ * 스태프 기기에는 전날 미리 붙여 두시라고 안내한다(랜딩 FAQ · `owner/guide.ts`).
+ */
+export type PwaArea = 'visitor' | 'admin' | 'staff'
+
+/** 영역별 진입 경로와 앱 이름 꼬리표 — 셋이 한 줄에 있어야 어긋나지 않는다 */
+const AREA = {
+  visitor: { path: '', suffix: '' },
+  admin: { path: '/admin', suffix: ' 관리자' },
+  staff: { path: '/staff', suffix: ' 스태프' },
+} as const
+
+/**
  * 슬롯별 **웹앱 매니페스트 + iOS 메타**를 문서에 심는다.
  *
- * 방문자가 브라우저의 "홈 화면에 추가" 를 누르면, 이 이벤트의 **이름·아이콘**으로,
- * 이 슬롯(`/{slug}`)으로 열리는 웹앱이 된다. 별도 설치 버튼은 두지 않는다(브라우저 기본을 쓴다).
- * 서비스워커·오프라인 캐시는 없다 — "홈 화면 추가" 만 목적이다.
+ * 브라우저의 "홈 화면에 추가" 를 누르면, 이 이벤트의 **이름·아이콘**으로 열리는 웹앱이 된다.
+ * 별도 설치 버튼은 두지 않는다(브라우저 기본을 쓴다). 서비스워커·오프라인 캐시는 없다 —
+ * "홈 화면 추가" 만 목적이다.
+ *
+ * **지금 보고 있는 영역으로 열린다.** 예전엔 어디서 추가하든 `start_url` 이 손님 화면이라,
+ * 스태프가 뽑기 화면을 붙여 놓고 눌러도 손님 화면이 떴다 — 붙여 두는 이유가 사라지는 버그였다.
+ * `scope` 는 셋 다 `/{slug}` 로 둔다(관리 화면이 손님 화면으로 넘어가도 앱 안에 머문다).
  *
  * **매니페스트가 슬롯마다 다르다** → 정적 파일로 못 둔다. Blob 으로 만들어 `<link rel="manifest">`
  * 에 건다. 이때 **URL 은 절대경로**여야 한다 — blob: 매니페스트엔 기준 경로가 없어 상대 start_url
@@ -14,7 +33,7 @@ import type { Slot } from '@/types/slot'
  *
  * 편집기 미리보기(iframe)에선 부르지 않는다 — 미리보기가 부모의 매니페스트를 갈아치우면 안 된다.
  */
-export function applyPwaHead(slot: Slot): () => void {
+export function applyPwaHead(slot: Slot, area: PwaArea = 'visitor'): () => void {
   const origin = window.location.origin
   const abs = (u: string) => {
     try {
@@ -30,13 +49,14 @@ export function applyPwaHead(slot: Slot): () => void {
    */
   const theme = filledTheme(slot.theme)
   const icon = theme.assets.appIcon ? abs(theme.assets.appIcon) : null
-  const name = slot.name || '이벤트'
+  const { path, suffix } = AREA[area]
+  const name = `${slot.name || '이벤트'}${suffix}`
   const canvas = theme.colors.canvas || '#0f1020'
 
   const manifest: Record<string, unknown> = {
     name,
     short_name: name.slice(0, 12),
-    start_url: `${origin}/${slot.slug}`,
+    start_url: `${origin}/${slot.slug}${path}`,
     scope: `${origin}/${slot.slug}`,
     display: 'standalone',
     background_color: canvas,

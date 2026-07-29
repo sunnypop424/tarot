@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 
 import { repo } from '@/lib/repo'
 import { onSlotChange } from '@/lib/repo/changed'
@@ -8,6 +8,7 @@ import { applyTheme, filledTheme } from '@/lib/theme'
 import { isLight } from '@/lib/color'
 import { useLivePreview } from './preview'
 import { applyPwaHead } from './pwa'
+import type { PwaArea } from './pwa'
 import type { Slot } from '@/types/slot'
 
 /**
@@ -45,6 +46,7 @@ const SlotContext = createContext<State>({ status: 'loading' })
  */
 export function SlotProvider({ children }: { children: ReactNode }) {
   const { slug } = useParams<{ slug: string }>()
+  const { pathname } = useLocation()
   const [loaded, setLoaded] = useState<State>({ status: 'loading' })
 
   /**
@@ -119,13 +121,20 @@ export function SlotProvider({ children }: { children: ReactNode }) {
   }, [state])
 
   /**
-   * 웹앱 매니페스트 + iOS 메타 — 방문자가 "홈 화면에 추가" 하면 이 이벤트로 열리는 앱이 된다.
+   * 웹앱 매니페스트 + iOS 메타 — "홈 화면에 추가" 하면 이 이벤트로 열리는 앱이 된다.
+   *
+   * **보고 있는 영역이 그대로 앱의 첫 화면이 된다.** 스태프가 뽑기 화면을 붙여 두는 게
+   * 이 기능의 실제 쓰임인데(랜딩 FAQ 에서 그렇게 권한다), 예전엔 어디서 붙이든 손님 화면이
+   * 떴다. 세 갈래뿐이라 경로 첫 마디만 본다 — 화면이 늘어도 관리/스태프 아래에 붙는다.
+   *
    * **미리보기(초안)일 땐 심지 않는다** — 편집기 iframe 이 부모의 매니페스트를 갈아치우면 안 된다.
    */
+  const sub = pathname.split('/').filter(Boolean)[1]
+  const area: PwaArea = sub === 'admin' ? 'admin' : sub === 'staff' ? 'staff' : 'visitor'
   useEffect(() => {
     if (state.status !== 'ready' || preview) return
-    return applyPwaHead(state.slot)
-  }, [state, preview])
+    return applyPwaHead(state.slot, area)
+  }, [state, preview, area])
 
   return <SlotContext.Provider value={state}>{children}</SlotContext.Provider>
 }
