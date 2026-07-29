@@ -147,7 +147,7 @@ export function QuestionEditor() {
       desc:
         overwrites > 0
           ? `이미 써 두신 답변 ${overwrites}장이 덮어써집니다.`
-          : '검수한 내용 그대로 방문자에게 나갑니다.',
+          : '검수한 내용 그대로 손님에게 나갑니다.',
       okLabel: '저장',
       danger: overwrites > 0,
     })
@@ -203,7 +203,7 @@ export function QuestionEditor() {
             id="q-text"
             className="ad-input ad-input--lg"
             value={draft.question}
-            placeholder="방문자에게 보일 문구"
+            placeholder="손님에게 보일 문구"
             onChange={(e) => patch({ question: e.target.value })}
           />
           <button

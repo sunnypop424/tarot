@@ -68,7 +68,7 @@ export function Login() {
               <TriangleAlert size={16} strokeWidth={2} aria-hidden="true" />
               <span className="t-text-xs">
                 이 브라우저에만 저장되는 임시 모드예요 (Supabase 미설정). 아무 값이나 들어가고,
-                고친 답변이 방문자에게 가지 않아요.
+                고친 답변이 손님에게 가지 않아요.
               </span>
             </p>
           )}

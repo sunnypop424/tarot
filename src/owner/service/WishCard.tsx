@@ -26,7 +26,7 @@ export function WishCard({
   return (
     <Card title="소원나무">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-        방문자가 소원을 적으면 등불로 나무에 매달려요. 건 즉시 보이고, 부적절한 건 주최자가 숨겨요.
+        손님이 소원을 적으면 등불로 나무에 매달려요. 건 즉시 보이고, 부적절한 건 주최자가 숨겨요.
         아래 색·글꼴은 소원나무 전용이에요 (위 테마와 별개).{' '}
         <b>메시지는 롤링페이퍼와 같은 저장소를 써요</b> — 주최자 검수 화면도 같습니다.
       </p>
@@ -55,7 +55,7 @@ export function WishCard({
       </div>
 
       <Divided>
-        <Field label="기본 글꼴" hint="제목·UI 글꼴이에요. 등불 글씨체는 방문자가 골라요.">
+        <Field label="기본 글꼴" hint="제목·UI 글꼴이에요. 등불 글씨체는 손님이 골라요.">
           <select value={d.font} onChange={(e) => patch({ font: e.target.value as FontId })} style={CSS.select}>
             {Object.entries(WEBFONTS).map(([id, f]) => (
               <option key={id} value={id}>{f.label}</option>
@@ -101,7 +101,7 @@ export function WishCard({
       <Divided>
         <PaletteField
           label="등불 색"
-          hint="방문자가 소원을 쓸 때 이 중에서 골라요. 비우면 색 선택이 없고 전부 첫 색으로 나갑니다."
+          hint="손님이 소원을 쓸 때 이 중에서 골라요. 비우면 색 선택이 없고 전부 첫 색으로 나갑니다."
           value={d.lanterns}
           onChange={(lanterns) => patch({ lanterns })}
         />
@@ -113,7 +113,7 @@ export function WishCard({
           label="매다는 장식"
           value={d.charms}
           onChange={(charms) => patch({ charms })}
-          hint="방문자가 등불에 달 수 있어요. 주최자에게 받은 이미지를 올려 주세요."
+          hint="손님이 등불에 달 수 있어요. 주최자에게 받은 이미지를 올려 주세요."
         />
       </Divided>
 

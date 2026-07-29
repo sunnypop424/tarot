@@ -42,7 +42,7 @@ export function Entries() {
         <h1 className="ad-head__title">응모자 명단</h1>
         {list && <span className="ad-head__count tnum">응모 {list.length}명</span>}
       </div>
-      <p className="ad-head__desc">보상을 받을 자격을 얻고 응모까지 마친 방문자 명단입니다.</p>
+      <p className="ad-head__desc">보상을 받을 자격을 얻고 응모까지 마친 손님 명단입니다.</p>
     </header>
   )
 

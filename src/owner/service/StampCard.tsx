@@ -103,7 +103,7 @@ export function StampCard({
   return (
     <Card title="방문 스탬프">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-        방문자가 현장 암호를 입력하면 도장이 찍혀요.{' '}
+        손님이 현장 암호를 입력하면 도장이 찍혀요.{' '}
         <b>암호와 보상 방식은 주최자가 관리 화면에서 정합니다</b> — 여기서는 칸과 겉모습만 정해요.
       </p>
 
@@ -170,7 +170,7 @@ export function StampCard({
               textAlign: 'center',
             }}
           >
-            아직 칸이 없어요. 칸을 만들어야 방문자 화면에 판이 그려집니다.
+            아직 칸이 없어요. 칸을 만들어야 손님 화면에 판이 그려집니다.
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }} data-stamp-cells>

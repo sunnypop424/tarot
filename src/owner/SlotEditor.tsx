@@ -1382,7 +1382,7 @@ export function SlotEditor() {
 
           <Card title="웹앱 아이콘">
             <p style={{ margin: '0 0 14px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-              방문자가 브라우저에서 “홈 화면에 추가” 하면 이 아이콘과 행사명으로 앱처럼 열려요. 정사각형 PNG 를 권장해요 (512×512).
+              손님이 브라우저에서 “홈 화면에 추가” 하면 이 아이콘과 행사명으로 앱처럼 열려요. 정사각형 PNG 를 권장해요 (512×512).
             </p>
             <ImageField slug={saved.slug} label="앱 아이콘" name="app-icon" title="앱 아이콘" value={draft.theme.assets.appIcon} onChange={(v) => patchAsset('appIcon', v)} thumbW={60} thumbH={60} thumbRadius={8} hint="없으면 홈 화면 아이콘이 기본으로 떠요." />
           </Card>
@@ -1707,7 +1707,7 @@ export function SlotEditor() {
             <>
               <Card title="롤링페이퍼">
                 <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-                  방문자가 포스트잇으로 메시지를 남기면 벽에 쌓여요. 남긴 즉시 벽에 보이고, 부적절한 건 주최자가 숨겨요. 아래 색·글꼴은 롤페 전용이에요 (위 테마와 별개).
+                  손님이 포스트잇으로 메시지를 남기면 벽에 쌓여요. 남긴 즉시 벽에 보이고, 부적절한 건 주최자가 숨겨요. 아래 색·글꼴은 롤페 전용이에요 (위 테마와 별개).
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
                   <div style={CSS.fieldCol}>
@@ -1738,7 +1738,7 @@ export function SlotEditor() {
                   </Field>
                 </div>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 16 }}>
-                  <Field label="기본 글꼴" hint="제목·UI 글꼴이에요. 쪽지 글씨체는 방문자가 골라요.">
+                  <Field label="기본 글꼴" hint="제목·UI 글꼴이에요. 쪽지 글씨체는 손님이 골라요.">
                     <select value={rd.font} onChange={(e) => patchRolling({ font: e.target.value as FontId })} style={CSS.select}>
                       {Object.entries(WEBFONTS).map(([id, f]) => (
                         <option key={id} value={id}>{f.label}</option>
@@ -1767,7 +1767,7 @@ export function SlotEditor() {
                   {/* 소원나무도 같은 위젯을 쓴다 (등불색) — service/PaletteField.tsx */}
                   <PaletteField
                     label="포스트잇 종이색"
-                    hint="방문자가 쪽지마다 고르는 색이에요. 파스텔 여러 색이 벽을 알록달록하게 해요."
+                    hint="손님이 쪽지마다 고르는 색이에요. 파스텔 여러 색이 벽을 알록달록하게 해요."
                     value={rd.papers}
                     onChange={(papers) => patchRolling({ papers })}
                   />
@@ -1816,7 +1816,7 @@ export function SlotEditor() {
                 </div>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee' }}>
                   <div style={{ ...CSS.label, marginBottom: 9 }}>스티커</div>
-                  <StickerField slug={saved.slug} label="스티커" value={rd.stickers} onChange={(next) => patchRolling({ stickers: next })} hint="방문자가 쪽지에 붙일 수 있어요. 주최자에게 받은 이미지를 올려 주세요." />
+                  <StickerField slug={saved.slug} label="스티커" value={rd.stickers} onChange={(next) => patchRolling({ stickers: next })} hint="손님이 쪽지에 붙일 수 있어요. 주최자에게 받은 이미지를 올려 주세요." />
                 </div>
               </Card>
 

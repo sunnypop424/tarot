@@ -370,7 +370,7 @@ export function SlotList() {
             <h1 style={{ margin: '0 0 5px', fontSize: 23, fontWeight: 700, letterSpacing: '-0.02em' }}>슬롯</h1>
             <p style={{ margin: 0, fontSize: 13, color: INK3 }}>
               {hasSupabase
-                ? '만들거나 고치면 바로 반영돼요 — 방문자가 그 주소로 들어올 수 있습니다.'
+                ? '만들거나 고치면 바로 반영돼요 — 손님이 그 주소로 들어올 수 있습니다.'
                 : '지금은 이 브라우저에만 저장돼요 (Supabase 미설정). 내보낸 slots.json 을 레포에 넣어야 배포됩니다.'}
             </p>
           </div>

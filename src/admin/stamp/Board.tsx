@@ -113,7 +113,7 @@ export function Board() {
         <div className="ad-banner ad-banner--info ad-banner--pad">
           <div className="ad-banner__title">이 목록의 규칙</div>
           <div className="ad-banner__body">
-            암호를 비워 두면 그 칸은 방문자에게 잠긴 채로 보여요. 암호가 새면 새로 만들기로 바꾸세요 —
+            암호를 비워 두면 그 칸은 손님에게 잠긴 채로 보여요. 암호가 새면 새로 만들기로 바꾸세요 —
             바꾸면 예전 암호는 바로 안 먹습니다. 칸 이름과 순서는 담당자가 정합니다.
           </div>
         </div>
@@ -178,7 +178,7 @@ export function Board() {
                     </div>
                     {!code.trim() && (
                       <span className="ad-tag ad-tag--sm" data-tone="warn">
-                        암호 없음 · 방문자에게 잠긴 칸이에요
+                        암호 없음 · 손님에게 잠긴 칸이에요
                       </span>
                     )}
                   </div>

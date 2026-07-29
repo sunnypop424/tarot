@@ -232,7 +232,7 @@ export function Dashboard() {
               </div>
               <div className="ad-hr" />
               <p className="ad-fine">
-                종료되면 방문자 주소는 종료 안내로 바뀌고, 보관 기간이 지나면 자료가 파기돼요.
+                종료되면 손님 주소는 종료 안내로 바뀌고, 보관 기간이 지나면 자료가 파기돼요.
               </p>
             </div>
 
@@ -347,7 +347,7 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
     const [all, open] = await Promise.all([repo.questions.listAll(slug), repo.questions.list(slug)])
     return [
       { label: '질문', value: n(all.length), unit: '개', note: '등록된 질문 수' },
-      { label: '공개', value: n(open.length), unit: '개', note: '방문자에게 보이는 질문' },
+      { label: '공개', value: n(open.length), unit: '개', note: '손님에게 보이는 질문' },
     ]
   },
   async luckydraw(slug) {

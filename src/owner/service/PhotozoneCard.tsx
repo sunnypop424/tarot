@@ -28,8 +28,8 @@ export function PhotozoneCard({
   return (
     <Card title="포토존">
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
-        방문자가 찍거나 올린 사진에 프레임을 씌워 자기 폰에 저장해 가요.{' '}
-        <b>사진은 방문자 폰 안에서 합성되고 서버로 오지 않아요</b> — 주최자도 저희도 볼 수 없습니다.
+        손님이 찍거나 올린 사진에 프레임을 씌워 자기 폰에 저장해 가요.{' '}
+        <b>사진은 손님 폰 안에서 합성되고 서버로 오지 않아요</b> — 주최자도 저희도 볼 수 없습니다.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>

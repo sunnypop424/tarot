@@ -37,7 +37,7 @@ async function common(slot: Slot): Promise<ReadyIssue[]> {
   // 주최자 계정이 없으면 고객이 자기 화면에 못 들어간다
   try {
     const list = await repo.organizers.list(slot.slug)
-    if (list.length === 0) out.push({ level: 'block', text: '주최자 계정이 없어요 — 고객이 관리 화면에 못 들어가요' })
+    if (list.length === 0) out.push({ level: 'block', text: '주최자 계정이 없어요 — 주최자가 관리 화면에 못 들어가요' })
   } catch {
     /* 계정 조회는 백엔드가 있을 때만 — 없으면 점검하지 않는다 */
   }

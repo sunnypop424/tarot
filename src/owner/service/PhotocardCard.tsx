@@ -218,7 +218,7 @@ export function PhotocardCard({
             ))}
             <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9a9a9a', lineHeight: 1.6 }}>
               <b>레어도·재고·럭키는 주최자 관리 화면에서 정합니다</b> — 행사 중에 바뀌는 값이라
-              고객이 직접 만질 수 있어야 해서요. 여기서는 이미지와 이름만 정해요.
+              주최자가 직접 만질 수 있어야 해서요. 여기서는 이미지와 이름만 정해요.
             </p>
           </div>
         )}

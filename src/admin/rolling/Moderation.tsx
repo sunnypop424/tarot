@@ -56,7 +56,7 @@ export function Moderation() {
   async function remove(m: RollingMessage) {
     const ok = await confirmAction({
       title: `이 ${c.unit}를 지울까요?`,
-      desc: '숨기기만 해도 방문자에겐 보이지 않습니다.',
+      desc: '숨기기만 해도 손님에겐 보이지 않습니다.',
       okLabel: '지우기',
       danger: true,
     })

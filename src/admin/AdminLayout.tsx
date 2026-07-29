@@ -192,8 +192,13 @@ export function AdminLayout() {
         </div>
       ))}
       <div className="ad-nav__sep" />
+      {/*
+        * 대시보드의 바로가기 카드와 **같은 주소를 여는 같은 링크**다 — 이름도 같아야 한다.
+        * 예전엔 여기가 "방문자 페이지 열기", 저쪽이 "내 페이지 보기" 라서 주최자가 둘을
+        * 다른 기능으로 읽었다 (`docs/REVIEW_COMMON.md` 4번).
+        */}
       <a className="ad-nav__visit" href={`/${slot.slug}`} target="_blank" rel="noreferrer">
-        방문자 페이지 열기 ↗
+        내 페이지 보기 ↗
       </a>
     </>
   )
@@ -249,7 +254,7 @@ export function AdminLayout() {
           <div className="ad-proxy" data-owner-view>
             <span className="ad-proxy__dot" aria-hidden="true" />
             <span className="ad-proxy__text">
-              최고관리자로 이 슬롯을 대신 보고 있어요. 고치면 고객 화면에 바로 반영돼요.
+              최고관리자로 이 슬롯을 대신 보고 있어요. 고치면 손님 화면에 바로 반영돼요.
             </span>
             <button
               type="button"

@@ -244,6 +244,12 @@ function Board({ slot }: { slot: Slot }) {
                       </div>
                     )}
                   </div>
+                  {/*
+                    * **막힌 이유를 버튼이 말한다.** 예전엔 `disabled` 만 걸어 둬서 손님이
+                    * 왜 안 눌리는지 모른 채 카페에서 계속 눌렀고, 그 문의는 주최자에게 갔다.
+                    * 모의고사·포카와 같은 표현을 쓴다 — 버튼 글자를 "마감됐어요" 로 바꾼다.
+                    * 칸이 아직 없을 때는 바로 위 빈 상태가 이미 이유를 말하고 있다.
+                    */}
                   <button
                     type="button"
                     className={styles.cta}
@@ -251,8 +257,12 @@ function Board({ slot }: { slot: Slot }) {
                     disabled={settings?.closed || cells.length === 0}
                     data-open-code
                   >
-                    <KeyRound size={19} strokeWidth={1.7} aria-hidden="true" />
-                    {complete && reward ? '내 보상 보기' : display.codeLabel}
+                    {!settings?.closed && <KeyRound size={19} strokeWidth={1.7} aria-hidden="true" />}
+                    {settings?.closed
+                      ? '마감됐어요'
+                      : complete && reward
+                        ? '내 보상 보기'
+                        : display.codeLabel}
                   </button>
                 </>
               )}
