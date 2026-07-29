@@ -115,7 +115,16 @@
   font-weight: 600;
   color: var(--ink);
 }
+/**
+ * 문장 안에 섞이는 링크 — `<button>` 이지만 **글자처럼 굴게 한다.**
+ *
+ * 기본값(inline-block)이면 줄 끝에서 통째로 다음 줄로 밀려 앞줄에 구멍이 남는다.
+ * 44px 터치 규칙(`docs/DESIGN.md` 「접근성」)도 여기엔 안 건다 — 문장 속 링크를 44px 로
+ * 키우면 줄 간격이 무너지고, 접근성 기준(WCAG 2.5.8)도 문장에 섞인 타깃은 예외로 둔다.
+ * 눌러야 하는 것들(탭·칩·버튼)은 규칙대로 44px 이다.
+ */
 .link {
+  display: inline;
   color: var(--accent);
   background: none;
   border: none;
@@ -297,6 +306,23 @@
   border-color: var(--accent);
   background: var(--accent);
   color: #fff;
+}
+/**
+ * **손가락으로 누를 때만 키운다** (`docs/DESIGN.md` 「접근성」의 44px).
+ *
+ * 시안의 32px 은 마우스엔 맞지만 엄지엔 작다. 그렇다고 데스크톱까지 키우면 칩이 뭉툭해져
+ * 글 속의 목록이라는 인상이 깨진다 — 규칙이 말하는 건 **터치** 타깃이라 입력 장치로 가른다.
+ * 보이지 않는 판(`::after`)을 덧대는 방법은 여기선 못 쓴다: 칩이 두 줄로 접혀 위아래로
+ * 겹치면 다른 칩의 탭을 빼앗는다.
+ */
+@media (pointer: coarse) {
+  .tabs {
+    gap: 7px;
+  }
+  .tab {
+    height: var(--tap-min);
+    padding: 0 15px;
+  }
 }
 
 .devices {

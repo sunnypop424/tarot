@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   DEVICE_SIZE,
@@ -12,6 +12,7 @@ import {
   STACK_MAX_H,
   STEPS,
 } from './landingData'
+import { josa } from '@/lib/josa'
 import { InquiryModal } from './InquiryModal'
 import styles from './Landing.module.css'
 
@@ -233,7 +234,9 @@ export default function Landing() {
         </h2>
         <p className={styles.lead} data-rv>
           단순한 스크린샷이 아닌, 실제로 구동되는 페이지입니다. 현재 선택하신{' '}
-          <span className={styles.mk}>{service.name}</span>을 직접 체험해 보세요.
+          {/* 조사는 이름 끝 받침에 따라 갈린다 — 박아 두면 "포토카드 뽑기을" 이 된다 */}
+          <span className={styles.mk}>{service.name}</span>
+          {josa(service.name, '을', '를')} 직접 체험해 보세요.
         </p>
 
         <div className={styles.stage} ref={stageRef} data-rv>
@@ -295,12 +298,35 @@ export default function Landing() {
             })}
           </div>
 
+          {/*
+            기기가 둘이면 **각각 열 수 있게** 나눠 건다. 하나로 묶으면 대표 주소만 열려서
+            (롤링페이퍼면 벽 화면) 정작 폰으로 써 보고 싶던 작성 화면엔 못 간다.
+            링크를 문장 끝에 몰아 두는 건 조사 때문이다 — 이름이 '스태프 기기 (판매)' 처럼
+            괄호로 끝나면 뒤에 을/를 을 붙일 수가 없다.
+          */}
           <p className={styles.stageNote}>
-            체험용이므로 입력하신 내용은 저장되지 않습니다. 화면이 작아 불편하시다면{' '}
-            <a className={styles.link} href={service.slug} target="_blank" rel="noreferrer">
-              직접 열어 보시는 편
-            </a>
-            을 추천합니다.
+            체험용이므로 입력하신 내용은 저장되지 않습니다.{' '}
+            {service.devices.length > 1 ? (
+              <>
+                화면이 작아 불편하시다면 새 탭에서 직접 열어 보시길 추천합니다 —{' '}
+                {service.devices.map((d, i) => (
+                  <Fragment key={d.path}>
+                    {i > 0 && ' · '}
+                    <a className={styles.link} href={d.path} target="_blank" rel="noreferrer">
+                      {d.label}
+                    </a>
+                  </Fragment>
+                ))}
+              </>
+            ) : (
+              <>
+                화면이 작아 불편하시다면{' '}
+                <a className={styles.link} href={service.slug} target="_blank" rel="noreferrer">
+                  직접 열어 보시는 편
+                </a>
+                을 추천합니다.
+              </>
+            )}
           </p>
         </div>
 

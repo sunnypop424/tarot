@@ -170,6 +170,16 @@
   font-weight: 700;
   cursor: pointer;
 }
+/* 랜딩의 탭과 같은 이유로 손가락일 때만 키운다 — `Landing.module.css` 의 `.tab` 주석 참고 */
+@media (pointer: coarse) {
+  .chips {
+    gap: 9px;
+  }
+  .chip {
+    height: var(--tap-min);
+    padding: 0 15px;
+  }
+}
 .chip[data-on] {
   background: var(--accent-soft);
   border-color: var(--accent);
