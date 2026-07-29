@@ -460,15 +460,15 @@ export default function Landing() {
             04 — ROLES
           </div>
           <h2 className={`${styles.h2} ${styles.rv}`} data-rv>
-            이건 우리 몫, 저건 주최자 몫
+            제가 할게요, 이건 맡아 주세요
           </h2>
           <div className={styles.roles}>
             <div className={`${styles.roleCard} ${styles.roleOurs} ${styles.rv}`} data-rv>
               <div className={styles.roleTop}>
-                <span>SLOT</span>
+                <span>ME</span>
                 <span>04 / A</span>
               </div>
-              <div className={styles.roleTitle}>우리 몫</div>
+              <div className={styles.roleTitle}>제가 할게요</div>
               <div className={styles.roleList}>
                 {OURS.map((t, i) => (
                   <div className={styles.roleRow} key={t}>
@@ -486,10 +486,10 @@ export default function Landing() {
 
             <div className={`${styles.roleCard} ${styles.roleTheirs} ${styles.rv}`} data-rv>
               <div className={styles.roleTop}>
-                <span>HOST</span>
+                <span>YOU</span>
                 <span>04 / B</span>
               </div>
-              <div className={styles.roleTitle}>주최자 몫</div>
+              <div className={styles.roleTitle}>맡아 주세요</div>
               <div className={styles.roleList}>
                 {THEIRS.map((t, i) => (
                   <div className={styles.roleRow} key={t}>
@@ -579,7 +579,7 @@ export default function Landing() {
       <div className={styles.footer}>
         <div className={styles.footerInner}>
           <span className={styles.brand}>OLUCKY!</span>
-          <span className={styles.footerNote}>하루짜리 행사에도 페이지 하나. 준비는 우리가, 그날은 주최자가.</span>
+          <span className={styles.footerNote}>하루짜리 행사에도 페이지 하나. 준비는 제가 할게요.</span>
         </div>
       </div>
 
