@@ -29,6 +29,7 @@ const DEFAULTS: PhotocardSettings = {
   allowSave: false,
   closed: false,
   rehearsal: true,
+  rarityCurve: 'gentle',
 }
 
 interface CardRow {
@@ -111,7 +112,7 @@ export const supabasePhotocard: PhotocardRepo = {
   async settings(slug) {
     const { data, error } = await (await db())
       .from('photocard_settings')
-      .select('mode, draws_per_visitor, batch_count, batch_cap_enabled, allow_save, closed, rehearsal')
+      .select('mode, draws_per_visitor, batch_count, batch_cap_enabled, allow_save, closed, rehearsal, rarity_curve')
       .eq('slug', slug)
       .maybeSingle()
     if (error) throw new Error(error.message)
@@ -124,6 +125,7 @@ export const supabasePhotocard: PhotocardRepo = {
       allow_save: boolean
       closed: boolean
       rehearsal: boolean
+      rarity_curve: PhotocardSettings['rarityCurve'] | null
     }
     return {
       mode: r.mode,
@@ -133,6 +135,8 @@ export const supabasePhotocard: PhotocardRepo = {
       allowSave: r.allow_save,
       closed: r.closed,
       rehearsal: r.rehearsal,
+      // 옛 행엔 컬럼이 없다 — 기본은 완만 (0045 의 default 와 같은 값)
+      rarityCurve: r.rarity_curve ?? 'gentle',
     }
   },
 
@@ -146,6 +150,7 @@ export const supabasePhotocard: PhotocardRepo = {
       allow_save: s.allowSave,
       closed: s.closed,
       rehearsal: s.rehearsal,
+      rarity_curve: s.rarityCurve,
       updated_at: new Date().toISOString(),
     })
     if (error) throw new Error(error.message)

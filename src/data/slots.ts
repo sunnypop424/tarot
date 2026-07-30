@@ -1,5 +1,6 @@
 import defaultThemeJson from './slot-default.json'
 import { planById, type PlanId } from './plans'
+import type { ServiceId } from './services'
 import type { DeckRange } from './cards'
 import type { DateRange, Slot, SlotPeriod } from '@/types/slot'
 import type { Theme } from '@/types/theme'
@@ -60,6 +61,49 @@ export function isSlotOpen(slot: Slot, today: string = todayKst()): boolean {
 export function isSlotExpired(slot: Slot, today: string = todayKst()): boolean {
   const end = slot.period?.rent?.end
   return Boolean(end && today > end) && !isSlotOpen(slot, today)
+}
+
+/**
+ * 종료 뒤 자료를 꺼낼 수 있는 날 수 — **`slot_grace_days` 를 그대로 옮긴 것이다**
+ * (`0039_grace_days_all.sql`).
+ *
+ * **모든 서비스가 14일이다.** 한때는 서비스마다 달랐는데(배송 명단이 남는 다섯만 14일),
+ * 롤링페이퍼·소원나무·영상회도 쪽지 CSV 가 실제로 나온다는 걸 놓친 판단이었다 — 유예가 0 이면
+ * 주최자는 부스를 접는 그 순간 그걸 잃는다. 서비스마다 다른 유예는 설명할 수도 없다.
+ *
+ * **함수로 두는 이유:** 숫자를 화면 여기저기에 적으면 DB 를 고칠 때 화면이 따라오지 않는다.
+ * 실제로 대시보드가 전부에게 "종료 후 14일" 이라고 적고 있었고, 그게 절반에겐 거짓이었다.
+ * 인자도 남겨 둔다 — 서비스별로 다시 갈릴 일이 생기면 부르는 쪽을 안 고쳐도 된다.
+ */
+export function graceDays(_service: ServiceId): number {
+  return 14
+}
+
+/**
+ * 자료를 꺼낼 수 있는 기한 — **종료일 + 유예**.
+ *
+ *  · `null`  — 기한이라는 게 없다 (종료일 미정)
+ *  · `left`  — 오늘부터 남은 날 (0 이면 오늘이 마지막)
+ *  · `over`  — 이미 지났다 (그 뒤엔 슬롯째 지워진다)
+ *
+ * 유예가 0일인 서비스는 **종료일이 곧 마지막 날**이다.
+ */
+export function exportDeadline(
+  slot: Slot,
+  service: ServiceId,
+  today: string = todayKst()
+): { date: string; left: number; over: boolean } | null {
+  const end = slot.period?.rent?.end ?? slot.period?.test?.end
+  if (!end) return null
+  const days = graceDays(service)
+  const date = new Date(`${end}T00:00:00+09:00`)
+  date.setDate(date.getDate() + days)
+  const last = KST_DATE.format(date)
+  const left = Math.round(
+    (new Date(`${last}T00:00:00+09:00`).getTime() - new Date(`${today}T00:00:00+09:00`).getTime()) /
+      86400000
+  )
+  return { date: last, left, over: left < 0 }
 }
 
 /** 빈 구간은 저장하지 않는다 — `{start:null,end:null}` 이 쌓이면 "안 정했다" 와 구별이 안 된다 */

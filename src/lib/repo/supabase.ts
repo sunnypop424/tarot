@@ -58,7 +58,7 @@ function toSlot(row: SlotRow): Slot {
 const SLOT_FIELDS = [
   'slug', 'name', 'service', 'plan', 'limits', 'deck', 'period',
   // DB 컬럼은 group_name 이다 — `group` 은 SQL 예약어라 인용부호 없이 못 쓴다 (0028)
-  'group_name', 'demo',
+  'group_name', 'demo', 'langs',
   'theme', 'event', 'luckydraw', 'rolling', 'photozone', 'wish', 'poll', 'stamp', 'quiz', 'photocard', 'cheer',
 ] as const
 

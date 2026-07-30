@@ -186,13 +186,30 @@ await setSettings({ batch_cap_enabled: true, rehearsal: true })
 }
 {
   /**
-   * **상태코드까지 본다.** 400 이면 "함수는 돌았고 안에서 막혔다" 는 뜻이고,
-   * 401/403 이라야 "부르지도 못했다" 는 뜻이다. 처음엔 400 이었고, 그걸 단서로
-   * `expired_slots` 가 anon 에게 통째로 열려 있는 걸 찾았다 (0010).
-   * 안쪽 검사만 믿으면 다음에 검사 없는 함수가 추가될 때 그대로 샌다.
+   * **방문자는 못 뽑는다** — 다만 "부르지도 못한다" 는 더 이상 맞는 단정이 아니다.
+   *
+   * 한때 여기서 401/403 을 단정했다. `expired_slots` 가 anon 에게 통째로 열려 있던 걸
+   * 그 단서로 찾았기 때문이다 (0010). 그런데 **0038 이 일부러 GRANT 를 열었다** —
+   * 체험 슬롯에서 스태프 버튼이 눌리려면 anon 이 함수 안 판정까지는 가야 한다.
+   * 그래서 지금 anon 호출은 400(함수가 돌고 `manages_slot` 이 거절)으로 돌아온다.
+   *
+   * **그래서 단정을 결과로 옮긴다.** 지켜야 하는 건 "못 부른다" 가 아니라
+   * **"안 뽑힌다 · 재고가 안 깎인다"** 이고, 그건 상태코드가 아니라 재고로 확인해야 한다.
+   * (상태코드만 보면 GRANT 정책이 바뀔 때마다 이 검사가 거짓 실패를 낸다 — 실제로 그랬다.)
    */
+  const before = await rest(`prizes?slug=eq.${SLUG}&select=remaining`, { headers: OWNER })
+  const beforeSum = (await before.json()).reduce((a, p) => a + p.remaining, 0)
+
   const res = await rpc('draw_prizes', { target: SLUG, draw_count: 1 }, ANONH)
-  check('방문자는 추첨을 부르지도 못한다', res.status === 401 || res.status === 403, `HTTP ${res.status}`)
+  check('방문자는 추첨을 못 한다', !res.ok, `HTTP ${res.status}`)
+
+  const after = await rest(`prizes?slug=eq.${SLUG}&select=remaining`, { headers: OWNER })
+  const afterSum = (await after.json()).reduce((a, p) => a + p.remaining, 0)
+  check(
+    '**방문자 호출로 재고가 안 깎인다** (진짜 계약)',
+    afterSum === beforeSum,
+    `${beforeSum} → ${afterSum}`
+  )
 }
 {
   // 만료 목록엔 함수 안 권한 검사가 없다 — grant 가 뚫리면 남의 이벤트가 그대로 샌다

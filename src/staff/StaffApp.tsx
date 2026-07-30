@@ -5,6 +5,7 @@ import { getSlotService, type ServiceId } from '@/data/services'
 import { RedeemStaff } from './RedeemStaff'
 import { ShowStaff } from './ShowStaff'
 import styles from './Staff.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 스태프 기기 — `/{slug}/staff`. **서비스마다 스태프가 하는 일이 다르다.**
@@ -40,6 +41,7 @@ const STAFF_KIND: Record<ServiceId, StaffKind> = {
 }
 
 export default function StaffApp() {
+  const t = useT()
   const state = useSlotState()
   if (state.status === 'loading') return <div className="app" aria-busy="true" />
   if (state.status === 'missing') return null
@@ -61,7 +63,7 @@ export default function StaffApp() {
       <main className={styles.stage}>
         <div className={`surface ${styles.panel}`}>
           <div className={styles.center}>
-            <div className={styles.centerTitle}>이 이벤트에는 스태프 화면이 없어요</div>
+            <div className={styles.centerTitle}>{t('이 이벤트에는 스태프 화면이 없어요')}</div>
             <p className={styles.centerBody}>
               스태프가 기기 앞에서 할 일이 있는 서비스에서만 쓰는 화면이에요
               (포토카드 뽑기 · 스탬프 · 모의고사).
@@ -69,7 +71,7 @@ export default function StaffApp() {
           </div>
         </div>
         <a className={styles.adminLink} href={`/${state.slot.slug}/admin`}>
-          관리자 페이지로 이동
+          {t('관리자 페이지로 이동')}
         </a>
       </main>
     </div>

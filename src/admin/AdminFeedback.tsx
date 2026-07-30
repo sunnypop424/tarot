@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useT } from '@/i18n'
 
 /**
  * 관리자 공용 피드백 — **토스트**(즉시 저장 알림)와 **확인 모달**(되돌리기 어려운 동작).
@@ -34,6 +35,7 @@ export function confirmAction(opts: ConfirmOpts): Promise<boolean> {
 }
 
 export function AdminFeedbackHost() {
+  const t = useT()
   const [message, setMessage] = useState<string | null>(null)
   const [req, setReq] = useState<ConfirmReq | null>(null)
 
@@ -79,16 +81,27 @@ export function AdminFeedbackHost() {
             {req.desc && <div className="ad-modal__desc">{req.desc}</div>}
             {/* 되돌릴 수 없는 동작은 그 사실을 따로 세워 말한다 — 설명 속에 묻히면 안 읽힌다 */}
             {req.danger && <div className="ad-modal__warn">되돌릴 수 없어요</div>}
+            {/*
+              * `data-*` 로 짚는다 — 클래스는 상태(`ad-btn--kill`/`--primary`)에 따라 바뀌고
+              * 글자는 부르는 쪽이 정해서(`okLabel`) 검증이 붙잡을 손잡이가 없었다.
+              * 그래서 `verify-ai` 가 확인 창을 못 누르고 "저장이 안 된다" 로 읽고 있었다.
+              */}
             <div className="ad-modal__actions">
-              <button type="button" className="ad-btn ad-btn--line" onClick={() => close(false)}>
+              <button
+                type="button"
+                className="ad-btn ad-btn--line"
+                onClick={() => close(false)}
+                data-confirm-cancel
+              >
                 취소
               </button>
               <button
                 type="button"
                 className={`ad-btn ${req.danger ? 'ad-btn--kill' : 'ad-btn--primary'}`}
                 onClick={() => close(true)}
+                data-confirm-ok
               >
-                {req.okLabel ?? '확인'}
+                {req.okLabel ?? t('확인')}
               </button>
             </div>
           </div>

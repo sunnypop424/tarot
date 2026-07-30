@@ -5,6 +5,7 @@ import type { StampSettings } from '@/lib/repo/types'
 import { stampDisplay } from '@/data/stamp'
 import { useSlot } from '@/slot/SlotProvider'
 import { toast } from '../AdminFeedback'
+import { useT } from '@/i18n'
 
 /**
  * 스탬프 운영 — **주최자의 자리다.**
@@ -13,6 +14,7 @@ import { toast } from '../AdminFeedback'
  * 수령 확인·추첨·응모자 명단은 **공용 화면**(`admin/reward/*`)이라 여기 없다.
  */
 export function Board() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const display = stampDisplay(slot)
@@ -240,7 +242,7 @@ export function Board() {
               '',
               settings.closed ? 'on' : 'off',
               [
-                { v: 'off' as const, n: '진행 중' },
+                { v: 'off' as const, n: t('진행 중') },
                 { v: 'on' as const, n: '마감 (도장을 못 찍어요)' },
               ],
               (v) => void save({ ...settings, closed: v === 'on' })

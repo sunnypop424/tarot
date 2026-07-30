@@ -154,6 +154,29 @@ export interface ThemeGenInput {
 }
 
 /**
+ * 슬롯 하나의 AI 사용량 — **최고관리자만 읽는다** (`0040_ai_tokens.sql` §3).
+ *
+ * 횟수(`reading`·`answerGen`)는 한도·정산의 근거이고, 토큰은 **원가를 실제와 맞춰볼 근거**다.
+ * 둘은 되감기는 기준이 달라 어긋날 수 있다 — 실패한 호출은 횟수를 되돌리지만(`release_ai_usage`)
+ * 토큰은 안 되돌린다(실패해도 입력 토큰은 청구된다). 그래서 두 숫자를 나눠서 든다.
+ */
+export interface AiUsageRow {
+  slug: string
+  /** 3장 리딩 호출 수 */
+  reading: number
+  /** '전체 생성' 실행 수 — 78장이 7묶음으로 쪼개져도 1 */
+  answerGen: number
+  readingIn: number
+  readingOut: number
+  answerIn: number
+  answerOut: number
+  /** 프롬프트 캐시 — 아직 안 켰다. 켜면 단가가 달라져 비교 기준이 필요하다 */
+  cacheRead: number
+  cacheWrite: number
+  updatedAt: string
+}
+
+/**
  * AI (M4).
  *
  * API 키를 클라이언트에 둘 수 없으므로 이 어댑터는 **반드시 서버 엔드포인트를 거친다** —
@@ -180,6 +203,15 @@ export interface AiRepo {
    * (src/owner/aiTheme.ts). 모델에게 대비를 맡기면 대충 맞춰 온다.
    */
   generateTheme(input: ThemeGenInput): Promise<Record<string, string>>
+  /**
+   * 슬롯별 사용량 — **최고관리자 도구.** 앞의 셋과 달리 **Claude 를 안 부른다**:
+   * DB 를 직접 읽는다(RLS 가 최고관리자만 통과시킨다). 그런데도 여기 있는 이유는
+   * 이 숫자를 만드는 게 위 세 함수라서다 — 따로 두면 다음 사람이 한쪽만 고친다.
+   *
+   * 못 읽는 어댑터(local·정책 없음)에서는 **빈 배열**을 준다 — 화면은 "0" 이 아니라
+   * "볼 수 없다" 로 그린다.
+   */
+  usage(): Promise<AiUsageRow[]>
 }
 
 /** 주최자 계정 한 개. 이메일은 `auth.users` 에 있어 **서버만 읽을 수 있다** */
@@ -406,6 +438,20 @@ export interface RollingRepo {
   setHidden(slug: string, id: string, hidden: boolean): Promise<void>
   /** 지운다 (주최자만) */
   remove(slug: string, id: string): Promise<void>
+  /**
+   * 금칙어 — **후검수 앞에 서는 1차 필터** (`0041_banned_words.sql`).
+   *
+   * 이 서비스들은 남긴 글이 **즉시 남에게 보인다**(영상회는 상영 화면에 뜬다). 주최자가 볼
+   * 때까지 몇 시간이 걸릴 수 있어서, 사람이 보기 전에 한 번 거른다. 검수를 없애는 게 아니라
+   * **사람이 볼 때까지의 시간을 줄이는** 장치다 — 작정하고 우회하는 사람은 못 막는다.
+   *
+   * **판정은 서버가 한다.** 이 서비스는 anon 이 직접 INSERT 하므로(럭드처럼 서버 함수를 안 거친다)
+   * 막는 자리는 DB 트리거뿐이다. 여기 메서드는 **주최자가 자기 슬롯 단어를 관리**하는 것뿐이고,
+   * 기본 목록(전역)은 안 온다 — 목록이 방문자에게 읽히면 그게 곧 우회 설명서다.
+   */
+  bannedWords(slug: string): Promise<string[]>
+  addBannedWord(slug: string, word: string): Promise<void>
+  removeBannedWord(slug: string, word: string): Promise<void>
   /**
    * 벽 실시간 — 다른 기기·탭이 남기면 그 자리에서 알려준다 (되돌리는 함수를 준다).
    * 부스 태블릿을 벽 전용으로 띄우면 스크린이 된다. **무엇이 바뀌었는지는 안 본다** —
@@ -676,6 +722,14 @@ export interface PhotocardSettings {
   closed: boolean
   /** **기본 켬** — 재고를 안 깎고 로그만 남긴다 */
   rehearsal: boolean
+  /**
+   * 레어도 간격 — `'gentle'`(6−r) 또는 `'steep'`(2^(5−r)) (`0045`).
+   *
+   * **레어도가 클수록 덜 나온다.** 얼마나 덜인지는 행사 규모가 정한다 — 100명 행사에
+   * 가파름을 쓰면 전설이 서너 장밖에 안 나오고, 1,000명 행사에 완만을 쓰면 흔해진다.
+   * 그 규모를 아는 사람이 주최자라 여기(운영 데이터)에 있다.
+   */
+  rarityCurve: 'gentle' | 'steep'
 }
 
 /** 뽑힌 카드 한 장 */

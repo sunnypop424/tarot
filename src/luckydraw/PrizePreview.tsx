@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import { Gift } from 'lucide-react'
 
 import styles from './Luckydraw.module.css'
+import { useT } from '@/i18n'
 
 interface PreviewPrize {
   rank: number
@@ -26,12 +27,13 @@ interface Props {
  * 켜고 끈다(스포일러가 싫은 행사, 수량이 민망한 행사가 있다). 색·형태는 전부 슬롯 테마 토큰.
  */
 export function PrizePreview({ prizes, showCount, highlightRanks, onClose }: Props) {
+  const t = useT()
   return createPortal(
     <div
       className={styles.overlay}
       role="dialog"
       aria-modal="true"
-      aria-label="경품 미리보기"
+      aria-label={t('경품 미리보기')}
       onClick={onClose}
     >
       <div className={styles.previewBody} onClick={(e) => e.stopPropagation()}>
@@ -40,8 +42,8 @@ export function PrizePreview({ prizes, showCount, highlightRanks, onClose }: Pro
             <Gift size={18} aria-hidden="true" />
           </span>
           <div>
-            <h2 className={styles.previewTitle}>준비된 경품</h2>
-            <p className={styles.previewSub}>이런 경품들을 준비했어요.</p>
+            <h2 className={styles.previewTitle}>{t('준비된 경품')}</h2>
+            <p className={styles.previewSub}>{t('이런 경품들을 준비했어요.')}</p>
           </div>
         </div>
 
@@ -62,7 +64,7 @@ export function PrizePreview({ prizes, showCount, highlightRanks, onClose }: Pro
         </ul>
 
         <button type="button" className="btn btn--primary btn--block" onClick={onClose}>
-          닫기
+          {t('닫기')}
         </button>
       </div>
     </div>,

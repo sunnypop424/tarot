@@ -222,3 +222,47 @@ export function Divided({ min = 240, gap = 16, children }: { min?: number; gap?:
     </div>
   )
 }
+
+/**
+ * radius 슬라이더 (시안) — 라벨 위, [슬라이더 · 숫자칸+px] 아래. 그리드 셀 한 줄 차지.
+ *
+ * **`SlotEditor` 와 럭키드로우 카드가 같이 쓴다.** 원래 `SlotEditor.tsx` 안에 있었는데,
+ * 럭드 카드를 `service/LuckydrawCard.tsx` 로 빼면서 둘 다 쓰는 부품이 됐다 — 이 파일이
+ * 존재하는 이유가 정확히 그것이다 (파일 머리말).
+ */
+export function RadiusSlider({
+  label,
+  value,
+  max = 40,
+  onChange,
+}: {
+  label: string
+  value: number
+  max?: number
+  onChange: (n: number) => void
+}) {
+  return (
+    <div style={CSS.fieldCol}>
+      <span style={CSS.label}>{label}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+        <input
+          type="range"
+          min={0}
+          max={Math.min(max, 32)}
+          value={value}
+          aria-label={label}
+          onChange={(e) => onChange(Number(e.target.value))}
+          style={CSS.range}
+        />
+        <div style={{ display: 'flex', alignItems: 'center', height: 30, border: '1px solid #dddddd', borderRadius: 4, overflow: 'hidden', flexShrink: 0 }}>
+          <input
+            value={value}
+            onChange={(e) => onChange(Math.max(0, Math.min(max, Number(e.target.value) || 0)))}
+            style={{ border: 'none', outline: 'none', width: 38, textAlign: 'center', fontSize: 12, background: '#fff', color: '#121212' }}
+          />
+          <span style={{ fontSize: 10.5, color: '#8a8a8a', padding: '0 7px', borderLeft: '1px solid #eeeeee' }}>px</span>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { AlertCircle, ArrowLeft, Check, Download, ExternalLink, Eye, Sparkles } from 'lucide-react'
 
 import { getSlotDeck } from '@/data/slots'
+import { LANGS } from '@/i18n'
 import { SERVICES, getSlotService, serviceLabel, type ServiceId } from '@/data/services'
 import { PLANS, getPlan, planById, effectiveLimits, type PlanId } from '@/data/plans'
 import { CATEGORIES } from '@/data/categories'
@@ -13,7 +14,11 @@ import { isLight } from '@/lib/color'
 import { filledTheme } from '@/lib/theme'
 import { repo } from '@/lib/repo'
 import { hasSupabase } from '@/lib/repo/client'
-import { AlphaColor, CSS, Card, Field, Swatch, SwatchColor } from './editorUi'
+import { AlphaColor, CSS, Card, Field, RadiusSlider, Swatch, SwatchColor } from './editorUi'
+import { BASE_PRESETS } from './basePresets'
+import { DEVICES, DEFAULT_DEVICE, type DeviceId } from './devices'
+import { stableStringify } from './stableStringify'
+import { LuckydrawExtra } from './service/LuckydrawCard'
 import { PhotozoneCard } from './service/PhotozoneCard'
 import { WishCard } from './service/WishCard'
 import { PollCard } from './service/PollCard'
@@ -35,13 +40,7 @@ import { onPreviewReady, postPreview, type PreviewState } from '@/slot/preview'
 import { PREVIEW_SCREENS } from './previewScreens'
 import { checkReadiness, type ReadyIssue } from './readiness'
 import { BackgroundField, bgRepeatValues } from './service/BackgroundField'
-import {
-  LUCKYDRAW_GROUPS,
-  LUCKYDRAW_NEUTRALS,
-  WEBFONTS,
-  luckydrawDisplay,
-  type FontId,
-} from '@/data/luckydraw'
+import { LUCKYDRAW_GROUPS, LUCKYDRAW_NEUTRALS, WEBFONTS, type FontId } from '@/data/luckydraw'
 import { rollingDisplay } from '@/data/rolling'
 import { photozoneDisplay, type PhotozoneDisplay } from '@/data/photozone'
 import { wishDisplay, type WishDisplay } from '@/data/wish'
@@ -51,445 +50,6 @@ import { quizDisplay, type QuizDisplay } from '@/data/quiz'
 import { photocardDisplay, type PhotocardDisplay } from '@/data/photocard'
 import { cheerDisplay, type CheerDisplay } from '@/data/cheer'
 import { exportSlots } from './slotsFile'
-
-/** radius 슬라이더 (시안) — 라벨 위, [슬라이더 · 숫자칸+px] 아래. 그리드 셀 한 줄 차지. */
-function RadiusSlider({ label, value, max = 40, onChange }: { label: string; value: number; max?: number; onChange: (n: number) => void }) {
-  return (
-    <div style={CSS.fieldCol}>
-      <span style={CSS.label}>{label}</span>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-        <input type="range" min={0} max={Math.min(max, 32)} value={value} aria-label={label} onChange={(e) => onChange(Number(e.target.value))} style={CSS.range} />
-        <div style={{ display: 'flex', alignItems: 'center', height: 30, border: '1px solid #dddddd', borderRadius: 4, overflow: 'hidden', flexShrink: 0 }}>
-          <input value={value} onChange={(e) => onChange(Math.max(0, Math.min(max, Number(e.target.value) || 0)))} style={{ border: 'none', outline: 'none', width: 38, textAlign: 'center', fontSize: 12, background: '#fff', color: '#121212' }} />
-          <span style={{ fontSize: 10.5, color: '#8a8a8a', padding: '0 7px', borderLeft: '1px solid #eeeeee' }}>px</span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/**
- * "1, 2" 처럼 **여러 값을 한 칸에** 적는 입력.
- *
- * 값을 곧바로 파싱해 되돌리면 **쉼표를 칠 수가 없다**: "1," 을 치는 순간 파싱이 `[1]` 로
- * 만들고 화면이 "1" 로 되돌아가 방금 친 쉼표가 지워진다. 그래서 **치는 동안은 적은 그대로**
- * 두고(로컬 문자열), 부모에는 파싱한 값을 함께 보낸다.
- *
- * 밖에서 값이 바뀌면(다른 슬롯으로 이동) 그때만 문자열을 다시 맞춘다 —
- * 매번 맞추면 결국 같은 문제로 돌아온다.
- */
-function RankListField({
-  label,
-  value,
-  hint,
-  onChange,
-}: {
-  label: string
-  value: number[]
-  hint?: string
-  onChange: (v: number[]) => void
-}) {
-  const joined = value.join(', ')
-  const [text, setText] = useState(joined)
-  const [lastSynced, setLastSynced] = useState(joined)
-
-  if (joined !== lastSynced) {
-    setLastSynced(joined)
-    setText(joined)
-  }
-
-  return (
-    <label style={CSS.fieldCol}>
-      <span style={CSS.label}>{label}</span>
-      <input
-        value={text}
-        inputMode="numeric"
-        onChange={(e) => {
-          setText(e.target.value)
-          onChange(
-            e.target.value
-              .split(',')
-              .map((s) => Number(s.trim()))
-              .filter((n) => Number.isFinite(n) && n > 0)
-          )
-        }}
-        style={CSS.input}
-      />
-      {hint && <span style={CSS.hint}>{hint}</span>}
-    </label>
-  )
-}
-
-/**
- * 카드 안에 색과 **같이 오는** 칸들 — 형태·여백·문구.
- *
- * 색만 카드로 묶고 나머지를 딴 데 두면 묶은 의미가 없다: "박스를 손본다" 는 배경색과
- * 둥글기와 여백을 함께 만지는 일이다.
- */
-function LuckydrawExtra({
-  kind,
-  draft,
-  slug,
-  patchSlot,
-  patchShape,
-  patchAsset,
-}: {
-  kind: string
-  draft: Slot
-  slug: string
-  patchSlot: (c: Partial<Slot> | ((p: Slot) => Partial<Slot>)) => void
-  patchShape: (k: keyof ThemeShape, v: number) => void
-  patchAsset: (k: 'backgroundPattern', v: string | null) => void
-}) {
-  const d = luckydrawDisplay(draft)
-  const patchLd = (change: Partial<typeof d>) =>
-    patchSlot((prev) => ({ luckydraw: { ...luckydrawDisplay(prev), ...change } }))
-
-  const num = (
-    label: string,
-    value: number,
-    onChange: (n: number) => void,
-    hint?: string,
-    max?: number
-  ) => (
-    <label style={CSS.fieldCol}>
-      <span style={CSS.label}>{label}</span>
-      <div style={{ display: 'flex', alignItems: 'center', height: 31, border: '1px solid #dddddd', borderRadius: 4, overflow: 'hidden' }}>
-        <input
-          type="number"
-          min={0}
-          max={max}
-          value={value}
-          onChange={(e) => onChange(Math.max(0, Math.min(max ?? Infinity, Number(e.target.value) || 0)))}
-          style={{ flex: 1, border: 'none', outline: 'none', fontSize: 12.5, padding: '0 9px', minWidth: 0, background: '#fff', color: '#121212' }}
-        />
-        <span style={{ fontSize: 10.5, color: '#8a8a8a', padding: '0 8px', borderLeft: '1px solid #eeeeee' }}>px</span>
-      </div>
-      {hint && <span style={CSS.hint}>{hint}</span>}
-    </label>
-  )
-
-  const text = (label: string, value: string, onChange: (v: string) => void, hint?: string) => (
-    <label style={CSS.fieldCol}>
-      <span style={CSS.label}>{label}</span>
-      <input value={value} onChange={(e) => onChange(e.target.value)} style={CSS.input} />
-      {hint && <span style={CSS.hint}>{hint}</span>}
-    </label>
-  )
-
-  switch (kind) {
-    case 'boxRadius':
-      return (
-        <RadiusSlider
-          label="둥글기"
-          value={draft.theme.shape.radiusLg}
-          max={40}
-          onChange={(n) => patchShape('radiusLg', n)}
-        />
-      )
-    case 'boxPadding':
-      return num('안쪽 여백 (px)', d.boxPadding, (n) => patchLd({ boxPadding: n }))
-    case 'boxBorder':
-      return (
-        <>
-          {num('테두리 두께 (px)', d.boxBorderWidth, (n) => patchLd({ boxBorderWidth: n }), '0 이면 테두리 없음', 20)}
-          <AlphaColor
-            label="테두리색"
-            value={d.boxBorderColor || draft.theme.colors.border}
-            onChange={(v) => patchLd({ boxBorderColor: v })}
-          />
-        </>
-      )
-    case 'boxTopMargin':
-      return num('상단 여백 (px)', d.boxTopMargin, (n) => patchLd({ boxTopMargin: n }), '가운데에서 얼마나 내릴지 — 사진 얼굴을 안 가리게')
-    case 'buttonRadius':
-      return (
-        <RadiusSlider
-          label="둥글기"
-          value={draft.theme.shape.radiusMd}
-          max={40}
-          onChange={(n) => patchShape('radiusMd', n)}
-        />
-      )
-    case 'texts':
-      return (
-        <>
-          {text('추첨 버튼 문구', d.drawLabel, (v) => patchLd({ drawLabel: v }))}
-          {text('마감 문구', d.closedText, (v) => patchLd({ closedText: v }))}
-        </>
-      )
-    case 'cover':
-      return (
-        <>
-          {text('커버 문자', d.coverMark, (v) => patchLd({ coverMark: v }), '긁기 전 덮인 자리에 찍혀요')}
-          <RankListField
-            label="긁는 등수"
-            value={d.highlightRanks}
-            hint="예: 1, 2 — 비우면 전부 바로 보여요"
-            onChange={(v) => patchLd({ highlightRanks: v })}
-          />
-        </>
-      )
-    case 'font':
-      return (
-        <div className="field">
-          <span className="field__label">본문 폰트</span>
-          <select
-            className="select"
-            value={d.fontFamily}
-            onChange={(e) => patchLd({ fontFamily: e.target.value as FontId })}
-          >
-            {Object.entries(WEBFONTS).map(([id, f]) => (
-              <option key={id} value={id}>
-                {f.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      )
-    case 'shadow':
-      return (
-        <>
-          <AlphaColor
-            label="그림자 색"
-            value={d.boxShadowColor}
-            hint="밝은 사진 위엔 짙게, 어두운 사진 위엔 옅게. 0% 면 그림자 없음"
-            onChange={(v) => patchLd({ boxShadowColor: v })}
-          />
-          {num(
-            '그림자 번짐 (px)',
-            d.boxShadowBlur,
-            (n) => patchLd({ boxShadowBlur: n }),
-            '클수록 은은하게 퍼져요. 0 이면 그림자가 사라져요'
-          )}
-          {num('그림자 내림 (px)', d.boxShadowY, (n) => patchLd({ boxShadowY: n }), '아래로 드리우는 정도')}
-        </>
-      )
-    case 'modal':
-      return (
-        <>
-          <AlphaColor
-            label="배경색"
-            value={d.modalBg || draft.theme.colors.surface}
-            hint="배송 창 배경. 비워두면 위 테마 '박스 배경색'을 써요"
-            onChange={(v) => patchLd({ modalBg: v })}
-          />
-          <AlphaColor
-            label="글자색"
-            value={d.modalText || draft.theme.colors.fg1}
-            onChange={(v) => patchLd({ modalText: v })}
-          />
-          <AlphaColor
-            label="요소 배경색"
-            value={d.modalItemBg || draft.theme.colors.surface}
-            hint="입력칸·배송 상품 줄 배경"
-            onChange={(v) => patchLd({ modalItemBg: v })}
-          />
-          {!d.modalNoBorder && (
-            <AlphaColor
-              label="테두리색"
-              value={d.modalBorder || draft.theme.colors.border}
-              hint="입력칸·배송 상품 줄·경품 줄 테두리"
-              onChange={(v) => patchLd({ modalBorder: v })}
-            />
-          )}
-          <label
-            className="field"
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 8, cursor: 'pointer' }}
-          >
-            <input
-              type="checkbox"
-              checked={d.modalNoBorder}
-              onChange={(e) => patchLd({ modalNoBorder: e.target.checked })}
-            />
-            <span className="field__label" style={{ margin: 0 }}>
-              테두리 없음 (배경색만으로 구분)
-            </span>
-          </label>
-        </>
-      )
-    case 'noBorder':
-      return (
-        <label
-          className="field"
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 8, cursor: 'pointer' }}
-        >
-          <input
-            type="checkbox"
-            checked={d.noBorder}
-            onChange={(e) => patchLd({ noBorder: e.target.checked })}
-          />
-          <span className="field__label" style={{ margin: 0 }}>
-            테두리 없음 (배경색만으로 구분)
-          </span>
-        </label>
-      )
-    case 'counter': {
-      /**
-       * 수량 고르기 — **포토카드와 같은 컴포넌트**를 쓴다 (`components/CountPicker.tsx`).
-       * 그래서 저장되는 값(`display.picker`)도 같은 모양이다. 화면 스타일이 이 편집기와
-       * 서비스 카드가 서로 달라 UI 는 각자 그리지만, **데이터는 한 벌**이라 동작이 안 갈린다.
-       */
-      const p = d.picker
-      const setPicker = (change: Record<string, unknown>) => patchLd({ picker: { ...p, ...change } })
-      /** 색을 비우면 키를 지운다 — 빈 문자열이 남으면 "검은색" 으로 읽히는 자리가 생긴다 */
-      const setColor = (key: string, v: string) => {
-        const next: Record<string, unknown> = { ...p }
-        if (v) next[key] = v
-        else delete next[key]
-        patchLd({ picker: next })
-      }
-      return (
-        <>
-          <div className="field">
-            <span className="field__label">모서리 둥글기</span>
-            <input
-              className="input"
-              type="number"
-              min={0}
-              max={40}
-              value={p.radius ?? 16}
-              /* 상한은 손을 뗄 때만 — 타이핑 중에 걸면 자릿수가 늘 때마다 40 으로 튄다 */
-              onChange={(e) => setPicker({ radius: Math.max(0, Number(e.target.value) || 0) })}
-              onBlur={(e) => setPicker({ radius: Math.min(40, Math.max(0, Number(e.target.value) || 0)) })}
-              data-picker-radius
-            />
-            <span className="field__hint">0 이면 각진 사각형이에요 (px).</span>
-          </div>
-          <div className="field">
-            <span className="field__label">테두리</span>
-            <select
-              className="select"
-              value={String(p.borderWidth ?? 1)}
-              onChange={(e) => setPicker({ borderWidth: Number(e.target.value) })}
-              data-picker-border
-            >
-              <option value="0">없음</option>
-              <option value="1">얇게 (1px)</option>
-              <option value="2">보통 (2px)</option>
-              <option value="3">굵게 (3px)</option>
-            </select>
-          </div>
-          <AlphaColor
-            label="배경색"
-            value={p.bg || d.counterBg || draft.theme.colors.wash}
-            hint="− 숫자 + 를 감싸는 판. 비우면 테마 보조 배경색"
-            onChange={(v) => setColor('bg', v)}
-          />
-          <AlphaColor
-            label="테두리색"
-            value={p.borderColor || d.counterBorder || draft.theme.colors.border}
-            hint="비우면 테마 테두리색"
-            onChange={(v) => setColor('borderColor', v)}
-          />
-          <AlphaColor
-            label="글자색"
-            value={p.fg || draft.theme.colors.fg1}
-            hint="숫자와 프리셋(1·5·10). 비우면 테마 글자색"
-            onChange={(v) => setColor('fg', v)}
-          />
-          <AlphaColor
-            label="± 버튼 배경"
-            value={p.stepBg || draft.theme.colors.surfaceRaised}
-            hint="비우면 테마 표면색"
-            onChange={(v) => setColor('stepBg', v)}
-          />
-          <AlphaColor
-            label="고른 프리셋 배경"
-            value={p.onBg || draft.theme.colors.primary}
-            onChange={(v) => setColor('onBg', v)}
-          />
-          <AlphaColor
-            label="고른 프리셋 글자"
-            value={p.onFg || draft.theme.colors.onPrimary}
-            onChange={(v) => setColor('onFg', v)}
-          />
-          <AlphaColor
-            label="뽑기 버튼 배경"
-            value={p.goBg || draft.theme.colors.primary}
-            onChange={(v) => setColor('goBg', v)}
-          />
-          <AlphaColor
-            label="뽑기 버튼 글자"
-            value={p.goFg || draft.theme.colors.onPrimary}
-            onChange={(v) => setColor('goFg', v)}
-          />
-          <AlphaColor
-            label="그림자색"
-            value={d.counterShadow || draft.theme.colors.primary}
-            hint="알약 아래 그림자. 번짐·내림은 시안 고정, 색만 골라요"
-            onChange={(v) => patchLd({ counterShadow: v })}
-          />
-        </>
-      )
-    }
-    case 'badgeStyle':
-      return (
-        <div className="field">
-          <span className="field__label">배지 스타일</span>
-          <select
-            className="select"
-            value={d.badgeStyle}
-            onChange={(e) => patchLd({ badgeStyle: e.target.value === 'solid' ? 'solid' : 'soft' })}
-          >
-            <option value="soft">옅게 (글자에 색, 배경은 글자색 따라감)</option>
-            <option value="solid">진하게 (배경 solid, 글자 흰색)</option>
-          </select>
-        </div>
-      )
-    case 'footer':
-      return text(
-        '오른쪽 아래 표기',
-        d.footerNote,
-        (v) => patchLd({ footerNote: v }),
-        '제작사 표기 같은 것. 비우면 안 나와요'
-      )
-    case 'badge':
-      return (
-        <div className="field">
-          <span className="field__label">남은 수량 배지</span>
-          <input
-            className="input"
-            type="number"
-            min={0}
-            value={d.lowStockThreshold ?? ''}
-            placeholder="안 띄움"
-            onChange={(e) =>
-              // 빈 칸 = 안 띄운다. 0 과 다르다 (0 은 "0개 남았을 때만")
-              patchLd({
-                lowStockThreshold: e.target.value === '' ? null : Math.max(0, Number(e.target.value)),
-              })
-            }
-          />
-          <span className="field__hint">이 수 이하로 내려가면 “N개 남았어요”. 비우면 안 띄워요</span>
-        </div>
-      )
-    case 'background':
-      return (
-        <>
-          <BackgroundField
-            slug={slug}
-            name="background"
-            value={draft.theme.assets.backgroundPattern}
-            repeat={draft.theme.assets.backgroundPatternRepeat === 'repeat'}
-            onImage={(v) => patchAsset('backgroundPattern', v)}
-            onRepeat={(on) => patchSlot((prev) => ({
-              theme: { ...prev.theme, assets: { ...prev.theme.assets, ...bgRepeatValues(on) } },
-            }))}
-            hint="박스가 얹힐 자리를 비워둔 사진이 좋아요."
-          />
-          <AlphaColor
-            label="관리자 링크 색"
-            value={d.adminLinkColor}
-            hint="방문자 눈엔 안 띄고 스태프는 찾을 정도로"
-            onChange={(v) => patchLd({ adminLinkColor: v })}
-          />
-        </>
-      )
-    default:
-      return null
-  }
-}
 
 /** 색을 역할별로 묶어 보여준다 — 17개를 한 줄로 늘어놓으면 뭘 고치는지 모른다 */
 const COLOR_GROUPS: {
@@ -551,91 +111,6 @@ const SHAPE_LABELS: Record<keyof ThemeShape, string> = {
  * radiusLg 만 힌트가 있는 이유: 입력값이 **카드 크기에 따라 달라지기** 때문이다.
  * 안 밝히면 "16 을 넣었는데 덱 카드는 왜 안 둥그냐" 가 된다 (`lib/card.ts`).
  */
-
-/**
- * 바탕 계열 프리셋 — 배경·표면·텍스트 9개만 밝은/어두운 쪽으로 한 번에 스왑한다.
- * 포인트·인터랙션 색(primary/accent/onPrimary)과 카드 뒷면은 슬롯의 브랜드 색이므로 건드리지 않는다.
- * 값은 tokens.css 의 다크 `:root` / `[data-theme='light']` 와 동일 — 자동 그림자 전환은 applyTheme() 이 캔버스 휘도로 처리한다.
- */
-const BASE_KEYS = [
-  'canvas', 'surface', 'surfaceRaised', 'wash', 'fg1', 'fg2', 'fg3', 'border', 'borderHover',
-] as const satisfies readonly (keyof ThemeColors)[]
-
-const BASE_PRESETS: { id: 'dark' | 'light'; label: string; base: Pick<ThemeColors, (typeof BASE_KEYS)[number]> }[] = [
-  {
-    id: 'dark',
-    label: '다크 우선',
-    base: {
-      canvas: '#0F1020', surface: '#1A1B2E', surfaceRaised: '#242537', wash: '#241F45',
-      fg1: '#F2F0FA', fg2: '#C6C3D8', fg3: '#9A97B0', border: '#2E2F45', borderHover: '#3A3B57',
-    },
-  },
-  {
-    id: 'light',
-    label: '라이트 우선',
-    base: {
-      canvas: '#FAF8FF', surface: '#FFFFFF', surfaceRaised: '#FFFFFF', wash: '#F0EDFF',
-      fg1: '#1A1B2E', fg2: '#4A4860', fg3: '#7A7791', border: '#E8E5F2', borderHover: '#D5D0E8',
-    },
-  },
-]
-
-/**
- * 키 순서에 흔들리지 않는 직렬화 — 객체 키를 재귀적으로 정렬해 문자열로 만든다.
- * "저장 안 됨" 판정에만 쓴다: JSONB 저장소가 키 순서를 바꿔 돌려줘도 값이 같으면 같다고 봐야 한다.
- */
-function stableStringify(value: unknown): string {
-  if (value === null || typeof value !== 'object') return JSON.stringify(value) ?? 'null'
-  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`
-  const obj = value as Record<string, unknown>
-  const body = Object.keys(obj)
-    .sort()
-    .map((k) => `${JSON.stringify(k)}:${stableStringify(obj[k])}`)
-    .join(',')
-  return `{${body}}`
-}
-
-/**
- * 미리보기 기기 — **어느 서비스든 고를 수 있다.**
- *
- * 예전엔 럭키드로우만 아이패드를 골랐다. 그런데 부스에 세워두는 화면은 럭드만이 아니다 —
- * 포토카드 스태프 기기·투표 스크린도 태블릿이고, 방문자 폰으로 여는 화면도 기기마다 다르다.
- * 실제로 쓸 기기로 맞춰 봐야 여백·글자 크기가 어긋나지 않는다.
- */
-const DEVICES = [
-  { id: 'phone', w: 390, h: 844, label: '폰 세로 (390×844)' },
-  { id: 'phone-l', w: 430, h: 932, label: '큰 폰 세로 (430×932)' },
-  { id: 'pad-mini', w: 1024, h: 768, label: '아이패드 미니 가로' },
-  { id: 'pad-air', w: 1180, h: 820, label: '아이패드 에어 가로' },
-  { id: 'pad-pro', w: 1366, h: 1024, label: '아이패드 프로 가로' },
-  { id: 'pad-port', w: 820, h: 1180, label: '아이패드 세로' },
-  /*
-   * 상영 화면(영상회 오버레이·엔딩크레딧)은 기기가 아니라 **영상 비율**로 본다 —
-   * 프로젝터·모니터·OBS 캔버스가 다 다르지만 결국 16:9 아니면 4:3 이다.
-   */
-  { id: 'screen-169', w: 1280, h: 720, label: '상영 화면 16:9' },
-  { id: 'screen-43', w: 1024, h: 768, label: '상영 화면 4:3' },
-] as const
-
-type DeviceId = (typeof DEVICES)[number]['id']
-
-/** 서비스마다 **실제로 쓰는 기기**가 다르다 — 처음 열 때 그걸로 맞춰 준다 */
-const DEFAULT_DEVICE: Record<ServiceId, DeviceId> = {
-  tarot: 'phone',
-  // 부스에 세워두는 아이패드 가로 (원본 빌더가 그렇게 쓰였다)
-  luckydraw: 'pad-pro',
-  rolling: 'phone',
-  wish: 'phone',
-  photozone: 'phone',
-  // 스크린이 태블릿이다 (방문자 투표는 폰이라 바꿔 볼 수 있어야 한다)
-  poll: 'pad-air',
-  stamp: 'phone',
-  quiz: 'phone',
-  photocard: 'phone',
-  // 상영 화면이 이 서비스의 본체다 — 기본을 16:9 로 (입력 화면은 폰으로 바꿔 본다)
-  cheer: 'screen-169',
-}
-
 /**
  * 슬롯 하나의 색·형태·이미지·이벤트 설정 — `/theme-editor/:slug`, **최고관리자 전용**
  * (Supabase 가 설정된 빌드에만 존재한다 — App.tsx).
@@ -1292,6 +767,39 @@ export function SlotEditor() {
                       <option key={g} value={g} />
                     ))}
                   </datalist>
+                </Field>
+                {/*
+                  * 영어 지원 — 켜면 **방문자 화면에 한/EN 토글**이 뜬다.
+                  * 기본이 꺼짐인 이유와 한계(주최자가 쓴 내용은 한국어로 남는다)는
+                  * `types/slot.ts` 의 `english` 주석에 적어 뒀다. 힌트로 그걸 그대로 말해 준다 —
+                  * 켜 놓고 "왜 상품명은 영어가 아니냐" 를 나중에 듣는 게 제일 나쁘다.
+                  */}
+                <Field
+                  label="방문자 언어 (선택)"
+                  hint="고르면 방문자 화면에 언어 단추가 생겨요. 한국어는 늘 있어요. 화면 문구만 번역되고, 주최자가 적은 내용(질문·상품명·문항·쪽지)은 한국어로 남아요."
+                >
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {LANGS.filter((l) => l.id !== 'ko').map((l) => {
+                      const on = (draft.langs ?? []).includes(l.id)
+                      return (
+                        <button
+                          key={l.id}
+                          type="button"
+                          style={{ ...CSS.ghostPill, ...(on ? { borderColor: '#816bff', color: '#816bff' } : {}) }}
+                          onClick={() => {
+                            const cur = draft.langs ?? []
+                            // 빈 배열은 저장하지 않는다 — `undefined` 와 같은 뜻인데 둘이 있으면 헷갈린다
+                            const next = on ? cur.filter((x) => x !== l.id) : [...cur, l.id]
+                            patchSlot({ langs: next.length ? next : undefined })
+                          }}
+                          data-lang-opt={l.id}
+                        >
+                          {on ? '✓ ' : ''}
+                          {l.label}
+                        </button>
+                      )
+                    })}
+                  </div>
                 </Field>
               </div>
               <div>

@@ -389,6 +389,42 @@ check('주최자는 색을 못 만든다 (최고관리자 전용)', themeAsAdmin
   check('뒷정리: 한도를 되돌림', restored.reading === before.reading, `reading=${restored.reading}`)
 }
 
+/**
+ * **토큰 사용량이 실제로 쌓이는가** (`0040_ai_tokens.sql`).
+ *
+ * 호출 횟수는 원래 세고 있었지만 토큰은 SSE 로 화면에 보내고 버렸다 — 그래서 아래 「실측 토큰」
+ * 블록이 재는 값이 **이 스크립트가 도는 동안에만** 존재했고, `PRICING.md` 의 추정을 실제 운영과
+ * 맞춰볼 근거가 없었다.
+ *
+ * 여기까지 오는 동안 리딩을 여러 번 불렀으므로 `reading_in`·`reading_out` 이 0 이면 안 된다.
+ * **최고관리자로 읽는다** — anon·주최자는 이 표를 못 본다(그것도 같이 확인한다).
+ */
+{
+  const usageAs = (token) =>
+    fetch(
+      `${sbUrl}/rest/v1/ai_usage?slug=eq.${SLUG}&select=reading,reading_in,reading_out`,
+      { headers: { apikey: sbKey, ...(token ? { authorization: `Bearer ${token}` } : {}) } }
+    )
+
+  const mine = await usageAs(ownerToken)
+  const row = mine.ok ? (await mine.json())[0] : null
+  check('최고관리자가 사용량을 읽는다', mine.ok && Boolean(row), `HTTP ${mine.status}`)
+  check(
+    '리딩 토큰이 쌓인다 (입력·출력 둘 다)',
+    (row?.reading_in ?? 0) > 0 && (row?.reading_out ?? 0) > 0,
+    `입력 ${row?.reading_in ?? 0} · 출력 ${row?.reading_out ?? 0} · 호출 ${row?.reading ?? 0}회`
+  )
+
+  // 남이 보면 안 된다 — 이 표엔 슬롯별 사용량이 다 들어 있다 (0040 §3 은 select 만, owner 에게만 열었다)
+  const asAnon = await usageAs(null)
+  const anonRows = asAnon.ok ? await asAnon.json() : []
+  check('방문자(anon)는 사용량을 못 읽는다', anonRows.length === 0, `${anonRows.length}행이 샜다`)
+
+  const asAdmin = await usageAs(adminToken)
+  const adminRows = asAdmin.ok ? await asAdmin.json() : []
+  check('주최자도 사용량을 못 읽는다', adminRows.length === 0, `${adminRows.length}행이 샜다`)
+}
+
 // ── 질문 × 카드 답변 생성 ───────────────────────────
 // demo 주최자로 — 이 버튼은 이제 권한이 있어야 눌린다
 const answersRes = await postAs(
@@ -644,10 +680,19 @@ check('"AI로 전체 생성" 버튼이 켜짐', genBtn !== null && !(await genBt
 
 await genBtn.click()
 await wait(600)
-const busy = await admin.evaluate(
-  () => document.querySelector('[role="status"]')?.textContent ?? ''
-)
-check('생성 중 진행률을 보여줌', /카드를 읽고 있어요/.test(busy), busy.trim())
+/**
+ * 진행률은 **버튼 안**에 있다 — `12 / 22장째 만드는 중…` (`QuestionEditor` 의 `gen`).
+ *
+ * 예전엔 `[role="status"]` 에서 "카드를 읽고 있어요" 를 찾았는데, 그건 **방문자 화면의
+ * 리딩 로더** 문구다 — 이 화면엔 처음부터 없었다. 78장이 몇 분 걸리는 버튼이라
+ * "지금 돌고 있나" 를 보여주는 게 계약이고, 그게 보이는 자리는 버튼이다.
+ */
+const busy = await admin.$eval('[data-generate]', (b) => ({
+  text: b.textContent?.trim() ?? '',
+  disabled: b.disabled,
+}))
+check('생성 중 진행률을 보여줌', /장째 만드는 중/.test(busy.text), busy.text)
+check('생성 중엔 버튼이 다시 안 눌린다', busy.disabled, `disabled=${busy.disabled}`)
 await admin.screenshot({ path: join(outDir, 'ai-admin-generating.png') })
 
 /**
@@ -688,8 +733,18 @@ const firstAnswer = await admin.evaluate(
 console.log(`\n첫 카드 답변: ${firstAnswer}\n`)
 check('검수칸에 생성된 답변이 들어 있음', firstAnswer.length > 30, `${firstAnswer.length}자`)
 
+/**
+ * 저장은 **확인 창을 한 번 거친다** (`confirmAction`) — 156장을 덮어쓰는 버튼이라 그게 맞다.
+ *
+ * 예전엔 여기서 `[data-apply]` 만 누르고 끝냈고, 확인 창이 뜬 채로 검사가 돌아
+ * **"저장하면 answers 에 들어감 0/22장"** 으로 계속 실패하고 있었다. 제품이 아니라 검증이
+ * 낡은 것이었는데, 실패 문구가 제품 버그처럼 읽혀서 오래 남아 있었다.
+ */
 await admin.click('[data-apply]')
-await wait(800)
+const confirmBtn = await admin.waitForSelector('[data-confirm-ok]', { timeout: 5000 }).catch(() => null)
+check('저장 전에 확인 창이 뜬다 (덮어쓰기라서)', Boolean(confirmBtn))
+await confirmBtn?.click()
+await wait(1200)
 check('저장하면 answers 에 들어감', (await savedAnswers()) === deckSize, `${await savedAnswers()}/${deckSize}장`)
 check('저장 후 검수 바가 사라짐', (await admin.$('[data-review]')) === null)
 await admin.screenshot({ path: join(outDir, 'ai-admin-saved.png') })

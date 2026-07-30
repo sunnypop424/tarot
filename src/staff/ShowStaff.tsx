@@ -9,6 +9,8 @@ import type { CheerSettings } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import { useOnline } from './staffLocal'
 import styles from './Staff.module.css'
+import { useT } from '@/i18n'
+import { LangBar } from '@/components/LangBar'
 
 /**
  * 상영 제어 — `/{slug}/staff` (영상회 응원).
@@ -21,6 +23,7 @@ import styles from './Staff.module.css'
  * (노트북에서 쓸 땐 상영 화면의 단축키: 스페이스=감추기 토글 · C=크레딧.)
  */
 export function ShowStaff({ slot }: { slot: Slot }) {
+  const t = useT()
   const { slug } = slot
   const { status } = useAdminAuth(slug)
   const online = useOnline()
@@ -57,10 +60,11 @@ export function ShowStaff({ slot }: { slot: Slot }) {
 
   const shell = (children: React.ReactNode) => (
     <div className={`app ${styles.app}`}>
+      <LangBar all />
       <main className={styles.stage} style={vars}>
         <div className={`surface ${styles.panel}`}>{children}</div>
         <a className={styles.adminLink} href={`/${slug}/admin/cheer`}>
-          관리자 페이지로 이동
+          {t('관리자 페이지로 이동')}
         </a>
       </main>
     </div>
@@ -72,8 +76,8 @@ export function ShowStaff({ slot }: { slot: Slot }) {
     return shell(
       <div className={styles.center}>
         <Lock size={32} strokeWidth={1.6} aria-hidden="true" />
-        <div className={styles.centerTitle}>상영 제어는 주최자만 써요</div>
-        <p className={styles.centerBody}>행사 계정으로 한 번만 로그인해 두시면 이 기기에서 계속 쓸 수 있어요.</p>
+        <div className={styles.centerTitle}>{t('상영 제어는 주최자만 써요')}</div>
+        <p className={styles.centerBody}>{t('행사 계정으로 한 번만 로그인해 두시면 이 기기에서 계속 쓸 수 있어요.')}</p>
         <Link className={styles.linkBtn} to={`/${slug}/admin/login`}>
           로그인하러 가기
         </Link>
@@ -100,17 +104,18 @@ export function ShowStaff({ slot }: { slot: Slot }) {
 
   return (
     <div className={`app ${styles.app}`}>
+      <LangBar all />
       <main className={styles.stage} style={vars}>
         <div className={`surface ${styles.panel}`}>
           <div className={styles.band}>
-            <span className={styles.bandMsg}>상영 제어</span>
+            <span className={styles.bandMsg}>{t('상영 제어')}</span>
           </div>
 
           {!online && (
             <div className={styles.banner} data-offline>
               <WifiOff size={16} aria-hidden="true" />
               <span>
-                <b>연결이 끊겼어요.</b> 지금 누르면 상영 화면에 전달되지 않아요.
+                <b>{t('연결이 끊겼어요.')}</b> 지금 누르면 상영 화면에 전달되지 않아요.
               </span>
             </div>
           )}
@@ -118,12 +123,12 @@ export function ShowStaff({ slot }: { slot: Slot }) {
           {/* 지금 상태 — 큰 글씨. 어두운 상영장에서 힐끗 보고 알아야 한다 */}
           <div className={styles.showState} data-state={s.showState}>
             {s.showState === 'idle'
-              ? '상영 전'
+              ? t('상영 전')
               : s.showState === 'live'
-                ? '말풍선 뜨는 중'
+                ? t('말풍선 뜨는 중')
                 : s.showState === 'hidden'
-                  ? '잠시 감춤'
-                  : '엔딩크레딧'}
+                  ? t('잠시 감춤')
+                  : t('엔딩크레딧')}
           </div>
 
           {running && (
@@ -131,7 +136,7 @@ export function ShowStaff({ slot }: { slot: Slot }) {
               <span className={styles.clockMain}>{hhmmss(elapsed)}</span>
               {left !== null && (
                 <span className={styles.clockSub} data-soon={left <= 60 || undefined}>
-                  {left > 0 ? `크레딧까지 ${hhmmss(left)}` : '크레딧 시점이 지났어요'}
+                  {left > 0 ? `크레딧까지 ${hhmmss(left)}` : t('크레딧 시점이 지났어요')}
                 </span>
               )}
             </div>
@@ -204,10 +209,10 @@ export function ShowStaff({ slot }: { slot: Slot }) {
               {s.runtimeSec > 0 ? (
                 <>
                   {' '}
-                  영상 길이를 적어두셔서 <b>끝나면 크레딧이 자동으로</b> 떠요 (10초 안에 취소할 수 있어요).
+                  영상 길이를 적어두셔서 <b>{t('끝나면 크레딧이 자동으로')}</b> 떠요 (10초 안에 취소할 수 있어요).
                 </>
               ) : (
-                <> 관리 화면에서 영상 길이를 적어두시면 크레딧이 자동으로 떠요.</>
+                <>{t('관리 화면에서 영상 길이를 적어두시면 크레딧이 자동으로 떠요.')}</>
               )}
             </span>
           </div>
@@ -219,7 +224,7 @@ export function ShowStaff({ slot }: { slot: Slot }) {
             <ExternalLink size={11} strokeWidth={2} aria-hidden="true" />
           </a>
           <a className={styles.adminLink} href={`/${slug}/admin/cheer`}>
-            관리자 페이지로 이동
+            {t('관리자 페이지로 이동')}
           </a>
         </div>
       </main>

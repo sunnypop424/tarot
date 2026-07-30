@@ -1,11 +1,14 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import type { ComponentType } from 'react'
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
 
 import { SlotProvider, useSlotState } from '@/slot/SlotProvider'
 import { getSlotService } from '@/data/services'
 import type { ServiceId } from '@/data/services'
+import { isSlotExpired } from '@/data/slots'
+import { LangProvider, useLang } from '@/i18n'
 import { QuestionsProvider } from '@/lib/questions'
+import { LangBar } from '@/components/LangBar'
 import { TabBar } from '@/components/TabBar'
 import { TopNav } from '@/components/TopNav'
 import { Home } from '@/screens/Home'
@@ -14,6 +17,7 @@ import { Draw } from '@/screens/Draw'
 import { Question } from '@/screens/Question'
 import { Cards } from '@/screens/Cards'
 import { CardDetail } from '@/screens/CardDetail'
+import { Ended } from '@/screens/Ended'
 import { NotFound } from '@/screens/NotFound'
 
 /** 관리자 코드는 방문자(카페에서 모바일)에게 내려가면 안 된다 — 별도 청크로 분리 */
@@ -129,6 +133,19 @@ function SlotLayout() {
   if (state.status === 'missing') return <NotFound />
   const slot = state.slot
 
+  /**
+   * **종료된 행사는 방문자에게 닫는다.**
+   *
+   * DB 는 종료 뒤에도 14일 더 슬롯을 읽게 해준다 (`slot_grace_days` — 주최자가 자료를 꺼내고
+   * 남은 선물을 건네는 시간이다). 쓰기는 `slot_open` 이 막으니 글이 남거나 도장이 찍히진 않는데,
+   * **읽기만으로 완전히 도는 서비스가 있다**: 타로 뽑기·포토존 합성은 서버에 아무것도 안 쓴다.
+   * 그러면 유예가 그대로 대여 연장이 된다.
+   *
+   * 그래서 여기서 한 번 더 판정한다. **`SlotLayout` 안이라 방문자 화면에만 걸린다** —
+   * 관리(`/admin`)·스태프(`/staff`)는 형제 라우트라 유예 동안 그대로 열려 있다.
+   */
+  if (isSlotExpired(slot)) return <Ended name={slot.name} />
+
   const ServiceApp = SERVICE_APPS[getSlotService(slot)]
   if (ServiceApp) return <ServiceApp />
 
@@ -139,6 +156,12 @@ function SlotLayout() {
         <TopNav />
 
         <main className="app__scroll">
+          {/*
+            * 타로만 셸이 다르다 — 상단 네비가 **데스크톱 전용**이라 폰에서는 고르개가
+            * 안 보였다. 스크롤 안 맨 위에 두면 넓은 화면에서도 네비의 고르개와 안 겹친다
+            * (`LangBar` 가 `.topnav` 처럼 숨지 않으므로 CSS 로 하나만 남긴다).
+            */}
+          <LangBar className="langbar--mobile" />
           <Outlet />
         </main>
         <TabBar />
@@ -151,15 +174,37 @@ function SlotLayout() {
 function SlotScope() {
   return (
     <SlotProvider>
+      <SlotDefaultLang />
       <Outlet />
     </SlotProvider>
   )
 }
 
+/**
+ * 슬롯이 정한 **기본 언어**를 처음 한 번 적용한다 (`slot.defaultLang`).
+ *
+ * `LangProvider` 는 `SlotProvider` **바깥**에 있어서(앱 전체가 한 언어를 쓴다) 슬롯을 모른다.
+ * 그래서 슬롯이 읽힌 뒤에 안쪽에서 알려 준다 — 아무것도 안 그리는 부품이 하나 필요한 이유다.
+ *
+ * **방문자가 한 번이라도 고르면 그쪽이 이긴다** (`applyDefault` 가 저장된 선택을 먼저 본다).
+ */
+function SlotDefaultLang() {
+  const state = useSlotState()
+  const { applyDefault } = useLang()
+  const slot = state.status === 'ready' ? state.slot : null
+
+  useEffect(() => {
+    if (slot) applyDefault(slot.defaultLang, slot.langs)
+  }, [slot, applyDefault])
+
+  return null
+}
+
 export function App() {
   return (
-    <BrowserRouter>
-      <Suspense fallback={null}>
+    <LangProvider>
+      <BrowserRouter>
+        <Suspense fallback={null}>
         <Routes>
           {/*
             * 배포 루트는 **랜딩**이다 — 파는 물건을 소개하고 체험 슬롯으로 보낸다.
@@ -188,8 +233,9 @@ export function App() {
           </Route>
 
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </LangProvider>
   )
 }

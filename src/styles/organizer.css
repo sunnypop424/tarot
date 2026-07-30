@@ -329,6 +329,24 @@
 .ad-nav__link[aria-current='page'] .ad-nav__badge {
   color: var(--ad-key);
 }
+/**
+ * 알림 개수 — **지금 보고 있는 화면에서도 색이 안 죽는다.**
+ * 위 규칙이 현재 메뉴의 배지를 보라로 덮는데, 이건 "손대야 할 게 있다" 는 신호라
+ * 대시보드를 보고 있는 동안에도 빨간색이어야 한다.
+ */
+.ad-nav__badge--count,
+.ad-nav__link[aria-current='page'] .ad-nav__badge--count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  background: var(--ad-bad);
+  color: #ffffff;
+}
 /* 서랍 안 메뉴는 카드 판을 또 깔지 않는다 */
 .ad-drawer .ad-nav__group + .ad-nav__group {
   margin-top: 16px;
@@ -436,6 +454,18 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--ad-ink-2);
+}
+/**
+ * 제목 줄을 좌우로 가른다 — 오른쪽엔 갱신 시각·새로고침 같은 **화면의 도구**가 온다.
+ * `flex-wrap` 이 걸려 있어 좁아지면 다음 줄로 내려간다 (밀어내지 않는다).
+ */
+.ad-head__spacer {
+  flex: 1;
+}
+.ad-head__tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 .ad-head__desc {
   font-size: 14px;
@@ -690,6 +720,44 @@
   margin-top: 5px;
   line-height: 1.7;
 }
+
+/**
+ * 알림 줄 — 관리 셸 맨 위, **모든 화면 위에** 얹힌다 (`AlertBar`).
+ * 배너 톤을 그대로 쓰고 배치만 다르다: 한 줄에 문장 + 고치러 가는 링크.
+ */
+.ad-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.ad-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-weight: 700;
+}
+.ad-alert__text {
+  flex: 1;
+  min-width: 0;
+}
+.ad-alert__go {
+  flex: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  /* 손가락으로 누르는 자리 — 44px 규칙 (docs/DESIGN.md) */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+/* 급한 것 하나는 눈에 띄게 — 세로 막대로 (색은 배너 톤이 이미 정했다) */
+.ad-alert[data-level='urgent'] {
+  border-left: 3px solid currentColor;
+}
 /* 즉시 저장 같은 규칙 한 줄 */
 .ad-note {
   display: inline-flex;
@@ -933,6 +1001,104 @@
   font-size: 16px;
   cursor: pointer;
 }
+/**
+ * 여러 개 붙여넣기 (`BulkPaste`) — 목록 화면 안에 잠깐 펼쳐지는 판.
+ * 카드 안에 또 카드를 그리지 않는다(테두리가 겹쳐 보인다) — 옅은 판에 얹는다.
+ */
+.ad-bulk {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--ad-key-wash-2);
+  border: 1px solid var(--ad-key-line-2);
+}
+.ad-bulk__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.ad-bulk__title {
+  font-size: 13px;
+  font-weight: 700;
+}
+.ad-bulk__area {
+  /* .ad-input 은 한 줄 높이가 고정이라 여러 줄에서는 풀어야 한다 */
+  height: auto;
+  padding: 11px 12px;
+  line-height: 1.7;
+  font-family: inherit;
+  resize: vertical;
+}
+.ad-bulk__preview {
+  display: grid;
+  gap: 7px;
+}
+.ad-bulk__count {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ad-key);
+}
+.ad-bulk__list {
+  margin: 0;
+  padding-left: 17px;
+  display: grid;
+  gap: 3px;
+  font-size: 12px;
+  color: var(--ad-ink-2);
+  line-height: 1.6;
+  /* 긴 줄이 판을 넓히면 화면 전체가 옆으로 밀린다 */
+  overflow-wrap: anywhere;
+}
+.ad-bulk__list--bad {
+  color: var(--ad-bad);
+}
+.ad-bulk__more {
+  list-style: none;
+  margin-left: -17px;
+  color: var(--ad-ink-3);
+}
+
+/**
+ * 뺄 수 있는 말 한 개 (금칙어) — 태그와 달리 **누르는 자리**가 안에 있다.
+ * `.ad-tag` 를 재활용하지 않는 건 그것이 상태 표시(숨김·마감)라 안에 버튼이 들어갈 자리가 없어서다.
+ */
+.ad-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 30px;
+  padding: 0 4px 0 11px;
+  border: 1px solid var(--ad-line-2);
+  border-radius: var(--radius-full);
+  background: var(--ad-surface);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ad-ink-2);
+}
+.ad-word__x {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--ad-ink-3);
+  font-size: 14px;
+  cursor: pointer;
+}
+.ad-word__x:hover:not(:disabled) {
+  background: var(--ad-bad-bg);
+  color: var(--ad-bad);
+}
+.ad-word__x:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .ad-x:hover:not(:disabled) {
   color: var(--ad-bad);
   background: var(--ad-bad-bg);

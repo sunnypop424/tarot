@@ -25,6 +25,7 @@ import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Stamp.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 방문 스탬프 — 현장 암호로 도장을 찍고, 다 모으면 보상(공용 인프라)으로 넘어간다.
@@ -58,6 +59,7 @@ const SAMPLE_REWARD: MyReward = {
 }
 
 function Board({ slot }: { slot: Slot }) {
+  const t = useT()
   const { slug } = slot
   const display = useMemo(() => stampDisplay(slot), [slot])
   const subject = useMemo(() => visitorId(), [])
@@ -114,7 +116,7 @@ function Board({ slot }: { slot: Slot }) {
       const r = await repo.stamp.checkin(slug, subject, code)
       // 틀린 암호·이미 찍은 칸은 예외가 아니라 값으로 온다 (0023 주석) — 입력칸에 그대로 머문다
       if (!r.ok || !r.stampId) {
-        setNotice(r.message ?? '암호가 맞지 않아요')
+        setNotice(r.message ?? t('암호가 맞지 않아요'))
         return false
       }
       const hit = r.stampId
@@ -130,7 +132,7 @@ function Board({ slot }: { slot: Slot }) {
       setTimeout(() => setFresh(null), 1200)
       return true
     } catch (e) {
-      setNotice(e instanceof Error ? e.message : '확인하지 못했어요')
+      setNotice(e instanceof Error ? e.message : t('확인하지 못했어요'))
       return false
     }
   }
@@ -138,7 +140,7 @@ function Board({ slot }: { slot: Slot }) {
   if (!repo.stamp.ready()) {
     return (
       <div className={`app ${styles.root}`} style={vars}>
-        <div className={styles.empty}>지금은 스탬프를 쓸 수 없어요.</div>
+        <div className={styles.empty}>{t('지금은 스탬프를 쓸 수 없어요.')}</div>
       </div>
     )
   }
@@ -208,7 +210,7 @@ function Board({ slot }: { slot: Slot }) {
             ) : (
               <div className={styles.boardWrap}>
                 <div className={styles.boardTop}>
-                  <div className={styles.boardLabel}>모은 도장</div>
+                  <div className={styles.boardLabel}>{t('모은 도장')}</div>
                   <div className={`${styles.boardCount} ${styles.tnum}`}>
                     {got} / {cells.length}
                   </div>
@@ -222,10 +224,10 @@ function Board({ slot }: { slot: Slot }) {
                 <div className={styles.toast} data-stamped>
                   <StampIcon size={24} strokeWidth={1.7} aria-hidden="true" />
                   <div>
-                    <div className={styles.toastTitle}>도장을 찍었어요</div>
+                    <div className={styles.toastTitle}>{t('도장을 찍었어요')}</div>
                     <div className={styles.toastSub}>
                       {complete
-                        ? '판을 다 채웠어요!'
+                        ? t('판을 다 채웠어요!')
                         : `${cells.length - got}개만 더 모으면 완성이에요`}
                     </div>
                   </div>
@@ -235,12 +237,12 @@ function Board({ slot }: { slot: Slot }) {
                   <div className={styles.notes}>
                     <div className={styles.note}>
                       <Info size={16} strokeWidth={1.7} aria-hidden="true" style={{ flex: 'none', marginTop: 1 }} />
-                      <span>이 기기에만 저장돼요.</span>
+                      <span>{t('이 기기에만 저장돼요.')}</span>
                     </div>
                     {settings?.dailyReset && (
                       <div className={styles.note}>
                         <Clock size={16} strokeWidth={1.7} aria-hidden="true" style={{ flex: 'none', marginTop: 1 }} />
-                        <span>오늘의 판이에요 · 자정에 초기화돼요.</span>
+                        <span>{t('오늘의 판이에요 · 자정에 초기화돼요.')}</span>
                       </div>
                     )}
                   </div>
@@ -259,9 +261,9 @@ function Board({ slot }: { slot: Slot }) {
                   >
                     {!settings?.closed && <KeyRound size={19} strokeWidth={1.7} aria-hidden="true" />}
                     {settings?.closed
-                      ? '마감됐어요'
+                      ? t('마감됐어요')
                       : complete && reward
-                        ? '내 선물 보기'
+                        ? t('내 선물 보기')
                         : display.codeLabel}
                   </button>
                 </>
@@ -355,6 +357,7 @@ function CodeEntry({
   onSubmit: (code: string) => Promise<boolean>
   notice: string | null
 }) {
+  const t = useT()
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
   const [shake, setShake] = useState(false)
@@ -388,13 +391,13 @@ function CodeEntry({
   return (
     <>
       <div className={styles.topBar}>
-        <button type="button" className={styles.backBtn} onClick={onBack} aria-label="돌아가기">
+        <button type="button" className={styles.backBtn} onClick={onBack} aria-label={t('돌아가기')}>
           <ChevronLeft size={18} strokeWidth={1.7} aria-hidden="true" />
         </button>
       </div>
 
       <div className={styles.codeWrap}>
-        <div className={styles.codeTitle}>참여하고 받은 암호를 입력해 주세요</div>
+        <div className={styles.codeTitle}>{t('참여하고 받은 암호를 입력해 주세요')}</div>
         {display.codeHint && <p className={styles.codeHint}>{display.codeHint}</p>}
 
         {/**
@@ -410,7 +413,7 @@ function CodeEntry({
             autoCapitalize="characters"
             autoComplete="one-time-code"
             maxLength={CODE_LEN}
-            aria-label="암호"
+            aria-label={t('암호')}
             data-code-input
             onChange={(e) => setCode(e.target.value.replace(/[^0-9A-Za-z]/g, '').toUpperCase().slice(0, CODE_LEN))}
             onKeyDown={(e) => e.key === 'Enter' && void go()}
@@ -430,7 +433,7 @@ function CodeEntry({
             </div>
           </>
         ) : (
-          <div className={styles.codeSmall}>대소문자는 구분하지 않아요</div>
+          <div className={styles.codeSmall}>{t('대소문자는 구분하지 않아요')}</div>
         )}
       </div>
 
@@ -442,7 +445,7 @@ function CodeEntry({
           onClick={() => void go()}
           data-code-submit
         >
-          {busy ? '확인 중…' : notice ? '다시 확인' : '확인'}
+          {busy ? t('확인 중…') : notice ? t('다시 확인') : t('확인')}
         </button>
       </div>
     </>
@@ -458,16 +461,17 @@ function Complete({
   cells: StampCell[]
   onBack: () => void
 }) {
+  const t = useT()
   return (
     <>
       <div className={styles.topBar}>
-        <button type="button" className={styles.backBtn} onClick={onBack} aria-label="돌아가기">
+        <button type="button" className={styles.backBtn} onClick={onBack} aria-label={t('돌아가기')}>
           <ChevronLeft size={18} strokeWidth={1.7} aria-hidden="true" />
         </button>
       </div>
       <div className={styles.doneWrap} data-complete>
         <div className={styles.doneKicker}>STAMP COMPLETE</div>
-        <div className={styles.doneTitle}>판을 다 채웠어요</div>
+        <div className={styles.doneTitle}>{t('판을 다 채웠어요')}</div>
         <div style={{ width: '100%', marginTop: 26 }}>
           <StampBoard cells={cells} mine={cells.map((c) => c.id)} fresh={null} />
         </div>
@@ -484,33 +488,34 @@ function Complete({
 }
 
 function Ticket({ reward, onBack }: { reward: MyReward; onBack: () => void }) {
+  const t = useT()
   const redeemed = !!reward.redeemedAt
   return (
     <>
       <div className={styles.topBar}>
-        <button type="button" className={styles.backBtn} onClick={onBack} aria-label="돌아가기">
+        <button type="button" className={styles.backBtn} onClick={onBack} aria-label={t('돌아가기')}>
           <ChevronLeft size={18} strokeWidth={1.7} aria-hidden="true" />
         </button>
       </div>
       <div style={{ padding: '16px 22px 0', textAlign: 'center' }}>
-        <div className={styles.doneKicker}>판을 다 채웠어요</div>
+        <div className={styles.doneKicker}>{t('판을 다 채웠어요')}</div>
         <div style={{ marginTop: 6, fontSize: 20, fontWeight: 800 }}>{reward.label} 교환권</div>
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 22px' }}>
         <div className={styles.ticket} data-ticket>
           <div className={redeemed ? styles.ticketFaded : undefined}>
-            <div className={styles.ticketLabel}>카운터에서 이 코드를 보여 주세요</div>
+            <div className={styles.ticketLabel}>{t('카운터에서 이 코드를 보여 주세요')}</div>
             <div className={styles.code} data-code>
               {reward.code}
             </div>
           </div>
-          {redeemed && <div className={styles.redeemedMark}>수령 완료</div>}
+          {redeemed && <div className={styles.redeemedMark}>{t('수령 완료')}</div>}
           {!redeemed && (
             <>
               <div className={styles.ticketDivider} />
               <div className={styles.prize}>
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.6 }}>받는 선물</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.6 }}>{t('받는 선물')}</div>
                   <div className={styles.prizeName}>{reward.label}</div>
                 </div>
               </div>
@@ -529,13 +534,13 @@ function Ticket({ reward, onBack }: { reward: MyReward; onBack: () => void }) {
               })}
               에 수령했어요
             </div>
-            <div className={styles.codeSmall}>이미 사용한 코드예요</div>
+            <div className={styles.codeSmall}>{t('이미 사용한 코드예요')}</div>
           </div>
         )}
 
         <div className={styles.note} style={{ marginTop: 16 }}>
           <Info size={16} strokeWidth={1.7} aria-hidden="true" style={{ flex: 'none', marginTop: 1 }} />
-          <span>이 기기에만 저장돼요. 브라우저 기록을 지우면 교환권도 사라져요.</span>
+          <span>{t('이 기기에만 저장돼요. 브라우저 기록을 지우면 교환권도 사라져요.')}</span>
         </div>
       </div>
       <div style={{ padding: '0 22px 30px' }} />
@@ -554,6 +559,7 @@ function EntryForm({
   onBack: () => void
   onDone: () => void | Promise<void>
 }) {
+  const t = useT()
   const f = settings?.entryFields ?? { handle: true, contact: false, address: false }
   const [nickname, setNickname] = useState('')
   const [handle, setHandle] = useState('')
@@ -563,7 +569,7 @@ function EntryForm({
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
 
-  const items = ['닉네임', f.handle && '트위터 아이디', f.contact && '연락처', f.address && '주소']
+  const items = [t('닉네임'), f.handle && t('트위터 아이디'), f.contact && t('연락처'), f.address && t('주소')]
     .filter(Boolean)
     .join(', ')
 
@@ -581,7 +587,7 @@ function EntryForm({
       })
       await onDone()
     } catch (e) {
-      setErr(e instanceof Error ? e.message : '응모하지 못했어요')
+      setErr(e instanceof Error ? e.message : t('응모하지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -590,17 +596,17 @@ function EntryForm({
   return (
     <form onSubmit={submit} style={{ display: 'contents' }} data-entry-form>
       <div className={styles.topBar}>
-        <button type="button" className={styles.backBtn} onClick={onBack} aria-label="돌아가기">
+        <button type="button" className={styles.backBtn} onClick={onBack} aria-label={t('돌아가기')}>
           <ChevronLeft size={18} strokeWidth={1.7} aria-hidden="true" />
         </button>
       </div>
       <div style={{ padding: '16px 22px 0' }}>
-        <div className={styles.doneKicker}>판을 다 채웠어요</div>
+        <div className={styles.doneKicker}>{t('판을 다 채웠어요')}</div>
         <h2 style={{ margin: '8px 0 0', fontSize: 24, fontWeight: 800, lineHeight: 1.35 }}>
           {reward.label} 응모하기
         </h2>
         <p className={styles.doneText} style={{ marginTop: 10 }}>
-          당첨자는 이벤트가 끝난 뒤 주최자가 따로 발표해요.
+          {t('당첨자는 이벤트가 끝난 뒤 주최자가 따로 발표해요.')}
         </p>
       </div>
 
@@ -614,7 +620,7 @@ function EntryForm({
             className={styles.input}
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
-            placeholder="발표 때 쓸 닉네임"
+            placeholder={t('발표 때 쓸 닉네임')}
             maxLength={30}
           />
         </div>
@@ -622,7 +628,7 @@ function EntryForm({
         {f.handle && (
           <div>
             <label className={styles.label} htmlFor="st-handle">
-              트위터 아이디
+              {t('트위터 아이디')}
             </label>
             <div className={styles.handleRow}>
               <span className={styles.at}>@</span>
@@ -631,7 +637,7 @@ function EntryForm({
                 className={styles.handleInput}
                 value={handle}
                 onChange={(e) => setHandle(e.target.value)}
-                placeholder="아이디"
+                placeholder={t('아이디')}
                 maxLength={30}
               />
             </div>
@@ -641,14 +647,14 @@ function EntryForm({
         {f.contact && (
           <div>
             <label className={styles.label} htmlFor="st-contact">
-              연락처
+              {t('연락처')}
             </label>
             <input
               id="st-contact"
               className={styles.input}
               value={contact}
               onChange={(e) => setContact(e.target.value)}
-              placeholder="연락 받으실 번호"
+              placeholder={t('연락 받으실 번호')}
               inputMode="tel"
             />
           </div>
@@ -657,20 +663,20 @@ function EntryForm({
         {f.address && (
           <div>
             <label className={styles.label} htmlFor="st-addr">
-              주소
+              {t('주소')}
             </label>
             <input
               id="st-addr"
               className={styles.input}
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="받으실 주소"
+              placeholder={t('받으실 주소')}
             />
           </div>
         )}
 
         <div className={styles.privacy}>
-          <div className={styles.privacyTitle}>개인정보 수집·이용 안내</div>
+          <div className={styles.privacyTitle}>{t('개인정보 수집·이용 안내')}</div>
           <div className={styles.privacyBody}>
             수집 항목: {items} · 수집 목적: 당첨자 확인 및 안내 · 보관 기간: 이벤트 종료 후 14일 ·
             파기 시점: 보관 기간 만료 즉시 파기.
@@ -694,7 +700,7 @@ function EntryForm({
 
       <div className={styles.submitBar}>
         <button type="submit" className={styles.cta} disabled={!nickname.trim() || !agree || busy} data-entry-submit>
-          {busy ? '보내는 중…' : '응모하기'}
+          {busy ? t('보내는 중…') : t('응모하기')}
         </button>
       </div>
     </form>
@@ -702,14 +708,15 @@ function EntryForm({
 }
 
 function Entered({ onBack }: { onBack: () => void }) {
+  const t = useT()
   return (
     <div className={styles.doneWrap} data-entered>
       <div className={styles.logoTile} style={{ width: 66, height: 66, borderRadius: 9999 }}>
         <CircleCheck size={30} strokeWidth={1.7} aria-hidden="true" />
       </div>
-      <div style={{ marginTop: 20, fontSize: 22, fontWeight: 800 }}>응모했어요</div>
+      <div style={{ marginTop: 20, fontSize: 22, fontWeight: 800 }}>{t('응모했어요')}</div>
       <p className={styles.doneText} style={{ marginTop: 10 }}>
-        당첨자는 이벤트가 끝난 뒤 주최자가 따로 발표해요.
+        {t('당첨자는 이벤트가 끝난 뒤 주최자가 따로 발표해요.')}
         <br />
         응모는 한 번만 할 수 있어요.
       </p>

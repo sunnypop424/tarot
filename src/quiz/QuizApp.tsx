@@ -24,6 +24,8 @@ import type { Slot } from '@/types/slot'
 import { drawTitleCard } from './titleCard'
 import { AdminEntry } from '@/components/AdminEntry'
 import styles from './Quiz.module.css'
+import { useT } from '@/i18n'
+import { LangBar } from '@/components/LangBar'
 
 /**
  * 최애 모의고사 — 문제를 풀고 칭호를 받는다.
@@ -78,6 +80,7 @@ const SAMPLE_REWARD: MyReward = {
 }
 
 function Quiz({ slot }: { slot: Slot }) {
+  const t = useT()
   const { slug } = slot
   const display = useMemo(() => quizDisplay(slot), [slot])
   const subject = useMemo(() => visitorId(), [])
@@ -137,7 +140,7 @@ function Quiz({ slot }: { slot: Slot }) {
       if (r.rewardCode) setReward(await repo.quiz.myReward(slug, subject).catch(() => null))
       setView('result')
     } catch (e) {
-      setError(e instanceof Error ? e.message : '제출하지 못했어요')
+      setError(e instanceof Error ? e.message : t('제출하지 못했어요'))
       setView('start')
     }
   }, [ordered, picks, slug, subject])
@@ -186,7 +189,9 @@ function Quiz({ slot }: { slot: Slot }) {
   if (!repo.quiz.ready()) {
     return (
       <div className={`app ${styles.root}`} style={vars}>
-        <div className={styles.empty}>지금은 모의고사를 쓸 수 없어요.</div>
+      {/* 이 서비스는 자기 무대를 그린다 — ServiceHeader 가 없어 여기서 얹는다 */}
+      <LangBar />
+        <div className={styles.empty}>{t('지금은 모의고사를 쓸 수 없어요.')}</div>
       </div>
     )
   }
@@ -238,7 +243,7 @@ function Quiz({ slot }: { slot: Slot }) {
         {at === 'grading' && (
           <div className={styles.grading}>
             <div className={styles.spinner} aria-hidden="true" />
-            <div className={styles.gradingText}>채점하는 중…</div>
+            <div className={styles.gradingText}>{t('채점하는 중…')}</div>
           </div>
         )}
 
@@ -296,6 +301,7 @@ function Start({
   onStart: () => void
   onReward: () => void
 }) {
+  const t = useT()
   const mins = Math.round(settings.timeLimitSec / 60)
   return (
     <>
@@ -315,13 +321,13 @@ function Start({
         {count > 0 && (
           <div className={styles.facts}>
             <div className={styles.fact}>
-              <div className={styles.factLabel}>문항 수</div>
+              <div className={styles.factLabel}>{t('문항 수')}</div>
               <div className={`${styles.factValue} ${styles.tnum}`}>{count}문항</div>
             </div>
             <div className={styles.fact}>
-              <div className={styles.factLabel}>제한시간</div>
+              <div className={styles.factLabel}>{t('제한시간')}</div>
               <div className={`${styles.factValue} ${styles.tnum}`}>
-                {settings.timeLimitSec ? `${mins}분` : '없음'}
+                {settings.timeLimitSec ? `${mins}분` : t('없음')}
               </div>
             </div>
           </div>
@@ -349,7 +355,7 @@ function Start({
             disabled={settings.closed}
             data-start
           >
-            {settings.closed ? '마감됐어요' : display.startLabel}
+            {settings.closed ? t('마감됐어요') : display.startLabel}
           </button>
         )}
         <div className={styles.adminRow}>
@@ -381,6 +387,7 @@ function Run({
   onPick: (v: string) => void
   onNext: () => void
 }) {
+  const t = useT()
   const last = step + 1 >= total
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -427,7 +434,7 @@ function Run({
             className={styles.qImage}
             style={{ backgroundImage: cssUrl(q.image) }}
             role="img"
-            aria-label="문제 사진"
+            aria-label={t('문제 사진')}
           />
         )}
 
@@ -452,13 +459,13 @@ function Run({
             <input
               className={styles.shortInput}
               value={value}
-              placeholder="답을 적어 주세요"
-              aria-label="답"
+              placeholder={t('답을 적어 주세요')}
+              aria-label={t('답')}
               onChange={(e) => onPick(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && value.trim() && onNext()}
               data-short
             />
-            <div className={styles.shortHint}>띄어쓰기는 채점에 영향을 주지 않아요</div>
+            <div className={styles.shortHint}>{t('띄어쓰기는 채점에 영향을 주지 않아요')}</div>
           </div>
         )}
       </div>
@@ -491,6 +498,7 @@ function Result({
   settings: QuizSettings
   onReward: () => void
 }) {
+  const t = useT()
   const [image, setImage] = useState<ResultImage | null>(null)
   const [note, setNote] = useState<string | null>(null)
   const won = titleFor(display.titles, result.score, result.total)
@@ -545,7 +553,7 @@ function Result({
     const name = `${display.title}-${title}.png`
     const how = kind === 'save' ? await saveResult(image, name) : await shareResult(image, name)
     // 새 탭까지 떨어지면 사용자가 직접 눌러 저장해야 한다 — 그걸 말해준다
-    setNote(how === 'opened' ? '새 탭에서 사진을 길게 눌러 저장해 주세요.' : null)
+    setNote(how === 'opened' ? t('새 탭에서 사진을 길게 눌러 저장해 주세요.') : null)
   }
 
   return (
@@ -600,7 +608,7 @@ function Result({
         <div className={styles.actions}>
           <button type="button" onClick={() => void run('save')} disabled={!image} data-save>
             <Download size={17} strokeWidth={1.9} aria-hidden="true" />
-            저장
+            {t('저장')}
           </button>
           <button
             type="button"
@@ -610,7 +618,7 @@ function Result({
             data-share
           >
             <Share2 size={17} strokeWidth={1.9} aria-hidden="true" />
-            공유
+            {t('공유')}
           </button>
         </div>
 
@@ -636,7 +644,7 @@ function Result({
             onClick={onReward}
             data-open-reward
           >
-            {reward.kind === 'guaranteed' ? '교환권 보기' : reward.entered ? '응모 확인' : '선물 응모하기'}
+            {reward.kind === 'guaranteed' ? t('교환권 보기') : reward.entered ? t('응모 확인') : t('선물 응모하기')}
           </button>
         )}
         {!reward && settings.rewardMode === 'threshold' && (
@@ -648,7 +656,7 @@ function Result({
         {wrong.length > 0 && (
           <div className={styles.review} data-review>
             <div className={styles.reviewTop}>
-              <div className={styles.reviewTitle}>틀린 문제 다시보기</div>
+              <div className={styles.reviewTitle}>{t('틀린 문제 다시보기')}</div>
               <span className={`${styles.reviewCount} ${styles.tnum}`}>{wrong.length}문항</span>
             </div>
             {wrong.map((d) => (
@@ -656,13 +664,13 @@ function Result({
                 <div className={styles.reviewQ}>{d.body}</div>
                 {d.given !== null && d.given !== undefined && (
                   <div className={styles.reviewRow}>
-                    <span>내 답</span>
+                    <span>{t('내 답')}</span>
                     <span style={{ fontWeight: 700 }}>{d.given || '—'}</span>
                   </div>
                 )}
                 {d.answer && (
                   <div className={styles.reviewRow}>
-                    <span>정답</span>
+                    <span>{t('정답')}</span>
                     <span style={{ fontWeight: 800 }}>{d.answer}</span>
                   </div>
                 )}
@@ -734,6 +742,7 @@ function Reward({
   onBack: () => void
   onEntered: () => void
 }) {
+  const t = useT()
   if (!reward) {
     return (
       <>
@@ -742,7 +751,7 @@ function Reward({
           <div className={styles.bigIcon}>
             <CircleCheck size={30} strokeWidth={1.8} aria-hidden="true" />
           </div>
-          <div className={styles.centerTitle}>참여해 주셔서 고마워요</div>
+          <div className={styles.centerTitle}>{t('참여해 주셔서 고마워요')}</div>
           <p className={styles.centerBody}>
             이 이벤트에는 따로 드리는 선물이 없어요.
             <br />
@@ -771,9 +780,10 @@ function Reward({
 }
 
 function Top({ onBack }: { onBack: () => void }) {
+  const t = useT()
   return (
     <div className={styles.topBar}>
-      <button type="button" className={styles.backBtn} onClick={onBack} aria-label="돌아가기">
+      <button type="button" className={styles.backBtn} onClick={onBack} aria-label={t('돌아가기')}>
         <ChevronLeft size={18} strokeWidth={1.7} aria-hidden="true" />
       </button>
     </div>
@@ -789,23 +799,24 @@ function Ticket({
   reward: MyReward
   onBack: () => void
 }) {
+  const t = useT()
   const redeemed = !!reward.redeemedAt
   return (
     <>
       <Top onBack={onBack} />
       <div style={{ padding: '14px 22px 0', textAlign: 'center' }}>
-        {!redeemed && <div className={styles.formKicker}>기준 점수를 넘었어요</div>}
+        {!redeemed && <div className={styles.formKicker}>{t('기준 점수를 넘었어요')}</div>}
         <div style={{ marginTop: 6, fontSize: 20, fontWeight: 800 }}>{reward.label} 교환권</div>
       </div>
       <div className={styles.ticketWrap}>
         <div className={styles.ticket} data-ticket>
           <div className={redeemed ? styles.faded : undefined}>
-            <div className={styles.ticketLabel}>카운터에서 이 코드를 보여 주세요</div>
+            <div className={styles.ticketLabel}>{t('카운터에서 이 코드를 보여 주세요')}</div>
             <div className={`${styles.code} ${styles.tnum}`} data-code>
               {reward.code}
             </div>
           </div>
-          {redeemed && <div className={styles.redeemedMark}>수령 완료</div>}
+          {redeemed && <div className={styles.redeemedMark}>{t('수령 완료')}</div>}
         </div>
 
         {redeemed && (
@@ -819,13 +830,13 @@ function Ticket({
               })}
               에 수령했어요
             </div>
-            <div className={styles.inputHint} style={{ textAlign: 'center' }}>이미 사용한 코드예요</div>
+            <div className={styles.inputHint} style={{ textAlign: 'center' }}>{t('이미 사용한 코드예요')}</div>
           </div>
         )}
 
         <div className={styles.note} style={{ marginTop: 16 }}>
           <Info size={16} strokeWidth={1.7} aria-hidden="true" style={{ flex: 'none', marginTop: 1 }} />
-          <span>이 기기에만 저장돼요. 브라우저 기록을 지우면 교환권도 사라져요.</span>
+          <span>{t('이 기기에만 저장돼요. 브라우저 기록을 지우면 교환권도 사라져요.')}</span>
         </div>
       </div>
       <div style={{ padding: '0 22px 30px', textAlign: 'center', fontSize: 12, color: display.subText }}>
@@ -851,6 +862,7 @@ function EntryForm({
   onBack: () => void
   onDone: () => void
 }) {
+  const t = useT()
   const f = settings.entryFields
   const [nickname, setNickname] = useState('')
   const [handle, setHandle] = useState('')
@@ -861,7 +873,7 @@ function EntryForm({
   const [err, setErr] = useState<string | null>(null)
 
   // 안 켠 항목은 문구에도 안 넣는다 — 받지 않는 걸 받는다고 적으면 그게 거짓 고지다
-  const items = ['닉네임', f.handle && '트위터 아이디', f.contact && '연락처', f.address && '주소']
+  const items = [t('닉네임'), f.handle && t('트위터 아이디'), f.contact && t('연락처'), f.address && t('주소')]
     .filter(Boolean)
     .join(', ')
 
@@ -878,7 +890,7 @@ function EntryForm({
       })
       onDone()
     } catch (e) {
-      setErr(e instanceof Error ? e.message : '응모하지 못했어요')
+      setErr(e instanceof Error ? e.message : t('응모하지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -888,9 +900,9 @@ function EntryForm({
     <>
       <Top onBack={onBack} />
       <div className={styles.formHead}>
-        <div className={styles.formKicker}>기준 점수를 넘었어요</div>
+        <div className={styles.formKicker}>{t('기준 점수를 넘었어요')}</div>
         <h2 className={styles.formTitle}>{reward.label} 응모하기</h2>
-        <p className={styles.formIntro}>당첨자는 이벤트가 끝난 뒤 주최자가 따로 발표해요.</p>
+        <p className={styles.formIntro}>{t('당첨자는 이벤트가 끝난 뒤 주최자가 따로 발표해요.')}</p>
       </div>
 
       <div className={styles.formScroll}>
@@ -902,23 +914,23 @@ function EntryForm({
             id="qz-nick"
             className={styles.input}
             value={nickname}
-            placeholder="발표 때 쓸 닉네임"
+            placeholder={t('발표 때 쓸 닉네임')}
             maxLength={24}
             onChange={(e) => setNickname(e.target.value)}
             data-nickname
           />
-          <div className={styles.inputHint}>당첨자 발표에 이 닉네임이 그대로 올라가요.</div>
+          <div className={styles.inputHint}>{t('당첨자 발표에 이 닉네임이 그대로 올라가요.')}</div>
         </div>
 
         {f.handle && (
           <div>
-            <label className={styles.label} htmlFor="qz-handle">트위터 아이디</label>
+            <label className={styles.label} htmlFor="qz-handle">{t('트위터 아이디')}</label>
             <div className={styles.atRow}>
               <span aria-hidden="true">@</span>
               <input
                 id="qz-handle"
                 value={handle}
-                placeholder="아이디"
+                placeholder={t('아이디')}
                 maxLength={20}
                 onChange={(e) => setHandle(e.target.value)}
               />
@@ -927,7 +939,7 @@ function EntryForm({
         )}
         {f.contact && (
           <div>
-            <label className={styles.label} htmlFor="qz-contact">연락처</label>
+            <label className={styles.label} htmlFor="qz-contact">{t('연락처')}</label>
             <input
               id="qz-contact"
               className={styles.input}
@@ -941,12 +953,12 @@ function EntryForm({
         )}
         {f.address && (
           <div>
-            <label className={styles.label} htmlFor="qz-addr">주소</label>
+            <label className={styles.label} htmlFor="qz-addr">{t('주소')}</label>
             <input
               id="qz-addr"
               className={styles.input}
               value={address}
-              placeholder="받으실 주소"
+              placeholder={t('받으실 주소')}
               maxLength={200}
               onChange={(e) => setAddress(e.target.value)}
             />
@@ -954,7 +966,7 @@ function EntryForm({
         )}
 
         <div className={styles.consent}>
-          <div className={styles.consentTitle}>개인정보 수집·이용 안내</div>
+          <div className={styles.consentTitle}>{t('개인정보 수집·이용 안내')}</div>
           <div className={styles.consentBody}>
             수집 항목: {items} · 수집 목적: 당첨자 확인 및 안내 · 보관 기간: 이벤트 종료 후 14일 ·
             파기 시점: 보관 기간 만료 즉시 파기. 동의하지 않으면 응모할 수 없어요.
@@ -980,7 +992,7 @@ function EntryForm({
           onClick={() => void go()}
           data-enter
         >
-          {busy ? '보내는 중…' : '응모하기'}
+          {busy ? t('보내는 중…') : t('응모하기')}
         </button>
       </div>
     </>
@@ -988,6 +1000,7 @@ function EntryForm({
 }
 
 function Entered({ display: _display, onBack }: { display: QuizDisplay; onBack: () => void }) {
+  const t = useT()
   return (
     <>
       <Top onBack={onBack} />
@@ -995,9 +1008,9 @@ function Entered({ display: _display, onBack }: { display: QuizDisplay; onBack: 
         <div className={styles.bigIcon}>
           <CircleCheck size={30} strokeWidth={1.8} aria-hidden="true" />
         </div>
-        <div className={styles.centerTitle}>응모했어요</div>
+        <div className={styles.centerTitle}>{t('응모했어요')}</div>
         <p className={styles.centerBody}>
-          당첨자는 이벤트가 끝난 뒤 주최자가 따로 발표해요.
+          {t('당첨자는 이벤트가 끝난 뒤 주최자가 따로 발표해요.')}
           <br />
           응모는 한 번만 할 수 있어요.
         </p>

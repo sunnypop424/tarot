@@ -3,6 +3,7 @@ import { useId } from 'react'
 import { useSlotOrNull } from '@/slot/SlotProvider'
 import { cssUrl, useImageAsset } from '@/lib/image'
 import styles from './CrystalBall.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 수정구슬 로더 — AI 가 리딩을 쓰는 동안 이 자리를 지킨다.
@@ -14,6 +15,7 @@ import styles from './CrystalBall.module.css'
  * 올린 이미지는 `<img>` 가 아니라 **background-image** 다 (src/lib/image.ts).
  */
 export function CrystalBall({ label = '카드를 읽고 있어요' }: { label?: string }) {
+  const t = useT()
   const slot = useSlotOrNull()
   const src = slot?.theme.assets.crystalBall ?? null
   const { status } = useImageAsset(src)
@@ -25,7 +27,7 @@ export function CrystalBall({ label = '카드를 읽고 있어요' }: { label?: 
         <span
           className={`${styles.ball} ${styles.image} ${styles.orb}`}
           role="img"
-          aria-label="수정구슬"
+          aria-label={t('수정구슬')}
           style={{ backgroundImage: cssUrl(src) }}
         />
       ) : (

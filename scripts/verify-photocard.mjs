@@ -95,9 +95,12 @@ await setSettings({ mode: 'save', drawsPerVisitor: 3 })
 // ── 2. 레어도 분포 ────────────────────────────────
 //
 // **이 절이 이 스크립트의 존재 이유다.** 가중치를 재고로 잘못 쓰면 여기서만 드러난다.
+//
+// **0045 에서 방향이 뒤집혔다** — 레어도가 클수록 **덜** 나온다. 그전엔 5('전설')가 가장
+// 자주 나왔고, 그건 화면이 부르는 이름과 정반대였다. 여기 기대값을 옛것으로 되돌리지 말 것.
 {
   await resetCards()
-  // 레어도 1(재고 무제한) vs 레어도 4(재고 5장) — **재고 가중치면 흔한 쪽이 압도**한다
+  // 레어도 1 vs 레어도 4 — 완만 곡선이면 가중치가 5 : 2 다 (6−r)
   await mkCard('흔함', 1, null)
   const rareId = await mkCard('귀함', 4, null)
   await setSettings({ mode: 'save', drawsPerVisitor: 2000 })
@@ -109,13 +112,34 @@ await setSettings({ mode: 'save', drawsPerVisitor: 3 })
       where slug='${SLUG}' and subject='dist' group by rarity order by rarity;`
   )
   const by = Object.fromEntries(rows.map((r) => [r.rarity, r.n]))
-  const ratio = (by[4] ?? 0) / Math.max(1, by[1] ?? 0)
-  // 기대값 4:1 = 4.0. 1000회면 3.2~5.0 안에 든다 (넉넉히 잡아도 버그는 이 범위 밖이다)
+  const ratio = (by[1] ?? 0) / Math.max(1, by[4] ?? 0)
+  // 완만 곡선 기대값 5:2 = 2.5. 1000회면 2.0~3.1 안에 든다 (버그는 이 범위 밖이다)
   check(
-    '**레어도가 곧 확률이다** (재고가 아니다) — 4:1 카드가 대략 4배로 나온다',
-    ratio > 3.0 && ratio < 5.2,
-    `흔함 ${by[1] ?? 0} · 귀함 ${by[4] ?? 0} (비율 ${ratio.toFixed(2)})`
+    '**레어도가 클수록 덜 나온다** — 완만 곡선에서 기본(1)이 시크릿(4)의 2.5배',
+    ratio > 2.0 && ratio < 3.1,
+    `기본 ${by[1] ?? 0} · 시크릿 ${by[4] ?? 0} (비율 ${ratio.toFixed(2)})`
   )
+
+  /**
+   * **가파름 곡선도 확인한다** — 주최자가 고르는 값이라 둘이 실제로 달라야 한다.
+   * 2^(5−r) 이면 1 → 16, 4 → 2 라 기대 비율이 8:1 이다.
+   * (여기가 없으면 곡선 스위치가 아무것도 안 해도 검증이 통과한다.)
+   */
+  await exec(`update public.photocard_settings set rarity_curve='steep' where slug='${SLUG}';`)
+  await exec(`delete from public.photocard_draws where slug='${SLUG}';`)
+  await exec(`select public._photocard_pick('${SLUG}', ${N}, 'save', 'steep') ;`)
+  const steepRows = await exec(
+    `select rarity, count(*)::int n from public.photocard_draws
+      where slug='${SLUG}' and subject='steep' group by rarity order by rarity;`
+  )
+  const st = Object.fromEntries(steepRows.map((r) => [r.rarity, r.n]))
+  const steepRatio = (st[1] ?? 0) / Math.max(1, st[4] ?? 0)
+  check(
+    '가파름 곡선은 더 가파르다 — 기본(1)이 시크릿(4)의 8배',
+    steepRatio > 6.0 && steepRatio < 11.0,
+    `기본 ${st[1] ?? 0} · 시크릿 ${st[4] ?? 0} (비율 ${steepRatio.toFixed(2)})`
+  )
+  await exec(`update public.photocard_settings set rarity_curve='gentle' where slug='${SLUG}';`)
   void rareId
   await exec(`delete from public.photocard_draws where slug='${SLUG}';`)
 }
@@ -234,9 +258,16 @@ await setSettings({ mode: 'save', drawsPerVisitor: 3 })
 // ── 6. sale — N연차 + 묶음 상한 ───────────────────
 {
   await resetCards()
-  // 상한 0.2 = 10연차에 2장까지
-  await mkCard('상한있음', 5, null, 0.2)
-  await mkCard('보통', 1, null)
+  /*
+   * 상한 0.2 = 10연차에 2장까지.
+   *
+   * **상한을 거는 카드가 흔한 쪽이어야 검사가 성립한다.** 0045 로 방향이 뒤집히면서
+   * 레어도 5 는 이제 가장 귀한 카드가 됐고, 그러면 10연차에 원래 한 장도 안 나와서
+   * `capped <= 2` 가 **0장으로 그냥 통과한다** — 상한을 지웠어도 통과하는 검사가 된다.
+   * 그래서 상한 카드를 레어도 1(가장 흔함), 나머지를 5(가장 귀함)로 둔다.
+   */
+  await mkCard('상한있음', 1, null, 0.2)
+  await mkCard('보통', 5, null)
   await setSettings({ mode: 'sale', batchCount: 10, batchCapEnabled: true })
 
   const anon = await rpc('photocard_draw_batch', { target: SLUG, cnt: 5 })
@@ -251,9 +282,9 @@ await setSettings({ mode: 'save', drawsPerVisitor: 3 })
   const capped = cards.filter((c) => c.name === '상한있음').length
   check('10연차가 정확히 10장이다', cards.length === 10, `${cards.length}장`)
   check(
-    '**묶음 상한이 지켜진다** (레어도 5인데도 2장까지)',
-    capped <= 2,
-    `상한있음 ${capped}장 (레어도 5 vs 1 이라 상한이 없으면 8장쯤 나온다)`
+    '**묶음 상한이 지켜진다** (가장 흔한 카드인데도 2장까지)',
+    capped >= 1 && capped <= 2,
+    `상한있음 ${capped}장 (가중치 5 vs 1 이라 상한이 없으면 8장쯤 나온다)`
   )
 
   const over = await rpc('photocard_draw_batch', { target: SLUG, cnt: 999 }, OWNER)

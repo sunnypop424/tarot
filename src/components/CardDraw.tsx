@@ -6,6 +6,7 @@ import { GATHER_MS, DEAL_MS, type ShufflePhase } from './DeckSpread'
 import { buildSpread, type SpreadOptions } from '@/lib/deck'
 import type { DrawnCard } from '@/types/card'
 import styles from './CardDraw.module.css'
+import { useT } from '@/i18n'
 
 interface CardDrawProps {
   title: string
@@ -35,6 +36,7 @@ export function CardDraw({
   spread: options,
   onComplete,
 }: CardDrawProps) {
+  const t = useT()
   const [deck, setDeck] = useState<DrawnCard[]>(() => buildSpread(options))
   const [selected, setSelected] = useState<number[]>([])
   const [phase, setPhase] = useState<ShufflePhase>('idle')
@@ -81,9 +83,9 @@ export function CardDraw({
 
         <p className={`t-text-s t-muted ${styles.count}`}>
           {phase !== 'idle'
-            ? '카드를 섞고 있어요…'
+            ? t('카드를 섞고 있어요…')
             : done
-              ? '다 골랐어요'
+              ? t('다 골랐어요')
               : `${cardCount}장 중 ${selected.length}장 골랐어요`}
         </p>
       </div>
@@ -94,7 +96,7 @@ export function CardDraw({
           className={`btn btn--md btn--slight ${styles.shuffleBtn}`}
           onClick={handleShuffle}
           disabled={phase !== 'idle'}
-          aria-label="카드 다시 섞기"
+          aria-label={t('카드 다시 섞기')}
         >
           <Shuffle size={20} strokeWidth={2} aria-hidden="true" />
         </button>

@@ -143,6 +143,37 @@ const claim = async (slug: string, kind: 'reading' | 'answer_gen') => {
 const release = (slug: string, kind: 'reading' | 'answer_gen') =>
   admin.rpc('release_ai_usage', { target: slug, kind })
 
+/**
+ * 쓴 토큰을 남긴다 (`0040_ai_tokens.sql`) — **원가를 실제와 맞춰볼 유일한 근거.**
+ *
+ * 지금까지 응답의 `usage` 는 SSE 로 화면에 보내고 버렸다. 그러면 `docs/PRICING.md` 의
+ * 실측치가 지금도 맞는지 알 방법이 없다 — 프롬프트가 길어지거나 모델이 바뀌면 원가가
+ * 조용히 달라진다.
+ *
+ * **절대 던지지 않는다.** 기록이 실패했다고 이미 만든 리딩을 못 주면 안 된다 —
+ * 이건 방어가 아니라 눈이고, 눈이 감겼다고 손을 멈출 이유는 없다.
+ * (`release` 와 반대로 **실패해도 안 되감는다** — 실패해도 입력 토큰은 이미 청구된다.)
+ */
+async function recordTokens(
+  slug: string,
+  kind: 'reading' | 'answer_gen',
+  usage: { input: number; output: number; cacheRead?: number; cacheWrite?: number } | null
+) {
+  if (!usage) return
+  try {
+    await admin.rpc('record_ai_tokens', {
+      target: slug,
+      kind,
+      tok_in: usage.input ?? 0,
+      tok_out: usage.output ?? 0,
+      tok_cache_read: usage.cacheRead ?? 0,
+      tok_cache_write: usage.cacheWrite ?? 0,
+    })
+  } catch {
+    /* 기록은 실패해도 응답을 막지 않는다 */
+  }
+}
+
 /** 클라이언트가 말할 수 있는 건 "무엇이 어디에 어느 방향으로" 뿐이다 — 의미 텍스트는 서버가 붙인다 */
 function validateDrawn(drawn: DrawnItem[]): string | null {
   if (!Array.isArray(drawn) || drawn.length === 0 || drawn.length > MAX_DRAWN) {
@@ -276,6 +307,7 @@ async function handleReading(req: Request, body: Record<string, unknown>, origin
           onText: (delta) => send(c, 'text', { text: delta }),
         })
         await admin.from('reading_cache').upsert({ key, slug, text })
+        await recordTokens(slug, 'reading', usage)
         send(c, 'done', { cached: false, usage })
       } catch (e) {
         // 못 만들었으면 한도를 돌려준다 — 실패에 돈을 물리지 않는다
@@ -349,6 +381,12 @@ async function handleAnswers(req: Request, body: Record<string, unknown>, origin
       allowReversed: Boolean(allowReversed),
     })
     const result = await generateJson({ client: claude!, model, system, user, schema })
+    /**
+     * **묶음마다 기록한다** — 한도(`claim`)와 단위가 다르다.
+     * 한도는 "전체 생성 1회" 로 세지만 토큰은 78장이 7묶음이면 7묶음 몫이 다 나간다.
+     * 첫 묶음에서만 기록하면 원가가 7분의 1로 보인다.
+     */
+    await recordTokens(slug, 'answer_gen', result.usage as never)
     return json(result, 200, origin)
   } catch (e) {
     if (first) await release(slug, 'answer_gen')

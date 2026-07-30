@@ -2,6 +2,7 @@ import { Minus, Plus } from 'lucide-react'
 
 import { COUNT_PRESETS } from '@/data/countPicker'
 import styles from './CountPicker.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 수량 고르기 — **럭키드로우와 포토카드가 같이 쓴다.**
@@ -37,6 +38,7 @@ export function CountPicker({
   disabled?: boolean
   className?: string
 }) {
+  const t = useT()
   const clamp = (n: number) => Math.max(1, Math.min(max, n))
   const presets = COUNT_PRESETS.filter((n) => n <= max)
 
@@ -48,7 +50,7 @@ export function CountPicker({
         <button
           type="button"
           className={styles.step}
-          aria-label="한 개 줄이기"
+          aria-label={t('한 개 줄이기')}
           disabled={count <= 1}
           onClick={() => onCount(clamp(count - 1))}
         >
@@ -58,7 +60,7 @@ export function CountPicker({
           className={styles.value}
           type="number"
           inputMode="numeric"
-          aria-label="개수"
+          aria-label={t('개수')}
           value={count}
           min={1}
           max={max}
@@ -68,7 +70,7 @@ export function CountPicker({
         <button
           type="button"
           className={styles.step}
-          aria-label="한 개 늘리기"
+          aria-label={t('한 개 늘리기')}
           disabled={count >= max}
           onClick={() => onCount(clamp(count + 1))}
         >
@@ -100,7 +102,7 @@ export function CountPicker({
         onClick={onGo}
         data-draw
       >
-        {busy ? '뽑는 중…' : goLabel}
+        {busy ? t('뽑는 중…') : goLabel}
       </button>
     </div>
   )

@@ -14,6 +14,8 @@ import { countPicker, pickerVars } from '@/data/countPicker'
 import { ResultReveal } from './ResultReveal'
 import { PrizePreview } from './PrizePreview'
 import styles from './Luckydraw.module.css'
+import { useT } from '@/i18n'
+import { LangBar } from '@/components/LangBar'
 
 /** 한 번에 뽑을 수 있는 최대 — 서버도 같은 값으로 막는다 (`draw_prizes`) */
 const MAX_DRAW = 100
@@ -59,6 +61,7 @@ function sampleResult(display: LuckydrawDisplay): DrawResult {
 }
 
 export default function LuckydrawApp() {
+  const t = useT()
   const slot = useSlot()
   const display = luckydrawDisplay(slot)
   const { status: authStatus } = useAdminAuth(slot.slug)
@@ -155,7 +158,7 @@ export default function LuckydrawApp() {
       setSettings(s)
     } catch {
       // 못 읽은 것과 상품이 없는 것은 다르다 — 빈 배열로 두면 "마감" 처럼 보인다
-      setError('상품 정보를 불러오지 못했어요')
+      setError(t('상품 정보를 불러오지 못했어요'))
       setPrizes([])
     }
   }, [slot.slug])
@@ -191,7 +194,7 @@ export default function LuckydrawApp() {
       setPrizes(next.prizes)
     } catch (e) {
       // 마감·재고 부족·권한 없음 — 서버가 한국어로 답한다
-      setError(e instanceof Error ? e.message : '뽑지 못했어요')
+      setError(e instanceof Error ? e.message : t('뽑지 못했어요'))
     } finally {
       setDrawing(false)
     }
@@ -236,6 +239,8 @@ export default function LuckydrawApp() {
 
   return (
     <div className={`app ${styles.app}`}>
+      {/* 이 서비스는 자기 무대를 그린다 — ServiceHeader 가 없어 여기서 얹는다 */}
+      <LangBar />
       <main
         className={styles.stage}
         /* 편집기가 누른 색이 어느 자리인지 — 그 부분만 깜빡인다 */
@@ -295,7 +300,7 @@ export default function LuckydrawApp() {
                       <span className={styles.bandMsg} data-low={lowStock || undefined}>
                         {lowStock
                           ? `남은 경품 ${remaining}개, 서둘러요!`
-                          : '어떤 경품이 있는지 확인해보세요!'}
+                          : t('어떤 경품이 있는지 확인해보세요!')}
                       </span>
                       {canPreview && (
                         <button
@@ -314,7 +319,7 @@ export default function LuckydrawApp() {
                     <div className={styles.infoBanner} data-rehearsal>
                       <Info size={16} aria-hidden="true" />
                       <span>
-                        지금은 <b>리허설</b>이에요. 뽑아도 실제 재고는 줄지 않아요.
+                        지금은 <b>{t('리허설')}</b>이에요. 뽑아도 실제 재고는 줄지 않아요.
                       </span>
                     </div>
                   )}
@@ -329,7 +334,7 @@ export default function LuckydrawApp() {
                     max={MAX_DRAW}
                     onCount={setCount}
                     onGo={draw}
-                    label="몇 개를 뽑을까요?"
+                    label={t('몇 개를 뽑을까요?')}
                     goLabel={display.drawLabel}
                     busy={drawing}
                     /**
@@ -372,7 +377,7 @@ export default function LuckydrawApp() {
          */}
         {previewing ? (
           <span className={styles.adminLink} data-part="adminLink">
-            관리자로 로그인
+            {t('관리자로 로그인')}
           </span>
         ) : (
           /**
@@ -383,10 +388,10 @@ export default function LuckydrawApp() {
           <Link to={`/${slot.slug}/admin`} className={styles.adminLink}>
             {/* 체험 슬롯은 로그인이 없으니 "로그인" 이라 쓰면 거짓말이다 — 그냥 가는 문이다 */}
             {authStatus === 'in' || slot.demo
-              ? '관리자 페이지로 이동'
+              ? t('관리자 페이지로 이동')
               : authStatus === 'checking'
-                ? '확인 중…'
-                : '관리자로 로그인'}
+                ? t('확인 중…')
+                : t('관리자로 로그인')}
           </Link>
         )}
 

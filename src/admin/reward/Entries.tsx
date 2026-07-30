@@ -6,6 +6,7 @@ import type { IssuedReward, RewardEntry } from '@/lib/repo/types'
 import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
 import { downloadCsv, when } from '../csv'
+import { useT } from '@/i18n'
 
 
 /**
@@ -15,6 +16,7 @@ import { downloadCsv, when } from '../csv'
  * 주최자가 안 켠 항목은 애초에 받지 않았으므로 열 자체가 안 나온다.
  */
 export function Entries() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const source = getSlotService(slot)
@@ -214,10 +216,10 @@ export function Entries() {
             <div className="ad-table" style={tableVars}>
               <div className="ad-table__inner" data-entries>
                 <div className="ad-table__head">
-                  <span>닉네임</span>
+                  <span>{t('닉네임')}</span>
                   {cols.handle && <span>트위터</span>}
-                  {cols.contact && <span>연락처</span>}
-                  {cols.address && <span>주소</span>}
+                  {cols.contact && <span>{t('연락처')}</span>}
+                  {cols.address && <span>{t('주소')}</span>}
                   {cols.score && <span>점수</span>}
                   <span>당첨</span>
                   <span>응모</span>

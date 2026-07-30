@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   Download,
   ExternalLink,
+  Gauge,
   LayoutGrid,
   LogOut,
   Copy,
@@ -315,6 +316,15 @@ export function SlotList() {
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/*
+            * 운영 보드 — **목록이 답하지 못하는 것**만 있는 화면 (종료 임박·자료 회수·AI 원가·점검).
+            * 목록 옆에 두는 이유: 슬롯을 만들러 들어왔다가 "이번 주에 뭐가 끝나지" 를 떠올리는
+            * 자리가 여기다. 별도 메뉴로 빼면 아무도 안 연다.
+            */}
+          <button type="button" style={ghostBtn} onClick={() => navigate('/theme-editor/board')}>
+            <Gauge size={14} strokeWidth={2} aria-hidden="true" />
+            운영 보드
+          </button>
           <label style={{ ...ghostBtn }}>
             <Upload size={14} strokeWidth={2} aria-hidden="true" />
             불러오기

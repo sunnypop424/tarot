@@ -3,6 +3,7 @@ import { readingOf } from '@/lib/deck'
 import { useInView } from '@/lib/useInView'
 import type { Aspect, DrawnCard } from '@/types/card'
 import styles from './ReadingCard.module.css'
+import { useT } from '@/i18n'
 
 interface ReadingCardProps {
   drawn: DrawnCard
@@ -31,6 +32,7 @@ export function ReadingCard({
   brief = false,
   verdict,
 }: ReadingCardProps) {
+  const t = useT()
   // 뷰포트 하단 35% 를 잘라낸 기준으로 판정 — 카드가 화면 중앙쯤 올라와야 열려서
   // 뒤집히는 모션이 제대로 보인다 (살짝 걸치자마자 열려버리지 않게)
   const [ref, inView] = useInView<HTMLElement>(0.35, '0px 0px -35% 0px')
@@ -49,7 +51,7 @@ export function ReadingCard({
       <div className={styles.textSide}>
         <p data-card-name className={`t-title-m ${styles.name}`}>
           {drawn.card.name}
-          {drawn.orientation === 'reversed' && <span className="t-text-s t-muted"> (역방향)</span>}
+          {drawn.orientation === 'reversed' && <span className="t-text-s t-muted">{t('(역방향)')}</span>}
         </p>
 
         <ul className={styles.keywords}>

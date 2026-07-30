@@ -14,6 +14,7 @@ import { loadPeriodDraw } from '@/lib/storage'
 import { useSlotPath } from '@/slot/useSlotPath'
 import type { Aspect, DrawnCard } from '@/types/card'
 import styles from './Home.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 홈 — 기간 운세(오늘·주간·월간).
@@ -22,6 +23,7 @@ import styles from './Home.module.css'
  * 주제별 운세(애정·금전 등)는 성격이 달라 운세 탭에 있다.
  */
 export function Home() {
+  const t = useT()
   const [periodId, setPeriodId] = useState<string>(PERIOD_CATEGORIES[0].id)
   const period = getCategory(periodId)!
 
@@ -31,7 +33,7 @@ export function Home() {
 
       <Logo className={styles.logo} />
 
-      <div className={`segment ${styles.segment}`} role="tablist" aria-label="기간">
+      <div className={`segment ${styles.segment}`} role="tablist" aria-label={t('기간')}>
         {PERIOD_CATEGORIES.map(({ id, label }) => (
           <button
             key={id}
@@ -41,7 +43,7 @@ export function Home() {
             aria-selected={periodId === id}
             onClick={() => setPeriodId(id)}
           >
-            {label}
+            {t(label)}
           </button>
         ))}
       </div>
@@ -49,7 +51,7 @@ export function Home() {
       {/* 기간이 바뀌면 카드도 새로 그려야 플립이 다시 걸린다 */}
       <PeriodPanel key={periodId} category={period} />
 
-      <p className="t-text-xxs disclaimer">타로는 재미와 성찰을 위한 것이에요.</p>
+      <p className="t-text-xxs disclaimer">{t('타로는 재미와 성찰을 위한 것이에요.')}</p>
     </div>
   )
 }
@@ -88,6 +90,7 @@ function PeriodPanel({ category }: { category: Category }) {
 }
 
 function PeriodEmpty({ category }: { category: Category }) {
+  const t = useT()
   const { go: goTo } = useSlotPath()
   const go = () => goTo(`draw/${category.id}`)
 
@@ -111,7 +114,7 @@ function PeriodEmpty({ category }: { category: Category }) {
           className={`btn btn--sm btn--primary btn--glow ${styles.emptyCta}`}
           onClick={go}
         >
-          카드 뽑기
+          {t('카드 뽑기')}
         </button>
       </div>
     </div>

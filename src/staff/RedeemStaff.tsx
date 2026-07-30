@@ -10,6 +10,8 @@ import type { RedeemResult } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import { useOnline, useStaffLog } from './staffLocal'
 import styles from './Staff.module.css'
+import { useT } from '@/i18n'
+import { LangBar } from '@/components/LangBar'
 
 /**
  * 교환 확인 스태프 화면 — `/{slug}/staff` (스탬프 · 모의고사).
@@ -28,6 +30,7 @@ import styles from './Staff.module.css'
  * 두 겹 중 하나만 열어 놓고 "열었다" 고 착각하지 않기 위해 여기 같이 적어 둔다.
  */
 export function RedeemStaff({ slot }: { slot: Slot }) {
+  const t = useT()
   const { slug } = slot
   const source = getSlotService(slot)
   const { status } = useAdminAuth(slug)
@@ -54,7 +57,7 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
       <main className={styles.stage} style={vars}>
         <div className={`surface ${styles.panel}`}>{children}</div>
         <a className={styles.adminLink} href={`/${slug}/admin/redeem`}>
-          관리자 페이지로 이동
+          {t('관리자 페이지로 이동')}
         </a>
       </main>
     </div>
@@ -66,9 +69,9 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
     return shell(
       <div className={styles.center}>
         <Lock size={32} strokeWidth={1.6} aria-hidden="true" />
-        <div className={styles.centerTitle}>스태프만 쓰는 화면이에요</div>
+        <div className={styles.centerTitle}>{t('스태프만 쓰는 화면이에요')}</div>
         <p className={styles.centerBody}>
-          행사 계정으로 한 번만 로그인해 두시면 이 기기에서 계속 쓸 수 있어요.
+          {t('행사 계정으로 한 번만 로그인해 두시면 이 기기에서 계속 쓸 수 있어요.')}
         </p>
         <Link className={styles.linkBtn} to={`/${slug}/admin/login`}>
           로그인하러 가기
@@ -80,8 +83,8 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
   if (!repo.rewards.ready()) {
     return shell(
       <div className={styles.center}>
-        <div className={styles.centerTitle}>지금은 교환 확인을 쓸 수 없어요</div>
-        <p className={styles.centerBody}>백엔드가 연결된 배포에서만 동작해요.</p>
+        <div className={styles.centerTitle}>{t('지금은 교환 확인을 쓸 수 없어요')}</div>
+        <p className={styles.centerBody}>{t('백엔드가 연결된 배포에서만 동작해요.')}</p>
       </div>
     )
   }
@@ -102,8 +105,8 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
         online
           ? e instanceof Error
             ? e.message
-            : '확인하지 못했어요'
-          : '연결이 끊겼어요 — 와이파이를 확인하고 다시 눌러 주세요'
+            : t('확인하지 못했어요')
+          : t('연결이 끊겼어요 — 와이파이를 확인하고 다시 눌러 주세요')
       )
     } finally {
       setBusy(false)
@@ -115,6 +118,7 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
 
   return (
     <div className={`app ${styles.app}`}>
+      <LangBar all />
       <main className={styles.stage} style={vars}>
         <div className={`surface ${styles.panel}`}>
           <div className={styles.band}>
@@ -125,7 +129,7 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
             <div className={styles.banner} data-offline>
               <WifiOff size={16} aria-hidden="true" />
               <span>
-                <b>연결이 끊겼어요.</b> 확인을 눌러도 서버에 닿지 않아요 — 와이파이를 확인해 주세요.
+                <b>{t('연결이 끊겼어요.')}</b> 확인을 눌러도 서버에 닿지 않아요 — 와이파이를 확인해 주세요.
               </span>
             </div>
           )}
@@ -147,7 +151,7 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
                   )}
                 </span>
                 <div className={styles.verdictTitle}>
-                  {result.ok && !result.already ? '수령 처리했어요' : result.already ? '이미 받아가셨어요' : '없는 번호예요'}
+                  {result.ok && !result.already ? t('수령 처리했어요') : result.already ? t('이미 받아가셨어요') : t('없는 번호예요')}
                 </div>
                 <p className={styles.verdictBody}>
                   {result.ok ? (
@@ -179,8 +183,8 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
             </div>
           ) : (
             <form className={styles.controls} onSubmit={(e) => void go(e)}>
-              <p className={styles.label}>교환권 번호</p>
-              <p className={styles.hint}>방문자 폰에 뜬 번호를 그대로 입력해 주세요.</p>
+              <p className={styles.label}>{t('교환권 번호')}</p>
+              <p className={styles.hint}>{t('방문자 폰에 뜬 번호를 그대로 입력해 주세요.')}</p>
               <input
                 className={styles.codeInput}
                 value={code}
@@ -190,7 +194,7 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
                 autoCapitalize="characters"
                 autoComplete="off"
                 autoFocus
-                aria-label="교환권 번호"
+                aria-label={t('교환권 번호')}
                 data-redeem-code
               />
               <button
@@ -200,7 +204,7 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
                 disabled={busy || code.trim().length < 4}
                 data-redeem
               >
-                {busy ? '확인 중…' : '확인'}
+                {busy ? t('확인 중…') : t('확인')}
               </button>
 
               {error && (
@@ -229,7 +233,7 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
             오늘 이 기기 {log.count}건
           </span>
           <a className={styles.adminLink} href={`/${slug}/admin/redeem`}>
-            관리자 페이지로 이동
+            {t('관리자 페이지로 이동')}
           </a>
         </div>
       </main>

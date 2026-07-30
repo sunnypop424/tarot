@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { House, Sparkles, BookOpen } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
+import { useT } from '@/i18n'
 import { useSlotPath } from '@/slot/useSlotPath'
 
 interface Tab {
@@ -24,13 +25,14 @@ const TABS: Tab[] = [
 
 export function TabBar() {
   const { path } = useSlotPath()
+  const t = useT()
 
   return (
-    <nav className="tabbar" aria-label="주요 메뉴">
+    <nav className="tabbar" aria-label={t('주요 메뉴')}>
       {TABS.map(({ to, label, icon: Icon }) => (
         <NavLink key={to} to={path(to)} end={to === ''} className="tabbar__item">
           <Icon size={24} strokeWidth={2} aria-hidden="true" />
-          <span>{label}</span>
+          <span>{t(label)}</span>
         </NavLink>
       ))}
     </nav>

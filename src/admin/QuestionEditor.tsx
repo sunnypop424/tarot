@@ -10,6 +10,7 @@ import { useSlot } from '@/slot/SlotProvider'
 import type { Aspect, Card, Orientation } from '@/types/card'
 import { QUESTION_CARD_COUNT, type Question, type QuestionAnswers } from '@/types/question'
 import { confirmAction, toast } from './AdminFeedback'
+import { useT } from '@/i18n'
 
 const ASPECTS: { value: Aspect; label: string }[] = [
   { value: 'general', label: '종합' },
@@ -31,6 +32,7 @@ function validate(q: Question, deck: DeckRange): string | null {
 }
 
 export function QuestionEditor() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const { questionId } = useParams<{ questionId: string }>()
@@ -153,7 +155,7 @@ export function QuestionEditor() {
         overwrites > 0
           ? `이미 써 두신 답변 ${overwrites}장이 덮어써져요.`
           : '검수한 내용 그대로 방문자에게 나가요.',
-      okLabel: '저장',
+      okLabel: t('저장'),
       danger: overwrites > 0,
     })
     if (!ok) return
@@ -229,7 +231,7 @@ export function QuestionEditor() {
           {/* 뽑는 수(항상 1장)·카드 범위·역방향 확률(50%)은 주최자가 고르지 않는다.
               범위는 슬롯 설정이라 최고관리자만 바꾼다 — 여긴 결과만 알려준다 */}
           <p className="ad-card__desc">
-            이 슬롯의 카드 범위({effDeck === 'major' ? '메이저 22장' : '전체 78장'})는 여기서 바꿀 수
+            이 슬롯의 카드 범위({effDeck === 'major' ? t('메이저 22장') : '전체 78장'})는 여기서 바꿀 수
             없어요 · 한 장 뽑고 역방향 50%로 나와요.
           </p>
 
@@ -344,7 +346,7 @@ export function QuestionEditor() {
               )}
               <div className="ad-btnrow" style={{ marginTop: 14 }}>
                 <button type="button" className="ad-btn ad-btn--primary ad-btn--lg" onClick={() => void applyPending()} data-apply>
-                  저장
+                  {t('저장')}
                 </button>
                 <button
                   type="button"
@@ -398,6 +400,7 @@ function AnswerRow({
   onChange: (cardId: string, orientation: Orientation, text: string) => void
   onChangePending: (orientation: Orientation, text: string) => void
 }) {
+  const t = useT()
   const [open, setOpen] = useState(false)
   const written = question.answers[card.id]
   const source = pending ?? written
@@ -429,14 +432,14 @@ function AnswerRow({
       {open && (
         <div className="ad-fold__body">
           <AnswerField
-            label="정방향"
+            label={t('정방향')}
             meaning={card.upright[question.fallbackAspect]}
             value={upright}
             onChange={(t) => edit('upright', t)}
           />
           {question.allowReversed && (
             <AnswerField
-              label="역방향"
+              label={t('역방향')}
               meaning={card.reversed[question.fallbackAspect]}
               value={reversed}
               onChange={(t) => edit('reversed', t)}

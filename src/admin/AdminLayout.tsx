@@ -5,9 +5,12 @@ import { hasSupabase } from '@/lib/repo/client'
 import { getSlotService, serviceLabel } from '@/data/services'
 import type { ServiceId } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
+import { LangPicker } from '@/components/LangPicker'
 import { AdminFeedbackHost } from './AdminFeedback'
+import { AlertBar, AlertProvider, useAlerts } from './AlertBar'
 import { SlotSwitcher } from './SlotSwitcher'
 import { useAdminAuth } from './useAdminAuth'
+import { useT } from '@/i18n'
 
 interface NavItem {
   to: string
@@ -140,12 +143,27 @@ function useNav(service: ServiceId, demo: boolean): NavGroup[] {
   ]
 }
 
+/**
+ * 알림을 **셸 전체**가 쓴다 — 메뉴 배지도, 본문 위 알림 줄도 같은 값을 본다.
+ * 그래서 제공자가 셸 바깥에 있고, 실제 화면은 `AdminShell` 이 그린다.
+ */
 export function AdminLayout() {
+  const slot = useSlot()
+  return (
+    <AlertProvider slot={slot} service={getSlotService(slot)}>
+      <AdminShell />
+    </AlertProvider>
+  )
+}
+
+function AdminShell() {
+  const t = useT()
   const slot = useSlot()
   const navigate = useNavigate()
   const { user, signOut } = useAdminAuth(slot.slug)
   const service = getSlotService(slot)
   const GROUPS = useNav(service, Boolean(slot.demo))
+  const { alerts } = useAlerts()
   const [menuOpen, setMenuOpen] = useState(false)
   const [proxyShown, setProxyShown] = useState(true)
 
@@ -192,6 +210,17 @@ export function AdminLayout() {
                   onClick={() => setMenuOpen(false)}
                 >
                   <span>{label}</span>
+                  {/*
+                    * 손대야 할 게 몇 건인지 — **대시보드 옆에만** 붙인다.
+                    * 알림마다 갈 곳이 달라(재고는 상품 화면, 선물은 수령 확인) 메뉴 여기저기
+                    * 흩어 놓으면 "몇 건 남았나" 를 셀 수가 없다. 한 자리에서 세고,
+                    * 어디로 갈지는 알림 줄의 링크가 말한다.
+                    */}
+                  {to === '' && alerts.length > 0 && (
+                    <span className="ad-nav__badge ad-nav__badge--count" data-alert-count>
+                      {alerts.length}
+                    </span>
+                  )}
                 </NavLink>
               )
             )}
@@ -235,6 +264,13 @@ export function AdminLayout() {
           </div>
 
           <div className="ad-top__right">
+            {/*
+              * 관리 화면 토글은 **늘 있다** — `slot.english` 와 무관하다.
+              * 그 값은 "방문자에게 영어를 보여줄까" 이고, 여기는 "이 화면을 쓰는 사람이
+              * 한국어를 읽나" 라 서로 다른 질문이다. 주최자 계정을 누구에게 주게 될지
+              * 우리가 미리 알 수 없다.
+              */}
+            <LangPicker />
             {user && (
               <div className="ad-top__who">
                 <div className="ad-top__whoMail">{user.email}</div>
@@ -267,7 +303,7 @@ export function AdminLayout() {
               type="button"
               className="ad-proxy__close"
               onClick={() => setProxyShown(false)}
-              aria-label="닫기"
+              aria-label={t('닫기')}
             >
               ×
             </button>
@@ -311,6 +347,8 @@ export function AdminLayout() {
         </aside>
 
         <main className="ad-main">
+          {/* 알림은 화면보다 위에 — 무슨 화면을 보고 있든 먼저 눈에 들어와야 한다 */}
+          <AlertBar slug={slot.slug} />
           <Outlet />
         </main>
       </div>

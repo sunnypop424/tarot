@@ -7,8 +7,14 @@ import type { Slot } from '@/types/slot'
  */
 export const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*$/
 
-/** 라우터가 먼저 잡아가는 경로 — 이런 슬러그는 열리지 않는다 */
-const RESERVED = ['theme-editor', 'login']
+/**
+ * 라우터가 먼저 잡아가는 경로 — 이런 슬러그는 열리지 않는다.
+ *
+ * `login`·`board` 는 **편집기 안**의 경로다 (`/theme-editor/login`·`/theme-editor/board`).
+ * 그 이름으로 슬롯을 만들면 편집기에서 그 슬롯을 영영 못 연다 — 주소가 먼저 잡힌다.
+ * 편집기에 화면을 하나 더 붙일 때마다 여기에 같이 적어야 한다.
+ */
+const RESERVED = ['theme-editor', 'login', 'board']
 
 /** 통과면 null, 아니면 사람이 읽을 이유 */
 export function validateSlug(slug: string, slots: Slot[], current?: string): string | null {

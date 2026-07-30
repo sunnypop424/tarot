@@ -1,6 +1,7 @@
-import { authHeader } from './client'
+import { authHeader, db, hasSupabase } from './client'
 import { fail } from './http'
 import type {
+  AiUsageRow,
   AnswerGenInput,
   GeneratedAnswer,
   AiRepo,
@@ -121,5 +122,43 @@ export const httpAi: AiRepo = {
     }
 
     return out
+  },
+
+  /**
+   * 사용량 — **Edge Function 이 아니라 DB 를 직접 읽는다.**
+   *
+   * 함수를 거칠 이유가 없다: 키가 필요한 일(Claude 호출)이 아니고, 누가 읽을 수 있나는
+   * 이미 RLS 가 정한다(`owner reads ai usage`, 0040 §3). 함수를 하나 더 만들면 같은 판정이
+   * 두 곳에 생긴다.
+   *
+   * 못 읽으면 **빈 배열**이다 — 최고관리자가 아니거나 Supabase 를 안 붙인 빌드.
+   * 화면은 그걸 "0" 이 아니라 "볼 수 없다" 로 그린다 (0 과 모름은 다르다).
+   */
+  async usage(): Promise<AiUsageRow[]> {
+    if (!hasSupabase) return []
+    try {
+      const client = await db()
+      const { data, error } = await client
+        .from('ai_usage')
+        .select(
+          'slug,reading,answer_gen,reading_in,reading_out,answer_in,answer_out,cache_read,cache_write,updated_at'
+        )
+        .order('updated_at', { ascending: false })
+      if (error || !data) return []
+      return data.map((r) => ({
+        slug: r.slug as string,
+        reading: (r.reading as number) ?? 0,
+        answerGen: (r.answer_gen as number) ?? 0,
+        readingIn: (r.reading_in as number) ?? 0,
+        readingOut: (r.reading_out as number) ?? 0,
+        answerIn: (r.answer_in as number) ?? 0,
+        answerOut: (r.answer_out as number) ?? 0,
+        cacheRead: (r.cache_read as number) ?? 0,
+        cacheWrite: (r.cache_write as number) ?? 0,
+        updatedAt: (r.updated_at as string) ?? '',
+      }))
+    } catch {
+      return []
+    }
   },
 }

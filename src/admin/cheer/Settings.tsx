@@ -5,6 +5,7 @@ import { RATIOS } from '@/data/cheer'
 import type { CheerSettings } from '@/lib/repo/types'
 import { useSlot } from '@/slot/SlotProvider'
 import { toast } from '../AdminFeedback'
+import { useT } from '@/i18n'
 
 /**
  * 영상회 응원 운영 — **주최자가 정한다.**
@@ -59,6 +60,7 @@ const FIELDS = [
 ]
 
 export function Settings() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const [s, setS] = useState<CheerSettings | null>(null)
@@ -181,7 +183,7 @@ export function Settings() {
             </div>
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
-                <div className="ad-switchrow__name">마감</div>
+                <div className="ad-switchrow__name">{t('마감')}</div>
                 <div className="ad-switchrow__hint">
                   이미 받은 한마디는 그대로 상영되고, 새로 받는 것만 막혀요.
                 </div>
@@ -190,7 +192,7 @@ export function Settings() {
                 type="button"
                 className="ad-switch"
                 data-on={s.closed || undefined}
-                aria-label="마감"
+                aria-label={t('마감')}
                 disabled={busy}
                 onClick={() => void patch({ closed: !s.closed })}
                 data-cheer-closed

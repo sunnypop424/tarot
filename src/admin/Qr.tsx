@@ -4,6 +4,7 @@ import qrcode from 'qrcode-generator'
 import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
 import { toast } from './AdminFeedback'
+import { useT } from '@/i18n'
 
 /**
  * QR 만들기 — **주최자가 제일 먼저 하는 일이 인쇄물 준비다.**
@@ -31,6 +32,7 @@ const SCALES = [
 const QUIET = 4
 
 export function Qr() {
+  const t = useT()
   const slot = useSlot()
   const service = getSlotService(slot)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -147,7 +149,7 @@ export function Qr() {
 
             <div className="ad-hr" />
 
-            <div className="ad-card__title">주소</div>
+            <div className="ad-card__title">{t('주소')}</div>
             <div className="ad-inline">
               <code className="ad-url" data-qr-url>
                 {url}
@@ -178,7 +180,7 @@ export function Qr() {
         </div>
 
         <div className="ad-card ad-card--form ad-qr">
-          <div className="ad-card__title">미리보기</div>
+          <div className="ad-card__title">{t('미리보기')}</div>
           <div className="ad-qr__box">
             {/* QR 은 캔버스다 — `<img>` 를 쓰지 않는다 (이 레포의 규칙) */}
             <canvas ref={canvasRef} data-qr-canvas className="ad-qr__canvas" aria-label="QR 코드" role="img" />

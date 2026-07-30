@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 
 import styles from './PasswordInput.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 비밀번호 입력 — 눈으로 껐다 켠다.
@@ -29,6 +30,7 @@ export function PasswordInput({
   placeholder?: string
   disabled?: boolean
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'type'>) {
+  const t = useT()
   const [shown, setShown] = useState(false)
   return (
     <div className={styles.field}>
@@ -45,7 +47,7 @@ export function PasswordInput({
         type="button"
         className={styles.toggle}
         onClick={() => setShown((s) => !s)}
-        aria-label={shown ? '비밀번호 숨기기' : '비밀번호 보기'}
+        aria-label={shown ? t('비밀번호 숨기기') : t('비밀번호 보기')}
         aria-pressed={shown}
       >
         {shown ? (

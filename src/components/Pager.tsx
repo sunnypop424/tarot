@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 import styles from './Pager.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 페이지 나누기 — **롤링페이퍼 벽과 소원나무가 같이 쓴다.**
@@ -57,6 +58,7 @@ export function Pager({
   onPage: (p: number) => void
   label?: string
 }) {
+  const t = useT()
   if (pages <= 1) return null
 
   /**
@@ -72,7 +74,7 @@ export function Pager({
         className={styles.arrow}
         onClick={() => onPage(page - 1)}
         disabled={page === 0}
-        aria-label="이전 페이지"
+        aria-label={t('이전 페이지')}
       >
         <ChevronLeft size={18} strokeWidth={1.8} aria-hidden="true" />
       </button>
@@ -102,7 +104,7 @@ export function Pager({
         className={styles.arrow}
         onClick={() => onPage(page + 1)}
         disabled={page === pages - 1}
-        aria-label="다음 페이지"
+        aria-label={t('다음 페이지')}
       >
         <ChevronRight size={18} strokeWidth={1.8} aria-hidden="true" />
       </button>

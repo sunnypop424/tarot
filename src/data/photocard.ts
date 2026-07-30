@@ -236,3 +236,59 @@ export const RARITY_LABEL: Record<number, string> = {
   4: '시크릿',
   5: '전설',
 }
+
+/** 확률을 셀 때 쓰는 카드 한 장 — 주최자 목록(`PhotocardReportRow`)과 편집기 양쪽에서 부른다 */
+export interface OddsCard {
+  name: string
+  rarity: number
+  /** null = 무제한. 0 이면 후보에서 빠진다 */
+  remaining: number | null
+}
+
+export interface OddsRow extends OddsCard {
+  /** 한 번 뽑을 때 이 카드가 나올 확률 (0~1) */
+  p: number
+}
+
+/** 레어도 간격 — 주최자가 고른다 (`photocard_settings.rarity_curve`, 0045) */
+export type RarityCurve = 'gentle' | 'steep'
+
+export const RARITY_CURVES: { id: RarityCurve; label: string; desc: string }[] = [
+  { id: 'gentle', label: '완만', desc: '전설이 기본보다 5배 귀해요' },
+  { id: 'steep', label: '가파름', desc: '전설이 기본보다 16배 귀해요' },
+]
+
+/**
+ * 레어도 → 가중치. **`photocard_weight` (0045) 와 같은 산식이어야 한다.**
+ *
+ *   완만  : 6 − 레어도      → 5·4·3·2·1
+ *   가파름: 2^(5 − 레어도)  → 16·8·4·2·1
+ *
+ * **숫자가 클수록 작아진다** — 레어도 5('전설')가 가장 귀하다.
+ * 0026 은 반대였고(가중치 = 레어도) 그래서 가장 귀한 카드가 가장 자주 나왔다. 0045 가 뒤집었다.
+ */
+export function rarityWeight(rarity: number, curve: RarityCurve = 'gentle'): number {
+  const r = Math.min(Math.max(rarity || 1, 1), 5)
+  return curve === 'steep' ? 2 ** (5 - r) : 6 - r
+}
+
+/**
+ * 한 번 뽑을 때의 출현 확률 — **`_photocard_pick` (0045) 과 같은 규칙이어야 한다.**
+ *
+ *   가중치 = `rarityWeight(레어도, 곡선)` · 재고는 **후보를 거를 때만** 쓴다
+ *   (0이면 빠지고, null 은 영원히 후보)
+ *
+ * 0026 이 "이 두 줄이 가장 중요하다" 고 적어 둔 자리를 여기서 그대로 옮긴 것이다. 옮긴 사본이라
+ * **갈라질 수 있다** — 갈라지면 화면이 거짓 확률을 보여준다. DB 가중치를 고치면 여기도 고친다.
+ *
+ * **묶음 상한(batchCapRatio)과 재고 소진은 안 본다.** 그 둘은 뽑는 도중에 후보가 줄어드는
+ * 효과라 한 장짜리 확률로는 표현할 수 없다 — 화면이 그 한계를 같이 적는다.
+ */
+export function photocardOdds(cards: OddsCard[], curve: RarityCurve = 'gentle'): OddsRow[] {
+  const live = cards.filter((c) => c.remaining === null || c.remaining > 0)
+  const total = live.reduce((a, c) => a + rarityWeight(c.rarity, curve), 0)
+  return cards.map((c) => {
+    const out = c.remaining !== null && c.remaining <= 0
+    return { ...c, p: out || total === 0 ? 0 : rarityWeight(c.rarity, curve) / total }
+  })
+}

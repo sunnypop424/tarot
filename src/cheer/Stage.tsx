@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ratioValue, shapesFor, type BubbleShape, type CheerDisplay } from '@/data/cheer'
 import type { CheerSettings, RollingMessage } from '@/lib/repo/types'
 import styles from './Cheer.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 상영 화면 — **오버레이**(영상 위에 얹는 투명 화면)와 **엔딩크레딧**.
@@ -113,6 +114,7 @@ function Overlay({
   messages: RollingMessage[]
   vars: React.CSSProperties
 }) {
+  const t = useT()
   useTransparentDocument(true)
 
   const count = settings?.bubbles ?? 6
@@ -153,6 +155,26 @@ function Overlay({
     }
     return queue.current.shift() ?? live.current[0] ?? null
   }
+
+  /**
+   * **검수로 사라진 한마디를 그 자리에서 걷어낸다.**
+   *
+   * 상영 화면은 5초마다 목록을 다시 읽는데(`CheerApp`), 그건 `messages` 만 갈아끼울 뿐
+   * **이미 대기 큐에 들어갔거나 이미 떠 있는 것은 안 건드렸다.** 그래서 주최자가 숨겨도
+   * 큐가 한 바퀴 돌 때까지 계속 떴다 — 상영 중 검수가 몇 분씩 늦게 먹는다는 뜻이다.
+   * (`repo.rolling.list` 는 숨김을 빼고 주므로, 여기서 사라진 것 = 숨겨졌거나 지워진 것이다.)
+   *
+   * 지운 자리는 **비워 둔다** — 다음 순번 타이머가 알아서 새 한마디로 채운다.
+   * 바뀐 게 없으면 `prev` 를 그대로 돌려줘 리렌더를 안 만든다 (5초마다 도는 자리다).
+   */
+  useEffect(() => {
+    const alive = new Set(messages.map((m) => m.id))
+    queue.current = queue.current.filter((m) => alive.has(m.id))
+    setSlots((prev) => {
+      if (!prev.some((s) => s.message && !alive.has(s.message.id))) return prev
+      return prev.map((s) => (s.message && !alive.has(s.message.id) ? { ...s, message: null } : s))
+    })
+  }, [messages])
 
   const shapesOf = useMemo(() => shapesFor, [])
 
@@ -214,7 +236,7 @@ function Overlay({
   return (
     <div className={styles.overlay} style={vars} data-overlay>
       {messages.length === 0 && (
-        <div className={styles.overlayEmpty}>아직 한마디가 없어요 — QR 로 들어와 남기면 여기에 떠요</div>
+        <div className={styles.overlayEmpty}>{t('아직 한마디가 없어요 — QR 로 들어와 남기면 여기에 떠요')}</div>
       )}
       {slots.map((s) =>
         s.message ? (
@@ -244,13 +266,14 @@ function Bubble({
   message: RollingMessage
   showName: boolean
 }) {
+  const t = useT()
   const name = showName ? message.nickname.trim() : ''
   const style = { ['--bubble' as string]: color }
 
   if (shape === 'chipBar')
     return (
       <div className={styles.chipBar} style={style}>
-        <span className={styles.chip}>{name || '한마디'}</span>
+        <span className={styles.chip}>{name || t('한마디')}</span>
         <span className={styles.chipBody}>{message.body}</span>
       </div>
     )
@@ -308,6 +331,7 @@ function Credits({
   messages: RollingMessage[]
   vars: React.CSSProperties
 }) {
+  const t = useT()
   const showName = settings?.showName ?? true
   // 줄 수에 비례해 시간을 준다 — 30줄이든 300줄이든 읽을 수 있는 속도로 (한 줄 2.2초)
   const seconds = Math.max(20, messages.length * 2.2)
@@ -322,7 +346,7 @@ function Credits({
             {m.body}
           </p>
         ))}
-        {messages.length === 0 && <p className={styles.creditsLine}>아직 한마디가 없어요</p>}
+        {messages.length === 0 && <p className={styles.creditsLine}>{t('아직 한마디가 없어요')}</p>}
       </div>
     </div>
   )

@@ -11,6 +11,8 @@ import { cssUrl } from '@/lib/image'
 import type { RollingMessage } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
+import { LangPicker } from '@/components/LangPicker'
+import { useT } from '@/i18n'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Rolling.module.css'
 
@@ -61,6 +63,7 @@ function Rolling({ slot }: { slot: Slot }) {
 
 function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
   const { slug } = slot
+  const t = useT()
   const navigate = useNavigate()
   const vars = useRollingVars(display)
   const [messages, setMessages] = useState<RollingMessage[]>([])
@@ -164,11 +167,8 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
             <div className={styles.emptyNote}>
               <span className={`${styles.tape} ${styles.tapeC}`} aria-hidden="true" />
               <Pencil size={26} strokeWidth={1.5} aria-hidden="true" className={styles.emptyIcon} />
-              <p className={styles.emptyText}>
-                첫 메시지를
-                <br />
-                남겨 보세요
-              </p>
+              {/* 줄바꿈을 문장에서 뺐다 — 언어마다 끊을 자리가 다르다 (CSS 가 감싼다) */}
+              <p className={styles.emptyText}>{t('첫 메시지를 남겨 보세요')}</p>
             </div>
           </div>
         ) : (
@@ -178,7 +178,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
                 <MessageNote key={m.id} message={m} papers={display.papers} />
               ))}
             </ul>
-            <Pager page={paged.page} pages={paged.pages} onPage={paged.setPage} label="벽" />
+            <Pager page={paged.page} pages={paged.pages} onPage={paged.setPage} label={t('벽')} />
           </>
         )}
 
@@ -278,6 +278,7 @@ const MAX_BODY = 120
 
 function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
   const { slug } = slot
+  const t = useT()
   const navigate = useNavigate()
   const vars = useRollingVars(display)
 
@@ -287,6 +288,7 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
   const [font, setFont] = useState('') // '' = 벽 기본 폰트
   const [sticker, setSticker] = useState<string | undefined>(undefined)
   const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // 작성 화면은 폰트 목록을 미리보기하므로 손글씨를 전부 로드
   useEffect(() => {
@@ -299,6 +301,7 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
     e.preventDefault()
     if (!canPost) return
     setBusy(true)
+    setError(null)
     try {
       /** **체험용 슬롯은 서버로 안 보낸다** (`slot.demo` — 0030). 공개 주소라 낙서가 남는다 */
       if (!slot.demo) {
@@ -311,6 +314,13 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
         })
       }
       navigate(`/${slug}`)
+    } catch (e) {
+      /**
+       * **거절 사유를 그대로 보여준다.** 금칙어에 걸리면 서버가 한국어로 답한다
+       * (`0041_banned_words.sql`) — 어떤 단어인지는 안 알려준다(알려주면 우회 설명서가 된다).
+       * 예전엔 여기서 예외를 삼켜서, 안 남겨졌는데 벽으로 돌아가 "왜 내 쪽지가 없지" 가 됐다.
+       */
+      setError(e instanceof Error ? e.message : t('남기지 못했어요. 잠시 뒤 다시 시도해 주세요.'))
     } finally {
       setBusy(false)
     }
@@ -321,34 +331,41 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
       <div className={styles.composeTop}>
         <button type="button" className={styles.backBtn} onClick={() => navigate(`/${slug}`)}>
           <ArrowLeft size={17} aria-hidden="true" />
-          돌아가기
+          {t('돌아가기')}
         </button>
-        <div className={styles.composeTitle}>메시지 남기기</div>
-        <span className={styles.composeTopSpacer} />
+        <div className={styles.composeTitle}>{t('메시지 남기기')}</div>
+        {/*
+          * 빈 칸(`composeTopSpacer`) 자리에 고르개를 놓는다 — 제목을 가운데 두려고 만든
+          * 균형추라 크기가 비슷하고, 새 줄을 만들지 않아 작성 화면이 안 길어진다.
+          * 여기가 없으면 `/write` 로 바로 들어온 사람은 언어를 못 바꾼다.
+          */}
+        <span className={styles.composeTopSpacer}>
+          <LangPicker only={slot.langs ?? []} />
+        </span>
       </div>
 
       <div className={`app__scroll ${styles.composeWrap}`}>
         <form className={styles.formCard} onSubmit={submit} data-rolling-composer>
           <div className={styles.formHead}>
-            <div className={styles.formHeadTitle}>{display.wallSubtitle || '한마디를 남겨 주세요'}</div>
-            <div className={styles.formHeadSub}>남기면 바로 벽에 붙어요.</div>
+            <div className={styles.formHeadTitle}>{display.wallSubtitle || t('한마디를 남겨 주세요')}</div>
+            <div className={styles.formHeadSub}>{t('남기면 바로 벽에 붙어요.')}</div>
           </div>
 
           <label className={styles.field}>
             <span className={styles.label}>
-              이름 <span className={styles.optional}>(선택)</span>
+              {t('이름')} <span className={styles.optional}>{t('(선택)')}</span>
             </span>
             <input
               className={styles.input}
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
-              placeholder="남길 이름"
+              placeholder={t('남길 이름')}
               maxLength={20}
             />
           </label>
 
           <label className={styles.field}>
-            <span className={styles.label}>메시지</span>
+            <span className={styles.label}>{t('메시지')}</span>
             <textarea
               className={styles.textarea}
               value={body}
@@ -364,8 +381,8 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
 
           {display.papers.length > 0 && (
             <div className={styles.field}>
-              <span className={styles.label}>쪽지 색</span>
-              <div className={styles.swatches} role="radiogroup" aria-label="쪽지 색">
+              <span className={styles.label}>{t('쪽지 색')}</span>
+              <div className={styles.swatches} role="radiogroup" aria-label={t('쪽지 색')}>
                 {display.papers.map((c) => (
                   <button
                     key={c}
@@ -384,8 +401,8 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
           )}
 
           <div className={styles.field}>
-            <span className={styles.label}>글씨체</span>
-            <div className={styles.fontList} role="radiogroup" aria-label="글씨체">
+            <span className={styles.label}>{t('글씨체')}</span>
+            <div className={styles.fontList} role="radiogroup" aria-label={t('글씨체')}>
               <button
                 type="button"
                 role="radio"
@@ -394,7 +411,7 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
                 data-active={font === ''}
                 style={fontStyle(display.font, 'var(--text-m)')}
                 onClick={() => setFont('')}
-                title="기본 글씨체"
+                title={t('기본 글씨체')}
               >
                 {display.fontSample}
               </button>
@@ -419,9 +436,9 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
           {display.stickers.length > 0 && (
             <div className={styles.field}>
               <span className={styles.label}>
-                스티커 <span className={styles.optional}>(선택)</span>
+                {t('스티커')} <span className={styles.optional}>{t('(선택)')}</span>
               </span>
-              <div className={styles.stickers} role="radiogroup" aria-label="스티커">
+              <div className={styles.stickers} role="radiogroup" aria-label={t('스티커')}>
                 {display.stickers.map((s) => (
                   <button
                     key={s}
@@ -432,28 +449,34 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
                     data-active={sticker === s}
                     style={{ backgroundImage: cssUrl(s) }}
                     onClick={() => setSticker(sticker === s ? undefined : s)}
-                    aria-label="스티커"
+                    aria-label={t('스티커')}
                   />
                 ))}
               </div>
             </div>
           )}
 
+          {error && (
+            <p className={styles.error} role="alert" data-post-error>
+              {error}
+            </p>
+          )}
+
           <button type="submit" className={styles.submit} disabled={!canPost}>
-            {busy ? '남기는 중…' : display.postLabel}
+            {busy ? t('남기는 중…') : display.postLabel}
           </button>
         </form>
 
         {/* 미리보기 — 데스크톱에서 곁에 (CSS 로 좁은 폭에선 숨긴다) */}
         <div className={styles.previewCol}>
-          <div className={styles.previewLabel}>미리보기</div>
+          <div className={styles.previewLabel}>{t('미리보기')}</div>
           <div className={styles.note} style={{ background: color || display.papers[0] || '#f4efe2' }}>
             <span className={`${styles.tape} ${styles.tapeC}`} aria-hidden="true" />
             {sticker && (
               <span className={styles.sticker} style={{ backgroundImage: cssUrl(sticker) }} aria-hidden="true" />
             )}
             <p className={styles.noteBody} style={fontStyle(font, 'var(--text-s)')}>
-              {body.trim() || '여기에 메시지가 보여요'}
+              {body.trim() || t('여기에 메시지가 보여요')}
             </p>
             {nickname.trim() && (
               <div className={styles.noteName} style={fontStyle(font, 'var(--text-xs)')}>

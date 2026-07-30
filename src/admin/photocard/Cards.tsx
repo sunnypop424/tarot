@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { repo } from '@/lib/repo'
-import { photocardRules, RARITY_LABEL } from '@/data/photocard'
+import { photocardOdds, photocardRules, RARITY_CURVES, RARITY_LABEL } from '@/data/photocard'
 import type { PhotocardReportRow, PhotocardSettings } from '@/lib/repo/types'
 import { cssUrl } from '@/lib/image'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
+import { useT } from '@/i18n'
 
 /**
  * 카드 재고 · 운영 설정 — **주최자의 자리다.**
@@ -18,6 +19,7 @@ import { confirmAction, toast } from '../AdminFeedback'
  * 재고는 행사 도중 실제로 손대는 값이다(실물이 더 왔거나, 상한 카드가 남았거나).
  */
 export function Cards() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const [rows, setRows] = useState<PhotocardReportRow[] | null>(null)
@@ -39,7 +41,7 @@ export function Cards() {
   const head = (
     <header className="ad-head">
       <div className="ad-head__row">
-        <h1 className="ad-head__title">카드</h1>
+        <h1 className="ad-head__title">{t('카드')}</h1>
         {rows && <span className="ad-head__count tnum">{rows.length}종</span>}
       </div>
       <p className="ad-head__desc">
@@ -97,9 +99,19 @@ export function Cards() {
 
   const totalLeft = rows.reduce((n, r) => n + (r.remaining ?? 0), 0)
   const anyFinite = rows.some((r) => r.remaining !== null)
+  /**
+   * **레어도를 감으로 정하고 있었다.** 5 를 누르면 그게 몇 퍼센트인지 알 방법이 없었고,
+   * 카드가 늘 때마다 다른 카드 확률도 같이 움직이는데 그것도 안 보였다.
+   * 규칙은 `photocardOdds` 한 곳에 있다 — 서버(0026)의 가중치를 그대로 옮긴 것이다.
+   */
+  const odds = photocardOdds(
+    rows.map((r) => ({ name: r.name, rarity: r.rarity, remaining: r.remaining })),
+    settings.rarityCurve
+  )
+  const oddsOf = new Map(rows.map((r, i) => [r.cardId ?? String(i), odds[i].p]))
   const tableVars = {
-    ['--ad-tcols' as string]: '44px minmax(0,1fr) 168px 84px 90px 78px',
-    ['--ad-tmin' as string]: '700px',
+    ['--ad-tcols' as string]: '44px minmax(0,1fr) 168px 76px 84px 76px 76px',
+    ['--ad-tmin' as string]: '780px',
   }
 
   return (
@@ -130,6 +142,35 @@ export function Cards() {
             올려 드려요.
           </p>
 
+          {/**
+           * 레어도 간격 — **행사 규모를 아는 사람이 고른다.**
+           *
+           * 100명 드는 행사에 가파름을 쓰면 전설이 서너 장밖에 안 나와 민원이 되고,
+           * 1,000명 행사에 완만을 쓰면 "전설이 흔하다" 가 된다. 그 규모는 주최자만 안다.
+           * 오른쪽 확률표가 **누르는 즉시** 바뀌므로 감이 아니라 숫자를 보고 고른다.
+           */}
+          <div className="ad-btnrow" style={{ marginBottom: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span className="ad-field__label" style={{ marginRight: 4 }}>
+              레어도 간격
+            </span>
+            {RARITY_CURVES.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                className="ad-choice ad-choice--sm"
+                data-on={settings.rarityCurve === c.id || undefined}
+                disabled={busy}
+                onClick={() => void save({ ...settings, rarityCurve: c.id })}
+                data-curve={c.id}
+              >
+                {c.label}
+              </button>
+            ))}
+            <span className="ad-fine">
+              {RARITY_CURVES.find((c) => c.id === settings.rarityCurve)?.desc}
+            </span>
+          </div>
+
           {rows.length === 0 ? (
             <div className="ad-empty">
               <div className="ad-empty__title">아직 카드가 없어요</div>
@@ -142,8 +183,10 @@ export function Cards() {
               <div className="ad-table__inner" data-cards>
                 <div className="ad-table__head">
                   <span />
-                  <span>이름</span>
+                  <span>{t('이름')}</span>
                   <span>레어도</span>
+                  {/* 레어도 바로 옆에 — 숫자를 누르면 이 값이 바뀌는 걸 그 자리에서 봐야 한다 */}
+                  <span style={{ textAlign: 'center' }}>나올 확률</span>
                   <span style={{ textAlign: 'center' }}>럭키</span>
                   <span style={{ textAlign: 'center' }}>재고</span>
                   <span style={{ textAlign: 'center' }}>뽑힌 수</span>
@@ -182,6 +225,19 @@ export function Cards() {
                         </button>
                       ))}
                     </div>
+                    {/*
+                      * 소진된 카드는 후보에서 빠지므로 확률이 0 이다 — '0%' 라고 적으면
+                      * 레어도를 0 으로 만든 것처럼 읽힌다. 왜 0인지를 적는다.
+                      */}
+                    <span
+                      className="ad-cell--num tnum"
+                      style={{ color: r.remaining === 0 ? 'var(--ad-ink-4)' : undefined }}
+                      data-odds
+                    >
+                      {r.remaining === 0
+                        ? '—'
+                        : `${((oddsOf.get(r.cardId ?? '') ?? 0) * 100).toFixed(1)}%`}
+                    </span>
                     <button
                       type="button"
                       className="ad-toggle-pill"
@@ -216,8 +272,12 @@ export function Cards() {
             <div className="ad-bullets">
               <div className="ad-bullet">재고를 비우면 무제한이에요.</div>
               <div className="ad-bullet">0이면 그 카드는 더 나오지 않아요.</div>
-              <div className="ad-bullet">레어도가 곧 확률이에요 — 숫자가 클수록 자주 나와요.</div>
+              <div className="ad-bullet">레어도 숫자가 <b>클수록 덜</b> 나와요 — 전설(5)이 가장 귀해요.</div>
               <div className="ad-bullet">재고는 나올지 말지만 정하고 확률은 건드리지 않아요.</div>
+              <div className="ad-bullet">
+                확률은 <b>한 번 뽑을 때</b> 기준이에요. 여러 장 뽑기의 묶음 상한과 뽑는 도중
+                재고가 떨어지는 건 안 셈에 넣었어요.
+              </div>
               <div className="ad-bullet">
                 럭키는 스태프 화면 라인업에 별이 붙는 표시일 뿐, 확률이 아니에요.
               </div>
@@ -356,14 +416,14 @@ export function Cards() {
             </div>
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
-                <div className="ad-switchrow__name">마감</div>
+                <div className="ad-switchrow__name">{t('마감')}</div>
                 <div className="ad-switchrow__hint">켜면 방문자가 더 뽑을 수 없어요.</div>
               </div>
               <button
                 type="button"
                 className="ad-switch"
                 data-on={settings.closed || undefined}
-                aria-label="마감"
+                aria-label={t('마감')}
                 disabled={busy}
                 onClick={() => void save({ ...settings, closed: !settings.closed })}
               />

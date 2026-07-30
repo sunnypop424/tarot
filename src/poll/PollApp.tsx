@@ -14,6 +14,7 @@ import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Poll.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 실시간 투표 — 방문자가 자기 폰으로 찍고 결과가 그 자리에서 차오른다.
@@ -49,6 +50,7 @@ const SAMPLE_POLL: Poll = {
 }
 
 function PollHome({ slot }: { slot: Slot }) {
+  const t = useT()
   const { slug } = slot
   const display = useMemo(() => pollDisplay(slot), [slot])
   const [polls, setPolls] = useState<Poll[] | null>(null)
@@ -116,7 +118,7 @@ function PollHome({ slot }: { slot: Slot }) {
       setMine(await repo.poll.mine(slug, subject))
     } catch (e) {
       // 서버가 문장으로 이유를 준다 ('이미 투표하셨어요' 등)
-      setNotice(e instanceof Error ? e.message : '투표하지 못했어요.')
+      setNotice(e instanceof Error ? e.message : t('투표하지 못했어요.'))
     }
   }
 
@@ -173,9 +175,9 @@ function PollHome({ slot }: { slot: Slot }) {
                         disabled={p.closed && !voted}
                       >
                         <div className={styles.cardTop}>
-                          <span className={styles.badge}>{p.closed ? '마감' : '진행 중'}</span>
+                          <span className={styles.badge}>{p.closed ? t('마감') : t('진행 중')}</span>
                           <span className={styles.meta}>
-                            {p.kind === 'multi' ? `최대 ${p.maxPick}개` : '하나만 고르기'}
+                            {p.kind === 'multi' ? `최대 ${p.maxPick}개` : t('하나만 고르기')}
                           </span>
                         </div>
                         <div className={styles.cardQ}>{p.title}</div>
@@ -184,7 +186,7 @@ function PollHome({ slot }: { slot: Slot }) {
                             {display.showCount ? `${total.toLocaleString('ko-KR')}표` : ''}
                           </span>
                           <span className={styles.cardCta} data-done={voted || undefined}>
-                            {p.closed ? '마감됨' : voted ? '참여함 · 결과 보기' : display.voteLabel}
+                            {p.closed ? t('마감됨') : voted ? t('참여함 · 결과 보기') : display.voteLabel}
                           </span>
                         </div>
                       </button>
@@ -231,6 +233,7 @@ function PollView({
   onSubmit: (picked: string[]) => void
   notice: string | null
 }) {
+  const t = useT()
   const [picked, setPicked] = useState<string[]>([])
   const voted = !!mine
   const result = showResult(display, poll, voted)
@@ -252,7 +255,7 @@ function PollView({
   return (
     <>
       <div className={styles.topBar}>
-        <button type="button" className={styles.backBtn} onClick={onBack} aria-label="목록으로">
+        <button type="button" className={styles.backBtn} onClick={onBack} aria-label={t('목록으로')}>
           <ChevronLeft size={18} strokeWidth={1.7} aria-hidden="true" />
         </button>
         {result ? (
@@ -273,7 +276,7 @@ function PollView({
         <div className={styles.doneBox} data-already>
           <CircleCheck size={18} strokeWidth={1.7} aria-hidden="true" style={{ flex: 'none', marginTop: 1 }} />
           <div>
-            <div className={styles.doneTitle}>이미 참여한 설문이에요</div>
+            <div className={styles.doneTitle}>{t('이미 참여한 설문이에요')}</div>
             <div className={styles.doneSub}>
               {new Date(mine.at).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}에
               투표했어요 · 결과만 볼 수 있어요
@@ -287,7 +290,7 @@ function PollView({
         {!result && (
           <div className={styles.qHint}>
             <span>
-              {poll.kind === 'multi' ? `${poll.maxPick}개까지 고를 수 있어요` : '하나만 고를 수 있어요'}
+              {poll.kind === 'multi' ? `${poll.maxPick}개까지 고를 수 있어요` : t('하나만 고를 수 있어요')}
             </span>
             {poll.kind === 'multi' && (
               <span className={`${styles.pickCount} ${styles.tnum}`}>
@@ -298,7 +301,7 @@ function PollView({
         )}
         {result && (
           <div className={`${styles.total} ${styles.tnum}`}>
-            {display.showCount ? `총 ${sum.toLocaleString('ko-KR')}표` : '표 수는 공개하지 않아요'}
+            {display.showCount ? `총 ${sum.toLocaleString('ko-KR')}표` : t('표 수는 공개하지 않아요')}
           </div>
         )}
       </div>
@@ -318,7 +321,7 @@ function PollView({
                 <div className={styles.resRow} data-mine={isMine || undefined} data-top={o.id === topId || undefined}>
                   {o.id === topId && <Crown size={17} strokeWidth={1.7} aria-hidden="true" />}
                   <span className={styles.resLabel}>{o.label}</span>
-                  {isMine && <span className={styles.mineTag}>내 선택</span>}
+                  {isMine && <span className={styles.mineTag}>{t('내 선택')}</span>}
                   <span className={`${styles.pct} ${styles.tnum}`}>{pct}%</span>
                 </div>
                 {display.chartStyle === 'heart' ? (

@@ -14,9 +14,13 @@
  *  - 방문자는 열린 슬롯에 남기고, 숨김 아닌 메시지를 읽는다 (벽이 서 있는 최소 조건)
  *  - **숨긴 메시지는 방문자에게 절대 안 간다** (후검수의 전부 — 뚫리면 검수가 무의미하다)
  *  - 방문자는 남의 메시지를 못 고치고 못 지운다 (누구나 쓰는 벽이라 여기가 제일 위험하다)
- *  - **마감된 슬롯엔 못 남기고, 마감 슬롯 메시지는 못 읽는다** (기간이 지나면 벽도 닫힌다, 0005/0009)
+ *  - **마감된 슬롯엔 못 남긴다** (기간이 지나면 쓰기가 닫힌다, 0005)
+ *  - **유예 안에서는 읽히고, 유예가 지나면 안 읽힌다** (0009/0039)
  *
- * 롤페는 grace 가 0 이라 slot_visible == slot_open — 마감이면 그 즉시 읽기·쓰기가 함께 닫힌다.
+ * **유예가 모든 서비스 14일이다** (0039). 예전엔 롤페가 0 이라 마감 즉시 읽기·쓰기가 함께
+ * 닫혔는데, 그러면 주최자가 부스를 접는 순간 쪽지 CSV 를 잃는다. 지금은 갈려 있다 —
+ * **쓰기는 `slot_open`(행사 중), 읽기는 `slot_visible`(행사 + 14일).** 이 갈림이 이 서비스의
+ * 계약이라 §7~9 가 세 상태(열림·유예 중·유예 지남)를 전부 찔러 본다.
  *
  * 이 스크립트는 실제 DB 에 슬롯 둘(열림·마감)을 만들었다 지운다. 중간에 죽으면 두 슬러그가
  * 남으므로 시작할 때 먼저 지운다 (verify-luckydraw.mjs 와 같은 이유 — 상설 시드 슬롯은 없다).
@@ -38,6 +42,8 @@ const OWNER_PASSWORD = env.SEED_PASSWORD ?? 'tarot1234'
 const SERVICE = process.env.SERVICE ?? 'rolling'
 const SLUG = `${SERVICE}-verify`
 const SLUG_CLOSED = `${SERVICE}-verify-closed`
+/** 어제 끝난 슬롯 — **유예(14일) 안**이라 읽기는 되고 쓰기는 안 돼야 한다 (0039) */
+const SLUG_GRACE = `${SERVICE}-verify-grace`
 
 if (!URL_ || !ANON) {
   console.error('.env.local 에 VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY 가 없어요')
@@ -67,7 +73,7 @@ const ANONH = { apikey: ANON, 'content-type': 'application/json' }
 const rest = (path, init = {}) => fetch(`${URL_}/rest/v1/${path}`, init)
 
 async function cleanup() {
-  await rest(`slots?slug=in.(${SLUG},${SLUG_CLOSED})`, { method: 'DELETE', headers: OWNER })
+  await rest(`slots?slug=in.(${SLUG},${SLUG_CLOSED},${SLUG_GRACE})`, { method: 'DELETE', headers: OWNER })
 }
 
 await cleanup()
@@ -87,12 +93,24 @@ const mkSlot = (slug, period) =>
     }),
   })
 
-// 기간을 안 정하면 늘 열림 (0005). 마감 슬롯은 2020 년으로 못박아 확실히 지난 것으로 둔다.
+/**
+ * 기간을 안 정하면 늘 열림 (0005).
+ *  · `SLUG_CLOSED` 는 2020 년 — 유예(14일)까지 한참 지난 **완전히 닫힌** 상태다.
+ *  · `SLUG_GRACE` 는 **어제** 끝났다 — 유예 안이라 읽기만 열려 있어야 한다.
+ * 날짜는 KST 로 만든다. 서버 판정(`today_kst`)이 KST 라 UTC 로 만들면 자정 근처에서 하루가 어긋난다.
+ */
+const kst = (offsetDays) => {
+  const d = new Date(Date.now() + offsetDays * 86400000)
+  return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul' }).format(d)
+}
+
 const open = await mkSlot(SLUG, {})
 const closed = await mkSlot(SLUG_CLOSED, { rent: { start: '2020-01-01', end: '2020-01-02' } })
+const grace = await mkSlot(SLUG_GRACE, { rent: { start: kst(-7), end: kst(-1) } })
 check('열린 슬롯을 만든다', open.ok, open.ok ? '' : await open.text())
 check('마감 슬롯을 만든다', closed.ok, closed.ok ? '' : await closed.text())
-if (!open.ok || !closed.ok) {
+check('유예 중인 슬롯을 만든다', grace.ok, grace.ok ? '' : await grace.text())
+if (!open.ok || !closed.ok || !grace.ok) {
   await cleanup()
   process.exit(1)
 }
@@ -197,10 +215,36 @@ let msgId = null
   check('방문자는 마감 슬롯 메시지를 못 읽는다', rows.length === 0, `${rows.length}행이 샜다`)
 }
 
-// ── 9. 정리 ───────────────────────────────────────
+// ── 9. 유예 중: 읽기는 열리고 쓰기는 닫힌다 (0039) ─
+//
+// **이게 0039 가 바꾼 계약이다.** 예전엔 롤페·소원나무의 유예가 0 이라 마감 즉시 둘 다 닫혔고,
+// 주최자는 부스를 접는 그 순간 쪽지 CSV 를 잃었다. 지금은 14일 더 읽힌다 — 그동안 방문자가
+// 벽을 다시 볼 수는 있지만 **새 글은 못 남긴다** (유예는 뒷정리 시간이지 행사 연장이 아니다).
+{
+  await rest('rolling_messages', {
+    method: 'POST',
+    headers: { ...OWNER, prefer: 'return=minimal' },
+    body: JSON.stringify({ slug: SLUG_GRACE, nickname: '관리자', body: '어제까지의 벽', color: '' }),
+  })
+
+  const read = await rest(`rolling_messages?slug=eq.${SLUG_GRACE}&select=id`, { headers: ANONH })
+  const rows = read.ok ? await read.json() : []
+  check('유예 중이면 방문자가 벽을 읽는다', rows.length === 1, `${rows.length}행`)
+
+  const write = await rest('rolling_messages', {
+    method: 'POST',
+    headers: ANONH,
+    body: JSON.stringify({ slug: SLUG_GRACE, nickname: '', body: '유예 중에 남겨봄', color: '' }),
+  })
+  check('유예 중이어도 방문자는 못 남긴다', !write.ok, `HTTP ${write.status}${write.ok ? ' — 남겨졌다' : ''}`)
+}
+
+// ── 10. 정리 ──────────────────────────────────────
 await cleanup()
 {
-  const left = await rest(`slots?slug=in.(${SLUG},${SLUG_CLOSED})&select=slug`, { headers: OWNER })
+  const left = await rest(`slots?slug=in.(${SLUG},${SLUG_CLOSED},${SLUG_GRACE})&select=slug`, {
+    headers: OWNER,
+  })
   const rows = left.ok ? await left.json() : []
   check('검증이 남긴 게 없다', rows.length === 0, `${rows.length}행 남음`)
 }

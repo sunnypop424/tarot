@@ -4,6 +4,72 @@ import { repo } from '@/lib/repo'
 import type { QuizQuestionFull, QuizSettings } from '@/lib/repo/types'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
+import { BulkPaste, splitCells, toLines, type BulkResult } from '../BulkPaste'
+import { useT } from '@/i18n'
+
+/**
+ * 붙여넣기 한 줄 → 문항 하나.
+ *
+ * 두 모양을 받는다:
+ *
+ *   문제 | 보기1 | 보기2 | 보기3 | 보기4 | 2   ← 객관식 (마지막 칸이 정답 **번호**)
+ *   문제 | 정답                                 ← 주관식 (보기가 없다)
+ *
+ * **정답을 번호로 받는다.** 정답 텍스트를 그대로 받으면 보기와 글자가 한 자만 달라도
+ * (띄어쓰기·따옴표) 못 찾고, 그러면 정답이 빈 문항이 조용히 만들어진다.
+ *
+ * **정답이 없거나 범위를 벗어나면 못 읽은 줄로 돌려준다.** 정답 없는 문항은 아무도 못 맞히고,
+ * 이미 푼 사람 점수까지 어긋나게 만든다 — 조용히 넣느니 안 넣는 게 낫다.
+ * (`readiness.ts` 도 정답 없는 문항을 출시 전 점검에서 막는다.)
+ */
+function parseQuestions(text: string, startOrder: number): BulkResult<QuizQuestionFull> {
+  const items: QuizQuestionFull[] = []
+  const skipped: string[] = []
+
+  for (const line of toLines(text)) {
+    const cells = splitCells(line).filter((c) => c !== '')
+    const body = cells[0] ?? ''
+    if (!body || cells.length < 2) {
+      skipped.push(line)
+      continue
+    }
+
+    // 칸이 둘뿐이면 주관식 — 보기가 없으니 정답 번호랄 게 없다
+    if (cells.length === 2) {
+      items.push({
+        id: crypto.randomUUID(),
+        order: startOrder + items.length + 1,
+        kind: 'short',
+        body,
+        choices: [],
+        points: 1,
+        hidden: true,
+        answers: [cells[1]],
+      })
+      continue
+    }
+
+    const answerCell = cells[cells.length - 1]
+    const choices = cells.slice(1, -1)
+    const answerNo = Number(answerCell)
+    if (!Number.isInteger(answerNo) || answerNo < 1 || answerNo > choices.length || choices.length < 2) {
+      skipped.push(line)
+      continue
+    }
+    items.push({
+      id: crypto.randomUUID(),
+      order: startOrder + items.length + 1,
+      kind: 'choice',
+      body,
+      choices,
+      points: 1,
+      hidden: true,
+      // 서버·화면 모두 **보기 인덱스 문자열**로 든다 (`QuizQuestionFull.answers` 주석)
+      answers: [String(answerNo - 1)],
+    })
+  }
+  return { items, skipped }
+}
 
 /**
  * 문항 관리 — **주최자의 자리다.**
@@ -14,17 +80,35 @@ import { confirmAction, toast } from '../AdminFeedback'
  * 맞히고, 이미 푼 사람들의 점수가 통째로 어긋난다. 정답이 빈 문항은 목록에서 눈에 띄게 그린다.
  */
 export function Questions() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const [list, setList] = useState<QuizQuestionFull[] | null>(null)
   const [settings, setSettings] = useState<QuizSettings | null>(null)
   const [editing, setEditing] = useState<QuizQuestionFull | null>(null)
   const [busy, setBusy] = useState(false)
+  /** 못 읽은 이유 — 0건과 구분해야 한다 (아래 `if (!list)` 가 영원히 빈 화면이 되던 자리) */
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
-    const [qs, st] = await Promise.all([repo.quiz.listAll(slug), repo.quiz.settings(slug)])
-    setList(qs)
-    setSettings(st)
+    /**
+     * **못 읽으면 그 사실을 화면에 남긴다.**
+     *
+     * `listAll` 은 정답이 붙어 있어 권한을 본다(`quiz_answers` 에 anon 권한이 없다 —
+     * 그건 열면 안 되는 자리다). 로그인 없이 들어오면 여기서 던지는데, 예전엔 그 예외가
+     * 아무 데도 안 잡혀 `list` 가 `null` 로 남았고 아래 `if (!list) return null` 이
+     * **아무것도 안 그렸다** — 하얀 화면이다. 체험 슬롯(`/demo-quiz/admin/quiz`)은 로그인
+     * 없이 열리므로 랜딩에서 이 서비스만 빈 화면으로 보였다.
+     */
+    try {
+      const [qs, st] = await Promise.all([repo.quiz.listAll(slug), repo.quiz.settings(slug)])
+      setList(qs)
+      setSettings(st)
+      setLoadError(null)
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : '문항을 읽지 못했어요')
+      setList([])
+    }
   }, [slug])
 
   useEffect(() => {
@@ -47,7 +131,57 @@ export function Questions() {
       </>
     )
   }
+  /**
+   * **못 읽었으면 이유를 보여준다.** 예전엔 여기서 `null` 을 돌려줘 하얀 화면이었다 —
+   * "고장났나" 와 "로그인이 필요하다" 를 구분할 방법이 없었다.
+   */
+  if (loadError) {
+    return (
+      <>
+        <header className="ad-head">
+          <div className="ad-head__row">
+            <h1 className="ad-head__title">모의고사</h1>
+          </div>
+        </header>
+        <div className="ad-card">
+          <div className="ad-empty">
+            <div className="ad-empty__title">문항을 읽지 못했어요</div>
+            <div className="ad-empty__sub">
+              문항과 정답은 로그인한 주최자만 볼 수 있어요. 로그인하고 다시 열어 주세요.
+            </div>
+            <div className="ad-fine" style={{ marginTop: 10 }}>
+              {loadError}
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
   if (!list || !settings) return null
+
+  /**
+   * 붙여넣은 문항을 한꺼번에 — **한 개씩 저장한다** (일괄 저장 RPC 가 없다).
+   *
+   * 중간에 실패하면 **거기서 멈추고 몇 개가 들어갔는지 말한다.** 끝까지 밀어붙이면
+   * 어디까지 됐는지 알 수 없고, 통째로 되돌리면 스무 개를 다시 붙여 넣어야 한다.
+   * 순서대로 저장하므로 앞의 것들은 그대로 남고, 주최자는 남은 줄만 다시 넣으면 된다.
+   */
+  const addMany = async (items: QuizQuestionFull[]) => {
+    setBusy(true)
+    let done = 0
+    try {
+      for (const q of items) {
+        await repo.quiz.saveQuestion(slug, q)
+        done++
+      }
+      toast(`${done}문항을 넣었어요 · 전부 비공개예요`)
+    } catch (e) {
+      toast(`${done}문항까지 넣었어요 — ${e instanceof Error ? e.message : '나머지는 실패했어요'}`)
+    } finally {
+      await load()
+      setBusy(false)
+    }
+  }
 
   const save = async (q: QuizQuestionFull) => {
     setBusy(true)
@@ -132,25 +266,54 @@ export function Questions() {
             <span className="ad-card__title">
               공개 {open.length}문항 · 만점 {maxScore}점 · 전체 {list.length}문항
             </span>
-            <button
-              type="button"
-              className="ad-btn ad-btn--soft ad-btn--sm"
-              onClick={() =>
-                setEditing({
-                  id: crypto.randomUUID(),
-                  order: list.length + 1,
-                  kind: 'choice',
-                  body: '',
-                  choices: ['', '', '', ''],
-                  points: 1,
-                  hidden: true,
-                  answers: [],
-                })
-              }
-              data-add-question
-            >
-              + 문항 추가
-            </button>
+            <div className="ad-btnrow">
+              {/*
+                * **문항 20개를 20번 만들지 않게.** 주최자는 그 목록을 이미 어딘가에 갖고 있다 —
+                * 여기 붙여 넣으면 정답까지 한 번에 들어간다. 들어간 문항은 **비공개로 시작한다**
+                * (아래 `addMany` 주석 — 손으로 만드는 것과 같은 규칙이다).
+                */}
+              <BulkPaste
+                label="문항"
+                disabled={busy}
+                placeholder={
+                  '우리 최애 데뷔 연도는? | 2015 | 2016 | 2017 | 2018 | 2\n최애 포지션은? | 메인보컬\n응원봉 색은? | 라벤더 | 민트 | 코랄 | 1'
+                }
+                hint={
+                  <>
+                    한 줄에 한 문항씩 <b>문제 | 보기1 | 보기2 | … | 정답번호</b> 순서로 적어 주세요.
+                    보기 없이 <b>문제 | 정답</b> 만 적으면 주관식이 돼요. 탭·쉼표·세로줄 다 돼요.
+                    <br />
+                    배점은 1점으로 들어가고, <b>전부 비공개</b>로 만들어져요 — 확인하고 공개해 주세요.
+                  </>
+                }
+                parse={(text) => parseQuestions(text, list.length)}
+                preview={(q) =>
+                  q.kind === 'choice'
+                    ? `${q.body} → ${q.choices[Number(q.answers[0])] ?? '?'}`
+                    : `${q.body} → ${q.answers[0] ?? '?'} (주관식)`
+                }
+                onApply={addMany}
+              />
+              <button
+                type="button"
+                className="ad-btn ad-btn--soft ad-btn--sm"
+                onClick={() =>
+                  setEditing({
+                    id: crypto.randomUUID(),
+                    order: list.length + 1,
+                    kind: 'choice',
+                    body: '',
+                    choices: ['', '', '', ''],
+                    points: 1,
+                    hidden: true,
+                    answers: [],
+                  })
+                }
+                data-add-question
+              >
+                + 문항 추가
+              </button>
+            </div>
           </div>
 
           {list.length === 0 ? (
@@ -289,7 +452,7 @@ export function Questions() {
               '',
               String(settings.timeLimitSec),
               [
-                { v: '0', n: '없음' },
+                { v: '0', n: t('없음') },
                 { v: '180', n: '3분' },
                 { v: '300', n: '5분' },
                 { v: '600', n: '10분' },
@@ -315,7 +478,7 @@ export function Questions() {
               settings.allowRetry ? 'on' : 'off',
               [
                 { v: 'on' as const, n: '여러 번 풀 수 있어요' },
-                { v: 'off' as const, n: '한 번만' },
+                { v: 'off' as const, n: t('한 번만') },
               ],
               (v) => void saveSettings({ ...settings, allowRetry: v === 'on' }),
               rewardOn ? '선물이 있으면 다시 풀기를 켤 수 없어요' : undefined
@@ -326,8 +489,8 @@ export function Questions() {
               '',
               settings.closed ? 'on' : 'off',
               [
-                { v: 'off' as const, n: '진행 중' },
-                { v: 'on' as const, n: '마감' },
+                { v: 'off' as const, n: t('진행 중') },
+                { v: 'on' as const, n: t('마감') },
               ],
               (v) => void saveSettings({ ...settings, closed: v === 'on' })
             )}

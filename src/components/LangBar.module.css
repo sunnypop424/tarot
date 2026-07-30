@@ -1,0 +1,13 @@
+/**
+ * 언어 고르개 한 줄 — 자기 헤더를 그리는 화면들이 쓴다 (`LangBar.tsx`).
+ *
+ * **오른쪽 정렬 + 흐름 안**이다. 구석에 띄우면(`position: fixed`) 카드·버튼 위에 겹쳐 앉아
+ * 누르는 걸 방해한다. 한 줄이면 어느 화면에서도 자리를 뺏지 않는다.
+ */
+.bar {
+  display: flex;
+  justify-content: flex-end;
+  /* 화면 가장자리 여백은 앱 공통값을 따른다 — 화면마다 다른 값을 쓰면 줄이 삐뚤어 보인다 */
+  padding: var(--space-sm) var(--layout-pad) 0;
+  flex: none;
+}

@@ -7,6 +7,7 @@ import { getSlotDeck } from '@/data/slots'
 import { CARDS, MAJOR_CARDS, SUIT_LABELS } from '@/data/cards'
 import type { Suit } from '@/types/card'
 import styles from './Cards.module.css'
+import { useT } from '@/i18n'
 
 type Filter = 'major' | Suit
 
@@ -20,6 +21,7 @@ const FILTERS: { id: Filter; label: string }[] = [
 
 /** 카드 도감 — 이 슬롯이 쓰는 카드만 훑어본다 (메이저 슬롯이면 22장) */
 export function Cards() {
+  const t = useT()
   const { go } = useSlotPath()
   const majorOnly = getSlotDeck(useSlot()) === 'major'
   const [filter, setFilter] = useState<Filter>('major')
@@ -31,13 +33,13 @@ export function Cards() {
 
   return (
     <div className="screen">
-      <h1 className="t-title-l screen__title">카드 도감</h1>
+      <h1 className="t-title-l screen__title">{t('카드 도감')}</h1>
       <p className="t-text-m screen__lead">
-        {majorOnly ? '메이저 22장' : '78장'}의 의미를 살펴보세요.
+        {majorOnly ? t('메이저 22장') : t('78장')}의 의미를 살펴보세요.
       </p>
 
       {!majorOnly && (
-        <div className={`segment ${styles.suits}`} role="tablist" aria-label="수트">
+        <div className={`segment ${styles.suits}`} role="tablist" aria-label={t('수트')}>
           {FILTERS.map(({ id, label }) => (
             <button
               key={id}
@@ -47,7 +49,7 @@ export function Cards() {
               aria-selected={filter === id}
               onClick={() => setFilter(id)}
             >
-              {label}
+              {t(label)}
             </button>
           ))}
         </div>
@@ -71,7 +73,7 @@ export function Cards() {
         ))}
       </ul>
 
-      <p className="t-text-xxs disclaimer">타로는 재미와 성찰을 위한 것이에요.</p>
+      <p className="t-text-xxs disclaimer">{t('타로는 재미와 성찰을 위한 것이에요.')}</p>
     </div>
   )
 }

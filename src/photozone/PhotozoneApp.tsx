@@ -37,6 +37,7 @@ import { CAMERA_MESSAGE, useCamera } from './useCamera'
 import { AdminEntry } from '@/components/AdminEntry'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Photozone.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 포토존 프레임 — 카페 포토존에서 찍은 사진에 **이벤트 프레임을 씌워 저장해 가는** 인증샷.
@@ -85,6 +86,7 @@ function fit(r: number): { w: number; h: number } {
 }
 
 function Photozone({ slot }: { slot: Slot }) {
+  const t = useT()
   const display = useMemo(() => photozoneDisplay(slot), [slot])
   const [stage, setStage] = useState<Stage>('ready')
   const [frameIdx, setFrameIdx] = useState(0)
@@ -151,14 +153,14 @@ function Photozone({ slot }: { slot: Slot }) {
   async function shoot() {
     const v = videoRef.current
     const photo = v && photoFromVideo(v)
-    if (!photo) return setNotice('아직 카메라가 준비되지 않았어요.')
+    if (!photo) return setNotice(t('아직 카메라가 준비되지 않았어요.'))
     setBusy(true)
     setNotice(null)
     try {
       // 전면 카메라는 화면에서 거울로 보여주므로 **찍힌 것도 거울이어야** 방문자가 본 그대로다
       await publish(photo, facing === 'user')
     } catch (e) {
-      setNotice(e instanceof Error ? e.message : '사진을 만들지 못했어요.')
+      setNotice(e instanceof Error ? e.message : t('사진을 만들지 못했어요.'))
     } finally {
       setBusy(false)
     }
@@ -170,7 +172,7 @@ function Photozone({ slot }: { slot: Slot }) {
     try {
       await publish(await loadFile(file), false)
     } catch (e) {
-      setNotice(e instanceof Error ? e.message : '사진을 열지 못했어요.')
+      setNotice(e instanceof Error ? e.message : t('사진을 열지 못했어요.'))
     } finally {
       setBusy(false)
     }
@@ -231,7 +233,7 @@ function Photozone({ slot }: { slot: Slot }) {
         {stage === 'live' && (
           <>
             <div className={styles.camTop}>
-              <button type="button" className={styles.camBack} onClick={backToReady} aria-label="돌아가기">
+              <button type="button" className={styles.camBack} onClick={backToReady} aria-label={t('돌아가기')}>
                 <ChevronLeft size={18} strokeWidth={1.7} aria-hidden="true" />
               </button>
               <div className={styles.camGuide}>{display.guide}</div>
@@ -254,7 +256,7 @@ function Photozone({ slot }: { slot: Slot }) {
               {!camera.stream && (
                 <div className={styles.camIdle}>
                   <User size={30} strokeWidth={1.7} aria-hidden="true" />
-                  <span>{camera.starting ? '카메라를 켜는 중…' : '카메라 프리뷰'}</span>
+                  <span>{camera.starting ? t('카메라를 켜는 중…') : t('카메라 프리뷰')}</span>
                 </div>
               )}
               {frame && (
@@ -267,7 +269,7 @@ function Photozone({ slot }: { slot: Slot }) {
                 type="button"
                 className={styles.camIcon}
                 onClick={() => setFacing((f) => (f === 'user' ? 'environment' : 'user'))}
-                aria-label="카메라 전환"
+                aria-label={t('카메라 전환')}
               >
                 <SwitchCamera size={22} strokeWidth={1.7} aria-hidden="true" />
               </button>
@@ -276,14 +278,14 @@ function Photozone({ slot }: { slot: Slot }) {
                 className={styles.shutter}
                 onClick={() => void shoot()}
                 disabled={busy || !camera.stream}
-                aria-label="촬영"
+                aria-label={t('촬영')}
                 data-shutter
               />
               <button
                 type="button"
                 className={styles.camIcon}
                 onClick={backToReady}
-                aria-label="프레임 바꾸기"
+                aria-label={t('프레임 바꾸기')}
               >
                 <Grid2x2 size={20} strokeWidth={1.7} aria-hidden="true" />
               </button>
@@ -294,7 +296,7 @@ function Photozone({ slot }: { slot: Slot }) {
         {stage === 'error' && (
           <>
             <div className={styles.camTop}>
-              <button type="button" className={styles.camBack} onClick={backToReady} aria-label="돌아가기">
+              <button type="button" className={styles.camBack} onClick={backToReady} aria-label={t('돌아가기')}>
                 <ChevronLeft size={18} strokeWidth={1.7} aria-hidden="true" />
               </button>
               <span />
@@ -305,9 +307,9 @@ function Photozone({ slot }: { slot: Slot }) {
               <div className={styles.failIcon}>
                 <CameraOff size={30} strokeWidth={1.7} aria-hidden="true" />
               </div>
-              <div className={styles.failTitle}>카메라를 열 수 없어요</div>
+              <div className={styles.failTitle}>{t('카메라를 열 수 없어요')}</div>
               <p className={styles.failText}>
-                {camera.error ? CAMERA_MESSAGE[camera.error] : ''}
+                {camera.error ? t(CAMERA_MESSAGE[camera.error]) : ''}
                 <br />
                 가지고 있는 사진을 올려도 똑같이 프레임을 씌울 수 있어요.
               </p>
@@ -330,7 +332,7 @@ function Photozone({ slot }: { slot: Slot }) {
         {stage === 'result' && result && (
           <>
             <div className={styles.topBar}>
-              <button type="button" className={styles.backBtn} onClick={backToReady} aria-label="돌아가기">
+              <button type="button" className={styles.backBtn} onClick={backToReady} aria-label={t('돌아가기')}>
                 <ChevronLeft size={18} strokeWidth={1.7} aria-hidden="true" />
               </button>
             </div>
@@ -341,7 +343,7 @@ function Photozone({ slot }: { slot: Slot }) {
                  * 코드베이스에서 `<img>` 가 나오는 유일한 자리 — 저장되는 게 목적인 결과물이다.
                  * `SavableImage` 는 `ResultImage` 만 받으므로 슬롯 자산이 여기 들어올 수 없다.
                  */}
-                <SavableImage image={result} alt="합성된 인증샷" className={styles.shot} />
+                <SavableImage image={result} alt={t('합성된 인증샷')} className={styles.shot} />
                 {saveBlocked && (
                   <span
                     aria-hidden="true"
@@ -373,7 +375,7 @@ function Photozone({ slot }: { slot: Slot }) {
                   <span className={styles.toastText}>
                     이 브라우저에서는 바로 저장이 안 돼요.
                     <br />
-                    <b>사진을 길게 눌러 저장</b>해 주세요.
+                    <b>{t('사진을 길게 눌러 저장')}</b>해 주세요.
                   </span>
                 </div>
               ) : (
@@ -386,7 +388,7 @@ function Photozone({ slot }: { slot: Slot }) {
                   {typeof navigator !== 'undefined' && 'share' in navigator && (
                     <button type="button" className={styles.ghost} onClick={() => void save('share')} data-share>
                       <Share2 size={17} strokeWidth={1.7} aria-hidden="true" />
-                      공유
+                      {t('공유')}
                     </button>
                   )}
                 </div>
@@ -396,7 +398,7 @@ function Photozone({ slot }: { slot: Slot }) {
                 {saveBlocked && typeof navigator !== 'undefined' && 'share' in navigator && (
                   <button type="button" className={styles.ghost} onClick={() => void save('share')} data-share>
                     <Share2 size={17} strokeWidth={1.7} aria-hidden="true" />
-                    공유
+                    {t('공유')}
                   </button>
                 )}
                 <button
@@ -444,6 +446,7 @@ function Ready({
   busy: boolean
   slug: string
 }) {
+  const t = useT()
   return (
     <>
       <ServiceHeader
@@ -460,8 +463,8 @@ function Ready({
       {display.frames.length > 0 && (
         <div className={styles.pickWrap}>
           <div className={styles.pickHead}>
-            <div className={styles.pickTitle}>프레임 고르기</div>
-            {display.frames.length > 1 && <div className={styles.pickHint}>좌우로 넘겨 보세요</div>}
+            <div className={styles.pickTitle}>{t('프레임 고르기')}</div>
+            {display.frames.length > 1 && <div className={styles.pickHint}>{t('좌우로 넘겨 보세요')}</div>}
           </div>
           <ul className={styles.frames} data-frames>
             {display.frames.map((f, i) => {

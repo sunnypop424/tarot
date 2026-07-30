@@ -15,6 +15,8 @@ import { useOnline, useStaffLog } from '@/staff/staffLocal'
 import type { PhotocardDrawn, PhotocardLineupRow, PhotocardSettings } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import styles from './Staff.module.css'
+import { useT } from '@/i18n'
+import { LangBar } from '@/components/LangBar'
 
 /**
  * 스태프 기기 — `/{slug}/staff`. **관리 화면이 아니다.**
@@ -34,6 +36,7 @@ export default function StaffApp() {
 }
 
 function Staff({ slot }: { slot: Slot }) {
+  const t = useT()
   const { slug } = slot
   const display = useMemo(() => photocardDisplay(slot), [slot])
   const { status } = useAdminAuth(slug)
@@ -118,10 +121,11 @@ function Staff({ slot }: { slot: Slot }) {
 
   const shell = (children: React.ReactNode) => (
     <div className={`app ${styles.app}`}>
+      <LangBar all />
       <main className={styles.stage} style={vars}>
         <div className={`surface ${styles.panel}`}>{children}</div>
         <a className={styles.adminLink} href={`/${slug}/admin/photocard`}>
-          관리자 페이지로 이동
+          {t('관리자 페이지로 이동')}
         </a>
       </main>
     </div>
@@ -130,8 +134,8 @@ function Staff({ slot }: { slot: Slot }) {
   if (getSlotService(slot) !== 'photocard') {
     return shell(
       <div className={styles.center}>
-        <div className={styles.centerTitle}>이 이벤트에는 스태프 화면이 없어요</div>
-        <p className={styles.centerBody}>포토카드 뽑기 이벤트에서만 쓰는 화면이에요.</p>
+        <div className={styles.centerTitle}>{t('이 이벤트에는 스태프 화면이 없어요')}</div>
+        <p className={styles.centerBody}>{t('포토카드 뽑기 이벤트에서만 쓰는 화면이에요.')}</p>
       </div>
     )
   }
@@ -147,9 +151,9 @@ function Staff({ slot }: { slot: Slot }) {
     return shell(
       <div className={styles.center}>
         <Lock size={32} strokeWidth={1.6} aria-hidden="true" />
-        <div className={styles.centerTitle}>스태프만 쓰는 화면이에요</div>
+        <div className={styles.centerTitle}>{t('스태프만 쓰는 화면이에요')}</div>
         <p className={styles.centerBody}>
-          행사 계정으로 한 번만 로그인해 두시면 이 기기에서 계속 쓸 수 있어요.
+          {t('행사 계정으로 한 번만 로그인해 두시면 이 기기에서 계속 쓸 수 있어요.')}
         </p>
         <Link className={styles.linkBtn} to={`/${slug}/admin/login`}>
           로그인하러 가기
@@ -166,9 +170,9 @@ function Staff({ slot }: { slot: Slot }) {
     return shell(
       <div className={styles.center}>
         <Sparkles size={32} strokeWidth={1.6} aria-hidden="true" />
-        <div className={styles.centerTitle}>이 이벤트는 방문자가 직접 뽑아요</div>
+        <div className={styles.centerTitle}>{t('이 이벤트는 방문자가 직접 뽑아요')}</div>
         <p className={styles.centerBody}>
-          운영 방식이 '저장용' 이라 스태프가 뽑을 일이 없어요. 방식은 관리 화면의 '카드' 에서
+          운영 방식이 t('저장용') 이라 스태프가 뽑을 일이 없어요. 방식은 관리 화면의 '카드' 에서
           바꿀 수 있어요.
         </p>
         <Link className={styles.linkBtn} to={`/${slug}/admin/photocard`}>
@@ -198,7 +202,7 @@ function Staff({ slot }: { slot: Slot }) {
     } catch (e) {
       // 끊긴 걸 모르면 "뽑지 못했어요" 만 뜨고 스태프는 시스템이 고장난 줄 안다
       setError(
-        online ? (e instanceof Error ? e.message : '뽑지 못했어요') : '연결이 끊겼어요 — 와이파이를 확인하고 다시 눌러 주세요'
+        online ? (e instanceof Error ? e.message : t('뽑지 못했어요')) : t('연결이 끊겼어요 — 와이파이를 확인하고 다시 눌러 주세요')
       )
     } finally {
       setBusy(false)
@@ -214,16 +218,17 @@ function Staff({ slot }: { slot: Slot }) {
 
   return (
     <div className={`app ${styles.app}`}>
+      <LangBar all />
       <main className={styles.stage} style={vars}>
         <div className={`surface ${styles.panel}`}>
           {/* 위쪽 밴드 — 럭드의 '경품 미리보기' 자리 */}
           {!result && (
             <div className={styles.band}>
-              <span className={styles.bandMsg}>어떤 포토카드가 있는지 확인해보세요!</span>
+              <span className={styles.bandMsg}>{t('어떤 포토카드가 있는지 확인해보세요!')}</span>
               {canPreview && (
                 <button type="button" className={styles.previewBtn} onClick={() => setSheet(true)} data-open-sheet>
                   <Layers size={13} strokeWidth={2} aria-hidden="true" />
-                  포토카드 미리보기
+                  {t('포토카드 미리보기')}
                 </button>
               )}
             </div>
@@ -237,14 +242,14 @@ function Staff({ slot }: { slot: Slot }) {
             <div className={styles.reveal}>
               <header className={styles.revealHead}>
                 {!summary && <p className={styles.eyebrow}>✦ 두근두근</p>}
-                <h2 className={styles.revealTitle}>{summary ? '전체 결과' : '당첨 결과'}</h2>
+                <h2 className={styles.revealTitle}>{summary ? t('전체 결과') : t('당첨 결과')}</h2>
               </header>
 
               {settings.rehearsal && (
                 <div className={styles.banner}>
                   <Info size={16} aria-hidden="true" />
                   <span>
-                    연습이라 <b>재고는 줄지 않았어요</b>.
+                    연습이라 <b>{t('재고는 줄지 않았어요')}</b>.
                   </span>
                 </div>
               )}
@@ -311,7 +316,7 @@ function Staff({ slot }: { slot: Slot }) {
                 <div className={styles.banner} data-demo>
                   <Info size={17} strokeWidth={2} aria-hidden="true" />
                   <span>
-                    <b>체험용 화면이에요.</b> 실제로는 스태프가 로그인한 기기에서만 열려요.
+                    <b>{t('체험용 화면이에요.')}</b> 실제로는 스태프가 로그인한 기기에서만 열려요.
                   </span>
                 </div>
               )}
@@ -319,7 +324,7 @@ function Staff({ slot }: { slot: Slot }) {
                 <div className={styles.banner} data-offline>
                   <WifiOff size={17} strokeWidth={2} aria-hidden="true" />
                   <span>
-                    <b>연결이 끊겼어요.</b> 지금 누르면 뽑히지 않아요 — 와이파이를 확인해 주세요.
+                    <b>{t('연결이 끊겼어요.')}</b> 지금 누르면 뽑히지 않아요 — 와이파이를 확인해 주세요.
                   </span>
                 </div>
               )}
@@ -327,7 +332,7 @@ function Staff({ slot }: { slot: Slot }) {
                 <div className={styles.banner}>
                   <Info size={17} strokeWidth={2} aria-hidden="true" />
                   <span>
-                    지금은 <b>연습</b>이에요. 뽑아도 실제 재고는 줄지 않아요.
+                    지금은 <b>{t('연습')}</b>이에요. 뽑아도 실제 재고는 줄지 않아요.
                   </span>
                 </div>
               )}
@@ -340,8 +345,8 @@ function Staff({ slot }: { slot: Slot }) {
 
               {rules.usesTicket ? (
                 <>
-                  <p className={styles.codeLabel}>뽑기권 번호</p>
-                  <p className={styles.codeHint}>방문자 폰에 뜬 네 자리를 그대로 입력해 주세요.</p>
+                  <p className={styles.codeLabel}>{t('뽑기권 번호')}</p>
+                  <p className={styles.codeHint}>{t('방문자 폰에 뜬 네 자리를 그대로 입력해 주세요.')}</p>
                   <input
                     className={styles.codeInput}
                     value={code}
@@ -352,7 +357,7 @@ function Staff({ slot }: { slot: Slot }) {
                     autoCapitalize="characters"
                     autoComplete="off"
                     autoFocus
-                    aria-label="뽑기권 번호"
+                    aria-label={t('뽑기권 번호')}
                     data-ticket-code
                   />
                   <button
@@ -363,7 +368,7 @@ function Staff({ slot }: { slot: Slot }) {
                     onClick={() => void go()}
                     data-draw
                   >
-                    {busy ? '뽑는 중…' : '뽑기'}
+                    {busy ? t('뽑는 중…') : t('뽑기')}
                   </button>
                 </>
               ) : (
@@ -372,9 +377,9 @@ function Staff({ slot }: { slot: Slot }) {
                   max={max}
                   onCount={setCount}
                   onGo={() => void go()}
-                  label="몇 장을 뽑을까요?"
+                  label={t('몇 장을 뽑을까요?')}
                   /* `drawLabel` 은 방문자 폰의 '뽑기권 받기' 라 여기선 안 쓴다 — 스태프가 누르는 건 뽑기다 */
-                  goLabel="뽑기"
+                  goLabel={t('뽑기')}
                   busy={busy}
                   disabled={settings.closed}
                   className={styles.picker}
@@ -423,7 +428,7 @@ function Staff({ slot }: { slot: Slot }) {
             </span>
           )}
           <a className={styles.adminLink} href={`/${slug}/admin/photocard`}>
-            관리자 페이지로 이동
+            {t('관리자 페이지로 이동')}
           </a>
         </div>
         {display.footerNote && <div className={styles.footerNote}>{display.footerNote}</div>}
@@ -435,12 +440,12 @@ function Staff({ slot }: { slot: Slot }) {
             className={styles.sheet}
             role="dialog"
             aria-modal="true"
-            aria-label="포토카드 미리보기"
+            aria-label={t('포토카드 미리보기')}
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.sheetBar}>
-              <div className={styles.sheetTitle}>포토카드 미리보기</div>
-              <button type="button" className={styles.sheetClose} onClick={() => setSheet(false)} aria-label="닫기">
+              <div className={styles.sheetTitle}>{t('포토카드 미리보기')}</div>
+              <button type="button" className={styles.sheetClose} onClick={() => setSheet(false)} aria-label={t('닫기')}>
                 <X size={17} strokeWidth={2} aria-hidden="true" />
               </button>
             </div>
@@ -463,7 +468,7 @@ function Staff({ slot }: { slot: Slot }) {
                     {!x.image && <ImageIcon size={20} strokeWidth={1.6} aria-hidden="true" />}
                   </div>
                   {x.lucky && !x.soldOut && (
-                    <span className={styles.luckyMark} aria-label="럭키 카드">
+                    <span className={styles.luckyMark} aria-label={t('럭키 카드')}>
                       <Star size={12} strokeWidth={2.6} fill="currentColor" aria-hidden="true" />
                     </span>
                   )}
@@ -477,10 +482,10 @@ function Staff({ slot }: { slot: Slot }) {
                 {lineup.some((x) => x.lucky) && (
                   <span>
                     <span className={styles.legendDot} aria-hidden="true" />
-                    럭키 카드
+                    {t('럭키 카드')}
                   </span>
                 )}
-                {lineup.some((x) => x.soldOut) && <span>흐린 카드는 소진됐어요</span>}
+                {lineup.some((x) => x.soldOut) && <span>{t('흐린 카드는 소진됐어요')}</span>}
               </div>
             )}
           </div>

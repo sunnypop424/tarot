@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 
 import { CrystalBall } from './CrystalBall'
 import styles from './ReadingLoader.module.css'
+import { useT } from '@/i18n'
 
 /**
  * AI 가 리딩을 쓰는 동안 화면을 통째로 덮는다 — 탭바까지.
@@ -13,6 +14,7 @@ import styles from './ReadingLoader.module.css'
  * 흐름: 카드 고르기 → 선택 완료 → **여기** → 뽑은 카드 + 리딩이 함께 등장.
  */
 export function ReadingLoader({ label }: { label?: string }) {
+  const t = useT()
   // 뒤 화면이 스크롤되면 덮은 의미가 없다
   useEffect(() => {
     const { overflow } = document.body.style
@@ -25,7 +27,7 @@ export function ReadingLoader({ label }: { label?: string }) {
   return (
     <div className={styles.overlay} data-reading-loader role="dialog" aria-modal="true">
       <CrystalBall label={label} />
-      <p className={`t-text-xs ${styles.hint}`}>잠시만요, 카드들을 이어 읽고 있어요</p>
+      <p className={`t-text-xs ${styles.hint}`}>{t('잠시만요, 카드들을 이어 읽고 있어요')}</p>
     </div>
   )
 }

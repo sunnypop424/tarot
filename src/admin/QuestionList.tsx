@@ -7,6 +7,7 @@ import { useSlot } from '@/slot/SlotProvider'
 import { getSlotDeck } from '@/data/slots'
 import { QUESTION_CARD_COUNT, type Question } from '@/types/question'
 import { confirmAction, toast } from './AdminFeedback'
+import { useT } from '@/i18n'
 
 /**
  * 새 질문의 기본값.
@@ -29,6 +30,7 @@ function blankQuestion(): Question {
 }
 
 export function QuestionList() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const majorOnly = getSlotDeck(slot) === 'major'
@@ -75,7 +77,7 @@ export function QuestionList() {
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">질문 타로</h1>
+          <h1 className="ad-head__title">{t('질문 타로')}</h1>
           {questions && (
             <span className="ad-head__count tnum">
               전체 {total} · 공개 {open}
@@ -150,7 +152,7 @@ export function QuestionList() {
                   </div>
                   {/* 장수는 안 쓴다 — 질문 타로는 전부 한 장이라 줄마다 "1장"이 붙으면 잡음이다 */}
                   <div className="ad-row__meta">
-                    {majorOnly || q.deck === 'major' ? '메이저 22장' : '전체 78장'} ·{' '}
+                    {majorOnly || q.deck === 'major' ? t('메이저 22장') : '전체 78장'} ·{' '}
                     {answeredCount(q)}개 답변 입력됨
                     {!q.published && (
                       <span className="ad-tag ad-tag--sm">비공개</span>

@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 
 import { cssUrl } from '@/lib/image'
+import { useSlotOrNull } from '@/slot/SlotProvider'
+import { LangPicker } from './LangPicker'
 
 /**
  * 방문자 화면 맨 위 **로고 + 제목 한 줄.**
@@ -63,6 +65,19 @@ export function ServiceHeader({
   children?: ReactNode
 }) {
   /**
+   * 언어 고르개 — **슬롯이 언어를 골랐을 때만** (`slot.langs`).
+   *
+   * 헤더에 두는 이유: 이 부품을 일곱 서비스가 같이 쓰므로 여기 한 번 넣으면 그 서비스들이
+   * 전부 같은 자리에 같은 모양으로 갖는다. 서비스마다 따로 넣으면 자리가 제각각이 되고,
+   * 새 서비스는 아예 빠뜨린다 (이 파일이 존재하는 이유와 같은 이야기다).
+   *
+   * `useSlotOrNull` 인 이유: 편집기 미리보기·랜딩 iframe 처럼 슬롯 컨텍스트가 없는 자리에서도
+   * 이 헤더가 그려진다 — 거기선 고르개가 없는 게 맞다.
+   */
+  const slot = useSlotOrNull()
+  const langPicker = slot?.langs?.length ? <LangPicker only={slot.langs} /> : null
+
+  /**
    * **여기가 이 부품의 전부다.** 로고가 없으면 로고 자리를 아예 안 그린다 —
    * 빈 타일은 "이미지가 깨졌다" 로 읽힌다.
    */
@@ -90,6 +105,7 @@ export function ServiceHeader({
           {below}
         </div>
         {children}
+        {langPicker}
       </header>
     )
   }
@@ -116,6 +132,7 @@ export function ServiceHeader({
         body
       )}
       {children}
+      {langPicker}
     </header>
   )
 }

@@ -4,8 +4,56 @@ import { repo } from '@/lib/repo'
 import type { LuckydrawSettings, PrizeReport } from '@/lib/repo'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
+import { BulkPaste, splitCells, toLines, type BulkResult } from '../BulkPaste'
+import { useT } from '@/i18n'
 
 const MAX_PRIZES = 100
+
+/** 붙여넣은 한 줄에서 뽑아내는 것 — 나머지 필드는 `blankPrize` 가 채운다 */
+type PastedPrize = Pick<PrizeReport, 'name' | 'remaining' | 'requiresShipping'>
+
+/**
+ * 붙여넣기 한 줄 → 상품 하나.
+ *
+ * 받는 모양이 하나가 아니다 — 주최자가 어디서 복사해 오느냐에 따라 다르다:
+ *
+ *   스페셜 포토북, 3            ← 이름과 수량만
+ *   1, 스페셜 포토북, 3         ← 앞에 등수 (엑셀에서 흔하다)
+ *   1, 스페셜 포토북, 3, 배송   ← 배송이 필요한 상품
+ *
+ * **등수는 무시한다.** 등수는 이 화면에서 줄 순서로 다시 매겨지므로(위 안내 문구),
+ * 붙여넣은 숫자를 그대로 믿으면 화면이 보여주는 것과 어긋난다. 대신 **맨 앞 칸이 숫자면
+ * 등수로 보고 버린다** — 안 그러면 "1" 이 상품 이름이 된다.
+ *
+ * 이름이 없거나 수량이 숫자가 아니면 **못 읽은 줄로 돌려준다.** 조용히 0개로 넣으면
+ * 재고 0 짜리 상품이 목록에 섞여 들어가고, 그건 현장에서 "왜 안 뽑히지" 가 된다.
+ */
+function parsePrizes(text: string): BulkResult<PastedPrize> {
+  const items: PastedPrize[] = []
+  const skipped: string[] = []
+
+  for (const line of toLines(text)) {
+    const cells = splitCells(line)
+    // 맨 앞이 순수한 숫자면 등수다 — 이름이 "2024 포토북" 처럼 숫자로 *시작*하는 건 이름이다
+    if (cells.length > 2 && /^\d+$/.test(cells[0])) cells.shift()
+
+    const name = cells[0] ?? ''
+    const qty = (cells[1] ?? '').replace(/[^0-9]/g, '')
+    const rest = cells.slice(2).join(' ')
+
+    if (!name || qty === '') {
+      skipped.push(line)
+      continue
+    }
+    items.push({
+      name,
+      remaining: Number(qty),
+      // '배송' 이라고 적어 두는 게 주최자에게 제일 자연스럽다 (양식에도 그렇게 쓴다)
+      requiresShipping: /배송/.test(rest),
+    })
+  }
+  return { items, skipped }
+}
 
 /** 새 상품 — id 는 화면에서 만든다 (저장 전에도 행을 구분해야 한다) */
 function blankPrize(rank: number): PrizeReport {
@@ -33,6 +81,7 @@ function blankPrize(rank: number): PrizeReport {
  * 한 번 더 확인한다.
  */
 export function Overview() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
 
@@ -213,7 +262,7 @@ export function Overview() {
     banners.push({ text: '행사가 마감됐어요. 다시 열면 방문자가 이어서 뽑을 수 있어요.', tone: 'mute' })
 
   const stateTone = settings.closed ? 'mute' : settings.rehearsal ? 'warn' : 'key'
-  const stateLabel = settings.closed ? '마감' : settings.rehearsal ? '리허설' : '실제 운영'
+  const stateLabel = settings.closed ? t('마감') : settings.rehearsal ? t('리허설') : '실제 운영'
   const stateHint = settings.closed
     ? '방문자가 더 뽑을 수 없어요'
     : settings.rehearsal
@@ -274,14 +323,45 @@ export function Overview() {
               <span className="ad-card__title">상품</span>
               <span className="ad-card__num tnum">{rows.length}종</span>
             </div>
-            <button
-              type="button"
-              className="ad-btn ad-btn--soft ad-btn--sm"
-              disabled={rows.length >= MAX_PRIZES}
-              onClick={addRow}
-            >
-              + 상품 추가
-            </button>
+            <div className="ad-btnrow">
+              {/* 문의 양식·엑셀에서 그대로 옮겨 붙이는 자리 — 상품이 여덟 종이면 여덟 번 누르지 않는다 */}
+              <BulkPaste
+                label="상품"
+                disabled={locked || rows.length >= MAX_PRIZES}
+                placeholder={'1\t스페셜 포토북\t3\n2\t아크릴 스탠드\t10\n3\t엽서 세트\t50'}
+                hint={
+                  <>
+                    한 줄에 하나씩 <b>이름, 수량</b> 순서로 적어 주세요. 앞에 등수를 적어도 되고
+                    안 적어도 돼요(줄 순서대로 매겨져요). 탭·쉼표·세로줄 다 돼요. 수량 뒤에{' '}
+                    <b>배송</b>이라고 적으면 그 상품은 배송 정보를 받아요.
+                  </>
+                }
+                parse={parsePrizes}
+                preview={(p) => `${p.name} · ${p.remaining}개${p.requiresShipping ? ' · 배송' : ''}`}
+                onApply={(items) => {
+                  setRows((prev) => {
+                    if (!prev) return prev
+                    const room = MAX_PRIZES - prev.length
+                    const add = items.slice(0, room).map((p, i) => ({
+                      ...blankPrize(prev.length + i + 1),
+                      ...p,
+                    }))
+                    if (items.length > room) toast(`${MAX_PRIZES}종까지만 넣을 수 있어요`)
+                    return [...prev, ...add]
+                  })
+                  setDirty(true)
+                  setSaved(false)
+                }}
+              />
+              <button
+                type="button"
+                className="ad-btn ad-btn--soft ad-btn--sm"
+                disabled={rows.length >= MAX_PRIZES}
+                onClick={addRow}
+              >
+                + 상품 추가
+              </button>
+            </div>
           </div>
           <p className="ad-sub" style={{ marginBottom: 16 }}>
             등수는 줄 순서예요 · 남은 수량에 적은 만큼만 뽑을 수 있어요 · 다음 날 물량을 더할 땐 지금
@@ -465,7 +545,7 @@ export function Overview() {
         </div>
 
         <div className="ad-card">
-          <div className="ad-card__title">경품 미리보기</div>
+          <div className="ad-card__title">{t('경품 미리보기')}</div>
           <div className="ad-checks" style={{ marginTop: 12 }}>
             <button
               type="button"
@@ -557,7 +637,7 @@ export function Overview() {
             onClick={() => void saveAll()}
             data-save
           >
-            {saving ? '저장하는 중…' : '저장'}
+            {saving ? '저장하는 중…' : t('저장')}
           </button>
         </div>
       </div>

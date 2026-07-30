@@ -31,6 +31,7 @@ import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Photocard.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 포토카드 뽑기 — **운영 방식 셋이 한 파일에 있다** (`photocardRules` 가 가른다).
@@ -85,6 +86,7 @@ interface Kept {
 }
 
 function Photocard({ slot }: { slot: Slot }) {
+  const t = useT()
   const { slug } = slot
   const display = useMemo(() => photocardDisplay(slot), [slot])
   const subject = useMemo(() => visitorId(), [])
@@ -160,7 +162,7 @@ function Photocard({ slot }: { slot: Slot }) {
   if (!repo.photocard.ready()) {
     return (
       <div className={`app ${styles.root}`} style={vars}>
-        <div className={styles.empty}>지금은 포토카드 뽑기를 쓸 수 없어요.</div>
+        <div className={styles.empty}>{t('지금은 포토카드 뽑기를 쓸 수 없어요.')}</div>
       </div>
     )
   }
@@ -202,7 +204,7 @@ function Photocard({ slot }: { slot: Slot }) {
     } catch (e) {
       await wait
       // **실패 복귀 경로** — 재고 소진·횟수 초과·마감이면 덱으로 돌아가고 이유를 말한다
-      setError(e instanceof Error ? e.message : '뽑지 못했어요')
+      setError(e instanceof Error ? e.message : t('뽑지 못했어요'))
       setView('deck')
     } finally {
       setBusy(false)
@@ -220,7 +222,7 @@ function Photocard({ slot }: { slot: Slot }) {
       appendItem('photocard-ticket', slug, { id: t.code }, 1)
       setView('ticket')
     } catch (e) {
-      setError(e instanceof Error ? e.message : '뽑기권을 받지 못했어요')
+      setError(e instanceof Error ? e.message : t('뽑기권을 받지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -330,7 +332,7 @@ function Photocard({ slot }: { slot: Slot }) {
               {!display.cardBack && <Sparkles size={34} strokeWidth={1.6} aria-hidden="true" />}
               <div className={styles.shine} aria-hidden="true" />
             </div>
-            <div className={styles.drawingText}>카드를 뽑는 중…</div>
+            <div className={styles.drawingText}>{t('카드를 뽑는 중…')}</div>
           </div>
         )}
         {at === 'result' && shownCard && (
@@ -399,6 +401,7 @@ function Deck({
   onPick: () => void
   onLocker: () => void
 }) {
+  const t = useT()
   const n = Math.max(3, Math.min(display.spreadCount, 21))
   const wrapRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
@@ -465,7 +468,7 @@ function Deck({
                 }}
                 disabled={disabled || shuffling}
                 onClick={onPick}
-                aria-label="카드 뽑기"
+                aria-label={t('카드 뽑기')}
                 data-deck-card
               >
                 <span className={styles.face}>
@@ -485,7 +488,7 @@ function Deck({
           </p>
         ) : (
           <div className={`${styles.deckLeft} ${styles.tnum}`}>
-            {closed ? '마감됐어요' : left > 0 ? `남은 기회 ${left}회` : '뽑을 수 있는 횟수를 다 쓰셨어요'}
+            {closed ? t('마감됐어요') : left > 0 ? `남은 기회 ${left}회` : t('뽑을 수 있는 횟수를 다 쓰셨어요')}
           </div>
         )}
         {/**
@@ -517,11 +520,11 @@ function Deck({
         <div className={styles.deckHint}>
           {disabled
             ? kept > 0
-              ? '모은 카드는 보관함에서 볼 수 있어요'
-              : '이벤트를 확인해 주세요'
+              ? t('모은 카드는 보관함에서 볼 수 있어요')
+              : t('이벤트를 확인해 주세요')
             : shuffling
-              ? '섞는 중…'
-              : '카드를 눌러 한 장을 골라 주세요'}
+              ? t('섞는 중…')
+              : t('카드를 눌러 한 장을 골라 주세요')}
         </div>
         <div className={styles.adminRow}>
           <AdminEntry slug={slug} className={styles.adminLink} />
@@ -552,6 +555,7 @@ function Result({
   onAgain: (() => void) | null
   onLocker: (() => void) | null
 }) {
+  const t = useT()
   const [image, setImage] = useState<ResultImage | null>(null)
   const [note, setNote] = useState<string | null>(null)
 
@@ -579,15 +583,15 @@ function Result({
 
   async function run(kind: 'save' | 'share') {
     if (!image) return
-    const name = `${card.name || '포토카드'}.png`
+    const name = `${card.name || t('포토카드')}.png`
     const how = kind === 'save' ? await saveResult(image, name) : await shareResult(image, name)
-    setNote(how === 'opened' ? '새 탭에서 사진을 길게 눌러 저장해 주세요.' : null)
+    setNote(how === 'opened' ? t('새 탭에서 사진을 길게 눌러 저장해 주세요.') : null)
   }
 
   return (
     <>
       <div className={styles.resultWrap}>
-        <div className={styles.kicker}>{physical ? '뽑힌 카드' : '뽑은 카드'}</div>
+        <div className={styles.kicker}>{physical ? t('뽑힌 카드') : t('뽑은 카드')}</div>
         {/**
           * **카드 앞면은 `background-image` 다** — 길게 눌러 저장되면 안 된다.
           * 저장은 아래 버튼(`SavableImage` + `saveResult`)으로만 간다. (CLAUDE.md)
@@ -609,7 +613,7 @@ function Result({
 
         {physical ? (
           <>
-            <div className={styles.resultName}>실물을 받아 가세요</div>
+            <div className={styles.resultName}>{t('실물을 받아 가세요')}</div>
             <div className={styles.chip}>
               <Store size={18} strokeWidth={1.7} aria-hidden="true" />
               카운터에서 수령
@@ -621,7 +625,7 @@ function Result({
               {card.name}
               {card.rarity > 0 && ` · ${RARITY_LABEL[card.rarity] ?? ''}`}
             </div>
-            <div className={styles.resultNote}>이 기기에만 저장돼요</div>
+            <div className={styles.resultNote}>{t('이 기기에만 저장돼요')}</div>
           </>
         )}
 
@@ -653,7 +657,7 @@ function Result({
                 data-share
               >
                 <Share2 size={17} strokeWidth={1.8} aria-hidden="true" />
-                공유
+                {t('공유')}
               </button>
             )}
           </div>
@@ -699,6 +703,7 @@ function Locker({
   onBack: () => void
   onDraw: () => void
 }) {
+  const t = useT()
   // 같은 카드를 두 번 뽑을 수 있다 — 종류로 접는다
   const owned = useMemo(() => {
     const m = new Map<string, Kept>()
@@ -711,7 +716,7 @@ function Locker({
   return (
     <>
       <div className={styles.lockerTop}>
-        <button type="button" className={styles.backBtn} onClick={onBack} aria-label="돌아가기">
+        <button type="button" className={styles.backBtn} onClick={onBack} aria-label={t('돌아가기')}>
           <ChevronLeft size={18} strokeWidth={1.7} aria-hidden="true" />
         </button>
         <div className={styles.lockerTitle}>{display.lockerLabel}</div>
@@ -750,7 +755,7 @@ function Locker({
       <div className={styles.lockerFoot}>
         <div className={styles.note} style={{ marginTop: 0, marginBottom: 12 }}>
           <Info size={16} strokeWidth={1.7} aria-hidden="true" style={{ flex: 'none', marginTop: 1 }} />
-          <span>이 기기에만 저장돼요. 브라우저 기록을 지우면 보관함도 사라져요.</span>
+          <span>{t('이 기기에만 저장돼요. 브라우저 기록을 지우면 보관함도 사라져요.')}</span>
         </div>
         <button
           type="button"
@@ -760,7 +765,7 @@ function Locker({
           onClick={onDraw}
           data-draw-more
         >
-          {left > 0 ? `한 번 더 뽑기 (${left}회 남음)` : '뽑을 수 있는 횟수를 다 쓰셨어요'}
+          {left > 0 ? `한 번 더 뽑기 (${left}회 남음)` : t('뽑을 수 있는 횟수를 다 쓰셨어요')}
         </button>
       </div>
     </>
@@ -784,6 +789,7 @@ function TicketIntro({
   error: string | null
   onIssue: () => void
 }) {
+  const t = useT()
   return (
     <>
       <div style={{ height: 32, flex: 'none' }} />
@@ -813,7 +819,7 @@ function TicketIntro({
         <div className={styles.note}>
           <TriangleAlert size={16} strokeWidth={1.7} aria-hidden="true" style={{ flex: 'none', marginTop: 1 }} />
           <span>
-            뽑기권은 <b style={{ color: 'var(--pc-head)' }}>한 번만</b> 받을 수 있어요. 받은 뒤에는 다시
+            뽑기권은 <b style={{ color: 'var(--pc-head)' }}>{t('한 번만')}</b> 받을 수 있어요. 받은 뒤에는 다시
             받을 수 없어요.
           </span>
         </div>
@@ -822,7 +828,7 @@ function TicketIntro({
 
       <div className={styles.bottom}>
         <button type="button" className={styles.cta} disabled={busy || closed} onClick={onIssue} data-issue>
-          {closed ? '마감됐어요' : busy ? '받는 중…' : display.drawLabel}
+          {closed ? t('마감됐어요') : busy ? t('받는 중…') : display.drawLabel}
         </button>
         <div className={styles.adminRow} style={{ textAlign: 'center' }}>
           <AdminEntry slug={slug} className={`${styles.adminLink} ${styles.adminLinkLight}`} />
@@ -845,6 +851,7 @@ function TicketView({
   busy: boolean
   onRefresh: () => void
 }) {
+  const t = useT()
   return (
     <>
       <div style={{ height: 32, flex: 'none' }} />
@@ -854,7 +861,7 @@ function TicketView({
 
       <div className={styles.center} style={{ padding: '0 22px' }}>
         <div className={styles.codeCard}>
-          <div className={styles.codeLabel}>카운터에 이 번호를 보여 주세요</div>
+          <div className={styles.codeLabel}>{t('카운터에 이 번호를 보여 주세요')}</div>
           <div className={styles.code} data-ticket-code>
             {ticket.code}
           </div>
@@ -868,7 +875,7 @@ function TicketView({
 
         <div className={styles.waiting}>
           <span className={styles.dot} aria-hidden="true" />
-          <span className={styles.waitingText}>스태프가 뽑기를 기다리는 중</span>
+          <span className={styles.waitingText}>{t('스태프가 뽑기를 기다리는 중')}</span>
         </div>
         <p className={styles.ticketBody} style={{ marginTop: 10 }}>
           뽑히면 이 화면이 결과로 바뀌어요.
@@ -881,12 +888,12 @@ function TicketView({
           */}
         <button type="button" className={styles.ghostBtn} disabled={busy} onClick={onRefresh} data-refresh>
           <RotateCw size={17} strokeWidth={1.8} aria-hidden="true" />
-          {busy ? '확인 중…' : '새로고침'}
+          {busy ? t('확인 중…') : t('새로고침')}
         </button>
 
         <div className={`${styles.note} ${styles.noteStrong}`}>
           <TriangleAlert size={16} strokeWidth={1.7} aria-hidden="true" style={{ flex: 'none', marginTop: 1 }} />
-          <span>이 번호는 다시 받을 수 없어요. 화면을 닫아도 이 기기에서 다시 볼 수 있어요.</span>
+          <span>{t('이 번호는 다시 받을 수 없어요. 화면을 닫아도 이 기기에서 다시 볼 수 있어요.')}</span>
         </div>
       </div>
 

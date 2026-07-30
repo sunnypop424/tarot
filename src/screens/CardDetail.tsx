@@ -7,6 +7,7 @@ import { getCardById, SUIT_LABELS } from '@/data/cards'
 import type { Card, CardReading, Orientation } from '@/types/card'
 import { NotReady } from './NotReady'
 import styles from './Cards.module.css'
+import { useT } from '@/i18n'
 
 const FIELDS: { key: keyof Omit<CardReading, 'core'>; label: string }[] = [
   { key: 'general', label: '종합' },
@@ -18,11 +19,12 @@ const FIELDS: { key: keyof Omit<CardReading, 'core'>; label: string }[] = [
 
 /** 카드 상세 — 상징과 정/역방향 전체 의미 */
 export function CardDetail() {
+  const t = useT()
   const { cardId } = useParams<{ cardId: string }>()
   const { go } = useSlotPath()
   const card = cardId ? getCardById(cardId) : undefined
 
-  if (!card) return <NotReady title="없는 카드" />
+  if (!card) return <NotReady title={t('없는 카드')} />
 
   return (
     <div className="screen">
@@ -45,12 +47,12 @@ export function CardDetail() {
       </ul>
 
       <section className={styles.section}>
-        <h2 className={`t-title-s ${styles.sectionTitle}`}>상징</h2>
+        <h2 className={`t-title-s ${styles.sectionTitle}`}>{t('상징')}</h2>
         <p className="t-body t-fg-2">{card.symbolism}</p>
       </section>
 
-      <Meanings card={card} orientation="upright" title="정방향" />
-      <Meanings card={card} orientation="reversed" title="역방향" />
+      <Meanings card={card} orientation="upright" title={t('정방향')} />
+      <Meanings card={card} orientation="reversed" title={t('역방향')} />
 
       {/* 뒤로가기는 다 읽고 난 아래쪽에 — 결과 화면의 "다시 뽑기"와 같은 자리·같은 모양 */}
       <button
@@ -62,7 +64,7 @@ export function CardDetail() {
         도감으로
       </button>
 
-      <p className="t-text-xxs disclaimer">타로는 재미와 성찰을 위한 것이에요.</p>
+      <p className="t-text-xxs disclaimer">{t('타로는 재미와 성찰을 위한 것이에요.')}</p>
     </div>
   )
 }
@@ -81,6 +83,7 @@ function Meanings({
   orientation: Orientation
   title: string
 }) {
+  const t = useT()
   const reading = card[orientation]
 
   return (
@@ -95,7 +98,7 @@ function Meanings({
       <div className={styles.meanings}>
         {FIELDS.map(({ key, label }) => (
           <div key={key} className={`surface ${styles.meaning}`}>
-            <span className="t-text-s t-primary">{label}</span>
+            <span className="t-text-s t-primary">{t(label)}</span>
             <span className="t-body">{reading[key]}</span>
           </div>
         ))}

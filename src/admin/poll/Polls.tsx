@@ -4,6 +4,25 @@ import { repo } from '@/lib/repo'
 import type { Poll } from '@/lib/repo/types'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
+import { BulkPaste, splitCells, toLines, type BulkResult } from '../BulkPaste'
+import { useT } from '@/i18n'
+
+/**
+ * 붙여넣기 → 선택지들.
+ *
+ * 선택지는 **이름 하나가 전부**라 줄마다 하나면 되는데, 주최자가 한 줄에 쉼표로 죽 적어 오는
+ * 경우가 잦다("청량, 청순, 걸크러시"). 그래서 줄 안도 한 번 더 나눈다 — 나눠 놓고 아니면
+ * 되돌리는 게, 안 나눠서 선택지 하나에 셋이 들어가는 것보다 낫다(그건 화면에서 바로 보인다).
+ *
+ * 못 읽는 줄이랄 게 없다 — 빈 줄만 빠진다.
+ */
+function parseOptions(text: string): BulkResult<string> {
+  const items = toLines(text)
+    .flatMap((line) => splitCells(line))
+    .map((s) => s.trim())
+    .filter(Boolean)
+  return { items, skipped: [] }
+}
 
 /**
  * 설문 관리 — **주최자의 운영 데이터다** (럭드 상품표와 같은 자리).
@@ -14,6 +33,7 @@ import { confirmAction, toast } from '../AdminFeedback'
  * 지우기도 저장 전까지는 초안이라, 잘못 눌러도 되돌리기로 살아난다.
  */
 export function Polls() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const [saved, setSaved] = useState<Poll[] | null>(null)
@@ -193,7 +213,7 @@ export function Polls() {
                       data-on={!p.closed || undefined}
                       onClick={() => patch(p.id, { closed: !p.closed })}
                     >
-                      {p.closed ? '마감됨' : '진행 중'}
+                      {p.closed ? t('마감됨') : t('진행 중')}
                     </button>
                     <button
                       type="button"
@@ -305,20 +325,48 @@ export function Polls() {
                       marginTop: 14,
                     }}
                   >
-                    <button
-                      type="button"
-                      className="ad-btn ad-btn--line ad-btn--sm"
-                      onClick={() =>
-                        patch(p.id, {
-                          options: [
-                            ...p.options,
-                            { id: crypto.randomUUID(), order: p.options.length + 1, label: '', votes: 0 },
-                          ],
-                        })
-                      }
-                    >
-                      + 선택지 추가
-                    </button>
+                    <div className="ad-btnrow">
+                      {/* 후보 12명을 열두 번 만들지 않는다 — 명단을 그대로 붙여 넣는다 */}
+                      <BulkPaste
+                        label="선택지"
+                        placeholder={'청량\n청순\n걸크러시'}
+                        hint={
+                          <>
+                            한 줄에 하나씩 적어 주세요. 한 줄 안에 쉼표·세로줄로 여러 개를 적어도
+                            나눠서 들어가요.
+                          </>
+                        }
+                        parse={parseOptions}
+                        preview={(label) => label}
+                        onApply={(labels) =>
+                          patch(p.id, {
+                            options: [
+                              ...p.options,
+                              ...labels.map((label, i) => ({
+                                id: crypto.randomUUID(),
+                                order: p.options.length + i + 1,
+                                label,
+                                votes: 0,
+                              })),
+                            ],
+                          })
+                        }
+                      />
+                      <button
+                        type="button"
+                        className="ad-btn ad-btn--line ad-btn--sm"
+                        onClick={() =>
+                          patch(p.id, {
+                            options: [
+                              ...p.options,
+                              { id: crypto.randomUUID(), order: p.options.length + 1, label: '', votes: 0 },
+                            ],
+                          })
+                        }
+                      >
+                        + 선택지 추가
+                      </button>
+                    </div>
                     <span className="ad-card__num tnum">
                       지금까지 {total.toLocaleString('ko-KR')}표
                     </span>

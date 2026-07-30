@@ -710,6 +710,15 @@
   padding: 14px 18px calc(26px + env(safe-area-inset-bottom));
   background: linear-gradient(rgb(0 0 0 / 0), color-mix(in srgb, var(--wt-sky) 88%, #000) 34%);
 }
+/* 걸지 못한 이유 — 금칙어에 걸리거나 네트워크가 끊겼을 때 (밤하늘 위라 밝은 쪽 오류색) */
+.error {
+  margin: 0 0 10px;
+  font-size: var(--text-s);
+  color: var(--color-error);
+  line-height: 1.6;
+  text-align: center;
+}
+
 .submit {
   width: 100%;
   height: 54px;

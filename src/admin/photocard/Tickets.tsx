@@ -9,6 +9,7 @@ import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
 /* 화면 표의 `when` 은 연도 없는 짧은 형식이라 별개다 — CSV 는 전체 표기를 쓴다 */
 import { downloadCsv, when as csvWhen } from '../csv'
+import { useT } from '@/i18n'
 
 
 const when = (iso: string) =>
@@ -29,6 +30,7 @@ const when = (iso: string) =>
  * **`subject` 는 안 보여준다** — 그건 그 폰을 가리키는 값이고, 번호와 짝지어 뿌릴 이유가 없다.
  */
 export function Tickets() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const [rows, setRows] = useState<PhotocardTicketRow[] | null>(null)
@@ -86,7 +88,7 @@ export function Tickets() {
       title: '이 번호를 지울까요?',
       desc:
         row.status === 'drawn'
-          ? `${row.code} 는 이미 ${row.cardName || '카드'} 를 뽑은 번호예요. 지우면 그 방문자가 한 번 더 뽑게 돼요. 뽑은 기록과 재고는 그대로예요.`
+          ? `${row.code} 는 이미 ${row.cardName || t('카드')} 를 뽑은 번호예요. 지우면 그 방문자가 한 번 더 뽑게 돼요. 뽑은 기록과 재고는 그대로예요.`
           : `${row.code} 를 지워요. 방문자가 이 번호로는 뽑을 수 없게 돼요.`,
       okLabel: '지우기',
       danger: true,
@@ -204,7 +206,7 @@ export function Tickets() {
                 <div className="ad-table__head">
                   <span>번호</span>
                   <span />
-                  <span>뽑은 카드</span>
+                  <span>{t('뽑은 카드')}</span>
                   <span>발급</span>
                   <span>뽑음</span>
                   <span />

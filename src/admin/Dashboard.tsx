@@ -4,11 +4,15 @@ import { Link } from 'react-router-dom'
 import { repo } from '@/lib/repo'
 import { getSlotService, SERVICES } from '@/data/services'
 import type { ServiceId } from '@/data/services'
+import { exportDeadline, graceDays } from '@/data/slots'
 import { useSlot } from '@/slot/SlotProvider'
 import { periodLabel, slotStatus } from '@/owner/period'
 import { collectSheets, downloadSheets, type Sheet } from './exportAll'
 import { toast } from './AdminFeedback'
+import { useAlerts } from './AlertBar'
+import { useVisibleInterval } from './useVisibleInterval'
 import type { Slot } from '@/types/slot'
+import { useT } from '@/i18n'
 
 /**
  * 주최자 대시보드 — `/{slug}/admin`. **행사장에서 제일 먼저 여는 화면이다.**
@@ -41,7 +45,17 @@ interface Shortcut {
   external?: boolean
 }
 
+/**
+ * 숫자를 다시 읽는 주기 — **부스에 띄워두는 화면이다.**
+ *
+ * 30초는 "옆 태블릿에서 마지막 하나가 나갔다" 를 놓치지 않을 만큼 짧고, 카페 와이파이에서
+ * 부담이 안 될 만큼 길다. 실시간(`watch`)을 안 쓰는 이유는 서비스마다 붙는 테이블이 다르고
+ * 대시보드가 그걸 전부 알아야 하기 때문이다 — 그러면 서비스가 늘 때마다 여기가 같이 자란다.
+ */
+const REFRESH_MS = 30_000
+
 export function Dashboard() {
+  const t = useT()
   const slot = useSlot()
   const service = getSlotService(slot)
   const [stats, setStats] = useState<Stat[] | null>(null)
@@ -49,16 +63,38 @@ export function Dashboard() {
   /** 재고 막대 — 한정 카드/경품이 있을 때만 (없으면 그릴 게 없다) */
   const [bars, setBars] = useState<StockBar[] | null>(null)
   const [saving, setSaving] = useState(false)
+  /** 마지막으로 읽은 시각 — 숫자가 언제 것인지 모르면 멈춘 화면과 구별이 안 된다 */
+  const [readAt, setReadAt] = useState<Date | null>(null)
+  const [busy, setBusy] = useState(false)
+  /** 알림은 셸이 읽는다 — 손으로 새로고침할 땐 그것도 같이 갱신한다 */
+  const { reload: reloadAlerts } = useAlerts()
 
   const load = useCallback(async () => {
     try {
       setStats(await collect(service, slot.slug))
+      setError(null)
     } catch (e) {
       setError(e instanceof Error ? e.message : '현황을 읽지 못했어요')
       setStats([])
     }
     setBars(await stockBars(service, slot.slug).catch(() => []))
+    setReadAt(new Date())
   }, [service, slot.slug])
+
+  /**
+   * 손으로 새로고침 — **자동 갱신이 있어도 필요하다.**
+   * 방금 재고를 고치고 돌아온 주최자는 30초를 기다리는 게 아니라 지금 확인하고 싶다.
+   */
+  async function refresh() {
+    if (busy) return
+    setBusy(true)
+    try {
+      await load()
+      reloadAlerts()
+    } finally {
+      setBusy(false)
+    }
+  }
 
   /**
    * 행사 자료 내보내기 — **종료 +14일이 지나면 못 꺼낸다.**
@@ -86,7 +122,11 @@ export function Dashboard() {
     void load()
   }, [load])
 
-  const period = periodLine(slot)
+  // 탭이 뒤로 넘어가면 멈추고, 돌아오면 그 자리에서 한 번 읽는다 (`useVisibleInterval`)
+  useVisibleInterval(() => void load(), REFRESH_MS)
+
+  const period = periodLine(slot, service)
+  const deadline = exportDeadline(slot, service)
   const serviceName = SERVICES.find((s) => s.id === service)?.label ?? service
 
   return (
@@ -95,9 +135,31 @@ export function Dashboard() {
         <div className="ad-head__row">
           <h1 className="ad-head__title">대시보드</h1>
           <span className="ad-head__count">{serviceName}</span>
+          {/*
+            * **언제 읽은 숫자인지 말한다.** 예전엔 들어온 순간 한 번만 읽어서, 부스에 띄워둔
+            * 화면이 몇 시간 전 숫자를 보여주면서도 그렇다는 티가 안 났다.
+            */}
+          <span className="ad-head__spacer" />
+          {/* 시각과 버튼은 **한 덩어리로** 줄바꿈한다 — 따로 두면 좁은 폭에서 둘이 갈라진다 */}
+          <span className="ad-head__tools">
+            {readAt && (
+              <span className="ad-sub tnum" data-read-at>
+                {readAt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 기준
+              </span>
+            )}
+            <button
+              type="button"
+              className="ad-btn ad-btn--line ad-btn--sm"
+              onClick={() => void refresh()}
+              disabled={busy}
+              data-refresh
+            >
+              {busy ? '읽는 중…' : t('새로고침')}
+            </button>
+          </span>
         </div>
         <p className="ad-head__desc">
-          오늘 이 행사에서 무엇이 얼마나 돌고 있는지 한눈에 봐요.
+          오늘 이 행사에서 무엇이 얼마나 돌고 있는지 한눈에 봐요. 30초마다 저절로 갱신돼요.
         </p>
       </header>
 
@@ -216,7 +278,7 @@ export function Dashboard() {
               </span>
               <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div className="ad-kv">
-                  <span>기간</span>
+                  <span>{t('기간')}</span>
                   <span className="tnum">{periodLabel(slot)}</span>
                 </div>
                 {period.left !== null && (
@@ -225,14 +287,22 @@ export function Dashboard() {
                     <span className="tnum">{period.left}일</span>
                   </div>
                 )}
+                {/*
+                  * **날짜를 적는다.** "종료 후 14일" 은 주최자가 머릿속으로 더해야 하는 값이라
+                  * 대개 안 더한다. 유예 일수는 `graceDays` 한 곳에서 온다 — DB(`slot_grace_days`)를
+                  * 고치면 화면이 따라오도록.
+                  */}
                 <div className="ad-kv">
                   <span>자료 보관</span>
-                  <span>종료 후 14일</span>
+                  <span className="tnum">
+                    {deadline ? `${deadline.date} 까지` : `종료 후 ${graceDays(service)}일`}
+                  </span>
                 </div>
               </div>
               <div className="ad-hr" />
               <p className="ad-fine">
-                종료되면 방문자 주소는 종료 안내로 바뀌고, 보관 기간이 지나면 자료가 파기돼요.
+                종료되면 방문자 화면은 종료 안내로 바뀌고, 보관 기간이 지나면 자료가 파기돼요.
+                관리 화면은 보관 기간 동안 그대로 열려 있어요.
               </p>
             </div>
 
@@ -264,7 +334,10 @@ export function Dashboard() {
  * 기간 한 줄 — **판정은 이미 있는 것을 쓴다** (`owner/period.ts` · `data/slots.ts`).
  * 여기서 날짜 비교를 다시 짜면 편집기와 관리 화면이 서로 다른 날 "열렸다" 고 말하게 된다.
  */
-function periodLine(slot: Slot): {
+function periodLine(
+  slot: Slot,
+  service: ServiceId
+): {
   badge: string
   detail: string
   tone: 'key' | 'warn' | 'mute'
@@ -276,9 +349,11 @@ function periodLine(slot: Slot): {
     end !== null
       ? Math.max(0, Math.ceil((new Date(`${end}T23:59:59+09:00`).getTime() - Date.now()) / 86400000))
       : null
+  /** 유예 일수는 한 곳(`graceDays`)에서 온다 — 여기에 14 를 적으면 DB 를 고칠 때 안 따라온다 */
+  const keep = `자료는 ${exportDeadline(slot, service)?.date ?? `종료 +${graceDays(service)}일`}까지 꺼낼 수 있어요`
 
   if (status === 'expired')
-    return { badge: '종료', detail: '기간이 끝났어요 · 자료는 종료 +14일까지 꺼낼 수 있어요', tone: 'mute', left: null }
+    return { badge: '종료', detail: `기간이 끝났어요 · ${keep}`, tone: 'mute', left: null }
   if (status === 'upcoming')
     return { badge: '시작 전', detail: `${periodLabel(slot)} 에 열려요`, tone: 'warn', left: days }
   if (status === 'unlimited')
@@ -288,8 +363,8 @@ function periodLine(slot: Slot): {
     // 마지막 사흘은 남은 날을 말한다 — 그때부터는 날짜보다 "며칠 남았나" 가 급하다
     detail:
       days !== null && days <= 3
-        ? `${periodLabel(slot)} · 종료까지 ${days}일 · 자료는 종료 +14일까지 꺼낼 수 있어요`
-        : `${periodLabel(slot)} · 자료는 종료 +14일까지 꺼낼 수 있어요`,
+        ? `${periodLabel(slot)} · 종료까지 ${days}일 · ${keep}`
+        : `${periodLabel(slot)} · ${keep}`,
     tone: days !== null && days <= 3 ? 'warn' : 'key',
     left: days,
   }

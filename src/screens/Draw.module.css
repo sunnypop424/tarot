@@ -44,6 +44,31 @@
   }
 }
 
+/**
+ * 저장·공유 — **결과 아래, 다시 뽑기 위.**
+ * 뽑은 걸 보고 나서 "가져가야지" 가 오고, 그 다음이 "또 뽑을까" 다. 순서를 바꾸면
+ * 다시 뽑기를 누른 뒤에야 저장 버튼을 발견하게 되는데 그때는 이미 결과가 사라졌다.
+ */
+.saveRow {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-base);
+}
+.saveRow > :global(.btn) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.saveNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  justify-content: center;
+  margin-top: var(--space-sm);
+  text-align: center;
+}
+
 .resultActions {
   display: flex;
   flex-direction: column;

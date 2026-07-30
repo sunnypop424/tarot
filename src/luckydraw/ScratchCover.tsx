@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import styles from './Luckydraw.module.css'
+import { useT } from '@/i18n'
 
 interface Props {
   /** 커버에 찍히는 글자 (♥ 등) — 슬롯이 정한 coverMark */
@@ -19,6 +20,7 @@ interface Props {
  * 움직임을 줄이는 사용자에겐 탭 한 번에 여는 버튼으로 바꾼다(.cover 는 CSS 로 같은 색을 입는다).
  */
 export function ScratchCover({ mark, onReveal }: Props) {
+  const t = useT()
   const reduce =
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -151,7 +153,7 @@ export function ScratchCover({ mark, onReveal }: Props) {
         type="button"
         className={styles.cover}
         data-scratch
-        aria-label="긁어서 확인"
+        aria-label={t('긁어서 확인')}
         onClick={finish}
       >
         <span aria-hidden="true">{mark || '♥'}</span>
@@ -160,6 +162,6 @@ export function ScratchCover({ mark, onReveal }: Props) {
   }
 
   return (
-    <canvas ref={canvasRef} className={styles.scratch} data-scratch aria-label="긁어서 확인" />
+    <canvas ref={canvasRef} className={styles.scratch} data-scratch aria-label={t('긁어서 확인')} />
   )
 }

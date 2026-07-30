@@ -7,6 +7,7 @@ import { Confetti } from './Confetti'
 import { ScratchCover } from './ScratchCover'
 import { ShippingForm } from './ShippingForm'
 import styles from './Luckydraw.module.css'
+import { useT } from '@/i18n'
 
 /** 긁히는 데 걸리는 시간 — CSS 의 transition 과 같아야 한다 */
 const SCRATCH_MS = 700
@@ -39,6 +40,7 @@ export function ResultReveal({
   onFinish,
   startAtSummary = false,
 }: Props) {
+  const t = useT()
   const { results } = result
   const [revealed, setRevealed] = useState<number[]>([])
   const [scratching, setScratching] = useState<number[]>([])
@@ -87,7 +89,7 @@ export function ResultReveal({
       <div className={styles.reveal}>
         <header className={styles.revealHead}>
           <h2 className={styles.revealTitle} data-part="title">
-            전체 결과
+            {t('전체 결과')}
           </h2>
         </header>
 
@@ -95,7 +97,7 @@ export function ResultReveal({
           <div className={styles.infoBanner}>
             <Info size={16} aria-hidden="true" />
             <span>
-              리허설이라 <b>재고는 줄지 않았어요</b>.
+              리허설이라 <b>{t('재고는 줄지 않았어요')}</b>.
             </span>
           </div>
         )}
@@ -166,7 +168,7 @@ export function ResultReveal({
       <header className={styles.revealHead}>
         <p className={styles.eyebrow}>✦ 두근두근</p>
         <h2 className={styles.revealTitle} data-part="title">
-          당첨 결과
+          {t('당첨 결과')}
         </h2>
       </header>
 

@@ -5,6 +5,7 @@ import type { Organizer } from '@/lib/repo/types'
 import { useSlot } from '@/slot/SlotProvider'
 import { useAdminAuth } from './useAdminAuth'
 import { confirmAction, toast } from './AdminFeedback'
+import { useT } from '@/i18n'
 
 /**
  * 스태프 계정 — **주최자가 자기 슬롯에 사람을 더한다.**
@@ -20,6 +21,7 @@ import { confirmAction, toast } from './AdminFeedback'
  * 보인다(해시로만 저장된다). 받은 사람이 '내 계정' 에서 자기 것으로 바꾼다.
  */
 export function Staff() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const { user } = useAdminAuth(slug)
@@ -62,7 +64,7 @@ export function Staff() {
         <div className="ad-card">
           <div className="ad-empty">
             <div className="ad-empty__title">지금 빌드에서는 계정을 만들 수 없어요</div>
-            <div className="ad-empty__sub">백엔드가 연결된 배포에서만 동작해요.</div>
+            <div className="ad-empty__sub">{t('백엔드가 연결된 배포에서만 동작해요.')}</div>
           </div>
         </div>
       </>

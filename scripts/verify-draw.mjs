@@ -2,7 +2,11 @@
  * 뽑기 플로우 실검증 — 실제로 카드를 눌러보고 슬롯·X·셔플·결과를 확인한다.
  * 개발 서버가 떠 있어야 한다.
  *
- *   node scripts/verify-draw.mjs <categoryId> <스크린샷 디렉터리>
+ *   node scripts/verify-draw.mjs <categoryId> <스크린샷 디렉터리> [폭] [높이] [슬러그]
+ *
+ * **슬러그가 인자다.** 예전엔 `/demo` 로 박혀 있었는데 체험 슬롯이 서비스별로 갈리면서
+ * (`/demo-tarot` — 0030) 그 주소가 없어졌다. 스크립트는 그대로 돌면서 "덱 0장" 을 세고
+ * 다음 줄에서 터졌다 — **없는 페이지를 검증하고 있는 걸 아무도 몰랐다.**
  */
 
 import puppeteer from 'puppeteer-core'
@@ -18,6 +22,7 @@ const category = process.argv[2] ?? 'love'
 const outDir = process.argv[3] ?? '.'
 const vw = Number(process.argv[4] ?? 390)
 const vh = Number(process.argv[5] ?? 844)
+const slug = process.argv[6] ?? 'demo-tarot'
 const shot = (name) => join(outDir, `${category}-${vh}-${name}.png`)
 
 const browser = await puppeteer.launch({
@@ -36,11 +41,17 @@ page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
 const wait = (ms) => new Promise((r) => setTimeout(r, ms))
 const count = (sel) => page.$$eval(sel, (els) => els.length).catch(() => 0)
 
-await page.goto(`http://localhost:5174/demo/draw/${category}`, { waitUntil: 'networkidle0' })
-await wait(300)
+await page.goto(`http://localhost:5174/${slug}/draw/${category}`, { waitUntil: 'networkidle0' })
+await wait(600)
 
 const deckCards = await page.$$('button[aria-label$="카드 고르기"]')
 console.log(`덱 카드: ${deckCards.length}장`)
+// 덱이 비면 뒤 검사는 전부 거짓 실패다 — 여기서 멈추고 이유를 말한다 (없는 슬롯이 흔한 원인)
+if (deckCards.length === 0) {
+  console.error(`\n덱이 비었어요 — /${slug}/draw/${category} 가 열리는지 확인하세요.`)
+  await browser.close()
+  process.exit(1)
+}
 
 const slots = await count('[class*="slotEmpty"]')
 console.log(`빈 슬롯: ${slots}개`)

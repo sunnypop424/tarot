@@ -1,10 +1,16 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { Download, Info, Share2 } from 'lucide-react'
 
 import { CardDraw } from '@/components/CardDraw'
 import { ReadingCard } from '@/components/ReadingCard'
 import { ReadingLoader } from '@/components/ReadingLoader'
+import { SavableImage } from '@/components/SavableImage'
 import { Synthesis } from '@/components/Synthesis'
+import { releaseResult, saveResult, shareResult, type ResultImage } from '@/lib/compose'
+import { cardFrontSrc } from '@/lib/theme'
+import { readingOf } from '@/lib/deck'
+import { drawResultCard } from './resultCard'
 import { repo } from '@/lib/repo'
 import { getCategory, positionsFor, type Category } from '@/data/categories'
 import { getCardById } from '@/data/cards'
@@ -18,12 +24,14 @@ import type { CategorySetting, Slot } from '@/types/slot'
 import type { DrawnCard } from '@/types/card'
 import { NotReady } from './NotReady'
 import styles from './Draw.module.css'
+import { useT } from '@/i18n'
 
 export function Draw() {
+  const t = useT()
   const { categoryId } = useParams<{ categoryId: string }>()
   const category = categoryId ? getCategory(categoryId) : undefined
 
-  if (!category) return <NotReady title="없는 운세" />
+  if (!category) return <NotReady title={t('없는 운세')} />
   // 카테고리가 바뀌면 뽑기 상태를 전부 새로 시작한다
   return <DrawFlow key={category.id} category={category} />
 }
@@ -159,10 +167,12 @@ interface ResultProps {
 }
 
 function Result({ category, drawn, synthesis, onRedraw, onDone }: ResultProps) {
+  const t = useT()
   // 기간 카테고리는 그 기간에 한 번뿐 — 다시 뽑을 수 없다
   const canRedraw = !category.period
   const isYesNo = category.id === 'yesno'
   const positions = positionsFor(category, drawn.length)
+  const { image, note, save, share } = useResultImage(category, drawn, synthesis, positions)
 
   return (
     <div className={`screen ${styles.resultScreen}`}>
@@ -189,6 +199,38 @@ function Result({ category, drawn, synthesis, onRedraw, onDone }: ResultProps) {
         {synthesis && <Synthesis text={synthesis} />}
       </div>
 
+      {/**
+        * **가져갈 수 있게 한다.** 열 서비스 중 포토존·모의고사·포토카드는 결과물을 가져가는데
+        * 타로만 없었다 — 화면을 닫으면 사라지고, 기간이 지나면 다시 볼 수도 없었다.
+        *
+        * 그림을 못 만들었으면 **버튼을 아예 안 그린다.** 눌러도 아무 일이 없는 버튼은
+        * 없는 것보다 나쁘다 (카드 이미지를 못 받아 왔을 때 그렇게 된다).
+        */}
+      {image && (
+        <div className={styles.saveRow}>
+          <button type="button" className="btn btn--sm btn--slight" onClick={() => void save()} data-save>
+            <Download size={16} aria-hidden="true" /> {t('저장')}
+          </button>
+          <button type="button" className="btn btn--sm btn--slight" onClick={() => void share()} data-share>
+            <Share2 size={16} aria-hidden="true" /> {t('공유')}
+          </button>
+        </div>
+      )}
+      {note && (
+        <p className={`t-text-xs t-muted ${styles.saveNote}`}>
+          <Info size={14} aria-hidden="true" /> {note}
+        </p>
+      )}
+      {/*
+        * 화면엔 안 그린다 — 저장·공유의 원본이다. `SavableImage` 는 `ResultImage` 만 받으므로
+        * 슬롯 자산 URL 이 이 자리에 오는 건 **타입이 막는다** (CLAUDE.md 의 `<img>` 예외).
+        */}
+      {image && (
+        <div style={{ display: 'none' }} aria-hidden="true">
+          <SavableImage image={image} alt={`${category.label} 결과`} />
+        </div>
+      )}
+
       <div className={styles.resultActions}>
         {canRedraw ? (
           <button type="button" className="btn btn--md btn--slight btn--block" onClick={onRedraw}>
@@ -204,7 +246,7 @@ function Result({ category, drawn, synthesis, onRedraw, onDone }: ResultProps) {
         </button>
       </div>
 
-      <p className="t-text-xxs disclaimer">타로는 재미와 성찰을 위한 것이에요.</p>
+      <p className="t-text-xxs disclaimer">{t('타로는 재미와 성찰을 위한 것이에요.')}</p>
     </div>
   )
 }
@@ -213,4 +255,99 @@ function Result({ category, drawn, synthesis, onRedraw, onDone }: ResultProps) {
 function verdictFor(drawn: DrawnCard) {
   const verdict = verdictOf(drawn)
   return { label: VERDICT_LABEL[verdict], note: VERDICT_NOTE[verdict] }
+}
+
+/**
+ * 결과 그림 한 장을 만들어 들고 있는다 — 저장·공유의 원본.
+ *
+ * **결과 화면에 들어온 순간 만든다.** 누른 뒤에 만들면 캔버스 합성(카드 이미지 내려받기 포함)이
+ * 끝날 때까지 기다려야 하고, 그 몇 백 밀리초가 "안 눌리는 버튼" 으로 읽힌다.
+ *
+ * 못 만들어도 **결과 화면은 그대로 뜬다** — 저장 버튼만 안 생긴다. 카드 이미지를 CORS 로 못
+ * 받아오는 슬롯이 있을 수 있는데, 그것 때문에 뽑은 결과를 못 보게 하면 안 된다.
+ */
+function useResultImage(
+  category: Category,
+  drawn: DrawnCard[],
+  synthesis: string | null,
+  positions: string[]
+) {
+  const slot = useSlot()
+  const [image, setImage] = useState<ResultImage | null>(null)
+  const [note, setNote] = useState<string | null>(null)
+
+  useEffect(() => {
+    let alive = true
+    let made: ResultImage | null = null
+    const c = slot.theme.colors
+
+    /**
+     * 본문은 **화면에 이미 있는 글** 중 하나를 고른다 — 새로 쓰지 않는다.
+     * 여러 장이면 AI 종합(그게 그 화면의 결론이다), 한 장이면 조언 한 줄.
+     * 저장한 그림에만 있는 문장을 만들면 화면과 저장물이 다른 말을 하게 된다.
+     */
+    const body = drawn.length > 1 ? (synthesis ?? '') : readingOf(drawn[0]).advice
+
+    void drawResultCard({
+      eventTitle: slot.name,
+      kicker: category.label,
+      cards: drawn.map((d, i) => ({
+        name: d.card.name,
+        nameEn: d.card.nameEn,
+        reversed: d.orientation === 'reversed',
+        // 한 장이면 포지션 라벨이 곧 카테고리라 중복이다 — 비운다
+        position: drawn.length > 1 ? positions[i] : '',
+        image: cardFrontSrc(slot.theme, d.card.id) ?? undefined,
+      })),
+      body,
+      date: new Date().toLocaleDateString('ko-KR').replace(/\.$/, '').replace(/\s/g, ''),
+      logo: slot.theme.assets.logo ?? undefined,
+      colors: {
+        bg: c.canvas,
+        head: c.fg1,
+        sub: c.fg2,
+        line: c.border,
+        accent: c.primary,
+        // 이미지 없는 슬롯의 카드 바탕 — 화면 폴백과 같은 두 색을 그대로 넘긴다
+        cardFrom: c.cardBackFrom,
+        cardTo: c.cardBackTo,
+      },
+      // 슬롯이 웹폰트를 쓰면 그것도 이미 문서에 붙어 있다 — 캔버스는 그 이름을 그대로 쓴다
+      fontFamily: getComputedStyle(document.body).fontFamily || 'sans-serif',
+    })
+      .then((img) => {
+        made = img
+        if (alive) setImage(img)
+        else releaseResult(img)
+      })
+      .catch(() => {
+        /* 못 만들어도 결과는 보여준다 — 저장 버튼만 안 생긴다 */
+      })
+
+    return () => {
+      alive = false
+      if (made) releaseResult(made)
+    }
+    // 결과 화면은 뽑은 카드가 바뀌면 통째로 다시 만들어진다 — 한 번만 그린다
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const filename = `${slot.name}-${category.label}.png`
+
+  /**
+   * **'저장' 과 '공유' 는 다른 일을 한다** (`compose.ts` 주석 — 모의고사에서 같은 실수가 있었다).
+   * 새 탭까지 떨어지면 사용자가 직접 눌러야 하므로 그걸 말해준다.
+   */
+  const run = async (kind: 'save' | 'share') => {
+    if (!image) return
+    const how = kind === 'save' ? await saveResult(image, filename) : await shareResult(image, filename)
+    setNote(how === 'opened' ? '새 탭에서 사진을 길게 눌러 저장해 주세요.' : null)
+  }
+
+  return {
+    image,
+    note,
+    save: () => run('save'),
+    share: () => run('share'),
+  }
 }

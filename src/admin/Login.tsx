@@ -7,6 +7,7 @@ import { useSlot } from '@/slot/SlotProvider'
 import { hasSupabase } from '@/lib/repo/client'
 import { useAdminAuth } from './useAdminAuth'
 import styles from '@/styles/auth.module.css'
+import { LangBar } from '@/components/LangBar'
 
 /**
  * Supabase 에러를 사람 말로. 원문은 영어인 데다 사용자가 할 수 있는 게 뭔지 안 알려준다.
@@ -52,6 +53,8 @@ export function Login() {
 
   return (
     <div className="admin">
+      {/* 관리 셸 밖이라 여기만 고르개가 없었다 — 로그인 화면부터 자기 언어여야 한다 */}
+      <LangBar all />
       <div className={styles.wrap}>
         <form className={styles.card} onSubmit={handleSubmit}>
           <div className={styles.head}>

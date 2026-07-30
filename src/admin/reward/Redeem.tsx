@@ -8,6 +8,7 @@ import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
 /* 화면 표의 `when` 은 연도 없는 짧은 형식이라 별개다 — CSV 는 전체 표기를 쓴다 */
 import { downloadCsv, when as csvWhen } from '../csv'
+import { useT } from '@/i18n'
 
 
 const when = (iso: string) =>
@@ -34,6 +35,7 @@ const when = (iso: string) =>
  * 상시 노출된다. 그건 '응모자' 화면에서만 본다.
  */
 export function Redeem() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const source = getSlotService(slot)
@@ -93,7 +95,7 @@ export function Redeem() {
       setCode('')
       await load()
     } catch (e) {
-      setResult({ kind: 'error', message: e instanceof Error ? e.message : '확인하지 못했어요' })
+      setResult({ kind: 'error', message: e instanceof Error ? e.message : t('확인하지 못했어요') })
     } finally {
       setBusy(false)
     }
@@ -127,7 +129,7 @@ export function Redeem() {
   const RESULT_MARK = { ok: '✓', already: '!', none: '?', error: '×' } as const
   const RESULT_TONE = { ok: undefined, already: 'warn', none: 'mute', error: 'bad' } as const
   const RESULT_TITLE = {
-    ok: '수령 처리했어요',
+    ok: t('수령 처리했어요'),
     already: '이미 수령한 코드예요',
     none: '없는 코드예요',
     error: '처리하지 못했어요',
@@ -149,7 +151,7 @@ export function Redeem() {
         <div className="ad-stats">
           {[
             { label: '발급', value: guaranteed.length, attr: 'data-issued' },
-            { label: '수령 완료', value: done.length, attr: 'data-redeemed' },
+            { label: t('수령 완료'), value: done.length, attr: 'data-redeemed' },
             { label: '아직 안 받음', value: left, attr: 'data-left' },
           ].map((k) => (
             <div key={k.label} className="ad-stat">
@@ -187,7 +189,7 @@ export function Redeem() {
               className="ad-btn ad-btn--primary ad-btn--hero"
               disabled={!code.trim() || busy}
             >
-              {busy ? '확인 중…' : '수령 처리'}
+              {busy ? t('확인 중…') : '수령 처리'}
             </button>
           </div>
           <p className="ad-fine" style={{ marginTop: 10 }}>
@@ -288,7 +290,7 @@ export function Redeem() {
                     <span className="ad-cell">{r.label}</span>
                     <span>
                       <span className="ad-tag" data-tone={r.redeemedAt ? 'on' : undefined}>
-                        {r.redeemedAt ? '수령 완료' : '아직 안 받음'}
+                        {r.redeemedAt ? t('수령 완료') : '아직 안 받음'}
                       </span>
                     </span>
                     <span className="ad-cell--mute tnum">{when(r.createdAt)}</span>

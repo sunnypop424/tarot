@@ -6,6 +6,7 @@ import type { ShippingEntry } from '@/lib/repo'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
 import { downloadCsv, when } from '../csv'
+import { useT } from '@/i18n'
 
 
 /**
@@ -16,6 +17,7 @@ import { downloadCsv, when } from '../csv'
  * **BOM 을 붙인다** — 안 붙이면 엑셀이 한글을 깨진 글자로 연다.
  */
 export function Shipping() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
 
@@ -147,9 +149,9 @@ export function Shipping() {
               <div className="ad-table" style={tableVars}>
                 <div className="ad-table__inner">
                   <div className="ad-table__head">
-                    <span>이름</span>
-                    <span>연락처</span>
-                    <span>주소</span>
+                    <span>{t('이름')}</span>
+                    <span>{t('연락처')}</span>
+                    <span>{t('주소')}</span>
                     <span>당첨 상품</span>
                     <span>제출</span>
                   </div>

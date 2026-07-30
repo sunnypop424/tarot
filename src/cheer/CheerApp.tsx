@@ -14,6 +14,7 @@ import type { Slot } from '@/types/slot'
 import { Stage } from './Stage'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Cheer.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 영상회 라이브 응원 — 화면 셋이 한 파일 아래 있다.
@@ -274,6 +275,7 @@ function Write({
   vars: React.CSSProperties
   onSent: () => void
 }) {
+  const t = useT()
   const { slug } = slot
   const [body, setBody] = useState('')
   const [name, setName] = useState('')
@@ -315,7 +317,7 @@ function Write({
       setDone(true)
       onSent()
     } catch (e) {
-      setError(e instanceof Error ? e.message : '보내지 못했어요')
+      setError(e instanceof Error ? e.message : t('보내지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -358,7 +360,7 @@ function Write({
             </span>
             <div className={styles.doneText}>{display.thanks}</div>
             {slot.demo && (
-              <p className={styles.demoNote}>체험용 페이지라 남긴 한마디는 저장되지 않아요</p>
+              <p className={styles.demoNote}>{t('체험용 페이지라 남긴 한마디는 저장되지 않아요')}</p>
             )}
             {left > 0 && !closed && (
               <button type="button" className={styles.again} onClick={() => setDone(false)} data-again>
@@ -368,11 +370,11 @@ function Write({
           </div>
         ) : closed ? (
           <div className={styles.doneBox}>
-            <div className={styles.doneText}>지금은 한마디를 받지 않아요</div>
+            <div className={styles.doneText}>{t('지금은 한마디를 받지 않아요')}</div>
           </div>
         ) : left <= 0 ? (
           <div className={styles.doneBox}>
-            <div className={styles.doneText}>이 기기에서 남길 수 있는 만큼 다 남기셨어요</div>
+            <div className={styles.doneText}>{t('이 기기에서 남길 수 있는 만큼 다 남기셨어요')}</div>
           </div>
         ) : (
           <form className={styles.form} onSubmit={(e) => void send(e)}>
@@ -383,7 +385,7 @@ function Write({
               placeholder={display.prompt}
               rows={3}
               maxLength={max}
-              aria-label="한마디"
+              aria-label={t('한마디')}
               data-cheer-body
             />
             <div className={styles.count}>
@@ -394,12 +396,12 @@ function Write({
               value={name}
               onChange={(e) => setName(e.target.value.slice(0, 12))}
               placeholder={display.namePrompt}
-              aria-label="이름"
+              aria-label={t('이름')}
               data-cheer-name
             />
             <button type="submit" className={styles.send} disabled={busy || !body.trim()} data-cheer-send>
               <Send size={17} strokeWidth={2} aria-hidden="true" />
-              {busy ? '보내는 중…' : display.postLabel}
+              {busy ? t('보내는 중…') : display.postLabel}
             </button>
             {error && <p className={styles.error}>{error}</p>}
           </form>

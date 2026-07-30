@@ -80,10 +80,21 @@
 }
 
 /* ── 데스크톱 상단 네비게이션 (넓은 화면 전용) ── */
+/**
+ * 타로 셸의 언어 고르개 — **상단 네비와 정확히 반대로** 보인다.
+ * 네비는 폰에서 숨고(아래) 고르개는 폰에서만 뜬다. 둘 다 보이면 한 화면에 고르개가 둘이다.
+ */
+.langbar--mobile {
+  display: flex;
+}
+
 .topnav {
   display: none;
 }
 @media (min-width: 720px) {
+  .langbar--mobile {
+    display: none;
+  }
   .topnav {
     display: block;
     flex-shrink: 0;

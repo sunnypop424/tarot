@@ -1,5 +1,6 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 
+import { Board } from './Board'
 import { OwnerLogin } from './OwnerLogin'
 import { SlotList } from './SlotList'
 import { SlotEditor } from './SlotEditor'
@@ -17,6 +18,8 @@ export default function OwnerRoutes() {
       <Route path="login" element={<OwnerLogin />} />
       <Route element={<RequireOwner />}>
         <Route index element={<SlotList />} />
+        {/* 운영 보드 — 목록이 답하지 못하는 것만 (종료 임박·자료 회수·AI 원가·점검) */}
+        <Route path="board" element={<Board />} />
         {/* 'login' 은 위에서 먼저 잡히고, 예약어라 슬러그로 만들 수도 없다 (owner/slug.ts) */}
         <Route path=":slug" element={<SlotEditor />} />
         <Route path="*" element={<Navigate to="/theme-editor" replace />} />

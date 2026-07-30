@@ -12,8 +12,10 @@ import { cssUrl } from '@/lib/image'
 import type { RollingMessage } from '@/lib/repo/types'
 import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
+import { LangPicker } from '@/components/LangPicker'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Wish.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 소원 나무 — 방문자가 소원을 적어 **등불**로 나무에 매단다.
@@ -306,6 +308,7 @@ function Lantern({
 }
 
 function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
+  const t = useT()
   const { slug } = slot
   const navigate = useNavigate()
   const vars = useWishVars(display)
@@ -467,8 +470,8 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
           <div className={styles.emptyLantern} aria-hidden="true">
             <Lamp size={26} strokeWidth={1.6} />
           </div>
-          <div className={styles.emptyTitle}>아직 걸린 소원이 없어요</div>
-          <p className={styles.emptyText}>첫 소원을 걸어 보세요.</p>
+          <div className={styles.emptyTitle}>{t('아직 걸린 소원이 없어요')}</div>
+          <p className={styles.emptyText}>{t('첫 소원을 걸어 보세요.')}</p>
         </div>
       ) : (
         <div
@@ -508,7 +511,7 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
         </div>
       )}
 
-      <Pager page={paged.page} pages={paged.pages} onPage={paged.setPage} label="나무" />
+      <Pager page={paged.page} pages={paged.pages} onPage={paged.setPage} label={t('나무')} />
 
       <div className={styles.bottom}>
         <button type="button" className={styles.cta} onClick={() => navigate(`/${slug}/write`)}>
@@ -549,6 +552,7 @@ function sampleWishes(display: WishDisplay): RollingMessage[] {
 const MAX_BODY = 100
 
 function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
+  const t = useT()
   const { slug } = slot
   const navigate = useNavigate()
   const vars = useWishVars(display)
@@ -559,6 +563,7 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
   const [font, setFont] = useState('') // '' = 기본 폰트
   const [charm, setCharm] = useState<string | undefined>(undefined)
   const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     for (const id of HANDWRITING_FONTS) loadWebfont(id)
@@ -570,6 +575,7 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
     e.preventDefault()
     if (!canPost) return
     setBusy(true)
+    setError(null)
     try {
       // 롤페와 **같은 repo·같은 테이블** — 필드 의미만 소원나무로 읽는다
       /** **체험용 슬롯은 서버로 안 보낸다** (`slot.demo` — 0030) */
@@ -583,6 +589,9 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
         })
       }
       navigate(`/${slug}`)
+    } catch (e) {
+      // 금칙어(0041)·네트워크 — 서버가 한국어로 답한다. 삼키면 안 걸린 줄 알고 나무로 돌아간다
+      setError(e instanceof Error ? e.message : t('걸지 못했어요. 잠시 뒤 다시 시도해 주세요.'))
     } finally {
       setBusy(false)
     }
@@ -597,11 +606,19 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
           type="button"
           className={styles.backBtn}
           onClick={() => navigate(`/${slug}`)}
-          aria-label="돌아가기"
+          aria-label={t('돌아가기')}
         >
           <ChevronLeft size={18} strokeWidth={1.6} aria-hidden="true" />
         </button>
-        <span className={styles.backLabel}>돌아가기</span>
+        <span className={styles.backLabel}>{t('돌아가기')}</span>
+        {/*
+          * 소원 적기 화면에도 고르개를 둔다 — `/write` 로 바로 들어온 사람은
+          * 나무(헤더가 있는 화면)를 안 거쳐서 언어를 바꿀 자리가 없었다.
+          * 뒤로가기 줄 오른쪽 끝이라 새 줄을 안 만든다.
+          */}
+        <span style={{ marginLeft: 'auto' }}>
+          <LangPicker only={slot.langs ?? []} />
+        </span>
       </div>
 
       <div className={`app__scroll ${styles.composeScroll}`}>
@@ -614,7 +631,7 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
                 wish={{
                   id: 'preview',
                   nickname: nickname.trim(),
-                  body: body.trim() || '적은 소원이 여기에 보여요',
+                  body: body.trim() || t('적은 소원이 여기에 보여요'),
                   color,
                   font,
                   sticker: charm,
@@ -626,20 +643,20 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
                 h={126}
               />
             </div>
-            <div className={styles.previewLabel}>내 등불 미리보기</div>
+            <div className={styles.previewLabel}>{t('내 등불 미리보기')}</div>
           </div>
 
           <div className={styles.fields}>
             <div>
               <label className={styles.label} htmlFor="wish-name">
-                이름 <span className={styles.optional}>(선택)</span>
+                이름 <span className={styles.optional}>{t('(선택)')}</span>
               </label>
               <input
                 id="wish-name"
                 className={styles.input}
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                placeholder="남길 이름"
+                placeholder={t('남길 이름')}
                 maxLength={20}
               />
             </div>
@@ -663,8 +680,8 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
 
             {display.lanterns.length > 0 && (
               <div>
-                <span className={styles.label}>등불 색</span>
-                <div className={styles.swatches} role="radiogroup" aria-label="등불 색">
+                <span className={styles.label}>{t('등불 색')}</span>
+                <div className={styles.swatches} role="radiogroup" aria-label={t('등불 색')}>
                   {display.lanterns.map((c) => (
                     <button
                       key={c}
@@ -683,8 +700,8 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
             )}
 
             <div>
-              <span className={styles.label}>글씨체</span>
-              <div className={styles.fontList} role="radiogroup" aria-label="글씨체">
+              <span className={styles.label}>{t('글씨체')}</span>
+              <div className={styles.fontList} role="radiogroup" aria-label={t('글씨체')}>
                 <button
                   type="button"
                   role="radio"
@@ -693,7 +710,7 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
                   data-active={font === ''}
                   style={fontStyle(display.font, '15px')}
                   onClick={() => setFont('')}
-                  title="기본 글씨체"
+                  title={t('기본 글씨체')}
                 >
                   {display.fontSample}
                 </button>
@@ -718,9 +735,9 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
             {display.charms.length > 0 && (
               <div>
                 <span className={styles.label}>
-                  장식 <span className={styles.optional}>(선택)</span>
+                  장식 <span className={styles.optional}>{t('(선택)')}</span>
                 </span>
-                <div className={styles.charms} role="radiogroup" aria-label="장식">
+                <div className={styles.charms} role="radiogroup" aria-label={t(t('장식'))}>
                   {display.charms.map((c) => (
                     <button
                       key={c}
@@ -731,7 +748,7 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
                       data-active={charm === c}
                       style={{ backgroundImage: cssUrl(c) }}
                       onClick={() => setCharm(charm === c ? undefined : c)}
-                      aria-label="장식"
+                      aria-label={t('장식')}
                     />
                   ))}
                   <button
@@ -742,7 +759,7 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
                     data-active={charm === undefined}
                     onClick={() => setCharm(undefined)}
                   >
-                    없음
+                    {t('없음')}
                   </button>
                 </div>
               </div>
@@ -752,8 +769,13 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
       </div>
 
       <div className={styles.submitBar}>
+        {error && (
+          <p className={styles.error} role="alert" data-post-error>
+            {error}
+          </p>
+        )}
         <button type="submit" className={styles.submit} disabled={!canPost}>
-          {busy ? '거는 중…' : display.hangLabel}
+          {busy ? t('거는 중…') : display.hangLabel}
         </button>
       </div>
     </form>

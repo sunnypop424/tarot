@@ -1,6 +1,7 @@
 import { Sparkles } from 'lucide-react'
 
 import styles from './Synthesis.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 여러 장을 하나의 흐름으로 — "종합" 블록 (M4).
@@ -15,11 +16,12 @@ import styles from './Synthesis.module.css'
  * 카페에서 앱이 멈추면 안 된다.
  */
 export function Synthesis({ text }: { text: string }) {
+  const t = useT()
   return (
     <section className={styles.block} data-synthesis>
       <p className={`t-title-s ${styles.head}`}>
         <Sparkles size={16} strokeWidth={2} aria-hidden="true" />
-        종합
+        {t('종합')}
       </p>
       <p className={`t-body ${styles.text}`}>{text}</p>
     </section>

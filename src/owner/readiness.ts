@@ -59,11 +59,23 @@ const BY_SERVICE: Record<ServiceId, (slot: Slot) => Promise<ReadyIssue[]>> = {
   },
   async luckydraw(slot) {
     if (!repo.luckydraw.ready()) return []
-    const prizes = await repo.luckydraw.listPrizes(slot.slug)
+    /**
+     * **리허설·마감을 함께 본다** — 포토카드에는 있고 여기만 없었다.
+     * 럭드의 리허설은 **기본이 켜짐**이라(실수로 재고를 태우는 게 더 비싸서) 끄는 걸 잊기 쉽고,
+     * 그러면 하루치가 통째로 기록에서 빠진다. 방문자 화면에 배너는 뜨지만 그건 방문자가 보는 것이고,
+     * 여는 사람에게 말해주는 자리는 여기다.
+     */
+    const [prizes, settings] = await Promise.all([
+      repo.luckydraw.listPrizes(slot.slug),
+      repo.luckydraw.getSettings(slot.slug).catch(() => null),
+    ])
     const stock = prizes.reduce((a, p) => a + p.remaining, 0)
     const out: ReadyIssue[] = []
     if (prizes.length === 0) out.push({ level: 'block', text: '경품이 하나도 없어요' })
     else if (stock === 0) out.push({ level: 'block', text: '경품 재고가 전부 0이에요' })
+    if (settings?.rehearsal)
+      out.push({ level: 'warn', text: '리허설이 켜져 있어요 — 뽑아도 재고가 줄지 않아요' })
+    if (settings?.closed) out.push({ level: 'warn', text: '마감으로 되어 있어요' })
     return out
   },
   // 벽은 방문자가 채운다 — 비어 있는 게 정상이다
