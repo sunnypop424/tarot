@@ -228,7 +228,15 @@ try {
     bs.find((b) => b.textContent.trim() === '방문자에게 공개')?.click()
   )
   await wait(400)
-  await page.$$eval('[aria-expanded]', (bs) => bs[0]?.click())
+  /**
+   * **카드 답변 접이를 콕 집는다.**
+   *
+   * 예전엔 `[aria-expanded]` 중 첫 번째를 눌렀는데, 그건 "화면에 접었다 펴는 게 하나뿐" 이라는
+   * 전제였다. 관리 상단 바에 언어 고르개(`LangPicker`)가 들어오면서 그게 깨졌다 —
+   * 고르개도 `aria-expanded` 를 갖고 DOM 에서 더 앞에 있어서, 클릭이 그쪽으로 갔다.
+   * 계약은 "첫 번째 접이" 가 아니라 **"답변 줄이 펴진다"** 이므로 그렇게 적는다.
+   */
+  await page.$$eval('[data-answer-row] [aria-expanded]', (bs) => bs[0]?.click())
   await wait(300)
   await page.type('textarea', '관리자가 직접 쓴 답변입니다.')
   await wait(600)
