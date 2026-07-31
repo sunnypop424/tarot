@@ -613,7 +613,7 @@ function EntryForm({
       <div className={styles.form}>
         <div>
           <label className={styles.label} htmlFor="st-nick">
-            닉네임 <span className={styles.req}>*</span>
+            {t('닉네임')} <span className={styles.req}>*</span>
           </label>
           <input
             id="st-nick"

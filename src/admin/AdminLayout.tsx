@@ -184,7 +184,7 @@ function AdminShell() {
     <>
       {GROUPS.map((group) => (
         <div className="ad-nav__group" key={group.title}>
-          <p className="ad-nav__title">{group.title}</p>
+          <p className="ad-nav__title">{t(group.title)}</p>
           <div className="ad-nav__items">
             {group.items.map(({ to, label, external }) =>
               external ? (
@@ -196,8 +196,8 @@ function AdminShell() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <span>{label}</span>
-                  <span className="ad-nav__badge ad-nav__badge--ext">새 탭 ↗</span>
+                  <span>{t(label)}</span>
+                  <span className="ad-nav__badge ad-nav__badge--ext">{t('새 탭 ↗')}</span>
                 </a>
               ) : (
                 // 절대 경로로 — 상대 경로는 현재 URL 에 누적돼 /questions/questions… 로 늘어난다
@@ -209,7 +209,7 @@ function AdminShell() {
                   className="ad-nav__link"
                   onClick={() => setMenuOpen(false)}
                 >
-                  <span>{label}</span>
+                  <span>{t(label)}</span>
                   {/*
                     * 손대야 할 게 몇 건인지 — **대시보드 옆에만** 붙인다.
                     * 알림마다 갈 곳이 달라(재고는 상품 화면, 선물은 수령 확인) 메뉴 여기저기
@@ -248,17 +248,17 @@ function AdminShell() {
               type="button"
               className="ad-menubtn"
               onClick={() => setMenuOpen(true)}
-              aria-label="메뉴 열기"
+              aria-label={t('메뉴 열기')}
             >
               ☰
             </button>
             <div style={{ minWidth: 0 }}>
               <div className="ad-top__name">
                 <span>{slot.name}</span>
-                <span className="ad-svc">{serviceLabel(service)}</span>
+                <span className="ad-svc">{t(serviceLabel(service))}</span>
               </div>
               <div className="ad-top__slug">
-                /<b>{slot.slug}</b> · 관리
+                /<b>{slot.slug}</b> · {t('관리')}
               </div>
             </div>
           </div>
@@ -274,7 +274,7 @@ function AdminShell() {
             {user && (
               <div className="ad-top__who">
                 <div className="ad-top__whoMail">{user.email}</div>
-                <div className="ad-top__whoRole">{user.owner ? '최고관리자' : '주최자'}</div>
+                <div className="ad-top__whoRole">{user.owner ? t('최고관리자') : t('주최자')}</div>
               </div>
             )}
             <button
@@ -316,31 +316,31 @@ function AdminShell() {
           <button
             type="button"
             className="ad-scrim"
-            aria-label="메뉴 닫기"
+            aria-label={t('메뉴 닫기')}
             onClick={() => setMenuOpen(false)}
           />
           <div className="ad-drawer">
             <div className="ad-drawer__head">
-              <span>메뉴</span>
+              <span>{t('메뉴')}</span>
               <button
                 type="button"
                 className="ad-drawer__close"
                 onClick={() => setMenuOpen(false)}
-                aria-label="메뉴 닫기"
+                aria-label={t('메뉴 닫기')}
               >
                 ×
               </button>
             </div>
             {/* 슬롯이 하나뿐인 주최자에겐 아무것도 안 그린다 */}
             {user && <SlotSwitcher current={slot.slug} slugs={user.slugs} />}
-            <nav aria-label="관리 메뉴">{menu}</nav>
+            <nav aria-label={t('관리 메뉴')}>{menu}</nav>
           </div>
         </>
       )}
 
       <div className="ad-body">
         <aside className="ad-side">
-          <nav className="ad-nav" aria-label="관리 메뉴">
+          <nav className="ad-nav" aria-label={t('관리 메뉴')}>
             {menu}
           </nav>
           {user && <SlotSwitcher current={slot.slug} slugs={user.slugs} />}

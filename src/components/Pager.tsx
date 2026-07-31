@@ -68,7 +68,7 @@ export function Pager({
   const dots = pages <= 7
 
   return (
-    <nav className={styles.pager} aria-label={label} data-pager>
+    <nav className={styles.pager} aria-label={t(label)} data-pager>
       <button
         type="button"
         className={styles.arrow}
@@ -88,7 +88,7 @@ export function Pager({
               className={styles.dot}
               data-active={i === page || undefined}
               onClick={() => onPage(i)}
-              aria-label={`${i + 1}번째 ${label}`}
+              aria-label={t('{n}번째 {label}', { n: i + 1, label: t(label) })}
               aria-current={i === page ? 'true' : undefined}
             />
           ))}

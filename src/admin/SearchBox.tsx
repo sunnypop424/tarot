@@ -1,3 +1,5 @@
+import { useT } from '@/i18n'
+
 /**
  * 목록 검색칸 — **줄 서 있는 방문자 앞에서 스크롤로 찾을 수는 없다.**
  *
@@ -17,13 +19,14 @@ export function SearchBox({
   onChange: (v: string) => void
   placeholder: string
 }) {
+  const t = useT()
   return (
     <input
       className="ad-input ad-input--search"
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      aria-label="목록 검색"
+      aria-label={t('목록 검색')}
       data-search
     />
   )

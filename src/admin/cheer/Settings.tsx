@@ -82,7 +82,7 @@ export function Settings() {
     try {
       await repo.cheer.saveSettings(slug, next)
     } catch (e) {
-      toast(e instanceof Error ? e.message : '저장하지 못했어요')
+      toast(e instanceof Error ? e.message : t('저장하지 못했어요'))
       await load()
     } finally {
       setBusy(false)
@@ -95,7 +95,7 @@ export function Settings() {
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">상영 설정</h1>
+          <h1 className="ad-head__title">{t('상영 설정')}</h1>
           <span className="ad-head__count tnum">
             한 화면 {s.bubbles}개 · {s.intervalSec}초
           </span>
@@ -119,7 +119,7 @@ export function Settings() {
               <div key={f.k}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 7 }}>
                   <span className="ad-field__label" style={{ marginBottom: 0 }}>
-                    {f.label}
+                    {t(f.label)}
                   </span>
                   <span className="ad-range">{f.range}</span>
                 </div>
@@ -128,7 +128,7 @@ export function Settings() {
                     className="ad-input ad-input--num"
                     inputMode="numeric"
                     value={s[f.k]}
-                    aria-label={f.label}
+                    aria-label={t(f.label)}
                     data-cheer={f.k}
                     onChange={(e) => {
                       const v = Number(e.target.value.replace(/[^0-9]/g, ''))
@@ -136,9 +136,9 @@ export function Settings() {
                       void patch({ [f.k]: Math.min(f.max, Math.max(f.min, v)) } as Partial<CheerSettings>)
                     }}
                   />
-                  <span className="ad-unit">{f.unit}</span>
+                  <span className="ad-unit">{t(f.unit)}</span>
                 </div>
-                <p className="ad-field__hint">{f.hint}</p>
+                <p className="ad-field__hint">{t(f.hint)}</p>
               </div>
             ))}
           </div>
@@ -166,7 +166,7 @@ export function Settings() {
           <div style={{ marginTop: 6 }}>
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
-                <div className="ad-switchrow__name">이름 표시</div>
+                <div className="ad-switchrow__name">{t('이름 표시')}</div>
                 <div className="ad-switchrow__hint">
                   말풍선에 닉네임을 같이 띄워요. 끄면 한마디만 떠요.
                 </div>
@@ -175,7 +175,7 @@ export function Settings() {
                 type="button"
                 className="ad-switch"
                 data-on={s.showName || undefined}
-                aria-label="이름 표시"
+                aria-label={t('이름 표시')}
                 disabled={busy}
                 onClick={() => void patch({ showName: !s.showName })}
                 data-cheer-showname

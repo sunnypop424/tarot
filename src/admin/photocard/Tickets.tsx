@@ -51,10 +51,10 @@ export function Tickets() {
   const head = (extra?: string) => (
     <header className="ad-head">
       <div className="ad-head__row">
-        <h1 className="ad-head__title">뽑기권</h1>
+        <h1 className="ad-head__title">{t('뽑기권')}</h1>
         {extra && <span className="ad-head__count tnum">{extra}</span>}
       </div>
-      <p className="ad-head__desc">발급된 번호와 뽑힌 카드를 봐요.</p>
+      <p className="ad-head__desc">{t('발급된 번호와 뽑힌 카드를 봐요.')}</p>
     </header>
   )
 
@@ -64,7 +64,7 @@ export function Tickets() {
         {head()}
         <div className="ad-card">
           <div className="ad-empty">
-            <div className="ad-empty__title">지금 빌드에서는 뽑기권을 쓸 수 없어요</div>
+            <div className="ad-empty__title">{t('지금 빌드에서는 뽑기권을 쓸 수 없어요')}</div>
           </div>
         </div>
       </>
@@ -85,12 +85,12 @@ export function Tickets() {
 
   async function remove(row: PhotocardTicketRow) {
     const ok = await confirmAction({
-      title: '이 번호를 지울까요?',
+      title: t('이 번호를 지울까요?'),
       desc:
         row.status === 'drawn'
           ? `${row.code} 는 이미 ${row.cardName || t('카드')} 를 뽑은 번호예요. 지우면 그 방문자가 한 번 더 뽑게 돼요. 뽑은 기록과 재고는 그대로예요.`
           : `${row.code} 를 지워요. 방문자가 이 번호로는 뽑을 수 없게 돼요.`,
-      okLabel: '지우기',
+      okLabel: t('지우기'),
       danger: true,
     })
     if (!ok) return
@@ -98,9 +98,9 @@ export function Tickets() {
     try {
       await repo.photocard.removeTicket(slug, row.code)
       await load()
-      toast('번호를 지웠어요')
+      toast(t('번호를 지웠어요'))
     } catch (e) {
-      toast(e instanceof Error ? e.message : '지우지 못했어요')
+      toast(e instanceof Error ? e.message : t('지우지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -111,7 +111,7 @@ export function Tickets() {
     const header = ['번호', '상태', '뽑힌 카드', '레어도', '발급시각', '뽑은시각']
     const body = rows.map((r) => [
       r.code,
-      r.status === 'drawn' ? '뽑음' : '대기',
+      r.status === 'drawn' ? t('뽑음') : t('대기'),
       r.cardName ?? '',
       r.rarity ? (RARITY_LABEL[r.rarity] ?? String(r.rarity)) : '',
       csvWhen(r.issuedAt),
@@ -132,7 +132,7 @@ export function Tickets() {
       <div className="ad-stack">
         {!usesTicket && (
           <div className="ad-banner ad-banner--mute ad-banner--pad" style={{ fontWeight: 400 }}>
-            <div className="ad-banner__title">이 운영 방식에서는 뽑기권을 쓰지 않아요</div>
+            <div className="ad-banner__title">{t('이 운영 방식에서는 뽑기권을 쓰지 않아요')}</div>
             <div className="ad-banner__body">
               저장용은 방문자가 자기 폰에서 바로 뽑아요. 아래 목록은 예전에 발급된 기록이에요.
             </div>
@@ -141,15 +141,15 @@ export function Tickets() {
 
         <div className="ad-stats">
           {[
-            { label: '발급', value: rows.length },
-            { label: '뽑음', value: drawn.length },
-            { label: '대기', value: open },
+            { label: t('발급'), value: rows.length },
+            { label: t('뽑음'), value: drawn.length },
+            { label: t('대기'), value: open },
           ].map((k) => (
             <div key={k.label} className="ad-stat">
               <div className="ad-stat__label">{k.label}</div>
               <div className="ad-stat__row">
                 <span className="ad-stat__value tnum">{k.value}</span>
-                <span className="ad-stat__unit">장</span>
+                <span className="ad-stat__unit">{t('장')}</span>
               </div>
             </div>
           ))}
@@ -164,7 +164,7 @@ export function Tickets() {
               </span>
             </div>
             <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>
-              <SearchBox value={query} onChange={setQuery} placeholder="번호·카드 이름으로 찾기" />
+              <SearchBox value={query} onChange={setQuery} placeholder={t('번호·카드 이름으로 찾기')} />
               <button
                 type="button"
                 className="ad-btn ad-btn--line ad-btn--md"
@@ -190,25 +190,25 @@ export function Tickets() {
 
           {rows.length === 0 ? (
             <div className="ad-empty">
-              <div className="ad-empty__title">아직 발급된 뽑기권이 없어요</div>
+              <div className="ad-empty__title">{t('아직 발급된 뽑기권이 없어요')}</div>
               <div className="ad-empty__sub">
                 방문자가 이벤트 페이지에서 ‘뽑기권 받기’ 를 누르면 여기 나와요.
               </div>
             </div>
           ) : shown.length === 0 ? (
             <div className="ad-empty ad-empty--sm">
-              <div className="ad-empty__title">찾는 번호가 없어요</div>
-              <div className="ad-empty__sub">검색어를 지우고 다시 찾아보세요.</div>
+              <div className="ad-empty__title">{t('찾는 번호가 없어요')}</div>
+              <div className="ad-empty__sub">{t('검색어를 지우고 다시 찾아보세요.')}</div>
             </div>
           ) : (
             <div className="ad-table" style={tableVars}>
               <div className="ad-table__inner" data-tickets>
                 <div className="ad-table__head">
-                  <span>번호</span>
+                  <span>{t('번호')}</span>
                   <span />
                   <span>{t('뽑은 카드')}</span>
-                  <span>발급</span>
-                  <span>뽑음</span>
+                  <span>{t('발급')}</span>
+                  <span>{t('뽑음')}</span>
                   <span />
                 </div>
                 {shown.map((r) => (
@@ -229,7 +229,7 @@ export function Tickets() {
                     <div style={{ minWidth: 0 }}>
                       {r.status === 'drawn' ? (
                         <>
-                          <div className="ad-cell--b">{r.cardName || '(이름 없음)'}</div>
+                          <div className="ad-cell--b">{r.cardName || t('(이름 없음)')}</div>
                           {r.rarity && (
                             <div className="ad-fine" style={{ marginTop: 3 }}>
                               {RARITY_LABEL[r.rarity] ?? r.rarity}

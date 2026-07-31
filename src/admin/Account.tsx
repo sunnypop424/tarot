@@ -4,6 +4,7 @@ import { MIN_PASSWORD } from '@/components/PasswordInput'
 import { repo } from '@/lib/repo'
 import { useSlot } from '@/slot/SlotProvider'
 import { useAdminAuth } from './useAdminAuth'
+import { useT } from '@/i18n'
 
 /**
  * 내 계정 — **비밀번호를 바꾸는 자리**.
@@ -17,6 +18,7 @@ import { useAdminAuth } from './useAdminAuth'
  * 그래서 이 화면은 주최자 것이고, 계정 만들기는 최고관리자 것이다.
  */
 export function Account() {
+  const t = useT()
   const slot = useSlot()
   const { user } = useAdminAuth(slot.slug)
 
@@ -52,7 +54,7 @@ export function Account() {
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">내 계정</h1>
+          <h1 className="ad-head__title">{t('내 계정')}</h1>
         </div>
         <p className="ad-head__desc">이 행사에서 쓰는 내 비밀번호를 바꿔요.</p>
       </header>
@@ -78,7 +80,7 @@ export function Account() {
               </div>
             </div>
             <span className="ad-tag" data-tone="on">
-              {user?.owner ? '최고관리자' : '주최자'}
+              {user?.owner ? t('최고관리자') : t('주최자')}
             </span>
           </div>
         </div>

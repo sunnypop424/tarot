@@ -96,9 +96,7 @@ export function ResultReveal({
         {result.rehearsal && (
           <div className={styles.infoBanner}>
             <Info size={16} aria-hidden="true" />
-            <span>
-              리허설이라 <b>{t('재고는 줄지 않았어요')}</b>.
-            </span>
+            <span>{t('리허설이라 재고는 줄지 않았어요.')}</span>
           </div>
         )}
 
@@ -110,7 +108,7 @@ export function ResultReveal({
               data-high={isHigh(p) || undefined}
             >
               <span className={styles.summaryBadge} data-high={isHigh(p) || undefined}>
-                {p.rank}등
+                {t('{n}등', { n: p.rank })}
               </span>
               {/* 전체 결과는 방문자 연출이 아니라 스태프 핸드오프 목록이다 —
                   displayMode(등수만/상품명만) 와 무관하게 늘 상품명을 보여준다.
@@ -119,10 +117,10 @@ export function ResultReveal({
               {p.requiresShipping && (
                 <span className={styles.shipChip}>
                   <Truck size={13} aria-hidden="true" />
-                  배송
+                  {t('배송')}
                 </span>
               )}
-              <span className={styles.summaryCount}>{p.count}개</span>
+              <span className={styles.summaryCount}>{t('{n}개', { n: p.count })}</span>
             </li>
           ))}
         </ul>
@@ -132,15 +130,15 @@ export function ResultReveal({
           {needsShipping ? (
             <>
               <button type="button" className="btn btn--primary" onClick={() => setShipping(true)}>
-                배송지 입력
+                {t('배송지 입력')}
               </button>
               <button type="button" className="btn btn--slight" onClick={onFinish}>
-                처음으로
+                {t('처음으로')}
               </button>
             </>
           ) : (
             <button type="button" className="btn btn--slight btn--block" onClick={onFinish}>
-              처음으로
+              {t('처음으로')}
             </button>
           )}
         </div>
@@ -166,7 +164,7 @@ export function ResultReveal({
       {celebrate && <Confetti />}
 
       <header className={styles.revealHead}>
-        <p className={styles.eyebrow}>✦ 두근두근</p>
+        <p className={styles.eyebrow}>{t('✦ 두근두근')}</p>
         <h2 className={styles.revealTitle} data-part="title">
           {t('당첨 결과')}
         </h2>
@@ -191,7 +189,7 @@ export function ResultReveal({
                */
               data-open={open || busy || undefined}
             >
-              {displayMode !== 'prize' && <span className={styles.resultRank}>{p.rank}등</span>}
+              {displayMode !== 'prize' && <span className={styles.resultRank}>{t('{n}등', { n: p.rank })}</span>}
               {displayMode !== 'rank' && <span className={styles.resultName}>{p.name}</span>}
 
               {high && !open && (
@@ -208,7 +206,7 @@ export function ResultReveal({
           className="btn btn--primary btn--block"
           onClick={() => setSummary(true)}
         >
-          전체 결과 보기
+          {t('전체 결과 보기')}
         </button>
       </div>
     </div>

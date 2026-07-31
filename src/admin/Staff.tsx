@@ -50,7 +50,7 @@ export function Staff() {
   const head = (
     <header className="ad-head">
       <div className="ad-head__row">
-        <h1 className="ad-head__title">스태프 계정</h1>
+        <h1 className="ad-head__title">{t('스태프 계정')}</h1>
         {list && list.length > 0 && <span className="ad-head__count tnum">계정 {list.length}개</span>}
       </div>
       <p className="ad-head__desc">현장에서 이 도구를 쓸 계정을 사람마다 따로 만들어요.</p>
@@ -124,7 +124,7 @@ export function Staff() {
       !(await confirmAction({
         title: `${o.email} 을 이 이벤트에서 뺄까요?`,
         desc: '이 이벤트 관리 화면에 못 들어오게 돼요. 이 계정이 남긴 처리 기록은 그대로 남아요.',
-        okLabel: '빼기',
+        okLabel: t('빼기'),
         danger: true,
       }))
     )
@@ -133,9 +133,9 @@ export function Staff() {
     try {
       await repo.organizers.remove(slug, o.userId)
       await load()
-      toast('뺐어요')
+      toast(t('뺐어요'))
     } catch (e) {
-      toast(e instanceof Error ? e.message : '빼지 못했어요')
+      toast(e instanceof Error ? e.message : t('빼지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -203,8 +203,8 @@ export function Staff() {
                   className="ad-btn ad-btn--primary ad-btn--xl"
                   onClick={() => {
                     void navigator.clipboard.writeText(temp.password).then(
-                      () => toast('복사했어요'),
-                      () => toast('복사하지 못했어요')
+                      () => toast(t('복사했어요')),
+                      () => toast(t('복사하지 못했어요'))
                     )
                   }}
                 >
@@ -228,7 +228,7 @@ export function Staff() {
         <div className="ad-card">
           <div className="ad-card__head">
             <div className="ad-card__titleRow">
-              <span className="ad-card__title">계정</span>
+              <span className="ad-card__title">{t('계정')}</span>
               <span className="ad-card__num tnum">{list?.length ?? 0}개</span>
             </div>
           </div>
@@ -282,7 +282,7 @@ export function Staff() {
                         onClick={() => void remove(o)}
                         data-staff-remove
                       >
-                        {me ? '나는 뺄 수 없어요' : '빼기'}
+                        {me ? '나는 뺄 수 없어요' : t('빼기')}
                       </button>
                     </div>
                   </div>

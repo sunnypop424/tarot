@@ -54,8 +54,8 @@ export function Shipping() {
      */
     const ok = await confirmAction({
       title: `배송 정보 ${list.length}건을 전부 지울까요?`,
-      desc: '다른 곳에 사본이 없어요. 방문자도 자기가 넣은 내용을 다시 볼 수 없어요. 먼저 CSV로 내려받으셨나요?',
-      okLabel: '전부 지우기',
+      desc: t('다른 곳에 사본이 없어요. 방문자도 자기가 넣은 내용을 다시 볼 수 없어요. 먼저 CSV로 내려받으셨나요?'),
+      okLabel: t('전부 지우기'),
       danger: true,
     })
     if (!ok) return
@@ -63,7 +63,7 @@ export function Shipping() {
     try {
       await repo.luckydraw.clearShipping(slug)
       await load()
-      toast('배송 정보를 모두 지웠어요')
+      toast(t('배송 정보를 모두 지웠어요'))
     } finally {
       setBusy(false)
     }
@@ -90,7 +90,7 @@ export function Shipping() {
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">배송 정보</h1>
+          <h1 className="ad-head__title">{t('배송 정보')}</h1>
           <span className="ad-head__count tnum">배송 {list.length}건</span>
         </div>
         <p className="ad-head__desc">
@@ -104,7 +104,7 @@ export function Shipping() {
          * 마감 +15일 자동 삭제(`0009_slot_lifecycle.sql`)를 모르면 어느 날 통째로 없어진 걸 보게 된다.
          */}
         <div className="ad-banner ad-banner--warn ad-banner--pad">
-          <div className="ad-banner__title">배송이 끝나면 반드시 지워 주세요</div>
+          <div className="ad-banner__title">{t('배송이 끝나면 반드시 지워 주세요')}</div>
           <div className="ad-banner__body">
             이름·연락처·주소가 그대로 들어 있는 화면이에요. 마감 +14일까지만 열람할 수 있고, +15일이
             지나면 저절로 지워져요.
@@ -114,13 +114,13 @@ export function Shipping() {
         <div className="ad-card">
           <div className="ad-card__head">
             <div className="ad-card__titleRow">
-              <span className="ad-card__title">배송 정보</span>
+              <span className="ad-card__title">{t('배송 정보')}</span>
               <span className="ad-card__num tnum">
                 {shown.length} / {list.length}건
               </span>
             </div>
             <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>
-              <SearchBox value={query} onChange={setQuery} placeholder="이름·연락처·주소로 찾기" />
+              <SearchBox value={query} onChange={setQuery} placeholder={t('이름·연락처·주소로 찾기')} />
               <button
                 type="button"
                 className="ad-btn ad-btn--line ad-btn--md"
@@ -134,15 +134,15 @@ export function Shipping() {
 
           {list.length === 0 ? (
             <div className="ad-empty">
-              <div className="ad-empty__title">아직 배송 정보를 낸 사람이 없어요</div>
+              <div className="ad-empty__title">{t('아직 배송 정보를 낸 사람이 없어요')}</div>
               <div className="ad-empty__sub">
                 배송이 필요한 상품에 당첨된 방문자가 주소를 넣으면 여기에 쌓여요.
               </div>
             </div>
           ) : shown.length === 0 ? (
             <div className="ad-empty ad-empty--sm">
-              <div className="ad-empty__title">찾는 배송 정보가 없어요</div>
-              <div className="ad-empty__sub">검색어를 지우고 다시 찾아보세요.</div>
+              <div className="ad-empty__title">{t('찾는 배송 정보가 없어요')}</div>
+              <div className="ad-empty__sub">{t('검색어를 지우고 다시 찾아보세요.')}</div>
             </div>
           ) : (
             <>
@@ -152,8 +152,8 @@ export function Shipping() {
                     <span>{t('이름')}</span>
                     <span>{t('연락처')}</span>
                     <span>{t('주소')}</span>
-                    <span>당첨 상품</span>
-                    <span>제출</span>
+                    <span>{t('당첨 상품')}</span>
+                    <span>{t('제출')}</span>
                   </div>
                   {shown.map((e) => (
                     <div key={e.id} className="ad-table__row">

@@ -43,7 +43,7 @@ export function ReadingCard({
     <section ref={ref} className={`${styles.reading} ${brief ? styles.brief : ''}`}>
       {/* 카드 쪽 — 한 장이면 넓은 화면에서 왼쪽. 여러 장(brief)이면 카드 위에 포지션 라벨을 보여준다 */}
       <div className={styles.cardSide}>
-        {brief && position && <p className="t-title-s t-primary t-center">{position}</p>}
+        {brief && position && <p className="t-title-s t-primary t-center">{t(position)}</p>}
         <FlipCard drawn={drawn} flipped={inView} className={styles.card} />
       </div>
 
@@ -66,8 +66,8 @@ export function ReadingCard({
         <div className={styles.body}>
           {verdict && (
             <p className={`t-body ${styles.verdict}`}>
-              <b className={styles.verdictLabel}>{verdict.label}</b>
-              {verdict.note}
+              <b className={styles.verdictLabel}>{t(verdict.label)}</b>
+              {t(verdict.note)}
             </p>
           )}
           {!brief && (

@@ -623,7 +623,7 @@ function Result({
           <>
             <div className={styles.resultName} data-card-name>
               {card.name}
-              {card.rarity > 0 && ` · ${RARITY_LABEL[card.rarity] ?? ''}`}
+              {card.rarity > 0 && ` · ${t(RARITY_LABEL[card.rarity] ?? '')}`}
             </div>
             <div className={styles.resultNote}>{t('이 기기에만 저장돼요')}</div>
           </>
@@ -645,7 +645,7 @@ function Result({
               data-save
             >
               <Download size={19} strokeWidth={1.9} aria-hidden="true" />
-              {display.saveLabel}
+              {t(display.saveLabel)}
             </button>
             {/* 공유는 이 기기가 실제로 공유를 할 수 있을 때만 — 없으면 저장과 똑같아진다 */}
             {typeof navigator !== 'undefined' && 'share' in navigator && (
@@ -819,8 +819,8 @@ function TicketIntro({
         <div className={styles.note}>
           <TriangleAlert size={16} strokeWidth={1.7} aria-hidden="true" style={{ flex: 'none', marginTop: 1 }} />
           <span>
-            뽑기권은 <b style={{ color: 'var(--pc-head)' }}>{t('한 번만')}</b> 받을 수 있어요. 받은 뒤에는 다시
-            받을 수 없어요.
+            {/* 강조 <b> 를 뺐다 — 어절 단위로 쪼개면 언어마다 어순이 달라 번역이 깨진다 */}
+            {t('뽑기권은 한 번만 받을 수 있어요. 받은 뒤에는 다시 받을 수 없어요.')}
           </span>
         </div>
         {error && <p className={styles.error} style={{ marginTop: 14 }}>{error}</p>}
@@ -856,7 +856,7 @@ function TicketView({
     <>
       <div style={{ height: 32, flex: 'none' }} />
       <div style={{ padding: '10px 20px 0', textAlign: 'center', fontSize: 12, fontWeight: 800, color: 'var(--pc-sub)', letterSpacing: '0.04em' }}>
-        뽑기권
+        {t('뽑기권')}
       </div>
 
       <div className={styles.center} style={{ padding: '0 22px' }}>

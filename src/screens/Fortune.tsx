@@ -30,8 +30,8 @@ export function Fortune() {
             onClick={() => go(`draw/${id}`)}
           >
             <Icon size={24} strokeWidth={1.75} className="icon-accent" aria-hidden="true" />
-            <span className="t-text-l">{label}</span>
-            <span className="t-text-xs t-muted">{desc}</span>
+            <span className="t-text-l">{t(label)}</span>
+            <span className="t-text-xs t-muted">{t(desc)}</span>
           </button>
         ))}
       </div>

@@ -80,7 +80,7 @@ export function AdminFeedbackHost() {
             <div className="ad-modal__title">{req.title}</div>
             {req.desc && <div className="ad-modal__desc">{req.desc}</div>}
             {/* 되돌릴 수 없는 동작은 그 사실을 따로 세워 말한다 — 설명 속에 묻히면 안 읽힌다 */}
-            {req.danger && <div className="ad-modal__warn">되돌릴 수 없어요</div>}
+            {req.danger && <div className="ad-modal__warn">{t('되돌릴 수 없어요')}</div>}
             {/*
               * `data-*` 로 짚는다 — 클래스는 상태(`ad-btn--kill`/`--primary`)에 따라 바뀌고
               * 글자는 부르는 쪽이 정해서(`okLabel`) 검증이 붙잡을 손잡이가 없었다.

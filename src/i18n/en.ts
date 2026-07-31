@@ -16,6 +16,11 @@
  *
  * 같은 이유로 카드 이름·칭호·상품명도 없다 — 그건 데이터다.
  *
+ * **폰트 이름도 안 넣는다** ('나눔손글씨 펜', 'Pretendard (깔끔함 · 기본)' …) — 고유명사고,
+ * 그 폰트로 그려져야 뜻이 통한다. **팔레트 색 이름**('첫눈'·'노을' …)과 **편집기 전용 힌트**
+ * (`src/data/*` 의 display 설정 설명 — 편집기는 한국어 고정)도 같다. 그래서
+ * `i18n-scan --missing` 에 이런 것들이 남는 건 **일부러 안 채운 것**이지 빠뜨린 게 아니다.
+ *
  * ── 말투 ─────────────────────────────────────────────
  *
  * 한국어 쪽이 해요체(부드럽고 짧게)라 영어도 같은 결로 간다: 짧은 문장, 명령형 대신 청유형,
@@ -305,4 +310,147 @@ export const EN: Record<string, string> = {
   '연결이 끊겼어요.': 'Connection lost.',
   '연결이 끊겼어요 — 와이파이를 확인하고 다시 눌러 주세요':
     'Connection lost — check the Wi-Fi and tap again',
+
+  // ── 운세 카테고리 · 스프레드 ─────────────────────
+  '타로': 'Tarot',
+  '주간': 'This week',
+  '월간': 'This month',
+  '애정운': 'Love',
+  '금전운': 'Money',
+  '직업·학업운': 'Career & study',
+  '예 / 아니오': 'Yes / No',
+  '하루 한 장의 메시지': 'One card, one message a day',
+  '이번 주의 흐름': "This week's current",
+  '이달의 키워드': "This month's keyword",
+  '그 사람의 마음이 궁금할 때': "When you wonder how they feel",
+  '돈의 흐름 살펴보기': 'A look at the flow of money',
+  '지금 이 길이 맞을까': 'Is this the right path?',
+  '가장 단순한 답': 'The simplest answer',
+  '오늘 하루를 떠올리며 카드를 골라보세요.': 'Think of your day and choose a card.',
+  '이번 주를 떠올리며 카드를 골라보세요.': 'Think of your week and choose a card.',
+  '이번 달을 떠올리며 카드를 골라보세요.': 'Think of your month and choose a card.',
+  '마음속 상대를 떠올려 보세요.': 'Picture the person on your mind.',
+  '돈에 관한 고민을 떠올려 보세요.': 'Bring to mind a worry about money.',
+  '지금 걷고 있는 길을 떠올려 보세요.': "Picture the path you're walking now.",
+  '예 또는 아니오로 답할 수 있는 질문을 떠올려 보세요.': 'Think of a question that can be answered yes or no.',
+  '매일 자정에 새로워져요': 'Renews at midnight',
+  '매주 월요일에 새로워져요': 'Renews every Monday',
+  '매월 1일에 새로워져요': 'Renews on the 1st',
+  '내일 다시 만나요': 'See you tomorrow',
+  '다음 주에 다시 만나요': 'See you next week',
+  '다음 달에 다시 만나요': 'See you next month',
+  '나의 마음': 'My heart',
+  '상대의 마음': 'Their heart',
+  '관계의 흐름': 'Where things flow',
+  '현재 상황': 'The situation',
+  '장애물': 'The obstacle',
+  '현재 위치': 'Where you stand',
+  '다가올 가능성': "What's ahead",
+  '돈의 흐름': 'The flow of money',
+  '지금 이 길': 'This path',
+  '예': 'Yes',
+  '아니오': 'No',
+  '글쎄요': 'Hard to say',
+  '지금 흐름은 긍정 쪽으로 기울어 있어요.': 'The current is leaning toward yes.',
+  '지금은 흐름이 받쳐주지 않는 편이에요.': "The current isn't quite with you right now.",
+  '아직 어느 쪽으로도 기울지 않았어요.': "It hasn't tipped either way yet.",
+  '소드': 'Swords',
+  '완드': 'Wands',
+  '컵': 'Cups',
+  '펜타클': 'Pentacles',
+  '{category} 카드 뽑기': 'Draw a {category} card',
+  '{category} 카드가 당신을 기다리고 있어요': 'A {category} card is waiting for you',
+  '{category} 결과': '{category} result',
+  '{position} 카드 다시 고르기': 'Pick the {position} card again',
+  '{n}번째 {label}': '{label} {n}',
+  '마음이 가는 카드를 한 장 골라 주세요': 'Choose the card your heart goes to',
+  '오늘 하루를 떠올리며 카드를 골라보세요': 'Think of your day and choose a card',
+
+  // ── 럭키드로우 ───────────────────────────────────
+  '럭키드로우': 'Lucky draw',
+  '럭키드로우가 마감됐어요': 'The lucky draw has closed',
+  '뽑기권 받기': 'Get a ticket',
+  '뽑기권을 받아 주세요': 'Please get a ticket',
+  '뽑기권을 받아 카운터에 보여 주시면 스태프가 대신 뽑아 드려요.':
+    'Get a ticket and show it at the counter — a staff member will draw for you.',
+  '카운터에서 뽑을 수 있어요': 'You can draw at the counter',
+  '✦ 두근두근': '✦ Here we go',
+  '전체 결과 보기': 'See all results',
+  '처음으로': 'Back to start',
+  '{n}등': 'Rank {n}',
+  '{n}개': '{n}',
+  '리허설이라 재고는 줄지 않았어요.': 'This was a rehearsal — stock was not reduced.',
+  '{name}{josa} 종료됐어요. 찾아와 주셔서 고마워요!': '{name} has ended. Thank you for stopping by!',
+
+  // ── 포토카드 ─────────────────────────────────────
+  '포토카드 뽑기': 'Photocard draw',
+  '포토카드 뽑기는 현장 스태프 기기에서 진행돼요. 카운터에 방문해 주세요.':
+    'Photocard draws happen on the staff device. Please visit the counter.',
+  '보관함': 'Collection',
+  '기본': 'Common',
+  '레어': 'Rare',
+  '스페셜': 'Special',
+  '시크릿': 'Secret',
+  '전설': 'Legendary',
+  '로그인하러 가기': 'Go to sign in',
+  '관리 화면 열기': 'Open the admin screen',
+  '운영 방식이 저장용이라 스태프가 뽑을 일이 없어요. 방식은 관리 화면의 카드에서 바꿀 수 있어요.':
+    'The mode is save-only, so staff never draw. You can change it under Cards in the admin screen.',
+  '뽑기권은 한 번만 받을 수 있어요. 받은 뒤에는 다시 받을 수 없어요.':
+    'You can get a ticket only once. It cannot be issued again.',
+
+  // ── 포토존 ───────────────────────────────────────
+  '포토존': 'Photo zone',
+  '프레임을 골라 인증샷을 남겨 보세요': 'Pick a frame and take a photo to remember',
+  '프레임에 맞춰 찍어 주세요': 'Line up with the frame',
+  '바로 찍기': 'Take a photo',
+  '다시 찍기': 'Retake',
+  '사진 올리기': 'Upload a photo',
+  '시작하기': 'Start',
+
+  // ── 소원나무 ─────────────────────────────────────
+  '소원 나무': 'Wish tree',
+  '소원나무': 'Wish tree',
+  '소원 걸기': 'Hang a wish',
+  '소원을 적어 나무에 걸어 주세요': 'Write a wish and hang it on the tree',
+  '이루고 싶은 소원을 적어 주세요': 'Write the wish you want to come true',
+  '이름 (선택)': 'Name (optional)',
+  '남기기': 'Leave it',
+
+  // ── 롤링페이퍼 · 영상회 응원 ─────────────────────
+  '롤링페이퍼': 'Rolling paper',
+  '영상회 응원': 'Screening cheers',
+  '한마디 남기기': 'Leave a message',
+  '오늘 하고 싶은 말을 적어 주세요': 'Write what you want to say today',
+  '따뜻한 한마디를 남겨 주세요': 'Leave a warm message',
+  '축하하는 마음을 자유롭게 적어 주세요': 'Write your congratulations, any way you like',
+  '남긴 한마디가 상영 화면에 떠요': 'Your message appears on the screening view',
+  '하루 한 장의 메시지를 남겨 보세요': 'Leave a message today',
+
+  // ── 설문 ─────────────────────────────────────────
+  '실시간 투표': 'Live poll',
+  '투표하기': 'Vote',
+  '참여하고 싶은 설문을 골라 주세요': "Choose a poll you'd like to join",
+
+  // ── 스탬프 ───────────────────────────────────────
+  '방문 스탬프': 'Visit stamps',
+  '암호 입력': 'Enter the code',
+  '이벤트에 참여하고 받은 암호를 입력하면 도장이 찍혀요': 'Join an event, enter the code you receive, and get a stamp',
+  '각 이벤트를 마치면 암호를 알려드려요.': "You'll be given a code after each event.",
+  '오늘은 마감됐어요': 'Closed for today',
+
+  // ── 모의고사 ─────────────────────────────────────
+  '최애 모의고사': 'Bias mock exam',
+  '문제를 풀고 나만의 칭호를 받아 가세요': 'Answer the questions and earn your own title',
+  '제출하기': 'Submit',
+  '다음': 'Next',
+  '{total}문항 중': 'Out of {total}',
+  '{n}문항': '{n}',
+  '제목': 'Title',
+  '다시 뽑기': 'Draw again',
+  '홈으로': 'Home',
+  '배송지 입력': 'Enter shipping details',
+  '바꾸지 못했어요': "We couldn't change it",
+  '오늘 함께해 주신 분들': 'Everyone who joined us today',
+  '화면에서 만나요!': 'See you on screen!',
 }

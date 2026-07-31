@@ -1,23 +1,28 @@
-const DAYS = ['일', '월', '화', '수', '목', '금', '토']
+/**
+ * 날짜 문구는 **사전이 아니라 `toLocaleDateString`** 으로 푼다 — "2026년 7월 15일 수요일"
+ * 같은 문장을 사전 키로 만들면 날짜 수만큼 키가 생긴다. 언어는 호출자가 넘긴다
+ * (여기는 훅을 못 쓰는 순수 함수라 — 화면이 `useLang()` 의 값을 내려 준다).
+ */
 
-/** "2026년 7월 15일 수요일" */
-export function formatDateLabel(d: Date = new Date()): string {
-  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${DAYS[d.getDay()]}요일`
+/** ko "2026년 7월 15일 수요일" · en "Wednesday, July 15, 2026" */
+export function formatDateLabel(d: Date = new Date(), lang = 'ko'): string {
+  return d.toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
 }
 
-/** "7월 13일 ~ 7월 19일" — 이번 주(월~일) */
-export function formatWeekLabel(d: Date = new Date()): string {
+/** ko "7월 13일 ~ 7월 19일" · en "July 13 ~ July 19" — 이번 주(월~일) */
+export function formatWeekLabel(d: Date = new Date(), lang = 'ko'): string {
   const dayNum = d.getDay() || 7 // 월=1 … 일=7
   const monday = new Date(d)
   monday.setDate(d.getDate() - (dayNum - 1))
   const sunday = new Date(monday)
   sunday.setDate(monday.getDate() + 6)
-  return `${monday.getMonth() + 1}월 ${monday.getDate()}일 ~ ${sunday.getMonth() + 1}월 ${sunday.getDate()}일`
+  const md = (x: Date) => x.toLocaleDateString(lang, { month: 'long', day: 'numeric' })
+  return `${md(monday)} ~ ${md(sunday)}`
 }
 
-/** "2026년 7월" */
-export function formatMonthLabel(d: Date = new Date()): string {
-  return `${d.getFullYear()}년 ${d.getMonth() + 1}월`
+/** ko "2026년 7월" · en "July 2026" */
+export function formatMonthLabel(d: Date = new Date(), lang = 'ko'): string {
+  return d.toLocaleDateString(lang, { year: 'numeric', month: 'long' })
 }
 
 /** "2026-07-15" — 하루 단위. 자정 리셋 기준 (로컬 타임존) */

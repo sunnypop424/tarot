@@ -309,7 +309,7 @@ export default function LuckydrawApp() {
                           onClick={() => setPrizeOpen(true)}
                           data-prize-preview
                         >
-                          <Gift size={14} aria-hidden="true" /> 경품 미리보기
+                          <Gift size={14} aria-hidden="true" /> {t('경품 미리보기')}
                         </button>
                       )}
                     </div>

@@ -6,6 +6,7 @@ import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
 import { downloadCsv, when } from '../csv'
+import { useT } from '@/i18n'
 
 
 /**
@@ -19,6 +20,7 @@ import { downloadCsv, when } from '../csv'
  * 없으면 선택지를 숨긴다.
  */
 export function Picker() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const source = getSlotService(slot)
@@ -40,7 +42,7 @@ export function Picker() {
   const head = (
     <header className="ad-head">
       <div className="ad-head__row">
-        <h1 className="ad-head__title">추첨</h1>
+        <h1 className="ad-head__title">{t('추첨')}</h1>
         {list && (
           <span className="ad-head__count tnum">
             응모자 {list.length}명 · 남은 후보 {list.filter((e) => !e.won).length}명
@@ -102,7 +104,7 @@ export function Picker() {
     const ok = await confirmAction({
       title: `${round}회차를 되돌릴까요?`,
       desc: `이 회차에서 뽑힌 ${names.length}명이 다시 후보로 돌아가요. 이미 안내를 보냈다면 혼선이 생길 수 있어요.`,
-      okLabel: '되돌리기',
+      okLabel: t('되돌리기'),
       danger: true,
     })
     if (!ok) return
@@ -140,7 +142,7 @@ export function Picker() {
       await navigator.clipboard.writeText(copyText(rows))
       toast(msg)
     } catch {
-      toast('복사하지 못했어요')
+      toast(t('복사하지 못했어요'))
     }
   }
 
@@ -151,15 +153,15 @@ export function Picker() {
       <div className="ad-stack">
         <div className="ad-stats">
           {[
-            { label: '응모자', value: list.length },
+            { label: t('응모자'), value: list.length },
             { label: '남은 후보', value: pool.length },
-            { label: '당첨자', value: winners.length },
+            { label: t('당첨자'), value: winners.length },
           ].map((k) => (
             <div key={k.label} className="ad-stat">
               <div className="ad-stat__label">{k.label}</div>
               <div className="ad-stat__row">
                 <span className="ad-stat__value tnum">{k.value}</span>
-                <span className="ad-stat__unit">명</span>
+                <span className="ad-stat__unit">{t('명')}</span>
               </div>
             </div>
           ))}
@@ -174,7 +176,7 @@ export function Picker() {
 
           <div className="ad-drawform">
             <div>
-              <span className="ad-field__label">뽑을 인원</span>
+              <span className="ad-field__label">{t('뽑을 인원')}</span>
               <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>
                 <button
                   type="button"
@@ -189,7 +191,7 @@ export function Picker() {
                   style={{ height: 48, fontSize: 20, fontWeight: 700, flex: 1, minWidth: 60 }}
                   inputMode="numeric"
                   value={count}
-                  aria-label="뽑을 인원"
+                  aria-label={t('뽑을 인원')}
                   onChange={(e) => setCount(Math.max(1, Number(e.target.value.replace(/[^0-9]/g, '')) || 1))}
                   data-pick-count
                 />
@@ -205,7 +207,7 @@ export function Picker() {
             </div>
             {hasScore && (
               <div>
-                <span className="ad-field__label">방식</span>
+                <span className="ad-field__label">{t('방식')}</span>
                 <div className="ad-seg">
                   {(
                     [

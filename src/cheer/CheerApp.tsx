@@ -358,7 +358,7 @@ function Write({
             <span className={styles.doneMark} aria-hidden="true">
               <Check size={30} strokeWidth={2.4} />
             </span>
-            <div className={styles.doneText}>{display.thanks}</div>
+            <div className={styles.doneText}>{t(display.thanks)}</div>
             {slot.demo && (
               <p className={styles.demoNote}>{t('체험용 페이지라 남긴 한마디는 저장되지 않아요')}</p>
             )}
@@ -401,7 +401,7 @@ function Write({
             />
             <button type="submit" className={styles.send} disabled={busy || !body.trim()} data-cheer-send>
               <Send size={17} strokeWidth={2} aria-hidden="true" />
-              {busy ? t('보내는 중…') : display.postLabel}
+              {busy ? t('보내는 중…') : t(display.postLabel)}
             </button>
             {error && <p className={styles.error}>{error}</p>}
           </form>

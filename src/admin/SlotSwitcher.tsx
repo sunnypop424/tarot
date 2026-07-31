@@ -4,6 +4,7 @@ import { repo } from '@/lib/repo'
 import type { Slot } from '@/types/slot'
 import { serviceLabel, getSlotService } from '@/data/services'
 import styles from './SlotSwitcher.module.css'
+import { useT } from '@/i18n'
 
 /**
  * 이 계정이 맡은 **다른 슬롯**으로 건너가는 자리.
@@ -16,6 +17,7 @@ import styles from './SlotSwitcher.module.css'
  * "슬롯 전환" 이라는 개념을 보여줄 이유가 없다.
  */
 export function SlotSwitcher({ current, slugs }: { current: string; slugs: string[] }) {
+  const t = useT()
   const [slots, setSlots] = useState<Slot[] | null>(null)
 
   useEffect(() => {
@@ -36,8 +38,8 @@ export function SlotSwitcher({ current, slugs }: { current: string; slugs: strin
   if (slugs.length < 2 || !slots) return null
 
   return (
-    <nav className={styles.switcher} aria-label="내 슬롯">
-      <p className={styles.title}>내 행사</p>
+    <nav className={styles.switcher} aria-label={t('내 슬롯')}>
+      <p className={styles.title}>{t('내 행사')}</p>
       {slots.map((s) => (
         <a
           key={s.slug}

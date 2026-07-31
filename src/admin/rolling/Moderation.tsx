@@ -5,6 +5,7 @@ import type { RollingMessage } from '@/lib/repo'
 import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
+import { useT } from '@/i18n'
 
 /**
  * **이 화면은 롤링페이퍼·소원나무·영상회 한마디가 같이 쓴다** (같은 테이블·같은 repo).
@@ -25,6 +26,7 @@ const COPY = {
  * 그래서 즉시 저장이다 (질문 편집과 같은 결): 숨김·삭제가 바로 방문자 화면에 반영된다.
  */
 export function Moderation() {
+  const t = useT()
   const slot = useSlot()
   const slug = slot.slug
   const service = getSlotService(slot)
@@ -57,7 +59,7 @@ export function Moderation() {
     const ok = await confirmAction({
       title: `이 ${c.unit}를 지울까요?`,
       desc: '숨기기만 해도 방문자에겐 보이지 않아요.',
-      okLabel: '지우기',
+      okLabel: t('지우기'),
       danger: true,
     })
     if (!ok) return
@@ -65,7 +67,7 @@ export function Moderation() {
     try {
       await repo.rolling.remove(slug, m.id)
       await load()
-      toast('지웠어요')
+      toast(t('지웠어요'))
     } finally {
       setBusy(false)
     }
@@ -79,7 +81,7 @@ export function Moderation() {
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">{c.title}</h1>
+          <h1 className="ad-head__title">{t(c.title)}</h1>
           <span className="ad-head__count tnum">
             {list.length}개 · 숨김 {hiddenCount}개
           </span>
@@ -99,7 +101,7 @@ export function Moderation() {
         <div className="ad-card">
           <div className="ad-card__head">
             <div className="ad-card__titleRow">
-              <span className="ad-card__title">전체</span>
+              <span className="ad-card__title">{t('전체')}</span>
               <span className="ad-card__num tnum">
                 {list.length}개 · 숨김 {hiddenCount}개
               </span>
@@ -143,11 +145,11 @@ export function Moderation() {
                       {m.body}
                     </div>
                     <div className="ad-row__meta">
-                      <span style={{ fontWeight: 700 }}>{m.nickname || '익명'}</span>
+                      <span style={{ fontWeight: 700 }}>{m.nickname || t('익명')}</span>
                       <span className="tnum" style={{ color: 'var(--ad-ink-4)' }}>
                         {new Date(m.createdAt).toLocaleString('ko-KR')}
                       </span>
-                      {m.hidden && <span className="ad-tag ad-tag--sm">숨김</span>}
+                      {m.hidden && <span className="ad-tag ad-tag--sm">{t('숨김')}</span>}
                     </div>
                   </div>
                   <div className="ad-btnrow" style={{ flexShrink: 0 }}>
@@ -157,7 +159,7 @@ export function Moderation() {
                       disabled={busy}
                       onClick={() => void toggleHidden(m)}
                     >
-                      {m.hidden ? '다시 보이기' : '숨기기'}
+                      {m.hidden ? t('다시 보이기') : t('숨기기')}
                     </button>
                     <button
                       type="button"
@@ -191,6 +193,7 @@ export function Moderation() {
  * 여기서 관리하는 건 **이 행사에서만 막고 싶은 말**이다 (다른 아이돌 이름·특정 사건 등).
  */
 function BannedWords({ slug, unit }: { slug: string; unit: string }) {
+  const t = useT()
   const [words, setWords] = useState<string[] | null>(null)
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
@@ -220,7 +223,7 @@ function BannedWords({ slug, unit }: { slug: string; unit: string }) {
       await load()
       toast('이제 이 말이 든 글은 안 올라와요')
     } catch (e) {
-      toast(e instanceof Error ? e.message : '넣지 못했어요')
+      toast(e instanceof Error ? e.message : t('넣지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -231,7 +234,7 @@ function BannedWords({ slug, unit }: { slug: string; unit: string }) {
     try {
       await repo.rolling.removeBannedWord(slug, word)
       await load()
-      toast('뺐어요')
+      toast(t('뺐어요'))
     } finally {
       setBusy(false)
     }
@@ -252,7 +255,7 @@ function BannedWords({ slug, unit }: { slug: string; unit: string }) {
           onClick={() => setOpen((v) => !v)}
           data-banned-toggle
         >
-          {open ? '접기' : '관리'}
+          {open ? t('접기') : t('관리')}
         </button>
       </div>
 

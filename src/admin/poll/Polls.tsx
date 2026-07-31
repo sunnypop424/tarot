@@ -68,7 +68,7 @@ export function Polls() {
       <>
         <header className="ad-head">
           <div className="ad-head__row">
-            <h1 className="ad-head__title">설문</h1>
+            <h1 className="ad-head__title">{t('설문')}</h1>
           </div>
         </header>
         <div className="ad-card">
@@ -109,7 +109,7 @@ export function Polls() {
     const ok = await confirmAction({
       title: '이 설문을 지울까요?',
       desc: total > 0 ? `받은 ${total.toLocaleString()}표도 함께 사라져요.` : '아직 받은 표가 없어요.',
-      okLabel: '지우기',
+      okLabel: t('지우기'),
       danger: true,
     })
     if (!ok) return
@@ -129,9 +129,9 @@ export function Polls() {
         await repo.poll.savePoll(slug, { ...d, options: d.options.map((o, i) => ({ ...o, order: i + 1 })) })
       }
       await load()
-      toast('저장했어요')
+      toast(t('저장했어요'))
     } catch (e) {
-      toast(e instanceof Error ? e.message : '저장하지 못했어요')
+      toast(e instanceof Error ? e.message : t('저장하지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -140,21 +140,21 @@ export function Polls() {
   async function revert() {
     if (!dirty) return
     const ok = await confirmAction({
-      title: '바꾼 내용을 버릴까요?',
-      desc: '저장하지 않은 변경이 모두 사라져요.',
-      okLabel: '버리기',
+      title: t('바꾼 내용을 버릴까요?'),
+      desc: t('저장하지 않은 변경이 모두 사라져요.'),
+      okLabel: t('버리기'),
       danger: true,
     })
     if (!ok) return
     await load()
-    toast('되돌렸어요')
+    toast(t('되돌렸어요'))
   }
 
   return (
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">설문</h1>
+          <h1 className="ad-head__title">{t('설문')}</h1>
           <span className="ad-head__count tnum">설문 {drafts.length}개</span>
         </div>
         <p className="ad-head__desc">
@@ -205,7 +205,7 @@ export function Polls() {
                       data-on={!p.hidden || undefined}
                       onClick={() => patch(p.id, { hidden: !p.hidden })}
                     >
-                      {p.hidden ? '준비 중' : '공개'}
+                      {p.hidden ? t('준비 중') : t('공개')}
                     </button>
                     <button
                       type="button"
@@ -254,7 +254,7 @@ export function Polls() {
                     </div>
                     {p.kind === 'multi' && (
                       <div className="ad-inline">
-                        <span className="ad-unit">최대</span>
+                        <span className="ad-unit">{t('최대')}</span>
                         <input
                           className="ad-input ad-input--sm ad-input--center"
                           style={{ width: 70 }}
@@ -267,7 +267,7 @@ export function Polls() {
                             })
                           }
                         />
-                        <span className="ad-unit">개</span>
+                        <span className="ad-unit">{t('개')}</span>
                       </div>
                     )}
                   </div>
@@ -278,7 +278,7 @@ export function Polls() {
                         <input
                           className="ad-input ad-input--sm"
                           value={o.label}
-                          placeholder="선택지 문구"
+                          placeholder={t('선택지 문구')}
                           aria-label={`선택지 ${i + 1}`}
                           onChange={(e) =>
                             patch(p.id, {
@@ -328,7 +328,7 @@ export function Polls() {
                     <div className="ad-btnrow">
                       {/* 후보 12명을 열두 번 만들지 않는다 — 명단을 그대로 붙여 넣는다 */}
                       <BulkPaste
-                        label="선택지"
+                        label={t('선택지')}
                         placeholder={'청량\n청순\n걸크러시'}
                         hint={
                           <>
@@ -392,7 +392,7 @@ export function Polls() {
 
       {dirty && (
         <div className="ad-savebar" data-dirty>
-          <span className="ad-savebar__note">아직 저장하지 않은 변경이 있어요</span>
+          <span className="ad-savebar__note">{t('아직 저장하지 않은 변경이 있어요')}</span>
           <div className="ad-btnrow">
             <button
               type="button"
@@ -400,7 +400,7 @@ export function Polls() {
               disabled={busy}
               onClick={() => void revert()}
             >
-              되돌리기
+              {t('되돌리기')}
             </button>
             <button
               type="button"
@@ -408,7 +408,7 @@ export function Polls() {
               disabled={busy}
               onClick={() => void save()}
             >
-              {busy ? '저장하는 중…' : '저장하기'}
+              {busy ? t('저장하는 중…') : t('저장하기')}
             </button>
           </div>
         </div>

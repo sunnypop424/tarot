@@ -54,14 +54,14 @@ export function QuestionList() {
   async function handleTogglePublish(q: Question) {
     await repo.questions.save(slug, { ...q, published: !q.published })
     await load()
-    toast('저장했어요')
+    toast(t('저장했어요'))
   }
 
   async function handleRemove(q: Question) {
     const ok = await confirmAction({
       title: '이 질문을 지울까요?',
-      desc: `“${q.question.trim() || '제목 없음'}” 과 여기에 적어 둔 답변이 모두 사라져요.`,
-      okLabel: '지우기',
+      desc: `“${q.question.trim() || t('제목 없음')}” 과 여기에 적어 둔 답변이 모두 사라져요.`,
+      okLabel: t('지우기'),
       danger: true,
     })
     if (!ok) return
@@ -131,7 +131,7 @@ export function QuestionList() {
                   type="button"
                   className="ad-check__box"
                   data-on={q.published || undefined}
-                  aria-label={`${q.question || '제목 없음'} 공개`}
+                  aria-label={`${q.question || t('제목 없음')} 공개`}
                   style={{
                     cursor: 'pointer',
                     background: q.published ? 'var(--ad-key)' : 'var(--ad-surface)',
@@ -148,14 +148,14 @@ export function QuestionList() {
                   onClick={() => navigate(`/${slug}/admin/questions/${q.id}`)}
                 >
                   <div className="ad-row__title" data-empty={q.question.trim() ? undefined : true}>
-                    {q.question.trim() || '(제목 없음)'}
+                    {q.question.trim() || t('(제목 없음)')}
                   </div>
                   {/* 장수는 안 쓴다 — 질문 타로는 전부 한 장이라 줄마다 "1장"이 붙으면 잡음이다 */}
                   <div className="ad-row__meta">
                     {majorOnly || q.deck === 'major' ? t('메이저 22장') : '전체 78장'} ·{' '}
                     {answeredCount(q)}개 답변 입력됨
                     {!q.published && (
-                      <span className="ad-tag ad-tag--sm">비공개</span>
+                      <span className="ad-tag ad-tag--sm">{t('비공개')}</span>
                     )}
                   </div>
                 </button>

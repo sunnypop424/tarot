@@ -91,7 +91,7 @@ export function ShowStaff({ slot }: { slot: Slot }) {
     try {
       setS(await repo.cheer.setShow(slug, state))
     } catch (e) {
-      alert(e instanceof Error ? e.message : '바꾸지 못했어요')
+      alert(e instanceof Error ? t(e.message) : t('바꾸지 못했어요'))
     } finally {
       setBusy(false)
     }

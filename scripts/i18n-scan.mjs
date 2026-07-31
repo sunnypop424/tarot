@@ -83,11 +83,14 @@ let keys = [...found.keys()].sort((a, b) => a.localeCompare(b, 'ko'))
 
 if (onlyMissing) {
   /**
-   * **사전이 둘이다** — 방문자(`en.ts`)와 주최자(`admin.en.ts`). 읽는 사람이 달라 파일을
-   * 나눴으므로(`admin.en.ts` 머리말) 여기서도 둘 다 봐야 한다. 한쪽만 보면 이미 번역한 것을
-   * "아직 없음" 으로 세어, 다 해놓고도 안 끝난 것처럼 보인다.
+   * **사전이 여럿이다** — 방문자(`en.ts`)와 주최자(`admin.en.ts` · `admin2.en.ts`). 읽는 사람이
+   * 달라 파일을 나눴으므로(`admin.en.ts` 머리말) 여기서도 전부 봐야 한다. 하나라도 빠뜨리면
+   * 이미 번역한 것을 "아직 없음" 으로 세어, 다 해놓고도 안 끝난 것처럼 보인다.
+   * 사전 파일을 새로 만들면 **이 목록에도 넣는다** (`index.tsx` 의 `DICTS` 와 짝이다).
    */
-  const dict = ['src/i18n/en.ts', 'src/i18n/admin.en.ts'].map((p) => readFileSync(p, 'utf8')).join('\n')
+  const dict = ['src/i18n/en.ts', 'src/i18n/admin.en.ts', 'src/i18n/admin2.en.ts']
+    .map((p) => readFileSync(p, 'utf8'))
+    .join('\n')
   keys = keys.filter((k) => !dict.includes(`'${k}'`) && !dict.includes(`"${k}"`))
 }
 

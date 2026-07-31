@@ -649,7 +649,7 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
           <div className={styles.fields}>
             <div>
               <label className={styles.label} htmlFor="wish-name">
-                이름 <span className={styles.optional}>{t('(선택)')}</span>
+                {t('이름')} <span className={styles.optional}>{t('(선택)')}</span>
               </label>
               <input
                 id="wish-name"
@@ -735,9 +735,9 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
             {display.charms.length > 0 && (
               <div>
                 <span className={styles.label}>
-                  장식 <span className={styles.optional}>{t('(선택)')}</span>
+                  {t('장식')} <span className={styles.optional}>{t('(선택)')}</span>
                 </span>
-                <div className={styles.charms} role="radiogroup" aria-label={t(t('장식'))}>
+                <div className={styles.charms} role="radiogroup" aria-label={t('장식')}>
                   {display.charms.map((c) => (
                     <button
                       key={c}

@@ -3,6 +3,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { ADMIN_EN } from './admin.en'
 import { ADMIN_JA } from './admin.ja'
 import { ADMIN_ZH } from './admin.zh'
+import { ADMIN2_EN } from './admin2.en'
+import { ADMIN2_JA } from './admin2.ja'
+import { ADMIN2_ZH } from './admin2.zh'
 import { EN } from './en'
 import { JA } from './ja'
 import { ZH } from './zh'
@@ -55,9 +58,9 @@ export type Lang = (typeof LANGS)[number]['id']
  * 우연히 같을 때(예: '카드'), 관리 화면에서 더 정확한 말이 나와야 한다.
  */
 const DICTS: Partial<Record<Lang, Record<string, string>>> = {
-  en: { ...EN, ...ADMIN_EN },
-  zh: { ...ZH, ...ADMIN_ZH },
-  ja: { ...JA, ...ADMIN_JA },
+  en: { ...EN, ...ADMIN_EN, ...ADMIN2_EN },
+  zh: { ...ZH, ...ADMIN_ZH, ...ADMIN2_ZH },
+  ja: { ...JA, ...ADMIN_JA, ...ADMIN2_JA },
 }
 
 /** 치환값 — `t('{n}개를 넣었어요', { n: 3 })` */

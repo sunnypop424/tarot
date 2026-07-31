@@ -34,7 +34,7 @@ export function CrystalBall({ label = '카드를 읽고 있어요' }: { label?: 
         <DefaultBall />
       )}
 
-      <span className={`t-text-s ${styles.label}`}>{label}</span>
+      <span className={`t-text-s ${styles.label}`}>{t(label)}</span>
     </p>
   )
 }

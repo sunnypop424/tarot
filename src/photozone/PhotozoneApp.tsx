@@ -383,7 +383,7 @@ function Photozone({ slot }: { slot: Slot }) {
                 <div className={styles.row}>
                   <button type="button" className={styles.primary} onClick={() => void save('save')} data-save>
                     <Download size={19} strokeWidth={1.7} aria-hidden="true" />
-                    {display.saveLabel}
+                    {t(display.saveLabel)}
                   </button>
                   {typeof navigator !== 'undefined' && 'share' in navigator && (
                     <button type="button" className={styles.ghost} onClick={() => void save('share')} data-share>

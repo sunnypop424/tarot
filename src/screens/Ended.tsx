@@ -21,10 +21,14 @@ export function Ended({ name }: { name: string }) {
       <main className="app__scroll">
         <div className="screen">
           <h1 className="t-title-l screen__title">{t('행사가 끝났어요')}</h1>
-          {/* 이벤트명이 데이터에서 오므로 조사를 박아 두지 않는다 (`lib/josa.ts`) */}
+          {/* 이벤트명이 데이터에서 오므로 조사를 박아 두지 않는다 (`lib/josa.ts`).
+            * 번역 키에는 조사가 없다 — 조사는 한국어 문법이라 `josa()` 가 붙이고,
+            * 다른 언어 사전은 {name} 자리만 옮긴다. */}
           <p className="t-body t-muted screen__lead">
-            {name}
-            {josa(name, '은', '는')} 종료됐어요. 찾아와 주셔서 고마워요!
+            {t('{name}{josa} 종료됐어요. 찾아와 주셔서 고마워요!', {
+              name,
+              josa: josa(name, '은', '는'),
+            })}
           </p>
         </div>
       </main>

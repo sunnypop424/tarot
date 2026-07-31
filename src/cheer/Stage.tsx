@@ -339,7 +339,7 @@ function Credits({
   return (
     <div className={styles.credits} style={{ ...vars, ['--roll' as string]: `${seconds}s` }} data-credits>
       <div className={styles.creditsRoll}>
-        <h1 className={styles.creditsTitle}>{display.creditsTitle}</h1>
+        <h1 className={styles.creditsTitle}>{t(display.creditsTitle)}</h1>
         {messages.map((m) => (
           <p key={m.id} className={styles.creditsLine}>
             {showName && m.nickname.trim() && <span className={styles.creditsName}>{m.nickname}</span>}

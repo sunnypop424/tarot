@@ -156,7 +156,7 @@ function Staff({ slot }: { slot: Slot }) {
           {t('행사 계정으로 한 번만 로그인해 두시면 이 기기에서 계속 쓸 수 있어요.')}
         </p>
         <Link className={styles.linkBtn} to={`/${slug}/admin/login`}>
-          로그인하러 가기
+          {t('로그인하러 가기')}
         </Link>
       </div>
     )
@@ -172,11 +172,10 @@ function Staff({ slot }: { slot: Slot }) {
         <Sparkles size={32} strokeWidth={1.6} aria-hidden="true" />
         <div className={styles.centerTitle}>{t('이 이벤트는 방문자가 직접 뽑아요')}</div>
         <p className={styles.centerBody}>
-          운영 방식이 t('저장용') 이라 스태프가 뽑을 일이 없어요. 방식은 관리 화면의 '카드' 에서
-          바꿀 수 있어요.
+          {t('운영 방식이 저장용이라 스태프가 뽑을 일이 없어요. 방식은 관리 화면의 카드에서 바꿀 수 있어요.')}
         </p>
         <Link className={styles.linkBtn} to={`/${slug}/admin/photocard`}>
-          관리 화면 열기
+          {t('관리 화면 열기')}
         </Link>
       </div>
     )
@@ -241,7 +240,7 @@ function Staff({ slot }: { slot: Slot }) {
              */
             <div className={styles.reveal}>
               <header className={styles.revealHead}>
-                {!summary && <p className={styles.eyebrow}>✦ 두근두근</p>}
+                {!summary && <p className={styles.eyebrow}>{t('✦ 두근두근')}</p>}
                 <h2 className={styles.revealTitle}>{summary ? t('전체 결과') : t('당첨 결과')}</h2>
               </header>
 
@@ -282,7 +281,7 @@ function Staff({ slot }: { slot: Slot }) {
                         {!x.image && <ImageIcon size={26} strokeWidth={1.6} aria-hidden="true" />}
                       </div>
                       <div className={styles.cardName}>{x.name}</div>
-                      <div className={styles.cardRarity}>{RARITY_LABEL[x.rarity] ?? ''}</div>
+                      <div className={styles.cardRarity}>{t(RARITY_LABEL[x.rarity] ?? '')}</div>
                     </div>
                   ))}
                 </div>

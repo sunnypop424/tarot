@@ -38,8 +38,9 @@ export interface Category {
   /** 값이 있으면 그 기간에 한 번만 뽑을 수 있다 */
   period?: PeriodUnit
   /** 지금이 어느 기간인지 — "2026년 7월 15일 수요일", "7월 13일 ~ 7월 19일" 등.
-   *  세 기간 모두 같은 자리에 나와야 세그먼트를 오갈 때 버튼이 움직이지 않는다 */
-  periodLabel?: () => string
+   *  세 기간 모두 같은 자리에 나와야 세그먼트를 오갈 때 버튼이 움직이지 않는다.
+   *  날짜는 사전이 아니라 `toLocaleDateString` 몫이라 언어를 인자로 받는다 (`lib/date.ts`) */
+  periodLabel?: (lang?: string) => string
   /** 기간 잠금 안내 — period 가 있을 때만 */
   renews?: string
   /** 다 뽑은 뒤 보여줄 문구 */
@@ -58,7 +59,7 @@ export const CATEGORIES: Category[] = [
     aspect: 'general',
     prompt: '오늘 하루를 떠올리며 카드를 골라보세요.',
     period: 'day',
-    periodLabel: () => formatDateLabel(),
+    periodLabel: (lang) => formatDateLabel(new Date(), lang),
     renews: '매일 자정에 새로워져요',
     locked: '내일 다시 만나요',
   },
@@ -72,7 +73,7 @@ export const CATEGORIES: Category[] = [
     aspect: 'general',
     prompt: '이번 주를 떠올리며 카드를 골라보세요.',
     period: 'week',
-    periodLabel: () => formatWeekLabel(),
+    periodLabel: (lang) => formatWeekLabel(new Date(), lang),
     renews: '매주 월요일에 새로워져요',
     locked: '다음 주에 다시 만나요',
   },
@@ -86,7 +87,7 @@ export const CATEGORIES: Category[] = [
     aspect: 'general',
     prompt: '이번 달을 떠올리며 카드를 골라보세요.',
     period: 'month',
-    periodLabel: () => formatMonthLabel(),
+    periodLabel: (lang) => formatMonthLabel(new Date(), lang),
     renews: '매월 1일에 새로워져요',
     locked: '다음 달에 다시 만나요',
   },

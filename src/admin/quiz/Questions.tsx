@@ -106,7 +106,7 @@ export function Questions() {
       setSettings(st)
       setLoadError(null)
     } catch (e) {
-      setLoadError(e instanceof Error ? e.message : '문항을 읽지 못했어요')
+      setLoadError(e instanceof Error ? e.message : t('문항을 읽지 못했어요'))
       setList([])
     }
   }, [slug])
@@ -120,12 +120,12 @@ export function Questions() {
       <>
         <header className="ad-head">
           <div className="ad-head__row">
-            <h1 className="ad-head__title">모의고사</h1>
+            <h1 className="ad-head__title">{t('모의고사')}</h1>
           </div>
         </header>
         <div className="ad-card">
           <div className="ad-empty">
-            <div className="ad-empty__title">지금 빌드에서는 모의고사를 쓸 수 없어요</div>
+            <div className="ad-empty__title">{t('지금 빌드에서는 모의고사를 쓸 수 없어요')}</div>
           </div>
         </div>
       </>
@@ -140,12 +140,12 @@ export function Questions() {
       <>
         <header className="ad-head">
           <div className="ad-head__row">
-            <h1 className="ad-head__title">모의고사</h1>
+            <h1 className="ad-head__title">{t('모의고사')}</h1>
           </div>
         </header>
         <div className="ad-card">
           <div className="ad-empty">
-            <div className="ad-empty__title">문항을 읽지 못했어요</div>
+            <div className="ad-empty__title">{t('문항을 읽지 못했어요')}</div>
             <div className="ad-empty__sub">
               문항과 정답은 로그인한 주최자만 볼 수 있어요. 로그인하고 다시 열어 주세요.
             </div>
@@ -189,9 +189,9 @@ export function Questions() {
       await repo.quiz.saveQuestion(slug, q)
       setEditing(null)
       await load()
-      toast('저장했어요')
+      toast(t('저장했어요'))
     } catch (e) {
-      toast(e instanceof Error ? e.message : '저장하지 못했어요')
+      toast(e instanceof Error ? e.message : t('저장하지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -203,7 +203,7 @@ export function Questions() {
       await repo.quiz.saveSettings(slug, next)
       // 서버가 값을 고칠 수 있다 (보상이 있으면 재응시가 강제로 꺼진다) — 되읽어서 화면을 맞춘다
       setSettings(await repo.quiz.settings(slug))
-      toast('저장했어요')
+      toast(t('저장했어요'))
     } finally {
       setBusy(false)
     }
@@ -228,7 +228,7 @@ export function Questions() {
     <div style={lockMsg ? { opacity: 0.55 } : undefined}>
       <div className="ad-card__titleRow">
         <span className="ad-card__title">{label}</span>
-        {lockMsg && <span className="ad-tag ad-tag--sm">지금은 바꿀 수 없어요</span>}
+        {lockMsg && <span className="ad-tag ad-tag--sm">{t('지금은 바꿀 수 없어요')}</span>}
       </div>
       {hint && <p className="ad-card__desc">{hint}</p>}
       <div className="ad-choices" style={{ marginTop: 12 }}>
@@ -252,12 +252,12 @@ export function Questions() {
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">모의고사</h1>
+          <h1 className="ad-head__title">{t('모의고사')}</h1>
           <span className="ad-head__count tnum">
             공개 {open.length}문항 · 만점 {maxScore}점
           </span>
         </div>
-        <p className="ad-head__desc">문항과 운영 방식을 관리해요.</p>
+        <p className="ad-head__desc">{t('문항과 운영 방식을 관리해요.')}</p>
       </header>
 
       <div className="ad-stack">
@@ -273,17 +273,17 @@ export function Questions() {
                 * (아래 `addMany` 주석 — 손으로 만드는 것과 같은 규칙이다).
                 */}
               <BulkPaste
-                label="문항"
+                label={t('문항')}
                 disabled={busy}
                 placeholder={
                   '우리 최애 데뷔 연도는? | 2015 | 2016 | 2017 | 2018 | 2\n최애 포지션은? | 메인보컬\n응원봉 색은? | 라벤더 | 민트 | 코랄 | 1'
                 }
                 hint={
                   <>
-                    한 줄에 한 문항씩 <b>문제 | 보기1 | 보기2 | … | 정답번호</b> 순서로 적어 주세요.
-                    보기 없이 <b>문제 | 정답</b> 만 적으면 주관식이 돼요. 탭·쉼표·세로줄 다 돼요.
+                    한 줄에 한 문항씩 <b>{t('문제 | 보기1 | 보기2 | … | 정답번호')}</b> 순서로 적어 주세요.
+                    보기 없이 <b>{t('문제 | 정답')}</b> 만 적으면 주관식이 돼요. 탭·쉼표·세로줄 다 돼요.
                     <br />
-                    배점은 1점으로 들어가고, <b>전부 비공개</b>로 만들어져요 — 확인하고 공개해 주세요.
+                    배점은 1점으로 들어가고, <b>{t('전부 비공개')}</b>로 만들어져요 — 확인하고 공개해 주세요.
                   </>
                 }
                 parse={(text) => parseQuestions(text, list.length)}
@@ -318,8 +318,8 @@ export function Questions() {
 
           {list.length === 0 ? (
             <div className="ad-empty">
-              <div className="ad-empty__title">아직 문항이 없어요</div>
-              <div className="ad-empty__sub">문항을 만들고 정답을 채운 뒤 공개해 주세요.</div>
+              <div className="ad-empty__title">{t('아직 문항이 없어요')}</div>
+              <div className="ad-empty__sub">{t('문항을 만들고 정답을 채운 뒤 공개해 주세요.')}</div>
             </div>
           ) : (
             <div className="ad-rows" data-questions>
@@ -332,10 +332,10 @@ export function Questions() {
                 >
                   <span className="ad-row__no tnum">{i + 1}</span>
                   <button type="button" className="ad-row__grow" onClick={() => setEditing(q)}>
-                    <div className="ad-row__title">{q.body || '(내용 없음)'}</div>
+                    <div className="ad-row__title">{q.body || t('(내용 없음)')}</div>
                     <div className="ad-row__meta">
                       <span>
-                        {q.kind === 'choice' ? '객관식' : '주관식'} · {q.points}점 ·{' '}
+                        {q.kind === 'choice' ? t('객관식') : t('주관식')} · {q.points}점 ·{' '}
                         {q.kind === 'choice'
                           ? `보기 ${q.choices.length}개 · 정답 ${q.answers.length}개`
                           : `인정 답 ${q.answers.length}개`}
@@ -354,13 +354,13 @@ export function Questions() {
                     disabled={busy}
                     onClick={() => {
                       if (q.hidden && q.answers.length === 0) {
-                        toast('정답이 비어 있어 공개할 수 없어요')
+                        toast(t('정답이 비어 있어 공개할 수 없어요'))
                         return
                       }
                       void save({ ...q, hidden: !q.hidden })
                     }}
                   >
-                    {q.hidden ? '비공개' : '공개'}
+                    {q.hidden ? t('비공개') : t('공개')}
                   </button>
                   <button
                     type="button"
@@ -370,16 +370,16 @@ export function Questions() {
                     onClick={async () => {
                       if (
                         !(await confirmAction({
-                          title: '이 문항을 지울까요?',
-                          desc: '이미 응시한 분들의 점수는 그대로 남아요. 문항만 사라져요.',
-                          okLabel: '지우기',
+                          title: t('이 문항을 지울까요?'),
+                          desc: t('이미 응시한 분들의 점수는 그대로 남아요. 문항만 사라져요.'),
+                          okLabel: t('지우기'),
                           danger: true,
                         }))
                       )
                         return
                       await repo.quiz.removeQuestion(slug, q.id)
                       await load()
-                      toast('문항을 지웠어요')
+                      toast(t('문항을 지웠어요'))
                     }}
                   >
                     ×
@@ -391,18 +391,18 @@ export function Questions() {
         </div>
 
         <div>
-          <span className="ad-note">아래 운영 설정은 고르면 바로 저장돼요</span>
+          <span className="ad-note">{t('아래 운영 설정은 고르면 바로 저장돼요')}</span>
         </div>
 
         <div className="ad-card ad-card--form">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
             {choice(
-              '선물',
-              '응모로 정하면 응모 때 받을 정보를 고를 수 있어요.',
+              t('선물'),
+              t('응모로 정하면 응모 때 받을 정보를 고를 수 있어요.'),
               settings.rewardMode,
               [
                 { v: 'none' as const, n: '없음 (점수·칭호만)' },
-                { v: 'threshold' as const, n: '기준 점수 이상 확정 선물' },
+                { v: 'threshold' as const, n: t('기준 점수 이상 확정 선물') },
                 { v: 'raffle' as const, n: '응모 (나중에 추첨)' },
               ],
               (v) => void saveSettings({ ...settings, rewardMode: v })
@@ -410,7 +410,7 @@ export function Questions() {
 
             {settings.rewardMode === 'threshold' && (
               <div>
-                <div className="ad-card__title">기준 점수</div>
+                <div className="ad-card__title">{t('기준 점수')}</div>
                 <div className="ad-inline" style={{ marginTop: 12 }}>
                   <input
                     className="ad-input ad-input--num"
@@ -426,7 +426,7 @@ export function Questions() {
                     onBlur={() => void saveSettings(settings)}
                     data-min-score
                   />
-                  <span className="ad-unit">점 이상</span>
+                  <span className="ad-unit">{t('점 이상')}</span>
                   <span className="ad-range">지금 만점은 {maxScore}점이에요</span>
                 </div>
               </div>
@@ -439,7 +439,7 @@ export function Questions() {
                   className="ad-input"
                   style={{ marginTop: 12 }}
                   value={settings.rewardLabel}
-                  placeholder="예: 아크릴 스탠드"
+                  placeholder={t('예: 아크릴 스탠드')}
                   disabled={busy}
                   onChange={(e) => setSettings({ ...settings, rewardLabel: e.target.value })}
                   onBlur={() => void saveSettings(settings)}
@@ -448,7 +448,7 @@ export function Questions() {
             )}
 
             {choice(
-              '제한시간',
+              t('제한시간'),
               '',
               String(settings.timeLimitSec),
               [
@@ -461,31 +461,31 @@ export function Questions() {
             )}
 
             {choice(
-              '정답 공개',
-              '카페에서 앞사람이 답을 알려주는 게 걱정되면 ‘안 보여줘요’ 로 두세요.',
+              t('정답 공개'),
+              t('카페에서 앞사람이 답을 알려주는 게 걱정되면 ‘안 보여줘요’ 로 두세요.'),
               settings.showAnswers,
               [
-                { v: 'wrongOnly' as const, n: '틀린 문제만' },
-                { v: 'after' as const, n: '다 보여줘요' },
-                { v: 'none' as const, n: '안 보여줘요' },
+                { v: 'wrongOnly' as const, n: t('틀린 문제만') },
+                { v: 'after' as const, n: t('다 보여줘요') },
+                { v: 'none' as const, n: t('안 보여줘요') },
               ],
               (v) => void saveSettings({ ...settings, showAnswers: v })
             )}
 
             {choice(
-              '다시 풀기',
-              rewardOn ? '선물이 있으면 켤 수 없어요. 될 때까지 풀면 모두가 당첨돼요.' : '',
+              t('다시 풀기'),
+              rewardOn ? t('선물이 있으면 켤 수 없어요. 될 때까지 풀면 모두가 당첨돼요.') : '',
               settings.allowRetry ? 'on' : 'off',
               [
-                { v: 'on' as const, n: '여러 번 풀 수 있어요' },
+                { v: 'on' as const, n: t('여러 번 풀 수 있어요') },
                 { v: 'off' as const, n: t('한 번만') },
               ],
               (v) => void saveSettings({ ...settings, allowRetry: v === 'on' }),
-              rewardOn ? '선물이 있으면 다시 풀기를 켤 수 없어요' : undefined
+              rewardOn ? t('선물이 있으면 다시 풀기를 켤 수 없어요') : undefined
             )}
 
             {choice(
-              '마감',
+              t('마감'),
               '',
               settings.closed ? 'on' : 'off',
               [
@@ -555,15 +555,16 @@ function Editor({
   onCancel: () => void
   onSave: (q: QuizQuestionFull) => void
 }) {
+  const t = useT()
   const [q, setQ] = useState(initial)
   const [extra, setExtra] = useState('')
 
   const set = (change: Partial<QuizQuestionFull>) => setQ({ ...q, ...change })
 
   const blockers: string[] = []
-  if (!q.body.trim()) blockers.push('문제 문구가 비어 있어요')
-  if (q.kind === 'choice' && q.answers.length === 0) blockers.push('정답으로 고른 보기가 없어요')
-  if (q.kind === 'short' && q.answers.length === 0) blockers.push('인정할 답이 하나도 없어요')
+  if (!q.body.trim()) blockers.push(t('문제 문구가 비어 있어요'))
+  if (q.kind === 'choice' && q.answers.length === 0) blockers.push(t('정답으로 고른 보기가 없어요'))
+  if (q.kind === 'short' && q.answers.length === 0) blockers.push(t('인정할 답이 하나도 없어요'))
   const canSave = blockers.length === 0
 
   const addAccept = () => {
@@ -580,7 +581,7 @@ function Editor({
           ‹ 문항 목록
         </button>
         <div className="ad-head__row">
-          <h1 className="ad-head__title">문항 {initial.body ? '고치기' : '추가'}</h1>
+          <h1 className="ad-head__title">문항 {initial.body ? t('고치기') : t('추가')}</h1>
         </div>
         <p className="ad-head__desc">
           정답은 방문자 화면에 한 번도 내려가지 않아요. 채점은 서버가 해요.
@@ -593,18 +594,18 @@ function Editor({
         </div>
 
         <div className="ad-card ad-card--form">
-          <span className="ad-field__label">문제</span>
+          <span className="ad-field__label">{t('문제')}</span>
           <input
             className="ad-input ad-input--lg"
             value={q.body}
-            placeholder="문제 문구"
+            placeholder={t('문제 문구')}
             onChange={(e) => set({ body: e.target.value })}
             data-q-body
           />
 
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginTop: 18 }}>
             <div>
-              <span className="ad-field__label">유형</span>
+              <span className="ad-field__label">{t('유형')}</span>
               {/* 옆의 배점 입력칸과 같은 높이 — 나란히 서는 두 컨트롤은 밑선이 맞아야 한다 */}
               <div className="ad-seg ad-seg--tall" data-q-kind>
                 {(
@@ -629,7 +630,7 @@ function Editor({
               </div>
             </div>
             <div>
-              <span className="ad-field__label">배점</span>
+              <span className="ad-field__label">{t('배점')}</span>
               <input
                 className="ad-input ad-input--num"
                 inputMode="numeric"
@@ -650,7 +651,7 @@ function Editor({
 
           {q.kind === 'choice' ? (
             <div style={{ marginTop: 22 }}>
-              <span className="ad-field__label">보기 · 정답 하나 고르기</span>
+              <span className="ad-field__label">{t('보기 · 정답 하나 고르기')}</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {/* 보기 입력칸은 문제·사진 칸과 **같은 폭**이다 — 정답 표시와 지우기는 칸 안쪽에 얹는다 */}
                 {q.choices.map((c, i) => (
@@ -675,7 +676,7 @@ function Editor({
                       type="button"
                       className="ad-x"
                       disabled={q.choices.length <= 2}
-                      aria-label="보기 삭제"
+                      aria-label={t('보기 삭제')}
                       onClick={() =>
                         set({
                           choices: q.choices.filter((_, n) => n !== i),
@@ -705,7 +706,7 @@ function Editor({
             </div>
           ) : (
             <div style={{ marginTop: 22 }}>
-              <span className="ad-field__label">인정할 답</span>
+              <span className="ad-field__label">{t('인정할 답')}</span>
               <p className="ad-fine" style={{ margin: '-2px 0 10px' }}>
                 띄어쓰기·문장부호·대소문자는 채점에서 무시돼요. 방문자가 다르게 쓸 표현을 미리 넣어
                 두면 문의가 줄어요.
@@ -729,7 +730,7 @@ function Editor({
                 <input
                   className="ad-input ad-input--sm ad-input--grow"
                   value={extra}
-                  placeholder="인정할 표현을 적고 추가"
+                  placeholder={t('인정할 표현을 적고 추가')}
                   onChange={(e) => setExtra(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key !== 'Enter') return
@@ -744,7 +745,7 @@ function Editor({
                   disabled={!extra.trim()}
                   onClick={addAccept}
                 >
-                  추가
+                  {t('추가')}
                 </button>
               </div>
             </div>
@@ -759,12 +760,12 @@ function Editor({
             <span className="ad-check__box" data-on={!q.hidden || undefined}>
               {q.hidden ? '' : '✓'}
             </span>
-            <span className="ad-checkbare__label">방문자에게 공개</span>
+            <span className="ad-checkbare__label">{t('방문자에게 공개')}</span>
           </button>
 
           {blockers.length > 0 && (
             <div className="ad-banner ad-banner--warn ad-banner--pad" style={{ marginTop: 18 }}>
-              <div className="ad-banner__title">아직 저장할 수 없어요</div>
+              <div className="ad-banner__title">{t('아직 저장할 수 없어요')}</div>
               {blockers.map((b) => (
                 <div key={b} className="ad-banner__body" style={{ marginTop: 4 }}>
                   · {b}
@@ -781,7 +782,7 @@ function Editor({
               onClick={() => onSave(q)}
               data-save-question
             >
-              저장하기
+              {t('저장하기')}
             </button>
             <button type="button" className="ad-btn ad-btn--line ad-btn--2xl" onClick={onCancel}>
               취소

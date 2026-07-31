@@ -22,6 +22,8 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 
 import { EN } from '../src/i18n/en.ts'
+import { ADMIN_EN } from '../src/i18n/admin.en.ts'
+import { ADMIN2_EN } from '../src/i18n/admin2.en.ts'
 
 const file = process.argv[2]
 const write = process.argv.includes('--write')
@@ -30,8 +32,9 @@ if (!file) {
   process.exit(1)
 }
 
-/** 사전에 있는 문장만 — 긴 것부터 봐야 짧은 것이 긴 것 안을 먼저 먹지 않는다 */
-const KEYS = Object.keys(EN).sort((a, b) => b.length - a.length)
+/** 사전에 있는 문장만 — 긴 것부터 봐야 짧은 것이 긴 것 안을 먼저 먹지 않는다.
+ *  사전 셋을 다 합친다 (`index.tsx` 의 `DICTS` 와 같은 판단 — 화면은 어차피 `t()` 하나다) */
+const KEYS = Object.keys({ ...EN, ...ADMIN_EN, ...ADMIN2_EN }).sort((a, b) => b.length - a.length)
 const KEYSET = new Set(KEYS)
 
 const src = readFileSync(file, 'utf8')

@@ -14,7 +14,7 @@ import { loadPeriodDraw } from '@/lib/storage'
 import { useSlotPath } from '@/slot/useSlotPath'
 import type { Aspect, DrawnCard } from '@/types/card'
 import styles from './Home.module.css'
-import { useT } from '@/i18n'
+import { useLang, useT } from '@/i18n'
 
 /**
  * 홈 — 기간 운세(오늘·주간·월간).
@@ -75,11 +75,12 @@ function restore(category: Category): DrawnCard[] | null {
 
 /** 뽑았으면 결과를, 아직이면 뽑으러 보낸다 */
 function PeriodPanel({ category }: { category: Category }) {
+  const t = useT()
   const drawn = restore(category)
 
   return (
     <>
-      <p className={`t-text-xs t-muted ${styles.renews}`}>{category.renews}</p>
+      <p className={`t-text-xs t-muted ${styles.renews}`}>{category.renews && t(category.renews)}</p>
       {drawn ? (
         <PeriodResult category={category} drawn={drawn} />
       ) : (
@@ -90,7 +91,7 @@ function PeriodPanel({ category }: { category: Category }) {
 }
 
 function PeriodEmpty({ category }: { category: Category }) {
-  const t = useT()
+  const { lang, t } = useLang()
   const { go: goTo } = useSlotPath()
   const go = () => goTo(`draw/${category.id}`)
 
@@ -99,16 +100,16 @@ function PeriodEmpty({ category }: { category: Category }) {
       <button
         type="button"
         className={`play-card play-card--lifted ${styles.emptyCard}`}
-        aria-label={`${category.label} 카드 뽑기`}
+        aria-label={t('{category} 카드 뽑기', { category: t(category.label) })}
         onClick={go}
       >
         <CardBack />
       </button>
       {/* 넓은 화면에선 카드 오른쪽에 세로로 붙는 히어로 텍스트 (모바일은 카드 아래 가운데) */}
       <div className={styles.emptyBody}>
-        <p className="t-text-l">{category.label} 카드가 당신을 기다리고 있어요</p>
+        <p className="t-text-l">{t('{category} 카드가 당신을 기다리고 있어요', { category: t(category.label) })}</p>
         {/* 기간 라벨은 세 세그먼트 모두 같은 자리에 — 없으면 버튼이 위아래로 움직인다 */}
-        <p className="t-text-xs t-muted">{category.periodLabel?.()}</p>
+        <p className="t-text-xs t-muted">{category.periodLabel?.(lang)}</p>
         <button
           type="button"
           className={`btn btn--sm btn--primary btn--glow ${styles.emptyCta}`}
@@ -150,6 +151,7 @@ const SUMMARY_ASPECTS: { aspect: Aspect; label: string; icon: LucideIcon }[] = [
 ]
 
 function AspectSummaries({ drawn }: { drawn: DrawnCard }) {
+  const t = useT()
   const reading = readingOf(drawn)
 
   return (
@@ -163,7 +165,7 @@ function AspectSummaries({ drawn }: { drawn: DrawnCard }) {
             aria-hidden="true"
           />
           <span className={styles.summaryText}>
-            <span className="t-text-s">{label}</span>
+            <span className="t-text-s">{t(label)}</span>
             <span className="t-text-m t-fg-2">{firstSentence(reading[aspect])}</span>
           </span>
         </div>

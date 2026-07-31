@@ -136,7 +136,7 @@ export function Overview() {
   }
   function addRow() {
     if (locked) {
-      toast('설정 잠금을 먼저 풀어 주세요')
+      toast(t('설정 잠금을 먼저 풀어 주세요'))
       return
     }
     setRows((prev) => prev && [...prev, blankPrize(prev.length + 1)])
@@ -147,13 +147,13 @@ export function Overview() {
     const target = rows?.[index]
     if (!target) return
     if (locked) {
-      toast('설정 잠금을 먼저 풀어 주세요')
+      toast(t('설정 잠금을 먼저 풀어 주세요'))
       return
     }
     const ok = await confirmAction({
-      title: '이 상품을 지울까요?',
-      desc: `“${target.name || '이름 없는 상품'}” 을 목록에서 빼요. 아래 등수가 하나씩 당겨지며 다시 매겨져요. 이미 뽑힌 기록은 남아요.`,
-      okLabel: '지우기',
+      title: t('이 상품을 지울까요?'),
+      desc: `“${target.name || t('이름 없는 상품')}” 을 목록에서 빼요. 아래 등수가 하나씩 당겨지며 다시 매겨져요. 이미 뽑힌 기록은 남아요.`,
+      okLabel: t('지우기'),
       danger: true,
     })
     if (!ok) return
@@ -168,9 +168,9 @@ export function Overview() {
     if (!settings) return
     if (key === 'rehearsal' && settings.rehearsal) {
       const ok = await confirmAction({
-        title: '실제 운영으로 바꿀까요?',
-        desc: '지금부터 뽑을 때마다 재고가 실제로 줄어들어요. 리허설에서 뽑은 기록은 재고에 반영되지 않아요.',
-        okLabel: '실제 운영으로',
+        title: t('실제 운영으로 바꿀까요?'),
+        desc: t('지금부터 뽑을 때마다 재고가 실제로 줄어들어요. 리허설에서 뽑은 기록은 재고에 반영되지 않아요.'),
+        okLabel: t('실제 운영으로'),
         danger: true,
       })
       if (!ok) return
@@ -179,9 +179,9 @@ export function Overview() {
     }
     if (key === 'closed' && !settings.closed) {
       const ok = await confirmAction({
-        title: '행사를 마감할까요?',
-        desc: '방문자가 더 이상 뽑을 수 없게 돼요. 다시 열 수 있지만, 마감 안내가 방문자 화면에 바로 떠요.',
-        okLabel: '마감하기',
+        title: t('행사를 마감할까요?'),
+        desc: t('방문자가 더 이상 뽑을 수 없게 돼요. 다시 열 수 있지만, 마감 안내가 방문자 화면에 바로 떠요.'),
+        okLabel: t('마감하기'),
         danger: true,
       })
       if (!ok) return
@@ -197,9 +197,9 @@ export function Overview() {
     if (!settings) return
     if (!settings.batchCapEnabled) {
       const ok = await confirmAction({
-        title: '묶음 뽑기 제한을 켤까요?',
-        desc: '흔한 상품이 덜 나오는 만큼 비싼 상품이 더 빨리 소진돼요. 상품 표에 “5개당 최대” 열이 생겨요.',
-        okLabel: '켜기',
+        title: t('묶음 뽑기 제한을 켤까요?'),
+        desc: t('흔한 상품이 덜 나오는 만큼 비싼 상품이 더 빨리 소진돼요. 상품 표에 “5개당 최대” 열이 생겨요.'),
+        okLabel: t('켜기'),
       })
       if (!ok) return
       patchSettings({ batchCapEnabled: true })
@@ -218,9 +218,9 @@ export function Overview() {
       if (dirty) await repo.luckydraw.savePrizes(slug, rows)
       await load()
       setSaved(true)
-      toast('저장했어요')
+      toast(t('저장했어요'))
     } catch (e) {
-      setNote(e instanceof Error ? e.message : '저장하지 못했어요')
+      setNote(e instanceof Error ? e.message : t('저장하지 못했어요'))
     } finally {
       setSaving(false)
     }
@@ -229,15 +229,15 @@ export function Overview() {
   async function discard() {
     if (!anyDirty) return
     const ok = await confirmAction({
-      title: '바꾼 내용을 버릴까요?',
-      desc: '저장하지 않은 변경이 모두 사라져요.',
-      okLabel: '버리기',
+      title: t('바꾼 내용을 버릴까요?'),
+      desc: t('저장하지 않은 변경이 모두 사라져요.'),
+      okLabel: t('버리기'),
       danger: true,
     })
     if (!ok) return
     await load()
     setSaved(false)
-    toast('바꾼 내용을 버렸어요')
+    toast(t('바꾼 내용을 버렸어요'))
   }
 
   const locked = settings?.locked ?? false
@@ -255,25 +255,25 @@ export function Overview() {
 
   const banners: { text: string; tone: 'warn' | 'mute' }[] = []
   if (locked)
-    banners.push({ text: '설정이 잠겨 있어요. 상품과 수량을 고치려면 아래에서 잠금을 풀어 주세요.', tone: 'mute' })
+    banners.push({ text: t('설정이 잠겨 있어요. 상품과 수량을 고치려면 아래에서 잠금을 풀어 주세요.'), tone: 'mute' })
   if (settings.rehearsal && !settings.closed)
-    banners.push({ text: '지금은 리허설이에요. 행사 시작 전에 실제 운영으로 바꿔 주세요.', tone: 'warn' })
+    banners.push({ text: t('지금은 리허설이에요. 행사 시작 전에 실제 운영으로 바꿔 주세요.'), tone: 'warn' })
   if (settings.closed)
-    banners.push({ text: '행사가 마감됐어요. 다시 열면 방문자가 이어서 뽑을 수 있어요.', tone: 'mute' })
+    banners.push({ text: t('행사가 마감됐어요. 다시 열면 방문자가 이어서 뽑을 수 있어요.'), tone: 'mute' })
 
   const stateTone = settings.closed ? 'mute' : settings.rehearsal ? 'warn' : 'key'
-  const stateLabel = settings.closed ? t('마감') : settings.rehearsal ? t('리허설') : '실제 운영'
+  const stateLabel = settings.closed ? t('마감') : settings.rehearsal ? t('리허설') : t('실제 운영')
   const stateHint = settings.closed
-    ? '방문자가 더 뽑을 수 없어요'
+    ? t('방문자가 더 뽑을 수 없어요')
     : settings.rehearsal
-      ? '뽑아도 재고가 줄지 않아요'
-      : '뽑을 때마다 재고가 줄어요'
+      ? t('뽑아도 재고가 줄지 않아요')
+      : t('뽑을 때마다 재고가 줄어요')
 
   return (
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">상품 · 운영</h1>
+          <h1 className="ad-head__title">{t('상품 · 운영')}</h1>
           <span className="ad-head__count tnum">상품 {rows.length}종</span>
         </div>
         <p className="ad-head__desc">
@@ -284,23 +284,23 @@ export function Overview() {
       <div className="ad-stack">
         <div className="ad-stats">
           <div className="ad-stat">
-            <div className="ad-stat__label">남은 수량</div>
+            <div className="ad-stat__label">{t('남은 수량')}</div>
             <div className="ad-stat__row">
               <span className="ad-stat__value tnum">{totalRemaining.toLocaleString()}</span>
-              <span className="ad-stat__unit">개</span>
+              <span className="ad-stat__unit">{t('개')}</span>
             </div>
             <div className="ad-stat__sub">상품 {rows.length}종</div>
           </div>
           <div className="ad-stat">
-            <div className="ad-stat__label">오늘 나간 수량</div>
+            <div className="ad-stat__label">{t('오늘 나간 수량')}</div>
             <div className="ad-stat__row">
               <span className="ad-stat__value tnum">{totalToday.toLocaleString()}</span>
-              <span className="ad-stat__unit">개</span>
+              <span className="ad-stat__unit">{t('개')}</span>
             </div>
             <div className="ad-stat__sub">누적 {totalAll.toLocaleString()}개</div>
           </div>
           <div className="ad-stat">
-            <div className="ad-stat__label">지금 운영 상태</div>
+            <div className="ad-stat__label">{t('지금 운영 상태')}</div>
             <div style={{ marginTop: 10 }}>
               <span className="ad-state" data-tone={stateTone}>
                 <span className="ad-state__dot" aria-hidden="true" />
@@ -320,20 +320,20 @@ export function Overview() {
         <div className="ad-card">
           <div className="ad-card__head" style={{ marginBottom: 6 }}>
             <div className="ad-card__titleRow">
-              <span className="ad-card__title">상품</span>
+              <span className="ad-card__title">{t('상품')}</span>
               <span className="ad-card__num tnum">{rows.length}종</span>
             </div>
             <div className="ad-btnrow">
               {/* 문의 양식·엑셀에서 그대로 옮겨 붙이는 자리 — 상품이 여덟 종이면 여덟 번 누르지 않는다 */}
               <BulkPaste
-                label="상품"
+                label={t('상품')}
                 disabled={locked || rows.length >= MAX_PRIZES}
                 placeholder={'1\t스페셜 포토북\t3\n2\t아크릴 스탠드\t10\n3\t엽서 세트\t50'}
                 hint={
                   <>
                     한 줄에 하나씩 <b>이름, 수량</b> 순서로 적어 주세요. 앞에 등수를 적어도 되고
                     안 적어도 돼요(줄 순서대로 매겨져요). 탭·쉼표·세로줄 다 돼요. 수량 뒤에{' '}
-                    <b>배송</b>이라고 적으면 그 상품은 배송 정보를 받아요.
+                    <b>{t('배송')}</b>이라고 적으면 그 상품은 배송 정보를 받아요.
                   </>
                 }
                 parse={parsePrizes}
@@ -371,12 +371,12 @@ export function Overview() {
           <div className="ad-table" style={tableVars}>
             <div className="ad-table__inner">
               <div className="ad-table__head">
-                <span>등수 · 상품명</span>
-                <span style={{ textAlign: 'center' }}>남은 수량</span>
-                <span style={{ textAlign: 'center' }}>오늘 나감</span>
-                <span style={{ textAlign: 'center' }}>누적</span>
-                {capOn && <span style={{ textAlign: 'center' }}>5개당 최대</span>}
-                <span>배송</span>
+                <span>{t('등수 · 상품명')}</span>
+                <span style={{ textAlign: 'center' }}>{t('남은 수량')}</span>
+                <span style={{ textAlign: 'center' }}>{t('오늘 나감')}</span>
+                <span style={{ textAlign: 'center' }}>{t('누적')}</span>
+                {capOn && <span style={{ textAlign: 'center' }}>{t('5개당 최대')}</span>}
+                <span>{t('배송')}</span>
                 <span />
               </div>
 
@@ -389,7 +389,7 @@ export function Overview() {
                     <input
                       className="ad-input ad-input--sm"
                       value={r.name}
-                      placeholder="상품 이름"
+                      placeholder={t('상품 이름')}
                       disabled={locked}
                       onChange={(e) => patchRow(i, { name: e.target.value })}
                     />
@@ -415,7 +415,7 @@ export function Overview() {
                     <input
                       className="ad-input ad-input--sm ad-input--center"
                       inputMode="numeric"
-                      placeholder="제한 없음"
+                      placeholder={t('제한 없음')}
                       value={r.batchCapRatio == null ? '' : Math.round(r.batchCapRatio * 5)}
                       disabled={locked}
                       aria-label={`${r.rank}등 5개당 최대 개수`}
@@ -433,7 +433,7 @@ export function Overview() {
                     aria-label={`${r.rank}등 배송 필요`}
                     onClick={() => patchRow(i, { requiresShipping: !r.requiresShipping })}
                   >
-                    {r.requiresShipping ? '필요' : '아니요'}
+                    {r.requiresShipping ? '필요' : t('아니요')}
                   </button>
                   <button
                     type="button"
@@ -448,7 +448,7 @@ export function Overview() {
               ))}
 
               <div className="ad-table__foot">
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ad-ink-2)' }}>합계</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ad-ink-2)' }}>{t('합계')}</span>
                 <span className="tnum" style={{ fontSize: 14, fontWeight: 700, textAlign: 'center' }}>
                   {totalRemaining.toLocaleString()}
                 </span>
@@ -478,33 +478,33 @@ export function Overview() {
              */}
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
-                <div className="ad-switchrow__name">실제 운영</div>
-                <div className="ad-switchrow__hint">끄면 리허설이에요. 뽑아도 재고가 줄지 않아요.</div>
+                <div className="ad-switchrow__name">{t('실제 운영')}</div>
+                <div className="ad-switchrow__hint">{t('끄면 리허설이에요. 뽑아도 재고가 줄지 않아요.')}</div>
               </div>
               <button
                 type="button"
                 className="ad-switch"
                 data-on={!settings.rehearsal || undefined}
-                aria-label="실제 운영"
+                aria-label={t('실제 운영')}
                 onClick={() => void toggleOp('rehearsal')}
               />
             </div>
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
-                <div className="ad-switchrow__name">행사 마감</div>
+                <div className="ad-switchrow__name">{t('행사 마감')}</div>
                 <div className="ad-switchrow__hint">켜면 방문자가 더 못 뽑아요. 언제든 다시 열 수 있어요.</div>
               </div>
               <button
                 type="button"
                 className="ad-switch"
                 data-on={settings.closed || undefined}
-                aria-label="행사 마감"
+                aria-label={t('행사 마감')}
                 onClick={() => void toggleOp('closed')}
               />
             </div>
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
-                <div className="ad-switchrow__name">설정 잠금</div>
+                <div className="ad-switchrow__name">{t('설정 잠금')}</div>
                 <div className="ad-switchrow__hint">
                   상품과 수량만 못 고치게 잠가요. 뽑기는 그대로 돼요.
                 </div>
@@ -513,7 +513,7 @@ export function Overview() {
                 type="button"
                 className="ad-switch"
                 data-on={settings.locked || undefined}
-                aria-label="설정 잠금"
+                aria-label={t('설정 잠금')}
                 onClick={() => void toggleOp('locked')}
               />
             </div>
@@ -521,8 +521,8 @@ export function Overview() {
         </div>
 
         <div className="ad-card">
-          <div className="ad-card__title">당첨 결과 표시</div>
-          <p className="ad-card__desc">뽑은 방문자 화면에 무엇으로 보일지 정해요.</p>
+          <div className="ad-card__title">{t('당첨 결과 표시')}</div>
+          <p className="ad-card__desc">{t('뽑은 방문자 화면에 무엇으로 보일지 정해요.')}</p>
           <div className="ad-choices" style={{ marginTop: 12 }}>
             {(
               [
@@ -555,8 +555,8 @@ export function Overview() {
             >
               <span className="ad-check__box">{settings.showPrizePreview ? '✓' : ''}</span>
               <span>
-                <span className="ad-check__name">뽑기 전에 경품 목록 보여주기</span>
-                <span className="ad-check__hint">상품명이 스포일러가 되는 행사면 꺼 주세요.</span>
+                <span className="ad-check__name">{t('뽑기 전에 경품 목록 보여주기')}</span>
+                <span className="ad-check__hint">{t('상품명이 스포일러가 되는 행사면 꺼 주세요.')}</span>
               </span>
             </button>
             <button
@@ -566,7 +566,7 @@ export function Overview() {
               data-dim={!settings.showPrizePreview || undefined}
               onClick={() => {
                 if (!settings.showPrizePreview) {
-                  toast('경품 미리보기를 먼저 켜 주세요')
+                  toast(t('경품 미리보기를 먼저 켜 주세요'))
                   return
                 }
                 patchSettings({ showPrizeCount: !settings.showPrizeCount })
@@ -576,15 +576,15 @@ export function Overview() {
                 {settings.showPrizePreview && settings.showPrizeCount ? '✓' : ''}
               </span>
               <span>
-                <span className="ad-check__name">남은 수량까지 보여주기</span>
-                <span className="ad-check__hint">경품 목록을 보여줄 때만 고를 수 있어요.</span>
+                <span className="ad-check__name">{t('남은 수량까지 보여주기')}</span>
+                <span className="ad-check__hint">{t('경품 목록을 보여줄 때만 고를 수 있어요.')}</span>
               </span>
             </button>
           </div>
         </div>
 
         <div className="ad-card">
-          <div className="ad-card__title">묶음 뽑기 제한</div>
+          <div className="ad-card__title">{t('묶음 뽑기 제한')}</div>
           <div style={{ marginTop: 12 }}>
             <button
               type="button"
@@ -594,7 +594,7 @@ export function Overview() {
             >
               <span className="ad-check__box">{capOn ? '✓' : ''}</span>
               <span>
-                <span className="ad-check__name">한 번에 5개 뽑을 때 상품마다 최대 개수를 정하기</span>
+                <span className="ad-check__name">{t('한 번에 5개 뽑을 때 상품마다 최대 개수를 정하기')}</span>
                 <span className="ad-check__hint">
                   켜면 상품 표에 열이 하나 늘어요. 비워 두면 그 상품은 제한이 없어요.
                 </span>
@@ -614,12 +614,12 @@ export function Overview() {
           {note
             ? note
             : saving
-              ? '저장하는 중이에요'
+              ? t('저장하는 중이에요')
               : anyDirty
-                ? '아직 저장하지 않은 변경이 있어요'
+                ? t('아직 저장하지 않은 변경이 있어요')
                 : saved
-                  ? '저장됐어요'
-                  : '바꾼 내용이 없어요'}
+                  ? t('저장됐어요')
+                  : t('바꾼 내용이 없어요')}
         </span>
         <div className="ad-btnrow">
           <button
@@ -628,7 +628,7 @@ export function Overview() {
             disabled={!anyDirty || saving}
             onClick={() => void discard()}
           >
-            되돌리기
+            {t('되돌리기')}
           </button>
           <button
             type="button"
@@ -637,7 +637,7 @@ export function Overview() {
             onClick={() => void saveAll()}
             data-save
           >
-            {saving ? '저장하는 중…' : t('저장')}
+            {saving ? t('저장하는 중…') : t('저장')}
           </button>
         </div>
       </div>

@@ -36,7 +36,7 @@ export function Board() {
   const head = (count: number) => (
     <header className="ad-head">
       <div className="ad-head__row">
-        <h1 className="ad-head__title">스탬프</h1>
+        <h1 className="ad-head__title">{t('스탬프')}</h1>
         <span className="ad-head__count tnum">칸 {count}개</span>
       </div>
       <p className="ad-head__desc">
@@ -64,7 +64,7 @@ export function Board() {
     try {
       await repo.stamp.saveSettings(slug, next)
       setSettings(next)
-      toast('저장했어요')
+      toast(t('저장했어요'))
     } finally {
       setBusy(false)
     }
@@ -87,7 +87,7 @@ export function Board() {
     <div style={locked ? { opacity: 0.55 } : undefined}>
       <div className="ad-card__titleRow">
         <span className="ad-card__title">{label}</span>
-        {locked && <span className="ad-tag ad-tag--sm">지금은 바꿀 수 없어요</span>}
+        {locked && <span className="ad-tag ad-tag--sm">{t('지금은 바꿀 수 없어요')}</span>}
       </div>
       {hint && <p className="ad-card__desc">{hint}</p>}
       <div className="ad-choices" style={{ marginTop: 12 }}>
@@ -113,7 +113,7 @@ export function Board() {
 
       <div className="ad-stack">
         <div className="ad-banner ad-banner--info ad-banner--pad">
-          <div className="ad-banner__title">이 목록의 규칙</div>
+          <div className="ad-banner__title">{t('이 목록의 규칙')}</div>
           <div className="ad-banner__body">
             암호를 비워 두면 그 칸은 방문자에게 잠긴 채로 보여요. 암호가 새면 새로 만들기로 바꾸세요 —
             바꾸면 예전 암호는 바로 안 먹어요. 칸 이름과 순서는 담당자가 정해요.
@@ -131,7 +131,7 @@ export function Board() {
               className="ad-btn ad-btn--line ad-btn--sm"
               onClick={() => setShown((v) => !v)}
             >
-              {shown ? '가리기' : '보기'}
+              {shown ? t('가리기') : t('보기')}
             </button>
           </div>
 
@@ -191,7 +191,7 @@ export function Board() {
         </div>
 
         <div>
-          <span className="ad-note">바꾸면 바로 저장돼요 · 저장 버튼이 없어요</span>
+          <span className="ad-note">{t('바꾸면 바로 저장돼요 · 저장 버튼이 없어요')}</span>
         </div>
 
         <div className="ad-card ad-card--form">
@@ -215,7 +215,7 @@ export function Board() {
                   className="ad-input"
                   style={{ marginTop: 12 }}
                   value={settings.rewardLabel}
-                  placeholder="예: 아크릴 스탠드"
+                  placeholder={t('예: 아크릴 스탠드')}
                   disabled={busy}
                   onChange={(e) => setSettings({ ...settings, rewardLabel: e.target.value })}
                   onBlur={() => void save(settings)}
@@ -227,18 +227,18 @@ export function Board() {
             )}
 
             {choice(
-              '날짜별 참여',
-              '매일 새로면 하루 안에 다 모아야 해요. 여러 카페를 도는 랠리면 ‘한 번만’ 이 맞아요.',
+              t('날짜별 참여'),
+              t('매일 새로면 하루 안에 다 모아야 해요. 여러 카페를 도는 랠리면 ‘한 번만’ 이 맞아요.'),
               settings.dailyReset ? 'on' : 'off',
               [
-                { v: 'off' as const, n: '한 번만 (계속 모아요)' },
+                { v: 'off' as const, n: t('한 번만 (계속 모아요)') },
                 { v: 'on' as const, n: '매일 새로 (자정에 초기화)' },
               ],
               (v) => void save({ ...settings, dailyReset: v === 'on' })
             )}
 
             {choice(
-              '마감',
+              t('마감'),
               '',
               settings.closed ? 'on' : 'off',
               [

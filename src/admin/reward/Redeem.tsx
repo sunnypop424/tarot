@@ -8,7 +8,7 @@ import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
 /* 화면 표의 `when` 은 연도 없는 짧은 형식이라 별개다 — CSV 는 전체 표기를 쓴다 */
 import { downloadCsv, when as csvWhen } from '../csv'
-import { useT } from '@/i18n'
+import { useLang } from '@/i18n'
 
 
 const when = (iso: string) =>
@@ -35,7 +35,7 @@ const when = (iso: string) =>
  * 상시 노출된다. 그건 '응모자' 화면에서만 본다.
  */
 export function Redeem() {
-  const t = useT()
+  const { lang, t } = useLang()
   const slot = useSlot()
   const slug = slot.slug
   const source = getSlotService(slot)
@@ -131,7 +131,7 @@ export function Redeem() {
   const RESULT_TITLE = {
     ok: t('수령 처리했어요'),
     already: '이미 수령한 코드예요',
-    none: '없는 코드예요',
+    none: t('없는 코드예요'),
     error: '처리하지 못했어요',
   } as const
 
@@ -150,7 +150,7 @@ export function Redeem() {
       <div className="ad-stack">
         <div className="ad-stats">
           {[
-            { label: '발급', value: guaranteed.length, attr: 'data-issued' },
+            { label: t('발급'), value: guaranteed.length, attr: 'data-issued' },
             { label: t('수령 완료'), value: done.length, attr: 'data-redeemed' },
             { label: '아직 안 받음', value: left, attr: 'data-left' },
           ].map((k) => (
@@ -160,7 +160,7 @@ export function Redeem() {
                 <span className="ad-stat__value tnum" {...{ [k.attr]: '' }}>
                   {k.value}
                 </span>
-                <span className="ad-stat__unit">건</span>
+                <span className="ad-stat__unit">{t('건')}</span>
               </div>
             </div>
           ))}
@@ -205,20 +205,23 @@ export function Redeem() {
                 <div className="ad-result__title">{RESULT_TITLE[result.kind]}</div>
                 <p className="ad-result__body">
                   {result.kind === 'ok' &&
-                    `${result.code}${result.label ? ` · ${result.label}` : ''} 을 전달한 것으로 기록했어요. 아래 목록에서 표시를 확인할 수 있어요.`}
+                    t('{what} 을 전달한 것으로 기록했어요. 아래 목록에서 표시를 확인할 수 있어요.', {
+                      what: `${result.code}${result.label ? ` · ${result.label}` : ''}`,
+                    })}
                   {result.kind === 'already' &&
-                    `${result.code} 는 ${
-                      result.at
-                        ? new Date(result.at).toLocaleString('ko-KR', {
+                    t('{code} 는 {when} 에 이미 처리됐어요. 같은 코드를 두 번 쓸 수 없어요.', {
+                      code: result.code,
+                      when: result.at
+                        ? new Date(result.at).toLocaleString(lang, {
                             month: 'long',
                             day: 'numeric',
                             hour: '2-digit',
                             minute: '2-digit',
                           })
-                        : '이전'
-                    } 에 이미 처리됐어요. 같은 코드를 두 번 쓸 수 없어요.`}
+                        : t('이전'),
+                    })}
                   {result.kind === 'none' &&
-                    `“${result.code}” 로 발급된 교환권이 없어요. 방문자 화면의 코드를 다시 확인해 주세요.`}
+                    t('“{code}” 로 발급된 교환권이 없어요. 방문자 화면의 코드를 다시 확인해 주세요.', { code: result.code })}
                   {result.kind === 'error' && result.message}
                 </p>
               </div>
@@ -267,16 +270,16 @@ export function Redeem() {
           ) : shown.length === 0 ? (
             <div className="ad-empty ad-empty--sm">
               <div className="ad-empty__title">찾는 교환권이 없어요</div>
-              <div className="ad-empty__sub">검색어를 지우거나 다른 코드로 찾아보세요.</div>
+              <div className="ad-empty__sub">{t('검색어를 지우거나 다른 코드로 찾아보세요.')}</div>
             </div>
           ) : (
             <div className="ad-table" style={tableVars}>
               <div className="ad-table__inner" data-issued-list>
                 <div className="ad-table__head">
-                  <span>코드</span>
-                  <span>내용</span>
-                  <span>상태</span>
-                  <span>발급</span>
+                  <span>{t('코드')}</span>
+                  <span>{t('내용')}</span>
+                  <span>{t('상태')}</span>
+                  <span>{t('발급')}</span>
                   <span>수령</span>
                 </div>
                 {shown.map((r) => (

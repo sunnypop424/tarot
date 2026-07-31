@@ -119,7 +119,7 @@ export function Entries() {
               !
             </span>
             <div>
-              <div className="ad-banner__title">개인정보가 들어 있는 명단이에요</div>
+              <div className="ad-banner__title">{t('개인정보가 들어 있는 명단이에요')}</div>
               <div className="ad-sub" style={{ marginTop: 5 }}>
                 {cols.contact || cols.address
                   ? '연락처·주소가 들어 있어요. 선물을 다 보내고 나면 지워 주세요 — '
@@ -137,21 +137,21 @@ export function Entries() {
               <div className="ad-stat__label">자격을 얻은 분</div>
               <div className="ad-stat__row">
                 <span className="ad-stat__value tnum">{raffle.length}</span>
-                <span className="ad-stat__unit">명</span>
+                <span className="ad-stat__unit">{t('명')}</span>
               </div>
             </div>
             <div className="ad-stat">
               <div className="ad-stat__label">응모 완료</div>
               <div className="ad-stat__row">
                 <span className="ad-stat__value tnum">{list.length}</span>
-                <span className="ad-stat__unit">명</span>
+                <span className="ad-stat__unit">{t('명')}</span>
               </div>
             </div>
             <div className="ad-stat" data-hot={raffle.length > list.length || undefined}>
               <div className="ad-stat__label">아직 안 냄</div>
               <div className="ad-stat__row">
                 <span className="ad-stat__value tnum">{Math.max(0, raffle.length - list.length)}</span>
-                <span className="ad-stat__unit">명</span>
+                <span className="ad-stat__unit">{t('명')}</span>
               </div>
               {raffle.length > list.length && (
                 <div className="ad-stat__sub">추첨 후보에 안 들어가요</div>
@@ -174,7 +174,7 @@ export function Entries() {
         <div className="ad-card">
           <div className="ad-card__head">
             <div className="ad-card__titleRow">
-              <span className="ad-card__title">응모자</span>
+              <span className="ad-card__title">{t('응모자')}</span>
               <span className="ad-card__num tnum">
                 {shown.length} / {list.length}명
               </span>
@@ -210,7 +210,7 @@ export function Entries() {
           ) : shown.length === 0 ? (
             <div className="ad-empty ad-empty--sm">
               <div className="ad-empty__title">찾는 응모자가 없어요</div>
-              <div className="ad-empty__sub">검색어를 지우고 다시 찾아보세요.</div>
+              <div className="ad-empty__sub">{t('검색어를 지우고 다시 찾아보세요.')}</div>
             </div>
           ) : (
             <div className="ad-table" style={tableVars}>
@@ -220,8 +220,8 @@ export function Entries() {
                   {cols.handle && <span>트위터</span>}
                   {cols.contact && <span>{t('연락처')}</span>}
                   {cols.address && <span>{t('주소')}</span>}
-                  {cols.score && <span>점수</span>}
-                  <span>당첨</span>
+                  {cols.score && <span>{t('점수')}</span>}
+                  <span>{t('당첨')}</span>
                   <span>응모</span>
                 </div>
                 {shown.map((e) => (

@@ -87,9 +87,9 @@ export function Qr() {
   async function copy() {
     try {
       await navigator.clipboard.writeText(url)
-      toast('주소를 복사했어요')
+      toast(t('주소를 복사했어요'))
     } catch {
-      toast('복사하지 못했어요 — 주소를 직접 선택해 주세요')
+      toast(t('복사하지 못했어요 — 주소를 직접 선택해 주세요'))
     }
   }
 
@@ -102,7 +102,7 @@ export function Qr() {
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">QR 만들기</h1>
+          <h1 className="ad-head__title">{t('QR 만들기')}</h1>
         </div>
         <p className="ad-head__desc">현장에 붙일 QR을 만들어 내려받아요.</p>
       </header>

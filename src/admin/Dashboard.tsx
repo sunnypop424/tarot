@@ -74,7 +74,7 @@ export function Dashboard() {
       setStats(await collect(service, slot.slug))
       setError(null)
     } catch (e) {
-      setError(e instanceof Error ? e.message : '현황을 읽지 못했어요')
+      setError(e instanceof Error ? e.message : t('현황을 읽지 못했어요'))
       setStats([])
     }
     setBars(await stockBars(service, slot.slug).catch(() => []))
@@ -106,13 +106,13 @@ export function Dashboard() {
     try {
       const sheets: Sheet[] = await collectSheets(slot, service)
       if (sheets.length === 0) {
-        toast('내보낼 기록이 아직 없어요')
+        toast(t('내보낼 기록이 아직 없어요'))
         return
       }
       await downloadSheets(slot.slug, sheets)
       toast(`${sheets.length}개 파일을 받았어요`)
     } catch (e) {
-      toast(e instanceof Error ? e.message : '내보내지 못했어요')
+      toast(e instanceof Error ? e.message : t('내보내지 못했어요'))
     } finally {
       setSaving(false)
     }
@@ -125,7 +125,7 @@ export function Dashboard() {
   // 탭이 뒤로 넘어가면 멈추고, 돌아오면 그 자리에서 한 번 읽는다 (`useVisibleInterval`)
   useVisibleInterval(() => void load(), REFRESH_MS)
 
-  const period = periodLine(slot, service)
+  const period = periodLine(slot, service, t)
   const deadline = exportDeadline(slot, service)
   const serviceName = SERVICES.find((s) => s.id === service)?.label ?? service
 
@@ -133,7 +133,7 @@ export function Dashboard() {
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">대시보드</h1>
+          <h1 className="ad-head__title">{t('대시보드')}</h1>
           <span className="ad-head__count">{serviceName}</span>
           {/*
             * **언제 읽은 숫자인지 말한다.** 예전엔 들어온 순간 한 번만 읽어서, 부스에 띄워둔
@@ -154,7 +154,7 @@ export function Dashboard() {
               disabled={busy}
               data-refresh
             >
-              {busy ? '읽는 중…' : t('새로고침')}
+              {busy ? t('읽는 중…') : t('새로고침')}
             </button>
           </span>
         </div>
@@ -167,14 +167,14 @@ export function Dashboard() {
         <div className="ad-card ad-card--tight" style={{ display: 'flex', alignItems: 'center', gap: 11, flexWrap: 'wrap' }}>
           <span className="ad-state" data-tone={period.tone}>
             <span className="ad-state__dot" aria-hidden="true" />
-            {period.badge}
+            {t(period.badge)}
           </span>
-          <span className="ad-sub">{period.detail}</span>
+          <span className="ad-sub">{t(period.detail)}</span>
         </div>
 
         {error && (
           <div className="ad-banner ad-banner--err ad-banner--pad">
-            <div className="ad-banner__title">현황을 읽지 못했어요</div>
+            <div className="ad-banner__title">{t('현황을 읽지 못했어요')}</div>
             <div className="ad-banner__body">{error}</div>
           </div>
         )}
@@ -194,12 +194,12 @@ export function Dashboard() {
           >
             {stats.map((s) => (
               <div key={s.label} className="ad-stat" data-hot={s.warn || undefined}>
-                <div className="ad-stat__label">{s.label}</div>
+                <div className="ad-stat__label">{t(s.label)}</div>
                 <div className="ad-stat__row">
                   <span className="ad-stat__value tnum">{s.value}</span>
-                  {s.unit && <span className="ad-stat__unit">{s.unit}</span>}
+                  {s.unit && <span className="ad-stat__unit">{t(s.unit)}</span>}
                 </div>
-                {s.note && <div className="ad-stat__sub">{s.note}</div>}
+                {s.note && <div className="ad-stat__sub">{t(s.note)}</div>}
               </div>
             ))}
           </div>
@@ -209,7 +209,7 @@ export function Dashboard() {
           <div className="ad-stack">
             {bars && bars.length > 0 && (
               <div className="ad-card" data-stock>
-                <div className="ad-card__title">품목별 남은 비율</div>
+                <div className="ad-card__title">{t('품목별 남은 비율')}</div>
                 <div className="ad-bars">
                   {bars.map((b) => {
                     const pct = b.total > 0 ? Math.round((b.left / b.total) * 100) : 0
@@ -228,7 +228,7 @@ export function Dashboard() {
                         </div>
                         {tone && (
                           <div className="ad-bar__note">
-                            {tone === 'out' ? '소진됐어요' : '20% 아래로 남았어요'}
+                            {tone === 'out' ? t('소진됐어요') : t('20% 아래로 남았어요')}
                           </div>
                         )}
                       </div>
@@ -239,7 +239,7 @@ export function Dashboard() {
             )}
 
             <div className="ad-card">
-              <div className="ad-card__title">바로 가기</div>
+              <div className="ad-card__title">{t('바로 가기')}</div>
               <div className="ad-shortcuts">
                 {SHORTCUTS[service].concat(COMMON_SHORTCUTS).map((s) =>
                   s.external ? (
@@ -251,17 +251,17 @@ export function Dashboard() {
                       rel="noreferrer"
                     >
                       <div className="ad-card__titleRow">
-                        <span className="ad-shortcut__name">{s.label}</span>
-                        <span className="ad-shortcut__tag">새 탭 ↗</span>
+                        <span className="ad-shortcut__name">{t(s.label)}</span>
+                        <span className="ad-shortcut__tag">{t('새 탭 ↗')}</span>
                       </div>
-                      <div className="ad-shortcut__desc">{s.desc}</div>
+                      <div className="ad-shortcut__desc">{t(s.desc)}</div>
                     </a>
                   ) : (
                     <Link key={s.to} className="ad-shortcut" to={`/${slot.slug}/admin/${s.to}`}>
                       <div className="ad-card__titleRow">
-                        <span className="ad-shortcut__name">{s.label}</span>
+                        <span className="ad-shortcut__name">{t(s.label)}</span>
                       </div>
-                      <div className="ad-shortcut__desc">{s.desc}</div>
+                      <div className="ad-shortcut__desc">{t(s.desc)}</div>
                     </Link>
                   )
                 )}
@@ -271,10 +271,10 @@ export function Dashboard() {
 
           <div className="ad-stack">
             <div className="ad-card">
-              <div className="ad-card__title">행사 기간</div>
+              <div className="ad-card__title">{t('행사 기간')}</div>
               <span className="ad-state" data-tone={period.tone}>
                 <span className="ad-state__dot" aria-hidden="true" />
-                {period.badge}
+                {t(period.badge)}
               </span>
               <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div className="ad-kv">
@@ -283,7 +283,7 @@ export function Dashboard() {
                 </div>
                 {period.left !== null && (
                   <div className="ad-kv">
-                    <span>남은 일수</span>
+                    <span>{t('남은 일수')}</span>
                     <span className="tnum">{period.left}일</span>
                   </div>
                 )}
@@ -293,7 +293,7 @@ export function Dashboard() {
                   * 고치면 화면이 따라오도록.
                   */}
                 <div className="ad-kv">
-                  <span>자료 보관</span>
+                  <span>{t('자료 보관')}</span>
                   <span className="tnum">
                     {deadline ? `${deadline.date} 까지` : `종료 후 ${graceDays(service)}일`}
                   </span>
@@ -307,7 +307,7 @@ export function Dashboard() {
             </div>
 
             <div className="ad-card">
-              <div className="ad-card__title">행사 자료 내보내기</div>
+              <div className="ad-card__title">{t('행사 자료 내보내기')}</div>
               <p className="ad-card__desc">
                 CSV 여러 개로 떨어져요 · 개인정보가 든 파일이 섞여 있어요 · 종료 +14일이 지나면
                 꺼낼 수 없어요
@@ -320,7 +320,7 @@ export function Dashboard() {
                 disabled={saving}
                 data-export
               >
-                {saving ? '모으는 중…' : '내보내기'}
+                {saving ? t('모으는 중…') : t('내보내기')}
               </button>
             </div>
           </div>
@@ -333,10 +333,14 @@ export function Dashboard() {
 /**
  * 기간 한 줄 — **판정은 이미 있는 것을 쓴다** (`owner/period.ts` · `data/slots.ts`).
  * 여기서 날짜 비교를 다시 짜면 편집기와 관리 화면이 서로 다른 날 "열렸다" 고 말하게 된다.
+ *
+ * `t` 를 인자로 받는다 — 모듈 함수라 훅을 못 쓰는데, 여기서 문장을 **조립**하므로
+ * 조각을 낱개로 사전에 넣을 수 없다 (조립된 결과는 사전 키와 영영 안 맞는다).
  */
 function periodLine(
   slot: Slot,
-  service: ServiceId
+  service: ServiceId,
+  t: (ko: string, vars?: Record<string, string | number>) => string
 ): {
   badge: string
   detail: string
@@ -350,20 +354,21 @@ function periodLine(
       ? Math.max(0, Math.ceil((new Date(`${end}T23:59:59+09:00`).getTime() - Date.now()) / 86400000))
       : null
   /** 유예 일수는 한 곳(`graceDays`)에서 온다 — 여기에 14 를 적으면 DB 를 고칠 때 안 따라온다 */
-  const keep = `자료는 ${exportDeadline(slot, service)?.date ?? `종료 +${graceDays(service)}일`}까지 꺼낼 수 있어요`
+  const until = exportDeadline(slot, service)?.date ?? t('종료 +{n}일', { n: graceDays(service) })
+  const keep = t('자료는 {date}까지 꺼낼 수 있어요', { date: until })
 
   if (status === 'expired')
-    return { badge: '종료', detail: `기간이 끝났어요 · ${keep}`, tone: 'mute', left: null }
+    return { badge: t('종료'), detail: `${t('기간이 끝났어요')} · ${keep}`, tone: 'mute', left: null }
   if (status === 'upcoming')
-    return { badge: '시작 전', detail: `${periodLabel(slot)} 에 열려요`, tone: 'warn', left: days }
+    return { badge: t('시작 전'), detail: t('{period} 에 열려요', { period: periodLabel(slot) }), tone: 'warn', left: days }
   if (status === 'unlimited')
-    return { badge: '진행 중', detail: '기간 제한 없음', tone: 'key', left: null }
+    return { badge: t('진행 중'), detail: t('기간 제한 없음'), tone: 'key', left: null }
   return {
-    badge: '진행 중',
+    badge: t('진행 중'),
     // 마지막 사흘은 남은 날을 말한다 — 그때부터는 날짜보다 "며칠 남았나" 가 급하다
     detail:
       days !== null && days <= 3
-        ? `${periodLabel(slot)} · 종료까지 ${days}일 · ${keep}`
+        ? `${periodLabel(slot)} · ${t('종료까지 {n}일', { n: days })} · ${keep}`
         : `${periodLabel(slot)} · ${keep}`,
     tone: days !== null && days <= 3 ? 'warn' : 'key',
     left: days,

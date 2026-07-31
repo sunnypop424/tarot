@@ -56,7 +56,7 @@ export function Cards() {
         {head}
         <div className="ad-card">
           <div className="ad-empty">
-            <div className="ad-empty__title">지금 빌드에서는 포토카드를 쓸 수 없어요</div>
+            <div className="ad-empty__title">{t('지금 빌드에서는 포토카드를 쓸 수 없어요')}</div>
           </div>
         </div>
       </>
@@ -71,7 +71,7 @@ export function Cards() {
     try {
       await repo.photocard.saveSettings(slug, next)
       setSettings(next)
-      toast('저장했어요')
+      toast(t('저장했어요'))
     } finally {
       setBusy(false)
     }
@@ -84,7 +84,7 @@ export function Cards() {
     if (!card) return
     await repo.photocard.saveCard(slug, { ...card, remaining: raw.trim() === '' ? null : Math.max(0, Number(raw) || 0) })
     await load()
-    toast('재고를 고쳤어요')
+    toast(t('재고를 고쳤어요'))
   }
 
   /** 카드 한 장의 운영값을 고친다 — 목록(report)엔 없는 필드가 있어 원본을 되읽는다 */
@@ -94,7 +94,7 @@ export function Cards() {
     if (!card) return
     await repo.photocard.saveCard(slug, { ...card, ...change })
     await load()
-    toast('저장했어요')
+    toast(t('저장했어요'))
   }
 
   const totalLeft = rows.reduce((n, r) => n + (r.remaining ?? 0), 0)
@@ -121,7 +121,7 @@ export function Cards() {
       <div className="ad-stack">
         {settings.rehearsal && (
           <div className="ad-banner ad-banner--warn ad-banner--pad">
-            <div className="ad-banner__title">연습 모드가 켜져 있어요</div>
+            <div className="ad-banner__title">{t('연습 모드가 켜져 있어요')}</div>
             <div className="ad-banner__body">
               지금 뽑아도 재고가 줄지 않아요 — 전날 시연에서 한정 카드를 태우는 사고를 막으려고
               기본으로 켜 둬요. 행사 전에 꼭 꺼 주세요.
@@ -133,7 +133,7 @@ export function Cards() {
           <div className="ad-card__head" style={{ marginBottom: 6 }}>
             <div className="ad-card__titleRow">
               <span className="ad-card__title">
-                {rows.length}종 · {anyFinite ? `남은 수량 ${totalLeft}장` : '수량 무제한'}
+                {rows.length}종 · {anyFinite ? `남은 수량 ${totalLeft}장` : t('수량 무제한')}
               </span>
             </div>
           </div>
@@ -173,7 +173,7 @@ export function Cards() {
 
           {rows.length === 0 ? (
             <div className="ad-empty">
-              <div className="ad-empty__title">아직 카드가 없어요</div>
+              <div className="ad-empty__title">{t('아직 카드가 없어요')}</div>
               <div className="ad-empty__sub">
                 이미지 등록은 담당자가 해요. 원본을 보내 주시면 올려 드려요.
               </div>
@@ -184,12 +184,12 @@ export function Cards() {
                 <div className="ad-table__head">
                   <span />
                   <span>{t('이름')}</span>
-                  <span>레어도</span>
+                  <span>{t('레어도')}</span>
                   {/* 레어도 바로 옆에 — 숫자를 누르면 이 값이 바뀌는 걸 그 자리에서 봐야 한다 */}
-                  <span style={{ textAlign: 'center' }}>나올 확률</span>
-                  <span style={{ textAlign: 'center' }}>럭키</span>
-                  <span style={{ textAlign: 'center' }}>재고</span>
-                  <span style={{ textAlign: 'center' }}>뽑힌 수</span>
+                  <span style={{ textAlign: 'center' }}>{t('나올 확률')}</span>
+                  <span style={{ textAlign: 'center' }}>{t('럭키')}</span>
+                  <span style={{ textAlign: 'center' }}>{t('재고')}</span>
+                  <span style={{ textAlign: 'center' }}>{t('뽑힌 수')}</span>
                 </div>
                 {rows.map((r) => (
                   <div key={r.cardId} className="ad-table__row ad-table__row--tight">
@@ -247,12 +247,12 @@ export function Cards() {
                       onClick={() => r.cardId && void patchCard(r.cardId, { lucky: !r.lucky })}
                       data-lucky
                     >
-                      {r.lucky ? '✓ 럭키' : '럭키'}
+                      {r.lucky ? t('✓ 럭키') : t('럭키')}
                     </button>
                     <input
                       className="ad-input ad-input--sm ad-input--center"
                       inputMode="numeric"
-                      placeholder="무제한"
+                      placeholder={t('무제한')}
                       value={stock[r.cardId ?? ''] ?? ''}
                       aria-label={`${r.name} 재고`}
                       onChange={(e) =>
@@ -268,14 +268,14 @@ export function Cards() {
           )}
 
           <div className="ad-rules">
-            <div className="ad-rules__title">이 목록에 걸리는 규칙</div>
+            <div className="ad-rules__title">{t('이 목록에 걸리는 규칙')}</div>
             <div className="ad-bullets">
-              <div className="ad-bullet">재고를 비우면 무제한이에요.</div>
-              <div className="ad-bullet">0이면 그 카드는 더 나오지 않아요.</div>
-              <div className="ad-bullet">레어도 숫자가 <b>클수록 덜</b> 나와요 — 전설(5)이 가장 귀해요.</div>
-              <div className="ad-bullet">재고는 나올지 말지만 정하고 확률은 건드리지 않아요.</div>
+              <div className="ad-bullet">{t('재고를 비우면 무제한이에요.')}</div>
+              <div className="ad-bullet">{t('0이면 그 카드는 더 나오지 않아요.')}</div>
+              <div className="ad-bullet">{t('레어도 숫자가')}<b>{t('클수록 덜')}</b>{t('나와요 — 전설(5)이 가장 귀해요.')}</div>
+              <div className="ad-bullet">{t('재고는 나올지 말지만 정하고 확률은 건드리지 않아요.')}</div>
               <div className="ad-bullet">
-                확률은 <b>한 번 뽑을 때</b> 기준이에요. 여러 장 뽑기의 묶음 상한과 뽑는 도중
+                확률은 <b>{t('한 번 뽑을 때')}</b> 기준이에요. 여러 장 뽑기의 묶음 상한과 뽑는 도중
                 재고가 떨어지는 건 안 셈에 넣었어요.
               </div>
               <div className="ad-bullet">
@@ -286,7 +286,7 @@ export function Cards() {
         </div>
 
         <div className="ad-card ad-card--form">
-          <div className="ad-card__title">운영 방식</div>
+          <div className="ad-card__title">{t('운영 방식')}</div>
           <p className="ad-card__desc">
             바꾸면 방문자 화면이 통째로 달라져요. 행사 중에는 바꾸지 마세요.
           </p>
@@ -307,9 +307,9 @@ export function Cards() {
                 onClick={async () => {
                   if (settings.mode === mode) return
                   const ok = await confirmAction({
-                    title: '운영 방식을 바꿀까요?',
+                    title: t('운영 방식을 바꿀까요?'),
                     desc: `“${label}” 으로 바꾸면 방문자 화면이 통째로 달라져요. 행사 중에는 바꾸지 마세요.`,
-                    okLabel: '바꾸기',
+                    okLabel: t('바꾸기'),
                     danger: true,
                   })
                   if (!ok) return
@@ -323,14 +323,14 @@ export function Cards() {
           </div>
           <p className="ad-field__hint">
             {rules.physical
-              ? '실물이 걸려 있어서 뽑기는 항상 스태프 기기에서 일어나요.'
-              : '실물 없이 이미지만 가져가는 방식이에요.'}
+              ? t('실물이 걸려 있어서 뽑기는 항상 스태프 기기에서 일어나요.')
+              : t('실물 없이 이미지만 가져가는 방식이에요.')}
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginTop: 22 }}>
             {rules.visitorDraws && (
               <div>
-                <span className="ad-field__label">한 사람이 뽑는 횟수</span>
+                <span className="ad-field__label">{t('한 사람이 뽑는 횟수')}</span>
                 <div className="ad-inline">
                   <input
                     className="ad-input ad-input--num"
@@ -345,7 +345,7 @@ export function Cards() {
                     }
                     onBlur={() => void save(settings)}
                   />
-                  <span className="ad-unit">회</span>
+                  <span className="ad-unit">{t('회')}</span>
                 </div>
                 <p className="ad-field__hint">
                   기기 기준이에요 — 브라우저 기록을 지우면 다시 뽑을 수 있어요.
@@ -354,7 +354,7 @@ export function Cards() {
             )}
             {rules.batch && (
               <div>
-                <span className="ad-field__label">한 번에 최대</span>
+                <span className="ad-field__label">{t('한 번에 최대')}</span>
                 <div className="ad-inline">
                   <input
                     className="ad-input ad-input--num"
@@ -369,7 +369,7 @@ export function Cards() {
                     }
                     onBlur={() => void save(settings)}
                   />
-                  <span className="ad-unit">장</span>
+                  <span className="ad-unit">{t('장')}</span>
                 </div>
                 <p className="ad-field__hint">N연차의 상한이에요 (최대 50장).</p>
               </div>
@@ -387,7 +387,7 @@ export function Cards() {
               <span className="ad-check__box" data-on={settings.allowSave || undefined}>
                 {settings.allowSave ? '✓' : ''}
               </span>
-              <span className="ad-checkbare__label">방문자가 이미지를 저장할 수 있게 하기</span>
+              <span className="ad-checkbare__label">{t('방문자가 이미지를 저장할 수 있게 하기')}</span>
             </button>
           )}
         </div>
@@ -399,7 +399,7 @@ export function Cards() {
           <div>
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
-                <div className="ad-switchrow__name">연습 모드</div>
+                <div className="ad-switchrow__name">{t('연습 모드')}</div>
                 <div className="ad-switchrow__hint">
                   켜져 있으면 뽑아도 재고가 줄지 않아요. 행사 전에 꺼 주세요.
                 </div>
@@ -408,7 +408,7 @@ export function Cards() {
                 type="button"
                 className="ad-switch"
                 data-on={settings.rehearsal || undefined}
-                aria-label="연습 모드"
+                aria-label={t('연습 모드')}
                 disabled={busy}
                 onClick={() => void save({ ...settings, rehearsal: !settings.rehearsal })}
                 data-rehearsal
@@ -431,7 +431,7 @@ export function Cards() {
             {rules.batch && (
               <div className="ad-switchrow">
                 <div className="ad-switchrow__text">
-                  <div className="ad-switchrow__name">묶음 상한</div>
+                  <div className="ad-switchrow__name">{t('묶음 상한')}</div>
                   <div className="ad-switchrow__hint">
                     켜면 한 묶음에 같은 카드가 몰리는 걸 막아요 — “10연차에 스페셜 5장” 같은 사고를
                     막아요.
@@ -441,7 +441,7 @@ export function Cards() {
                   type="button"
                   className="ad-switch"
                   data-on={settings.batchCapEnabled || undefined}
-                  aria-label="묶음 상한"
+                  aria-label={t('묶음 상한')}
                   disabled={busy}
                   onClick={() => void save({ ...settings, batchCapEnabled: !settings.batchCapEnabled })}
                 />

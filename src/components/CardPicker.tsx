@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 
 import { CardBack } from './CardBack'
 import { DeckSpread, type ShufflePhase } from './DeckSpread'
+import { useT } from '@/i18n'
 import styles from './CardPicker.module.css'
 
 /** --dur-fly 와 맞춘다 */
@@ -42,6 +43,7 @@ export function CardPicker({
   onChange,
   phase,
 }: CardPickerProps) {
+  const t = useT()
   const slotRefs = useRef<(HTMLDivElement | null)[]>([])
   const [flight, setFlight] = useState<Flight | null>(null)
   /** 두 번째 프레임에 목적지로 transform 을 걸어야 트랜지션이 산다 */
@@ -120,7 +122,7 @@ export function CardPicker({
                     <button
                       type="button"
                       className={styles.remove}
-                      aria-label={`${slotLabels[i]} 카드 다시 고르기`}
+                      aria-label={t('{position} 카드 다시 고르기', { position: t(slotLabels[i]) })}
                       onClick={() => handleRemove(i)}
                     >
                       <X size={14} strokeWidth={2.5} aria-hidden="true" />
@@ -132,7 +134,7 @@ export function CardPicker({
                   />
                 )}
               </div>
-              <span className={`t-text-xxs t-muted ${styles.slotLabel}`}>{slotLabels[i]}</span>
+              <span className={`t-text-xxs t-muted ${styles.slotLabel}`}>{t(slotLabels[i])}</span>
             </div>
           )
         })}

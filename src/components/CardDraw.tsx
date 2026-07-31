@@ -67,9 +67,9 @@ export function CardDraw({
 
   return (
     <div className={`screen ${styles.draw}`}>
-      <h1 className="t-title-l screen__title">{title}</h1>
-      <p className="t-text-m screen__lead">{lead}</p>
-      {note && <p className="t-text-xs t-muted screen__lead">{note}</p>}
+      <h1 className="t-title-l screen__title">{t(title)}</h1>
+      <p className="t-text-m screen__lead">{t(lead)}</p>
+      {note && <p className="t-text-xs t-muted screen__lead">{t(note)}</p>}
 
       <div className={styles.pickArea}>
         <CardPicker

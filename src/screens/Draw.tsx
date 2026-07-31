@@ -176,8 +176,8 @@ function Result({ category, drawn, synthesis, onRedraw, onDone }: ResultProps) {
 
   return (
     <div className={`screen ${styles.resultScreen}`}>
-      <h1 className="t-title-l screen__title">{category.label}</h1>
-      {category.renews && <p className="t-text-xs t-muted screen__lead">{category.renews}</p>}
+      <h1 className="t-title-l screen__title">{t(category.label)}</h1>
+      {category.renews && <p className="t-text-xs t-muted screen__lead">{t(category.renews)}</p>}
 
       <div className={styles.results}>
         {/* 카드들 — 여러 장이면 넓은 화면에서 한 줄로 나열 */}
@@ -218,7 +218,7 @@ function Result({ category, drawn, synthesis, onRedraw, onDone }: ResultProps) {
       )}
       {note && (
         <p className={`t-text-xs t-muted ${styles.saveNote}`}>
-          <Info size={14} aria-hidden="true" /> {note}
+          <Info size={14} aria-hidden="true" /> {t(note)}
         </p>
       )}
       {/*
@@ -227,22 +227,22 @@ function Result({ category, drawn, synthesis, onRedraw, onDone }: ResultProps) {
         */}
       {image && (
         <div style={{ display: 'none' }} aria-hidden="true">
-          <SavableImage image={image} alt={`${category.label} 결과`} />
+          <SavableImage image={image} alt={t('{category} 결과', { category: t(category.label) })} />
         </div>
       )}
 
       <div className={styles.resultActions}>
         {canRedraw ? (
           <button type="button" className="btn btn--md btn--slight btn--block" onClick={onRedraw}>
-            다시 뽑기
+            {t('다시 뽑기')}
           </button>
         ) : (
           <button type="button" className="btn btn--md btn--block" disabled>
-            {category.locked}
+            {category.locked && t(category.locked)}
           </button>
         )}
         <button type="button" className="btn btn--sm btn--ghost btn--block" onClick={onDone}>
-          홈으로
+          {t('홈으로')}
         </button>
       </div>
 

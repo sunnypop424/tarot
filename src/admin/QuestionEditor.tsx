@@ -165,7 +165,7 @@ export function QuestionEditor() {
     }
     patch({ answers: merged })
     setPending(null)
-    toast('저장했어요')
+    toast(t('저장했어요'))
   }
 
   const pendingCount = pending ? Object.keys(pending).length : 0
@@ -198,7 +198,7 @@ export function QuestionEditor() {
       <div className="ad-stack">
         <div>
           <span className="ad-note">
-            {saving ? '저장 중…' : '자동 저장'} · 저장을 잊어 날리는 편이 더 나빠서 즉시 저장해요
+            {saving ? t('저장 중…') : t('자동 저장')} · 저장을 잊어 날리는 편이 더 나빠서 즉시 저장해요
           </span>
         </div>
 
@@ -210,7 +210,7 @@ export function QuestionEditor() {
             id="q-text"
             className="ad-input ad-input--lg"
             value={draft.question}
-            placeholder="방문자에게 보일 문구"
+            placeholder={t('방문자에게 보일 문구')}
             onChange={(e) => patch({ question: e.target.value })}
           />
           <button
@@ -222,7 +222,7 @@ export function QuestionEditor() {
             <span className="ad-check__box" data-on={draft.published || undefined}>
               {draft.published ? '✓' : ''}
             </span>
-            <span className="ad-checkbare__label">방문자에게 공개</span>
+            <span className="ad-checkbare__label">{t('방문자에게 공개')}</span>
           </button>
         </div>
 
@@ -242,7 +242,7 @@ export function QuestionEditor() {
                 className="ad-input ad-input--num"
                 inputMode="numeric"
                 value={draft.spreadCount ?? ''}
-                placeholder="전부"
+                placeholder={t('전부')}
                 onChange={(e) => {
                   const v = e.target.value.replace(/[^0-9]/g, '')
                   patch({ spreadCount: v === '' ? null : Number(v) })
@@ -266,7 +266,7 @@ export function QuestionEditor() {
                   data-on={draft.fallbackAspect === value || undefined}
                   onClick={() => patch({ fallbackAspect: value })}
                 >
-                  {label}
+                  {t(label)}
                 </button>
               ))}
             </div>
@@ -356,7 +356,7 @@ export function QuestionEditor() {
                     toast('생성한 답변을 버렸어요')
                   }}
                 >
-                  버리기
+                  {t('버리기')}
                 </button>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import { photozoneDisplay } from '@/data/photozone'
 import { useSlot } from '@/slot/SlotProvider'
+import { useT } from '@/i18n'
 
 /**
  * 포토존 주최자 화면 — **만질 데이터가 하나도 없다.**
@@ -12,6 +13,7 @@ import { useSlot } from '@/slot/SlotProvider'
  * 주최자가 이걸 알아야 방문자에게 답할 수 있다 (얼굴 사진이라 실제로 묻는다).
  */
 export function Guide() {
+  const t = useT()
   const slot = useSlot()
   const display = photozoneDisplay(slot)
 
@@ -19,10 +21,10 @@ export function Guide() {
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">포토존</h1>
+          <h1 className="ad-head__title">{t('포토존')}</h1>
           <span className="ad-head__count tnum">프레임 {display.frames.length}종</span>
         </div>
-        <p className="ad-head__desc">따로 설정할 것이 없는 서비스예요.</p>
+        <p className="ad-head__desc">{t('따로 설정할 것이 없는 서비스예요.')}</p>
       </header>
 
       <div style={{ maxWidth: 680 }}>
@@ -35,7 +37,7 @@ export function Guide() {
           </p>
 
           <div className="ad-banner ad-banner--info ad-banner--pad" style={{ marginTop: 20 }}>
-            <div className="ad-banner__title">방문자 사진은 서버에 저장되지 않아요</div>
+            <div className="ad-banner__title">{t('방문자 사진은 서버에 저장되지 않아요')}</div>
             <div className="ad-banner__body">
               합성은 방문자 폰 안에서 끝나고, 결과 이미지도 그 기기에만 남아요. 그래서 주최자가 볼
               사진도, 지울 사진도 없어요. 방문자가 물어보면 이대로 답해 주시면 돼요.

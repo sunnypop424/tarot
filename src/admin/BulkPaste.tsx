@@ -154,7 +154,7 @@ export function BulkPaste<T>({
           disabled={busy || result.items.length === 0}
           data-bulk-apply
         >
-          {busy ? '넣는 중…' : `${result.items.length}개 넣기`}
+          {busy ? t('넣는 중…') : `${result.items.length}개 넣기`}
         </button>
         <span className="ad-fine">지금 목록 아래에 덧붙어요 — 있는 걸 지우지 않아요.</span>
       </div>

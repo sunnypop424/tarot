@@ -137,7 +137,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
       <ServiceHeader
         variant="mark"
         logo={display.logo}
-        title={display.wallTitle}
+        title={t(display.wallTitle)}
         showTitle={display.showTitle}
         align={display.logoAlign}
         marginTop={display.logoMarginTop}
@@ -157,7 +157,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
           onClick={() => navigate(`/${slug}/write`)}
         >
           <Pencil size={17} aria-hidden="true" />
-          {display.postLabel}
+          {t(display.postLabel)}
         </button>
       </ServiceHeader>
 
@@ -192,7 +192,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
       <div className={styles.fixedBar}>
         <button type="button" className={styles.fixedBtn} onClick={() => navigate(`/${slug}/write`)}>
           <Pencil size={18} aria-hidden="true" />
-          {display.postLabel}
+          {t(display.postLabel)}
         </button>
       </div>
     </div>
@@ -463,7 +463,7 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
           )}
 
           <button type="submit" className={styles.submit} disabled={!canPost}>
-            {busy ? t('남기는 중…') : display.postLabel}
+            {busy ? t('남기는 중…') : t(display.postLabel)}
           </button>
         </form>
 

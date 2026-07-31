@@ -140,10 +140,10 @@ function Quiz({ slot }: { slot: Slot }) {
       if (r.rewardCode) setReward(await repo.quiz.myReward(slug, subject).catch(() => null))
       setView('result')
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('제출하지 못했어요'))
+      setError(e instanceof Error ? t(e.message) : t('제출하지 못했어요'))
       setView('start')
     }
-  }, [ordered, picks, slug, subject])
+  }, [ordered, picks, slug, subject, t])
 
   /**
    * 제한시간 — **시간이 다 되면 그 자리에서 제출한다.** 남은 답을 버리고 시작 화면으로
@@ -596,7 +596,7 @@ function Result({
             </div>
             <div className={styles.rule} />
             <div className={`${styles.scoreLine} ${styles.tnum}`} data-score>
-              {result.count}문항 중 <b>{result.correct}문항</b> 정답
+              {t('{total}문항 중', { total: result.count })} <b>{t('{n}문항', { n: result.correct })}</b> {t('정답')}
             </div>
           </div>
           <div className={styles.cardFoot}>
@@ -890,7 +890,7 @@ function EntryForm({
       })
       onDone()
     } catch (e) {
-      setErr(e instanceof Error ? e.message : t('응모하지 못했어요'))
+      setErr(e instanceof Error ? t(e.message) : t('응모하지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -908,7 +908,7 @@ function EntryForm({
       <div className={styles.formScroll}>
         <div>
           <label className={styles.label} htmlFor="qz-nick">
-            닉네임 <span className={styles.req}>*</span>
+            {t('닉네임')} <span className={styles.req}>*</span>
           </label>
           <input
             id="qz-nick"
