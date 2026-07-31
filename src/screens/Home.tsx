@@ -15,6 +15,7 @@ import { useSlotPath } from '@/slot/useSlotPath'
 import type { Aspect, DrawnCard } from '@/types/card'
 import styles from './Home.module.css'
 import { useLang, useT } from '@/i18n'
+import { useCardText } from '@/i18n/cardText'
 
 /**
  * 홈 — 기간 운세(오늘·주간·월간).
@@ -152,7 +153,8 @@ const SUMMARY_ASPECTS: { aspect: Aspect; label: string; icon: LucideIcon }[] = [
 
 function AspectSummaries({ drawn }: { drawn: DrawnCard }) {
   const t = useT()
-  const reading = readingOf(drawn)
+  const lc = useCardText()
+  const reading = readingOf({ ...drawn, card: lc(drawn.card) })
 
   return (
     <div className={styles.summaries}>

@@ -4,6 +4,7 @@ import { cssUrl, useImageAsset } from '@/lib/image'
 import type { DrawnCard } from '@/types/card'
 import styles from './CardFace.module.css'
 import { useT } from '@/i18n'
+import { useCardText } from '@/i18n/cardText'
 
 /**
  * 카드 앞면 — 이벤트 테마가 앞면 이미지를 주면 이미지, 없으면 텍스트로 폴백한다.
@@ -12,14 +13,16 @@ import { useT } from '@/i18n'
  *
  * 이미지는 background-image 로만 그린다 (lib/image.ts) — 카페에서 길게 눌러 저장되면 안 된다.
  */
-export function CardFace({ card, orientation }: DrawnCard) {
+export function CardFace({ card: raw, orientation }: DrawnCard) {
   const t = useT()
+  const lc = useCardText()
   const { theme } = useSlot()
+  const card = lc(raw)
   const src = cardFrontSrc(theme, card.id)
   const { status } = useImageAsset(src)
 
   const reversed = orientation === 'reversed'
-  const label = `${card.name}${reversed ? ' (역방향)' : ''}`
+  const label = `${card.name}${reversed ? ` ${t('(역방향)')}` : ''}`
 
   if (src && status !== 'failed') {
     return (

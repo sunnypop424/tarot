@@ -8,6 +8,7 @@ import { CARDS, MAJOR_CARDS, SUIT_LABELS } from '@/data/cards'
 import type { Suit } from '@/types/card'
 import styles from './Cards.module.css'
 import { useT } from '@/i18n'
+import { useCardText } from '@/i18n/cardText'
 
 type Filter = 'major' | Suit
 
@@ -22,6 +23,7 @@ const FILTERS: { id: Filter; label: string }[] = [
 /** 카드 도감 — 이 슬롯이 쓰는 카드만 훑어본다 (메이저 슬롯이면 22장) */
 export function Cards() {
   const t = useT()
+  const lc = useCardText()
   const { go } = useSlotPath()
   const majorOnly = getSlotDeck(useSlot()) === 'major'
   const [filter, setFilter] = useState<Filter>('major')
@@ -67,7 +69,7 @@ export function Cards() {
               <span className={`play-card ${styles.itemCard}`}>
                 <CardFace card={card} orientation="upright" />
               </span>
-              <span className={`t-text-xs ${styles.itemName}`}>{card.name}</span>
+              <span className={`t-text-xs ${styles.itemName}`}>{lc(card).name}</span>
             </button>
           </li>
         ))}

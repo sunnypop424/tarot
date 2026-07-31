@@ -24,7 +24,8 @@ import type { CategorySetting, Slot } from '@/types/slot'
 import type { DrawnCard } from '@/types/card'
 import { NotReady } from './NotReady'
 import styles from './Draw.module.css'
-import { useT } from '@/i18n'
+import { useLang, useT } from '@/i18n'
+import { useCardText } from '@/i18n/cardText'
 
 export function Draw() {
   const t = useT()
@@ -273,6 +274,8 @@ function useResultImage(
   positions: string[]
 ) {
   const slot = useSlot()
+  const { lang, t } = useLang()
+  const lc = useCardText()
   const [image, setImage] = useState<ResultImage | null>(null)
   const [note, setNote] = useState<string | null>(null)
 
@@ -285,22 +288,23 @@ function useResultImage(
      * 본문은 **화면에 이미 있는 글** 중 하나를 고른다 — 새로 쓰지 않는다.
      * 여러 장이면 AI 종합(그게 그 화면의 결론이다), 한 장이면 조언 한 줄.
      * 저장한 그림에만 있는 문장을 만들면 화면과 저장물이 다른 말을 하게 된다.
+     * 카드 이름·해석은 화면과 같은 번역을 입힌다 (`i18n/cardText.ts`) — 저장물도 그 언어다.
      */
-    const body = drawn.length > 1 ? (synthesis ?? '') : readingOf(drawn[0]).advice
+    const body = drawn.length > 1 ? (synthesis ?? '') : readingOf({ ...drawn[0], card: lc(drawn[0].card) }).advice
 
     void drawResultCard({
       eventTitle: slot.name,
-      kicker: category.label,
+      kicker: t(category.label),
       cards: drawn.map((d, i) => ({
-        name: d.card.name,
+        name: lc(d.card).name,
         nameEn: d.card.nameEn,
         reversed: d.orientation === 'reversed',
         // 한 장이면 포지션 라벨이 곧 카테고리라 중복이다 — 비운다
-        position: drawn.length > 1 ? positions[i] : '',
+        position: drawn.length > 1 ? t(positions[i]) : '',
         image: cardFrontSrc(slot.theme, d.card.id) ?? undefined,
       })),
       body,
-      date: new Date().toLocaleDateString('ko-KR').replace(/\.$/, '').replace(/\s/g, ''),
+      date: new Date().toLocaleDateString(lang).replace(/\.$/, '').replace(/\s/g, ''),
       logo: slot.theme.assets.logo ?? undefined,
       colors: {
         bg: c.canvas,
@@ -328,9 +332,10 @@ function useResultImage(
       alive = false
       if (made) releaseResult(made)
     }
-    // 결과 화면은 뽑은 카드가 바뀌면 통째로 다시 만들어진다 — 한 번만 그린다
+    // 결과 화면은 뽑은 카드가 바뀌면 통째로 다시 만들어진다. 카드 번역 사전이 도착하면
+    // (lc 가 그때만 바뀐다 — useCallback) 저장물도 그 언어로 다시 그린다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [lc])
 
   const filename = `${slot.name}-${category.label}.png`
 

@@ -1,0 +1,282 @@
+{
+  "wands-1": {
+    "name": "Ace of Wands",
+    "keywords": ["New beginnings", "Inspiration", "Passion", "Creative energy", "Opportunity"],
+    "upright": {
+      "core": "The pure expression of creative energy — the seed of every beginning. It marks the moment a new passion, inspiration or opportunity quickens, and symbolises potential not yet shaped, waiting to be realised through action.",
+      "general": "A new spark is flaring up inside you. The opportunity or idea you've long waited for may well appear in front of you. Trust the flutter you're feeling and take the first step.",
+      "love": "New meetings — or a fresh flame in an existing relationship. Excitement is building, so keep your heart open.",
+      "money": "A new income idea or investment thought may surface. It's a fine time to start, even small.",
+      "career": "Doors are opening for challenges — a new project, a move, a venture. Today's drive can be a very good starting point.",
+      "advice": "Trust the passion you have now over perfect preparation — just begin."
+    },
+    "reversed": {
+      "core": "Means delayed, frustrated or misdirected creative energy. The will to begin is blocked by inner hesitation or outer obstacles; inspiration blurs, and passion cannot find its proper outlet.",
+      "general": "You want to start, but the engine won't quite turn over. Ideas fog up, and enthusiasm cools fast. The ember hasn't died — the airflow is just blocked for the moment.",
+      "love": "The spark may not feel like it used to, or a beginning may be stalling. Rather than fretting, take the temperature of your feelings slowly.",
+      "money": "A new venture may be delayed or underdeliver. Better to postpone any forced starts.",
+      "career": "Projects slip and motivation sags. You need time to recheck the direction.",
+      "advice": "Instead of pushing through, go back and ask: what do I actually want?"
+    }
+  },
+  "wands-2": {
+    "name": "Two of Wands",
+    "keywords": ["Planning", "Future vision", "Choice", "Expansion", "Potential"],
+    "upright": {
+      "core": "Means the planning and outlook toward a wider world after a first achievement. It marks the stage of designing the future on ground already secured, choosing the next move — personal will expanding into long-term vision.",
+      "general": "The first step is taken; now you're drawing the bigger picture. Your view is widening as if the world sat in your palm. The plan you set now is likely to decide the direction of what follows.",
+      "love": "You're starting to picture the next stage of the relationship in earnest. A conversation about the future can lead somewhere good.",
+      "money": "Good conditions for long-term financial planning. Seeing the big picture beats chasing immediate gains.",
+      "career": "You're weighing expansion, a bigger stage. It's the moment for a strategic call between two options.",
+      "advice": "Don't linger in the familiar spot — make a plan that looks a little further out."
+    },
+    "reversed": {
+      "core": "Means plans stalled by fear of the future and a lack of execution. Vision narrows until the big picture is lost, or settling into familiar territory quietly limits the chance to expand.",
+      "general": "Plenty of plans, but you're hovering instead of executing. Anxiety about the future may be keeping you in the familiar seat. Remember: postponing a choice is itself a choice.",
+      "love": "The relationship's direction stays undecided and the ambiguity drags. An honest conversation is what this current needs.",
+      "money": "You may spend without a plan — or worry so much you miss the chance. A realistic review helps.",
+      "career": "Delaying the decision could cost you the timing. Set a direction, even a small one.",
+      "advice": "Don't wait for the perfect plan — pick one step you can take now."
+    }
+  },
+  "wands-3": {
+    "name": "Three of Wands",
+    "keywords": ["Expansion", "Outlook", "Waiting", "Progress", "Cooperation"],
+    "upright": {
+      "core": "Means the stage where an executed plan expands and the first signs of fruit appear. You can see the results of effort approaching in the distance and survey wider possibilities — a growth midpoint where waiting and progress coexist.",
+      "general": "You're watching the seeds you planted begin to grow. The fruits of effort are approaching on the horizon. Widen your view and a bigger opportunity is likely to show itself.",
+      "love": "The relationship steps forward, or a distant connection draws closer. The waiting will not have been wasted.",
+      "money": "Signs of return are appearing on what you've prepared and invested. Steadiness is likely to convert into profit.",
+      "career": "What's underway is expanding smoothly. Links abroad or into new fields are worth expecting too.",
+      "advice": "Don't rush — trust the result that's coming, and prepare the next stage."
+    },
+    "reversed": {
+      "core": "Means expected progress delayed and plans disrupted. Unexpected obstacles appear along the expansion, or the view narrows; the gap between eager expectation and reality needs recalibrating.",
+      "general": "The expected result is running late, or the plan has hit a snag. Your view may have narrowed to just the problem in front of you. A delay isn't failure — it can be the chance to refine the course.",
+      "love": "Progress feels slow and the frustration piles up. Respect the other person's pace as well.",
+      "money": "Expected returns may lag or plans slip. Having a plan B ready will ease your mind considerably.",
+      "career": "Project delays and misaligned collaboration are possible. Recheck the schedule and the communication.",
+      "advice": "Rather than despairing at the delay, use the time to prepare more thoroughly."
+    }
+  },
+  "wands-4": {
+    "name": "Four of Wands",
+    "keywords": ["Celebration", "Stability", "Harmony", "Achievement", "Rest"],
+    "upright": {
+      "core": "Means the celebration, stability and harmony that mark a completed stage. Joy and rest enjoyed on foundations built by effort — happiness shared in harmony with home and community.",
+      "general": "A stage has closed safely and there's something to celebrate. Stability is settling into home, relationships and work. It's a lovely time to share the joy with the people who saw you through.",
+      "love": "The relationship is entering a stable season — anniversaries, moving in, even marriage grow likelier. Love deepens inside the ease.",
+      "money": "Finances steady and you can breathe. A small celebratory treat is a good reward to give yourself.",
+      "career": "A season for confirming achievements — a finished project, a team pulling together. Recognition for the work so far is likely.",
+      "advice": "Before racing to the next goal, celebrate this one properly."
+    },
+    "reversed": {
+      "core": "Means stability and harmony wobbling, or celebration postponed. Calm on the surface while the inner base shakes — a card that turns you back to the truth that real stability comes from within, not from appearances.",
+      "general": "Stability is shaking, or the celebration you expected keeps getting pushed back. Things look calm, but one corner of you may be uneasy. This current asks what actually makes you feel secure.",
+      "love": "Small discords may surface at home or in the relationship. Air the hurt as it comes instead of stacking it.",
+      "money": "An unexpected expense may rattle your footing. Time to re-examine the base.",
+      "career": "The mood at work is unsettled, or recognition is slow. Keeping your own pace is what matters.",
+      "advice": "Before the stability that shows, check the ease that's actually in your heart."
+    }
+  },
+  "wands-5": {
+    "name": "Five of Wands",
+    "keywords": ["Competition", "Conflict", "Clashing views", "Challenge", "Growing pains"],
+    "upright": {
+      "core": "Means the competition and conflict of many wills and energies colliding. Closer to a healthy clash that sharpens everyone than to a destructive fight — the process in which skill is tested and growth happens amid the noise.",
+      "general": "Opinions and energies are colliding all around you. The rivalry can be tiring, but inside it your skills are being honed. Healthy competition can be fuel.",
+      "love": "Small quarrels, even a rival — tension is possible. Trying to understand rather than to win is what protects the relationship.",
+      "money": "Disputes over money or fierce competition may arise. Park the emotional decisions for now.",
+      "career": "Competition heats up and the team's opinions split. In the collision there's also a chance to prove your strengths.",
+      "advice": "Don't just dodge the conflict — raise your voice, fairly and squarely."
+    },
+    "reversed": {
+      "core": "Means conflict ending — or avoided and driven inward. It may be the phase of stepping back from a war of attrition, or discord festering under the surface; either way the purpose and worth of the fight needs re-evaluating.",
+      "general": "The conflict is winding down — or it's festering out of sight. You may be worn out enough to want to avoid it all. Time to retrace what you were fighting for.",
+      "love": "Avoiding fights may mean postponing the real conversation. The longer the silence, the deeper the misunderstanding.",
+      "money": "Stepping back from a draining competition may be the profitable move. Don't spend energy on needless skirmishes.",
+      "career": "Internal conflict resolving — or burnout with competing itself. Taking some distance is also a strategy.",
+      "advice": "You don't have to answer every fight. Spend energy only on what's worth defending."
+    }
+  },
+  "wands-6": {
+    "name": "Six of Wands",
+    "keywords": ["Victory", "Recognition", "Success", "Confidence", "Honour"],
+    "upright": {
+      "core": "Means victory won through effort and the public recognition that follows. The moment of success arriving after conflict and competition — achievement turning into confidence and honour, becoming fuel for the next challenge.",
+      "general": "Your efforts are being recognised in front of everyone. Visible results — promotion, a pass, applause — are in the air. You're likely to see proof that the hard stretch wasn't wasted.",
+      "love": "A relationship that draws congratulations, or feelings openly acknowledged. Confidence is your charm this season.",
+      "money": "Pleasant news may arrive — rewards, bonuses, realised gains. It's fine to enjoy the fruits.",
+      "career": "Public recognition is likely — a promotion, a project landing well. Today's reputation invites tomorrow's opportunity.",
+      "advice": "Enjoy the win humbly — but fully. You've earned it."
+    },
+    "reversed": {
+      "core": "Means recognition delayed, results undervalued, confidence dented. The expected victory postponed or the honour tarnished — a card that shows how fragile self-worth becomes when it leans on other people's verdicts.",
+      "general": "The recognition is late, or the work feels undervalued, and it stings. Other people's eyes may be rocking your self-worth. Your own approval has to come before their applause.",
+      "love": "Feeling unacknowledged, confidence dipping. Trust your own pace as a couple instead of comparing.",
+      "money": "Rewards postponed, or returns thin against the effort. Make it a season of regrouping rather than disappointment.",
+      "career": "Credit gets obscured, reviews come up short. Keep records, keep stacking skill — that's the answer.",
+      "advice": "Before thirsting for anyone's approval, tell yourself first: I'm doing well."
+    }
+  },
+  "wands-7": {
+    "name": "Seven of Wands",
+    "keywords": ["Defence", "Meeting challenges", "Conviction", "Holding on", "Competitive edge"],
+    "upright": {
+      "core": "Means the defence and endurance that protect a won position and one's convictions. Holding the high ground against challenge and pressure — confident resistance as the force that keeps the competitive edge.",
+      "general": "This is a season for defending the position you've built. Challenges and pressure crowd in, but the high ground is yours. The strength to hold without wavering is likely what decides this.",
+      "love": "You may need to speak up to protect the relationship. Make your standards clear and it grows sturdier.",
+      "money": "Situations may arise where you must guard your assets and interests. Don't concede easily — check every term.",
+      "career": "Your position and results are being challenged. Meet it with skill and conviction and the edge stays yours.",
+      "advice": "Don't step back. The ground you're defending is ground you earned."
+    },
+    "reversed": {
+      "core": "Means the exhaustion of constant defence and the feeling of being overwhelmed. The strength to resist runs out, or an over-defensive posture invites isolation — the need to sort what to keep from what to put down.",
+      "general": "The endless pressure has you wanting to give up. Trying to block everything alone is a road to burnout. Time to set priorities: what to defend, what to release.",
+      "love": "A defensive posture may itself have become the wall. You don't have to take everything as an attack.",
+      "money": "Straining to protect everything can widen the loss. Letting some things go is also judgement.",
+      "career": "Energy is draining into an endless defensive battle. Asking for help is not weakness.",
+      "advice": "Don't try to hold it all alone — pick out what's actually worth defending."
+    }
+  },
+  "wands-8": {
+    "name": "Eight of Wands",
+    "keywords": ["Swift progress", "News", "Momentum", "Movement", "Rapid current"],
+    "upright": {
+      "core": "Means events accelerating and momentum meeting no resistance. Blockages clear and messages, contacts and results fly back and forth — a season when quick movement itself creates the progress.",
+      "general": "What was stalled is suddenly riding a rapid current. Contact, news, results — everything is arriving fast. Catch the flow and a short time can bring big progress.",
+      "love": "The relationship closes distance quickly, or the awaited message finally lands. The speed of feeling is part of the fun right now.",
+      "money": "Money moves faster and chances come in a row. Judge quickly — verify carefully.",
+      "career": "Work moves at speed and good news arrives. Travel and relocation show in this current too.",
+      "advice": "Speed is your weapon now. When the chance comes, move without hesitating."
+    },
+    "reversed": {
+      "core": "Means the current stalling and delaying — or unchecked haste. The awaited news runs late and progress jams, or too much speed breeds confusion and mistakes; the direction needs checking more than the pace.",
+      "general": "Expected news is late and things keep slipping — or rushing is causing errors. Check whether the direction is right, not whether the speed is high.",
+      "love": "Messages thin out, the relationship's rhythm slips, and it's frustrating. Don't let impatience grow the misunderstanding.",
+      "money": "Payments delayed, deals snagged — the money flow feels jammed. Rushed decisions will miss things.",
+      "career": "Schedules slide, communication tangles. Double-check anything important.",
+      "advice": "Don't fret at the delay — use the gap to polish the details."
+    }
+  },
+  "wands-9": {
+    "name": "Nine of Wands",
+    "keywords": ["Perseverance", "Grit", "The last hurdle", "Vigilance", "Resilience"],
+    "upright": {
+      "core": "Means the perseverance and resilience that refuse to retreat despite wounds. The grit summoned at the final hurdle before completion — accumulated experience become a defensive wisdom that carries you to the end.",
+      "general": "You're worn through — and the finish line is right there. Everything you've endured has become the armour protecting you now. Very likely there's just one more hurdle to clear.",
+      "love": "Old wounds may have you opening the door carefully. It's fine to reveal the sincerity behind the guard slowly.",
+      "money": "The financial habits you kept through the hard stretch are paying off. Hold on a little longer and you reach stable ground.",
+      "career": "You're in the project's final, hardest stretch. Quitting here would waste everything already given.",
+      "advice": "You're almost there. Keep your pace to the very end and finish."
+    },
+    "reversed": {
+      "core": "Means exhaustion at its limit and over-vigilance. The strength to endure is spent, or defensiveness has gone so far it isolates you — the sign that what's needed is rest and regrouping, not endurance at any cost.",
+      "general": "You feel at your limit, with nothing left for holding on. Or vigilance has grown until it pushes everyone away. This is also a signal: endurance may not be the answer.",
+      "love": "Old wounds may have you doubting them endlessly. Remember — this person is not that person.",
+      "money": "Grinding on may be cracking your finances. Consider help, or changing the structure.",
+      "career": "You may be on the edge of burnout. Don't forget that resting is a strategy too.",
+      "advice": "The courage to set something down for a while matters as much as the courage to endure."
+    }
+  },
+  "wands-10": {
+    "name": "Ten of Wands",
+    "keywords": ["Heavy burden", "Responsibility", "Overwork", "Pressure", "Final stretch"],
+    "upright": {
+      "core": "Means the state of shouldering excessive responsibility alone. The load that grew as the price of achievement now presses toward overwork — the weight of the final stretch, and the question of whether this way of carrying it can last.",
+      "general": "You're carrying far too much by yourself. The stronger your sense of duty, the heavier the body and heart get. The destination is close — but it's time to ask if this way of carrying is sustainable.",
+      "love": "It may feel like you're the only one trying. The relationship needs an honest conversation about sharing the weight.",
+      "money": "Loans, expenses, obligations are stacking up. Look for concrete ways to lighten the load.",
+      "career": "The work is piling onto you. Ask for the load to be shared — don't let diligence be taken for granted.",
+      "advice": "You don't have to carry it all. Pick one burden to set down first."
+    },
+    "reversed": {
+      "core": "Means the release of setting burdens down — or the brink of collapse from exceeding the limit. A turning point of delegating and clearing what can't be carried, and of leaving behind the habit of shouldering everything alone.",
+      "general": "You're starting to set the load down — or you're a step from buckling. This current teaches that carrying alone is not a virtue. The moment you delegate and share, the breath comes back.",
+      "love": "You're stepping out from under the relationship's weight, or the pressed-down exhaustion is breaking out. Honesty is what saves this.",
+      "money": "A chance to restructure debts and obligations is visible. Professional help is a good option too.",
+      "career": "It's time to delegate and re-sort priorities. You don't have to do everything well.",
+      "advice": "Saying 'help me' — that's the courage you need most right now."
+    }
+  },
+  "wands-11": {
+    "name": "Page of Wands",
+    "keywords": ["Curiosity", "Exploration", "Seed of passion", "Fresh news", "Free spirit"],
+    "upright": {
+      "core": "Means the unrefined seed of passion and pure curiosity. An explorer's spirit toward new possibility and the arrival of welcome news — short on experience, but carrying the free, fearless energy of a beginning.",
+      "general": "Everything looks interesting and you want to try it all. A new interest or welcome news is on its way. It's fine to be clumsy — this is the time to just dive in.",
+      "love": "A fluttering new connection or fresh young feelings may begin. Enjoying it without calculation is exactly the charm.",
+      "money": "Interest stirs in a side gig or first investments. Start small, as if learning.",
+      "career": "Curiosity about a new field can be a career seed. Grab the chances to learn.",
+      "advice": "Put down the pressure to do it well — follow where the curiosity leads."
+    },
+    "reversed": {
+      "core": "Means passion without direction and enthusiasm that doesn't hold. Scatter — all starts, no finishes — and immature impulse; the scattered energy needs gathering onto one goal.",
+      "general": "Enthusiasm runs ahead but boredom or lost direction follows fast. Projects pile up half-done. The problem isn't the passion — it's not having chosen the one thing to focus on.",
+      "love": "Feelings cool quickly, or a light touch invites misunderstanding. If you're sincere, show it through consistency.",
+      "money": "Impulse buys and on-a-whim investing lead to regret. Wait one day before paying.",
+      "career": "Focus scatters and things only get started. Concentrate on finishing the one in your hands.",
+      "advice": "Rather than starting ten things, build the experience of finishing one."
+    }
+  },
+  "wands-12": {
+    "name": "Knight of Wands",
+    "keywords": ["Charge", "Adventure", "Boldness", "Drive", "Passionate action"],
+    "upright": {
+      "core": "Means the bold charge toward a goal and passionate power to act. Momentum that leaps into adventure without hesitation, energy at its crest — the dynamic force by which action itself creates opportunity.",
+      "general": "You're full of energy that runs at the goal without flinching. The drive to leap into what you'd been hesitating over is flowing now. That boldness is likely to draw people and chances to you.",
+      "love": "Feelings burn hot and the pull is to make your move. The courage to approach first can bring a fine result.",
+      "money": "Bold investment and ventures may convert to profit. Just match the risk management to the speed.",
+      "career": "Favourable for a move, a daring project, a new stage. Right now, momentum is the competitive edge.",
+      "advice": "See the opening, move — no dithering. Action is the answer now."
+    },
+    "reversed": {
+      "core": "Means the haste and recklessness of unmastered passion. Direction-less galloping, impulsive decisions, the risk of quitting midway — drive missing its restraint and patience.",
+      "general": "Passion is tipping into overspeed and losing the road. Rash decisions and half-finished exits grow likelier. Braking, remember, is also part of driving.",
+      "love": "The blaze-up-then-cool pattern may be repeating. Slow the tempo of the feelings by one beat.",
+      "money": "Impulse spending and oversized bets can bring losses. Let the big decisions sit for a few days.",
+      "career": "A rushed move or a snap judgement may leave regret. Check the plan — and the exit — first.",
+      "advice": "Before you run, ask just once: is this passion, or is it impatience?"
+    }
+  },
+  "wands-13": {
+    "name": "Queen of Wands",
+    "keywords": ["Confidence", "Charisma", "Independence", "Warm passion", "Charm"],
+    "upright": {
+      "core": "Means confidence and charisma that combine warmth with backbone. An independent charm grounded in self-belief, an energy that vitalises everyone nearby — passion expressed maturely, through sociability and care.",
+      "general": "You're shining as the lead of your own life. Your warm, firm energy is drawing people in. The more you act like yourself, the better both work and relationships flow.",
+      "love": "Your confidence and charm are at their brightest. Honest, forthright expression breathes life into the relationship.",
+      "money": "You can trust your own sense and judgement. Manage it hands-on and the finances grow steadily.",
+      "career": "A fine time to lead and to be seen. Roles that pull people along suit this current well.",
+      "advice": "Stop reading the room and shine your own way. That's your greatest weapon."
+    },
+    "reversed": {
+      "core": "Means self-belief lost — or passion warped into jealousy and stubbornness. Self-worth shaken by comparison, charisma curdled into control; the inner steadiness needs restoring.",
+      "general": "Confidence is wobbling — or energy is leaking out through stubbornness and envy. You may be cutting yourself down by comparison. What's lost isn't ability; it's self-belief. Notice that.",
+      "love": "Jealousy and unease can shake things. Steady your own heart before trying to steer theirs.",
+      "money": "Show-off spending and emotional purchases may rise. Ask if the spending is for you or for an audience.",
+      "career": "Low self-belief is muffling your performance. Recover the feel through small wins.",
+      "advice": "Spend less time comparing with others — compare with yesterday's you."
+    }
+  },
+  "wands-14": {
+    "name": "King of Wands",
+    "keywords": ["Leadership", "Vision", "Decisiveness", "Command", "Mature passion"],
+    "upright": {
+      "core": "Means visionary leadership that governs passion with full maturity. The command and decisiveness that set out the big picture and move people — will tempered by experience, settled into authority and influence.",
+      "general": "This is the leader's season: handling passion maturely and steering the big picture. The power to set a vision and move people is flowing. Your decision may well change the whole board.",
+      "love": "You're carrying the relationship with responsibility. That solidity plants deep trust.",
+      "money": "Good judgement is available for large decisions and long-term investments. Place your resources where the vision is.",
+      "career": "Doors open to leading roles — promotion, founding, heading a team. Trust the intuition your experience built.",
+      "advice": "Don't drown in the small stuff — set the big direction, and delegate."
+    },
+    "reversed": {
+      "core": "Means leadership warped into high-handedness and arrogance. Authority turning coercive, vision hardening into obstinacy — or command lost to the fatigue of responsibility. What must be restored is leadership that leads by trust, not force.",
+      "general": "Leadership is tipping into my-way-only, or the weight of responsibility has worn you down. The certainty that your way is the right one may be opening distance around you. Time to revisit the difference between dragging and leading.",
+      "love": "The urge to steer is strong enough to stifle. Practise deciding together.",
+      "money": "Overconfident calls can turn into losses. Keep an ear open to other people's counsel.",
+      "career": "Solo decisions and thin communication are shaking the teamwork. Listening comes before directing right now.",
+      "advice": "Real leadership comes from the listening ear, not the loud voice."
+    }
+  }
+}

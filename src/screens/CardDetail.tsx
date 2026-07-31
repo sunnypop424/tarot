@@ -8,6 +8,7 @@ import type { Card, CardReading, Orientation } from '@/types/card'
 import { NotReady } from './NotReady'
 import styles from './Cards.module.css'
 import { useT } from '@/i18n'
+import { useCardText } from '@/i18n/cardText'
 
 const FIELDS: { key: keyof Omit<CardReading, 'core'>; label: string }[] = [
   { key: 'general', label: '종합' },
@@ -20,9 +21,11 @@ const FIELDS: { key: keyof Omit<CardReading, 'core'>; label: string }[] = [
 /** 카드 상세 — 상징과 정/역방향 전체 의미 */
 export function CardDetail() {
   const t = useT()
+  const lc = useCardText()
   const { cardId } = useParams<{ cardId: string }>()
   const { go } = useSlotPath()
-  const card = cardId ? getCardById(cardId) : undefined
+  const raw = cardId ? getCardById(cardId) : undefined
+  const card = raw && lc(raw)
 
   if (!card) return <NotReady title={t('없는 카드')} />
 
@@ -31,7 +34,7 @@ export function CardDetail() {
       {/* 타이틀·리드는 다른 화면과 같은 자리에 둔다 — 이동할 때 어긋나 보이지 않게 */}
       <h1 className="t-title-l screen__title">{card.name}</h1>
       <p className="t-text-m screen__lead">
-        {card.nameEn} · {arcanaLabel(card)}
+        {card.nameEn} · {arcanaLabel(card, t)}
       </p>
 
       <div className={`play-card ${styles.detailCard}`}>
@@ -69,9 +72,9 @@ export function CardDetail() {
   )
 }
 
-function arcanaLabel(card: Card): string {
-  if (card.arcana === 'major') return `메이저 아르카나 · ${card.number}`
-  return `${SUIT_LABELS[card.suit!]} · 마이너 아르카나`
+function arcanaLabel(card: Card, t: (ko: string) => string): string {
+  if (card.arcana === 'major') return `${t('메이저 아르카나')} · ${card.number}`
+  return `${t(SUIT_LABELS[card.suit!])} · ${t('마이너 아르카나')}`
 }
 
 function Meanings({

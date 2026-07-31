@@ -1,0 +1,442 @@
+{
+  "major-0": {
+    "name": "The Fool",
+    "keywords": ["New beginnings", "Innocence", "Adventure", "Freedom", "Possibility"],
+    "upright": {
+      "core": "Symbolises the pure energy of a beginning — leaping into an unknown journey without calculation or fear. The outcome is not guaranteed, but that blank page is exactly what makes the possibilities infinite. As the starting point of the Major Arcana journey, it stands for a free spirit and a deep, original optimism.",
+      "general": "The energy of a brand-new journey is stirring. You can't know how it ends yet, but that open space is precisely what can become infinite possibility for you. This is a good time to trust the flutter in your chest over the maths and take the first step.",
+      "love": "An unexpected meeting or a fresh chapter in a relationship is likely on its way. Don't weigh it up too much — approach with an honest heart.",
+      "money": "You're open to new income streams and first tries at investing. It's still early days, though, so start light.",
+      "career": "The current favours unfamiliar challenges — a job change, a start-up, a new project. Even without experience, this energy lets you learn and grow as you go.",
+      "advice": "Rather than waiting to be perfectly ready, trust today's excitement and set off lightly."
+    },
+    "reversed": {
+      "core": "Symbolises innocence tipping into recklessness and freedom into irresponsibility. It can mean the danger of a leap made without preparation — or the opposite: standing frozen, unable to take the first step out of fear. A card that warns against rash judgement and losing your bearings.",
+      "general": "The balance between boldness and care may be wobbling. You may have jumped in unprepared and stumbled — or be so afraid that you haven't even started. This is the moment to check your direction.",
+      "love": "You may be dodging responsibility in the relationship, or your feelings may be floating somewhere untethered. Ask yourself whether you're giving the other person any certainty.",
+      "money": "Impulsive spending or unverified investments could bring losses. It's a good time to redo your budget.",
+      "career": "Mistakes are creeping in from lack of preparation, or scattered focus is stopping you finishing things. Sort out your priorities.",
+      "advice": "Remember that freedom and irresponsibility are different things — put a minimum safety net in place before you move."
+    }
+  },
+  "major-1": {
+    "name": "The Magician",
+    "keywords": ["Creation", "Execution", "Talent", "Focus", "Will"],
+    "upright": {
+      "core": "Symbolises the creative power to turn thought into reality through will and focus. The talent, resources and skills you need are already in your hands; this card means the ability to gather them into one and act. It marks the moment potential converts into concrete results.",
+      "general": "The ingredients to make what you want real are already in your hands. Talent, resources and timing are lining up — gather your will and move, and good results are likely to follow.",
+      "love": "Your charm is shining, so expressing yourself proactively can move things forward fast. Be the one to open the conversation.",
+      "money": "Ideas and ability are converting into income. A side project built on your own skills is worth a look.",
+      "career": "Your planning and execution are being recognised. It's a great time to show what you can do in presentations, proposals and negotiations.",
+      "advice": "Gather everything you have into one and put it into action — now."
+    },
+    "reversed": {
+      "core": "Symbolises talent and will misdirected or left unexpressed. It can mean misuse of ability, deception and trickery, bravado that is all talk, or potential unrealised through lack of confidence. A card that warns of the gap between appearance and substance.",
+      "general": "The ability is there, but the direction may be scattered, or your talent isn't being used properly. Sometimes it's all words and no follow-through — or you may be caught up in something that isn't what it seems. Check what's real.",
+      "love": "Look past the surface and the smooth talk to the sincerity underneath. Ask whether anything in the relationship is being exaggerated or steered.",
+      "money": "Beware inflated returns and offers that sound too good. Read the contract and the conditions carefully.",
+      "career": "Chances to show your ability may be blocked, or confidence may be low. Rebuild from small wins.",
+      "advice": "Put your energy into actually doing, not into how it looks."
+    }
+  },
+  "major-2": {
+    "name": "The High Priestess",
+    "keywords": ["Intuition", "Inner wisdom", "Secrets", "Stillness", "The subconscious"],
+    "upright": {
+      "core": "Symbolises the wisdom of intuition and the subconscious that lies beyond reason and logic. It means truths and secrets not yet visible, and an inner knowing that can only be reached through quiet contemplation. A card of still wisdom that asks for receptivity and observation rather than action.",
+      "general": "Right now your inner voice is more accurate than the visible facts. Don't rush — step back and watch quietly, and truths you couldn't see are likely to reveal themselves bit by bit.",
+      "love": "A deep connection is flowing that words can't fully carry. Rather than hurrying to confirm their feelings, watch how things unfold.",
+      "money": "Watching and gathering information beats aggressive investing right now. Keep your distance from offers your gut resists.",
+      "career": "It's a good season to build skill where no one is watching. Study, certifications, research — quiet groundwork pays.",
+      "advice": "The answer is inside you, not out there — make some quiet time and listen to your intuition."
+    },
+    "reversed": {
+      "core": "Symbolises a blocked channel of intuition, or turning away from the inner voice. It means suppressed emotions, concealed secrets, and judgement distorted by relying only on surface information. A card showing that what is hidden and what is repressed are stirring up confusion.",
+      "general": "Your intuition may be clouded, or emotions may be making it hard to judge. Information you need may also be hidden, which is frustrating. Take a calm look at what's underneath the surface.",
+      "love": "They may be hiding their real feelings — or you may be the one with the wall up. An honest conversation will clear the misunderstanding.",
+      "money": "Check for hidden costs and conditions. Deciding on gut feeling alone will leave gaps.",
+      "career": "Information isn't flowing, and things are getting tangled. Don't guess alone — go and confirm directly.",
+      "advice": "Trade anxious imagination for confirmed facts, and if there's a feeling you've been pressing down, take it out and face it."
+    }
+  },
+  "major-3": {
+    "name": "The Empress",
+    "keywords": ["Abundance", "Love", "Creativity", "Nurture", "Fruition"],
+    "upright": {
+      "core": "The archetype of the mother who bears and nurtures life — a symbol of nature's abundance and creativity. It means the ripening of what was sown into fruit, sensory and material plenty, and unconditional care and love.",
+      "general": "What you planted is ripening — an abundant current is flowing. It's an especially good season for loving and being loved, and for growing and making things. The more generous you are with yourself, the better this flow gets.",
+      "love": "The relationship is settling and deepening. Affection moves naturally both ways, and bigger steps — marriage, moving in — grow more possible.",
+      "money": "Income may grow and material breathing room appear. Sensible spending on yourself will also lift your quality of life.",
+      "career": "Effort is coming back as results. You'll shine especially in creative work, planning, and roles that care for people.",
+      "advice": "Don't rush — enjoy what you have and let the fruit finish ripening."
+    },
+    "reversed": {
+      "core": "Symbolises creative and nurturing energy blocked or distorted. It means stalled creativity, overprotection of or dependence on others, and the depletion of caring for everyone but yourself. It can also warn of abundance curdling into excess or idleness.",
+      "general": "Your energy may be draining inward, leaving you worn out. Perhaps you've looked after everyone but yourself — or slipped into excess and lethargy. It's time to turn the care back toward you.",
+      "love": "Affection may be tipping into clinginess or dependence, or you may have gone numb to each other. Rebalance the relationship.",
+      "money": "Overspending and unplanned outgoings may be leaking your reserves. Learn to tell self-care spending from waste.",
+      "career": "Results feel slow and creativity feels blocked. Check whether you're simply short of rest.",
+      "advice": "Fill your own cup before you pour into anyone else's."
+    }
+  },
+  "major-4": {
+    "name": "The Emperor",
+    "keywords": ["Stability", "Leadership", "Responsibility", "Structure", "Authority"],
+    "upright": {
+      "core": "The archetype of the father who governs the world with order, structure and discipline. It means rule grounded in reason and principle, an unshakeable foundation, and the authority and leadership that carry responsibility.",
+      "general": "The energy to build an unshakeable foundation is with you. Sort the situation with reason and principle rather than emotion, and you can create stability and achievement that last. You have more than enough strength to take the lead.",
+      "love": "A dependable, steady current runs through the relationship. A responsible attitude earns deep trust.",
+      "money": "A good time to set long-term financial plans. Steady saving and systematic management will harden your foundations.",
+      "career": "Leadership, promotion, or a role with real responsibility is likely. Sticking to your principles is what gets noticed.",
+      "advice": "Decide by your standards, not your mood — and see the plan through to the end."
+    },
+    "reversed": {
+      "core": "Symbolises authority abused — or lost. It means excessive control and rigidity, a domineering attitude, or the opposite: dodged responsibility and an unstable base. A card warning of both extremes, where power and order become oppression or collapse.",
+      "general": "Control may have tightened into rigidity, or the foundation may be shaking. Ask whether an authoritarian streak is causing friction around you — or whether you're avoiding a responsibility that's yours.",
+      "love": "Stubbornness and power struggles can stiffen the relationship. Look at each other's feelings before who's right.",
+      "money": "Either overcontrol or neglect could be putting holes in your finances. Review how the money actually flows.",
+      "career": "Friction with bosses or the organisation, and inflexibility, are holding you back. Look for the balance between principle and give.",
+      "advice": "Think about how to lead with trust instead of pressing down with force."
+    }
+  },
+  "major-5": {
+    "name": "The Hierophant",
+    "keywords": ["Tradition", "Teaching", "Counsel", "Trust", "Spiritual anchor"],
+    "upright": {
+      "core": "Symbolises institutional tradition, proven teaching, and spiritual guidance. It means following the norms and wisdom a community has built over time rather than personal improvisation, and learning through teachers and mentors. The card of the mediator between heaven and humanity.",
+      "general": "Proven paths and the wisdom of those who've gone before will carry you now. Rather than wrestling alone, ask a trusted mentor or an expert — the answer will come much clearer. The orthodox route may be the fastest one right now.",
+      "love": "The relationship is maturing into something serious and stable. It may ripen through introductions and the blessing of people around you; marriage prospects look positive too.",
+      "money": "Proven, conventional saving and investing serve you best. A session with a financial professional helps in this season.",
+      "career": "Following the organisation's norms and learning from seniors leads to growth. Education, counselling and public-sector work are favoured.",
+      "advice": "Don't hesitate to ask someone who has already walked the road."
+    },
+    "reversed": {
+      "core": "Symbolises tradition and rules turned oppressive — or the movement to break free of them. It means questioning formalism and blind custom, pushing back against the existing order, and the independence of building your own system of values.",
+      "general": "The set way of doing things may be squeezing the breath out of you. If custom or others' expectations are pulling against what you really feel, that's the signal to find your own answer instead of borrowing someone else's.",
+      "love": "Outside measures — family, conditions, other people's eyes — may be pressing on the relationship. Focus on what the two hearts actually want.",
+      "money": "A choice made 'because that's how it's done' could cost you. Check the terms yourself before deciding.",
+      "career": "The culture doesn't fit and it's stifling. Rather than fighting every rule, start by proposing the changes that are possible.",
+      "advice": "Don't follow something just because everyone does — test whether it fits you."
+    }
+  },
+  "major-6": {
+    "name": "The Lovers",
+    "keywords": ["Love", "Choice", "Harmony", "Union", "Values"],
+    "upright": {
+      "core": "Symbolises the harmonious union and deep bond of two beings — and at the same time, the major life choice made at a crossroads according to your values. Love and choice overlap here: a card about following the truth of the heart.",
+      "general": "The energy of a meeting of minds and a harmonious union is flowing. At the same time, this is a season that asks for a decision at an important fork in the road. Choose the side your heart truly wants over the side the sums recommend, and you're less likely to regret it.",
+      "love": "A powerful mutual pull and deepening feelings — the best of currents. A confession, a beginning, a clear step forward can all be expected.",
+      "money": "Spending and investing that match your values will satisfy you. Partnerships and shared finances are in sync in this season too.",
+      "career": "Like-minded colleagues and good partnerships create the results. At a career crossroads, let your values be the measure.",
+      "advice": "Put down the checklist and look honestly at where your heart is pointing."
+    },
+    "reversed": {
+      "core": "Symbolises disharmony in union and choices gone askew. It means clashing values, broken communication, judgement clouded by temptation, and the avoidance of the responsibility a choice carries. A card announcing that balance has broken in relationships and decisions.",
+      "general": "The heart's balance may have tipped, or a postponed choice may be tangling things up. Value differences, lingering attachments and temptations can all blur the picture — first sort out what you actually feel.",
+      "love": "Mistimed feelings, thin communication, even a triangle — discord is possible. An ambiguous attitude only makes it harder.",
+      "money": "Indecision, or spending you were talked into, could cost you. Remember that postponing a decision is a cost too.",
+      "career": "Collaboration is out of step, or you're wavering between two paths. Define your criteria clearly.",
+      "advice": "End the foot-in-both-camps arrangement — choose one and take responsibility for it."
+    }
+  },
+  "major-7": {
+    "name": "The Chariot",
+    "keywords": ["Drive", "Victory", "Will", "Overcoming", "Advance"],
+    "upright": {
+      "core": "Symbolises advance and victory — controlling opposing forces with strong will and driving toward the goal. It means the momentum that overcomes inner conflict and outer obstacles, and a self-assured, decisive breakthrough.",
+      "general": "A powerful forward current is running — you're charging at the goal. Hold the reins on the forces pulling in different directions and push on, and you can win even against competition. This is the time to pick up speed.",
+      "love": "Approach boldly and you can win their heart. Honest, confident directness works better than games.",
+      "money": "Set a target amount and push — you're likely to hit it. Just don't get so drunk on speed that you forget the brakes.",
+      "career": "The energy of victory in competitions, exams and projects. Travel, relocation, stepping onto a new stage — all favoured.",
+      "advice": "Hesitate and the opening passes. Once you've chosen the direction, hit the accelerator."
+    },
+    "reversed": {
+      "core": "Symbolises lost control and momentum without direction. It means collisions brought on by impatience and aggression — or the opposite, stalling with the engine dead. The card says the problem isn't speed but steering.",
+      "general": "Your drive may be spinning without traction, or impatience may be inviting an accident. You could exhaust yourself forcing situations you can't control — check the direction before the speed.",
+      "love": "Pushing too hard may be overwhelming them, or running emotions may spark fights. Take a beat.",
+      "money": "Hasty decisions and overextension can bring losses. Brake, and re-examine the plan.",
+      "career": "Delays, tough competition, a lost sense of direction. Re-define the goal clearly.",
+      "advice": "Knowing when to stop is a skill too. Ease off until your hands are back on the wheel."
+    }
+  },
+  "major-8": {
+    "name": "Strength",
+    "keywords": ["Inner strength", "Patience", "Courage", "Gentle mastery", "Self-trust"],
+    "upright": {
+      "core": "Symbolises the inner courage that masters instinctive force with gentleness and patience, not muscle. It means mature self-command — taming fear and desire kindly rather than crushing them — and a quiet, unshakeable trust in yourself.",
+      "general": "This is a season when real strength shines: steering the situation with softness and patience rather than force. The energy to gently tame the lion inside — fear, desire — is flowing with you. You are far sturdier than you think.",
+      "love": "Unhurried sincerity and warmth are opening their heart. The waiting itself deepens the relationship.",
+      "money": "The strength to resist tempting spending is growing. Steadiness is what makes the finances solid.",
+      "career": "Tricky work and difficult people both yield to patience and craft. In a crisis, your composure gets noticed.",
+      "advice": "Don't push harder — push softer, and don't stop."
+    },
+    "reversed": {
+      "core": "Symbolises inner strength depleted or self-trust collapsed. It means self-doubt and shrinking back — or emotion and instinct slipping out of control. A card saying that what's needed is recovery, not forced toughness.",
+      "general": "Confidence may have dipped into self-doubt, or emotions may be running past your control. These are signs your inner reserves are drained — give yourself time to recover instead of driving yourself harder.",
+      "love": "Clinging from anxiety, or mood swings, may be shaking the relationship. Soothe your own heart before reaching for theirs.",
+      "money": "Stress spending and impulse buys can break the balance. Practise separating feelings from the wallet.",
+      "career": "Low confidence may make you shrink from a chance, or burnout may be creeping in. Tell yourself it's fine not to be perfect.",
+      "advice": "What you need now isn't to be stronger — it's the courage to look after your tired self."
+    }
+  },
+  "major-9": {
+    "name": "The Hermit",
+    "keywords": ["Reflection", "Solitude", "Inner search", "Wisdom", "Regrouping"],
+    "upright": {
+      "core": "Symbolises the time of reflection spent withdrawing from the outer world to seek truth alone. It means the deep wisdom only solitude can give, self-guidance by an inner light, and regrouping for the next stage.",
+      "general": "You need a moment away from the noise to face yourself. In your own quiet, you're likely to find the answer you'd been missing. This solitude isn't loneliness — it's a regrouping for growth.",
+      "love": "Looking inward comes before the relationship right now. A slow, unhurried getting-to-know lasts longer anyway.",
+      "money": "What's needed is a quiet audit, not showy spending. Go through your finances calmly and the leaks will show themselves.",
+      "career": "Favoured: solo deep work, research, self-development. A good time to rethink your direction from the roots.",
+      "advice": "Stop comparing your pace with anyone else's — follow your own lantern."
+    },
+    "reversed": {
+      "core": "Symbolises reflection soured into isolation. It means disconnection from the world, excessive withdrawal and loneliness — or the opposite, a distractedness that avoids the reflection that's needed. The card that says the retreat is over; it's time to reconnect.",
+      "general": "Reflection may have turned into isolation and the thread to the world gone slack. If time alone is feeding loneliness and worry instead of answers, that's the sign to step out of the cave.",
+      "love": "The door may be closed so tight there's no gap to approach through, and distance is growing. Start again with one small message.",
+      "money": "Locked in your own head, your field of view narrows. An objective second opinion will help.",
+      "career": "Avoiding collaboration and hoarding the work has stalled it. Asking for help is not weakness.",
+      "advice": "If you've thought it through, take one step back in among people."
+    }
+  },
+  "major-10": {
+    "name": "Wheel of Fortune",
+    "keywords": ["Turning point", "Luck", "Cycles", "Change", "Timing"],
+    "upright": {
+      "core": "Symbolises the turning points of fate beyond human will, and the law of cycles. It means the moment a stalled current starts to move, luck rotating into an upswing, and the timing that must not be missed.",
+      "general": "You're standing at a turning point — the wheel of life is making a big rotation. What was stuck is coming loose, and unexpected luck and opportunity are likely. This current belongs to whoever grabs it, so don't miss the signals of change.",
+      "love": "A meeting that feels like fate, or a sudden leap forward in the relationship. Open your heart to chances disguised as coincidence.",
+      "money": "Unexpected income or a good investment window may arrive. Shore up your base while the current is with you.",
+      "career": "A career turning point may arrive — an offer, a promotion, a project pivot. When the chance comes, don't hesitate.",
+      "advice": "The wheel keeps turning — when the good stretch comes, climb on."
+    },
+    "reversed": {
+      "core": "Symbolises the descending arc of the cycle and variables beyond control. It means setbacks that knock plans askew, patterns of repeating bad luck, and the friction that grows the harder you resist the current. But the wheel never stops — this phase, too, passes.",
+      "general": "You may be in the stretch where the wheel dips. Plans slip and things won't cooperate — but this is a phase of the cycle, not a failure. Rather than forcing the wheel, prepare for the next upswing.",
+      "love": "Timing is off, or the same conflict keeps looping and wearing you down. If the problem repeats, change the pattern itself.",
+      "money": "Unplanned expenses or a market reversal are possible. Avoid big bets for now.",
+      "career": "Delays and outside variables are rocking the boat. Focus on what you can control, not what you can't.",
+      "advice": "When the current is against you, enduring is a strategy. The wheel turns again soon."
+    }
+  },
+  "major-11": {
+    "name": "Justice",
+    "keywords": ["Fairness", "Balance", "Cause and effect", "Responsibility", "Truth"],
+    "upright": {
+      "core": "Symbolises the law of cause and effect — reaping what you sowed — and fair judgement. It means decisions grounded in fact and principle rather than emotion, just responsibility and reward for what was done, and the restoration of balance as truth comes to light.",
+      "general": "The scales of cause and effect are weighing precisely right now. If you've built steadily, a fair reward is likely on its way back to you. It's a good time to make big decisions leaning on facts and principles, not feelings.",
+      "love": "A fair, balanced relationship is taking shape. If things were ambiguous, a clear conclusion may arrive.",
+      "money": "Fair outcomes are likely in contracts, settlements and legal matters. The more transparent you are, the better you come out.",
+      "career": "Your results are being measured objectively and your effort paid its true worth. In paperwork, contracts and negotiations, thoroughness is your weapon.",
+      "advice": "Before weighing what profits you, make the choice you can stand behind."
+    },
+    "reversed": {
+      "core": "Symbolises the tilted scale — unfairness and distorted judgement. It means biased vision, responsibility dodged or shifted, unjust treatment, and the self-deception of reading everything in your own favour. A card that demands a cold, second look at the truth.",
+      "general": "The scale may feel tilted — unfair treatment, blurry accountability, an undeserved burden. Or you may be reading the situation only in the way that suits you. Look at the facts coldly, again.",
+      "love": "A lopsided relationship, giving and receiving out of balance, is feeding resentment. Rebalance with conversation, not with feelings.",
+      "money": "Watch for one-sided contracts and opaque deals. Read the clauses once more before you sign.",
+      "career": "Disputes over evaluations or shifted blame may flare. Keep records and have your evidence ready.",
+      "advice": "Don't sink into the grievance — start straightening what can be straightened, one piece at a time."
+    }
+  },
+  "major-12": {
+    "name": "The Hanged Man",
+    "keywords": ["New perspective", "Patience", "Sacrifice", "Pause", "Letting go"],
+    "upright": {
+      "core": "Symbolises the new perspective gained through voluntary pause and sacrifice. It means the insight reached by suspending action and turning the situation upside down, and the deeper understanding bought by putting down immediate gain.",
+      "general": "This pause is not waste — it's precious time for gaining a new way of seeing. Hang upside down and the world shows answers it was hiding; flip your perspective and the whole situation may read completely differently.",
+      "love": "Now is for seeing the relationship from their side, not for pushing it forward. Patience and consideration return later as deeper trust.",
+      "money": "Today's spending or investment may be a seed for the future rather than now. Don't fret over short-term returns.",
+      "career": "Work looks stalled, but depth is accumulating. Re-define the problem from another angle and the way through appears.",
+      "advice": "Don't force the current to change — accept the different view this stillness offers."
+    },
+    "reversed": {
+      "core": "Symbolises draining sacrifice without insight and meaningless stagnation. It means clinging to what should be released, endurance without a cause, and waiting that has decayed into an excuse for postponing change.",
+      "general": "You may be trapped in pointless sacrifice and depleting waiting. If holding on has stopped being a virtue and become a fixation, it's time to ask yourself what you're unable to put down — and why.",
+      "love": "You may be worn thin from always being the one who adjusts. Love that grinds you down does not last.",
+      "money": "Check whether money and time are still tied up where recovery is unlikely. Cutting a loss is also a decision.",
+      "career": "Energy is leaking into growth-less grind and effort that spins in place. Consider changing the method — or the board.",
+      "advice": "Work out whether what you're holding is hope or just reluctance — and if it's reluctance, let it go."
+    }
+  },
+  "major-13": {
+    "name": "Death",
+    "keywords": ["Endings and beginnings", "Change", "Rebirth", "Clearing", "Transition"],
+    "upright": {
+      "core": "Symbolises the complete closing of one cycle and the rebirth that follows. It means the natural passing of what has run its course, parting with an old identity, and the fundamental transformation that begins in that cleared space. A card of transition, not of physical death.",
+      "general": "A big transitional energy is moving — one chapter closing, a new one opening. The ending isn't something to fear: it's the natural process of releasing what no longer fits you so you can be born again. Clear what needs clearing and a new door opens.",
+      "love": "The relationship is either closing a stage or crossing into something entirely new. Open your heart to the connection ahead rather than the one behind.",
+      "money": "A good time to overhaul old spending habits and income structures. Clear out the old and a new current flows in.",
+      "career": "A big knot in your career may be tied off — resignation, a move, a change of field. End it well and the next beginning is much lighter.",
+      "advice": "Don't clutch at what is ending — see it off well, and you are already preparing the new beginning."
+    },
+    "reversed": {
+      "core": "Symbolises resistance to inevitable change and the postponement of an ending. It means the lingering grip on what is finished, stagnation born of fear of change, and the cost of transition that grows with every delay.",
+      "general": "Change may be stalled because an ending hasn't been allowed to end. Fear of change is holding your ankle — but the longer the delay, the higher the cost of the crossing. What's needed now is the courage to finish.",
+      "love": "A cooled relationship, or an old connection, may be blocking a new beginning. Tie off the unresolved feelings first.",
+      "money": "Refusing to admit a loss can lead to a bigger one. If there's an account or an expense to close, don't put it off.",
+      "career": "Are you staying in ill-fitting work or surroundings out of inertia? Postponing the change may be the biggest risk of all.",
+      "advice": "The decision you keep delaying out of fear is exactly the key that sets you free."
+    }
+  },
+  "major-14": {
+    "name": "Temperance",
+    "keywords": ["Balance", "Harmony", "Moderation", "Recovery", "Blending"],
+    "upright": {
+      "core": "Symbolises the alchemical balance that blends opposing elements into a higher harmony. It means the moderate stance that avoids extremes, the fusion of unlike things, and the healing and recovery that come through patient adjustment.",
+      "general": "Different things are blending harmoniously and settling into stability. Staying off the extremes softens the whole situation, and a tired body and mind can slowly recover in this current.",
+      "love": "A relationship that breathes easily, each accepting how the other differs. A calm love that quietly deepens.",
+      "money": "Income and spending are finding their balance. Steady, unforced management brings the good result.",
+      "career": "Your gifts for tuning and mediating are shining. You can blend mismatched teams and tasks into synergy.",
+      "advice": "Neither rush nor stall — keep your own pace and keep going."
+    },
+    "reversed": {
+      "core": "Symbolises lost balance and failed adjustment. It means excess or lack tipped to one side, elements that refuse to blend, and the exhaustion a broken rhythm brings.",
+      "general": "Life may have tipped to one side and overloaded. When the tuning between work and rest, feeling and reason breaks, the body and mind start sending signals. Getting your rhythm back comes first.",
+      "love": "Different temperatures, different paces — the beat is off. Put down the impatience and match speeds.",
+      "money": "Swinging between splurging and starving breaks the balance. Find the sustainable middle.",
+      "career": "Overwork, burnout, or friction in collaboration comes easily now. Adjust the schedule and the load to reality.",
+      "advice": "Drop the all-or-nothing — do only as much as today allows."
+    }
+  },
+  "major-15": {
+    "name": "The Devil",
+    "keywords": ["Obsession", "Temptation", "Bondage", "Addiction", "The shadow"],
+    "upright": {
+      "core": "Symbolises the realm of shadow and bondage created by desire, obsession and addiction. It means a state of lost freedom, gripped by material temptation and instinctive impulse — while holding this truth: the chain was fastened by your own hand, so your own hand can remove it.",
+      "general": "Something has a strong pull on you — a person, a habit, a desire. It's time to check whether a chain hides behind the sweetness. The good news this card carries: that chain is loose enough for you to slip off yourself.",
+      "love": "An intense pull, a hot connection — but you need to tell healthy love from obsession and dependence. Check whether you can still be yourself inside the relationship.",
+      "money": "The pull of jackpots, impulse buys and spending on credit grows now. The sweeter the offer, the colder you should read the terms.",
+      "career": "You may be locked into unwanted work by the conditions, or tied into uncomfortable interests. Look straight at what is holding you.",
+      "advice": "The thing you feel you can't quit — put one hand's width of distance between it and you, today."
+    },
+    "reversed": {
+      "core": "Symbolises liberation from bondage and the beginning of awareness. It means seeing your obsessions, addictions and draining relationships for what they are, and the recovering movement of shedding the chain. A card of agency reclaimed by facing the shadow.",
+      "general": "The energy of release is flowing — you're starting to slip the chain that bound you so long. The moment you recognise the bad habit, the draining relationship, the self-made limit, you're already half free. The current is moving toward recovery.",
+      "love": "You're stepping out of an unhealthy pattern, or finally putting the obsession down. Past the lightness, a relationship that's actually good for you comes into view.",
+      "money": "Good timing to clear debts and cut spending habits. One small success becomes the footing for recovery.",
+      "career": "You're taking back the wheel from a binding situation or relationship. Practising refusal — declining what should be declined — builds the muscle.",
+      "advice": "The chain is already loose — don't hesitate, pull your hand free."
+    }
+  },
+  "major-16": {
+    "name": "The Tower",
+    "keywords": ["Upheaval", "Collapse", "Awakening", "Dismantling", "Rebuilding"],
+    "upright": {
+      "core": "Symbolises the sudden collapse of a structure built on false foundations. It means upheaval and dismantling that arrive without warning, and the awakening in which illusion shatters and truth stands exposed. The destruction is painful — and the precondition of a sturdier rebuild.",
+      "general": "The familiar structure is shaking — sudden change is in the air. It can shock and it can hurt, but what falls was standing on unstable ground to begin with. This shaking is also a forceful invitation: rebuild on firmer ground.",
+      "love": "A hidden problem may surface abruptly, or an unforeseen change arrive. What matters isn't the shock — it's what you build after it.",
+      "money": "Prepare for sudden expenses and plans knocked flat. Check your safety nets — the emergency fund, the insurance.",
+      "career": "Sharp changes are possible — reorganisations, cancelled projects. Inside the crisis, the chance to redraw the whole board comes into view.",
+      "advice": "Don't stand clutching the rubble — think about what to raise in its place."
+    },
+    "reversed": {
+      "core": "Symbolises collapse postponed and resistance to necessary change. It means the precariousness of propping up what should fall, the aftershocks that follow an upheaval, and a scale of ruin that grows with every avoidance.",
+      "general": "You may be straining to hold up something that needs to fall, or riding out the aftershocks of a recent blow. Postponing change is comfortable for a moment — but the rebuilding is postponed with it. Sorting out comes before fear.",
+      "love": "A relationship held together with the pressure sealed in. The longer honesty waits, the deeper the crack runs.",
+      "money": "Are makeshift patches holding up a precarious structure? This is the moment for repairs at the foundation.",
+      "career": "Dodging the festering problem, scrambling to keep things as they are. A crack costs least when it's mended small.",
+      "advice": "Change it yourself and it's a renovation; put it off and it's an accident. Fix it before it falls."
+    }
+  },
+  "major-17": {
+    "name": "The Star",
+    "keywords": ["Hope", "Healing", "Inspiration", "Recovery", "Optimism"],
+    "upright": {
+      "core": "Symbolises the hope, healing and purified faith that follow an ordeal. It means the recovering process of wounds closing and the heart opening toward the future again, and a quiet but unmistakable light of inspiration and guidance.",
+      "general": "Like stars after a storm, a gentle current of hope and healing is flowing. A tired heart recovers and belief in the future revives. Even without dazzling results yet, you may hold the conviction that the direction is right.",
+      "love": "Wounds are closing, and you're seeing love with clear eyes again. Expect an easy, honest closeness.",
+      "money": "Finances are slowly recovering — a good time to plan ahead. Plant seeds toward the long-term goals.",
+      "career": "Inspiration is welling up and the vision turning sharp. A fine current for creative fields and long-held dreams.",
+      "advice": "Don't rush. Follow that hope — faint like starlight, but unmistakable."
+    },
+    "reversed": {
+      "core": "Symbolises hope lost and faith shaken. It means the listlessness and pessimism born of disappointment, and weakened conviction about the future. Yet the star itself has not vanished — only the view is obscured; the possibility of recovery remains.",
+      "general": "Hope may have dimmed, and a heaviness seeped in. But the star hasn't gone out — a cloud is passing across it, that's all. What's needed isn't grand optimism, just picking the small recovery routines back up, one at a time.",
+      "love": "Expectation is souring into disappointment and the feeling cooling. See the person in front of you as they are, not the ideal.",
+      "money": "Vague optimism — or its twin, heavy pessimism — is fogging your judgement. Look at the actual numbers and get your bearings back.",
+      "career": "Motivation is thin and the vision hard to see. Set the big picture aside and focus on one small thing you can do today.",
+      "advice": "When hope is invisible, start with sleeping well and eating well — recovery starts there."
+    }
+  },
+  "major-18": {
+    "name": "The Moon",
+    "keywords": ["Anxiety", "Illusion", "The unconscious", "Ambiguity", "Tested intuition"],
+    "upright": {
+      "core": "Symbolises the ambiguous passage ruled by uncertainty, illusion and the unconscious. It means a state where fact and imagination blur and perception distorts, suppressed anxieties surfacing, and a period when judgement should be held until things turn clear.",
+      "general": "Under moonlight everything looks larger and blurrier than it is. Anxiety and imagination can eclipse the facts right now, and judging by what you see risks illusion. Until things clarify, wisdom is postponing the big decisions.",
+      "love": "You can't read their heart, and the anxiety grows. Don't write the script alone — give it time and verify the feelings.",
+      "money": "Decisions built on rumour and murky information are dangerous. Until it's clear, watching is the answer.",
+      "career": "The situation is foggy and hidden variables may lurk. Put things in writing, keep records, move carefully.",
+      "advice": "Separate the shadows your anxiety casts from the real dangers — and don't rush before sunrise."
+    },
+    "reversed": {
+      "core": "Symbolises the phase when the fog lifts and confusion shows its true shape. It means hidden truths surfacing, vague anxieties identified at last, and the turn toward waking from illusion to face reality.",
+      "general": "The fog is lifting and the confusing situation is showing its real outline. Once you learn what the vague dread actually was, it's likely smaller than it seemed. The uncovering may be uncomfortable — but it ends by setting you free.",
+      "love": "Misunderstandings resolve, or something hidden comes to light. With clarity, the direction of the relationship gets easier to choose.",
+      "money": "The cause of the murky problem is surfacing, and with it the thread of a solution. You can move on confirmed information now.",
+      "career": "The confusion is settling and grounds for judgement are appearing. It's fine to go ahead with the postponed decision.",
+      "advice": "Even if the surfaced truth is uncomfortable, don't look away — make it the footing for your next step."
+    }
+  },
+  "major-19": {
+    "name": "The Sun",
+    "keywords": ["Success", "Vitality", "Joy", "Positivity", "Achievement"],
+    "upright": {
+      "core": "Symbolises the clarity, success and life-force after darkness and confusion have cleared. It means truth in the open and unmixed joy, and achievement in which effort finally shines in full light. Counted the brightest, most positive card of the Major Arcana.",
+      "general": "Bright, warm success fills the air like a cloudless sky. What you worked for is coming into the light, and you're likely to share the joy with the people around you. This is a season to be confident and shine as much as you please.",
+      "love": "A bright, healthy relationship where feelings are shown without hiding. Confessions, milestones, happy occasions ahead.",
+      "money": "An abundant stretch with energy in the finances. Bonuses, raised income — clear rewards for effort can follow.",
+      "career": "Your results are being recognised publicly — the best of currents. A great time to present, to stand up, to be seen.",
+      "advice": "Don't hide behind modesty — show your achievement proudly."
+    },
+    "reversed": {
+      "core": "Symbolises light temporarily veiled — success delayed and joy dimmed. It means the shrinking that keeps achievement from being enjoyed in full, overconfidence or complacency, or the shade cast by comparing yourself to others. The essential brightness remains intact.",
+      "general": "The sun is up, but a thin cloud is passing across it. Success may be delayed, or the joy not quite reaching you — yet the essential brightness hasn't gone anywhere. Find what's casting the shade and the light returns.",
+      "love": "Even in a good relationship, small hurts and self-doubt can cast shade. Start by counting what you're grateful for again.",
+      "money": "The reward feels late or small against expectations. Stop comparing and today's results turn out to be plenty.",
+      "career": "Your work is undervalued, or the light is slow in coming. The skill is real — keep stacking it.",
+      "advice": "Don't manufacture clouds by comparing yourself to others — trust the light you already have."
+    }
+  },
+  "major-20": {
+    "name": "Judgement",
+    "keywords": ["Rebirth", "Awakening", "Reckoning", "Calling", "Reappraisal"],
+    "upright": {
+      "core": "Symbolises the reckoning of the life lived so far and the resurrection beyond it. It means answering the calling that sounds from deep within, and the awakening in which past experience integrates and rises to a new level. The card of comebacks and second chances.",
+      "general": "The energy of revival is flowing — settling accounts with the past and waking into something new. Long-awaited news or a second chance is likely on its way, and everything you've been through becomes an asset for the next stage. It's time to answer the call inside.",
+      "love": "Reunion, repair, or an important conclusion about the relationship. Settle the past and the heart comes clear.",
+      "money": "Tied-up money may come loose, or old effort finally pay out. A good moment for a full financial reckoning.",
+      "career": "The door of the second chance is opening — retries, passes, returns. The old failure is precisely what makes you stronger now.",
+      "advice": "That call that keeps sounding inside you — stop postponing it and answer."
+    },
+    "reversed": {
+      "core": "Symbolises harsh self-judgement and a calling ignored. It means stagnation held in place by regret and guilt, the avoidance of a necessary reckoning, and a second chance standing unrecognised at the door.",
+      "general": "Regret and self-blame may be pinning you in place — or you may be carefully looking away from an opportunity that's already arrived. The past isn't material for a verdict; it's material for learning. Remember that now.",
+      "love": "Old wounds and guilt may be blocking a new beginning. Forgive the past and the present opens.",
+      "money": "Is fear of the old failure postponing a decision you need to make? Keep the lesson, put down the fear.",
+      "career": "You're hesitating over a retry, or grading yourself far too harshly. Ask for objective feedback.",
+      "advice": "Withdraw the guilty verdict you passed on yourself and grant yourself the chance to stand again."
+    }
+  },
+  "major-21": {
+    "name": "The World",
+    "keywords": ["Completion", "Achievement", "Integration", "Journey's end", "New dimension"],
+    "upright": {
+      "core": "As the terminus of the Major Arcana journey, symbolises the completion and integration of a great cycle. It means the achievement in which scattered experience and effort click into one whole — and that this completion itself becomes the start of a wider dimension.",
+      "general": "The long journey is finally completing — achievement is in the air. The scattered pieces of your effort are fitting together into a whole, full fruition. And this completion isn't an ending: it's the departure point into a wider world.",
+      "love": "The relationship is arriving at full fruition. Marriage, completed trust, a mature love in which you are each other's whole match.",
+      "money": "A long-term goal lands and a financial cycle completes. Enjoy the achievement — and sketch the next goal.",
+      "career": "A project carried to successful completion, a target met, expansion overseas or onto a bigger stage — the finest current.",
+      "advice": "Celebrate this properly — then plan the next journey with your newly widened view."
+    },
+    "reversed": {
+      "core": "Symbolises the unfinished state, stopped just short of completion. It means the delay of the final piece, tasks left untied, and the hollowness an unclosed ending leaves behind. The card that says: close the circle, and the next journey can begin.",
+      "general": "Completion is in sight, but the last piece hasn't dropped into place. The wrap-up may be dragging, or a hollowness may follow the achievement. Find what's still unfinished, and the knot ties itself.",
+      "love": "The relationship circles just short of fruition, or one corner of the heart stays unfilled. Talk together about what homework remains.",
+      "money": "The goal is delayed, or variables appear in the final stretch. Hold your focus to the end.",
+      "career": "The project's ending drags, or strength fades just before the finish line. List what remains and cross the items off one by one.",
+      "advice": "Don't stop at ninety percent — fill in the last ten and set the full stop where it belongs."
+    }
+  }
+}

@@ -1,0 +1,282 @@
+{
+  "pentacles-1": {
+    "name": "Ace of Pentacles",
+    "keywords": ["A new opportunity", "Material beginnings", "Seed of prosperity", "Stability", "Making it real"],
+    "upright": {
+      "core": "Means a new beginning and opportunity in the material world. The moment a seed is planted in the practical realms — money, work, health — with the potential to grow into solid fruit if tended steadily.",
+      "general": "The seed of a practical opportunity is being placed in your hand. A new income source, an offer, a beginning is likely to appear — and this start can become a foundation that lasts.",
+      "love": "A connection that can last, on steady ground, may be starting. In an existing relationship, a practical occasion to sketch the future together may arrive.",
+      "money": "New income chances or an unexpected financial offer are in the current. The seed you plant now is likely to grow into something real.",
+      "career": "Career doors are opening — a new project, an offer, an acceptance. If the opportunity has substance, it's worth taking.",
+      "advice": "Don't just watch the opportunity in front of you — take the first step, however small."
+    },
+    "reversed": {
+      "core": "Means the delay or loss of an opportunity, an unstable base. The material plan has lost its footing in reality, or the timing of the start has slipped — the foundation needs rechecking.",
+      "general": "An opportunity may slide away just short of your hand, or the timing may be off. Check whether the plan has inflated past what reality supports.",
+      "love": "The beginning may be postponed, or material conditions may be shaking the feelings. Look again at the essence, past the terms.",
+      "money": "Expected money runs late, or the spending plan goes askew. Postpone the stretch investments and the impulse buys.",
+      "career": "The offer may stall, the start may slip. Take it as the signal to build the preparation firmer.",
+      "advice": "Don't force it through impatience — recheck the base and wait for the moment."
+    }
+  },
+  "pentacles-2": {
+    "name": "Two of Pentacles",
+    "keywords": ["Balance", "Juggling", "Flexibility", "Priorities", "Adapting to change"],
+    "upright": {
+      "core": "Means the balance among many duties and priorities. The ability to adapt flexibly to constant change while keeping your own rhythm.",
+      "general": "You're spinning several plates without losing the beat. Even as things keep shifting, the current is with you to keep a flexible balance.",
+      "love": "You may be juggling busily between work and love. Portion the time well and the relationship rolls along without strain.",
+      "money": "Income and spending are balancing — narrowly, but they balance. The knack of adjusting the budget to a fluid situation is what shines now.",
+      "career": "A stretch of handling several jobs and roles at once. Keep the priorities clear and it becomes a showcase of your ability.",
+      "advice": "Don't try to do everything perfectly — put what matters now first, in order."
+    },
+    "reversed": {
+      "core": "Means balance lost to overload. Responsibilities past the limit of what can be carried, priorities in disorder, the money management fraying.",
+      "general": "The load has passed the limit and the balance is wobbling. Catch one plate and another drops — that heaviness may be settling in.",
+      "love": "'Busy' may have quietly pushed the relationship to the back. Check whether hurt is accumulating on the other side.",
+      "money": "Spending may be outrunning income, the bookkeeping fraying. Just reopening the ledger can change the current.",
+      "career": "Overload is breeding mistakes and slipped deadlines. Cutting work — or asking for help — is also a skill.",
+      "advice": "Don't try to hold everything — choose one thing to set down."
+    }
+  },
+  "pentacles-3": {
+    "name": "Three of Pentacles",
+    "keywords": ["Collaboration", "Teamwork", "Skill recognised", "Craft-building", "Joint work"],
+    "upright": {
+      "core": "Means collaboration and the recognition of skill. The process where different specialities interlock to build what no one could alone — the first fruits of learning and craft.",
+      "general": "Together beats alone this season. As each person's expertise meshes, your skill is set to be recognised.",
+      "love": "You're building the relationship together, honouring how you differ. Conversation and cooperation flow well — even conflicts resolve constructively.",
+      "money": "Income may come through joint projects and collaborations. Fair reward for skill is likely to follow.",
+      "career": "Your presence in the team is showing and your ability being recognised. Say yes to the collaboration and it can end well.",
+      "advice": "Don't struggle alone — borrow the expertise around you, actively."
+    },
+    "reversed": {
+      "core": "Means disharmony in collaboration and recognition absent. Thin communication, role conflict, effort going without its fair appraisal.",
+      "general": "The collaboration is creaking, or the recognition isn't matching the effort. Everyone's facing a different direction and the output is fraying.",
+      "love": "The temperatures of effort differ, and one side feels alone in trying. Worth sharing: a relationship is also a thing built together.",
+      "money": "Noise may arise in partnerships and shared expenses. With money especially, fix the roles and the shares clearly.",
+      "career": "No communication, tangled roles — the results get buried. Rebuild the structure for exchanging feedback first.",
+      "advice": "Don't stockpile the frustration — tell each other plainly what role you're expecting."
+    }
+  },
+  "pentacles-4": {
+    "name": "Four of Pentacles",
+    "keywords": ["Possession", "Seeking security", "Thrift", "Control", "Holding tight"],
+    "upright": {
+      "core": "Means the desire to possess, preserve and be secure. The solidity that guards what was built — with the warning that, taken too far, it becomes the grip that blocks change and flow.",
+      "general": "The urge to hold tight to what you've built is strong. The security grows — but check whether the clenched hand is also blocking the new current.",
+      "love": "The wish to protect the relationship is growing. Just don't let the hunger for security spread into controlling them.",
+      "money": "A favourable current for saving and thrift. The finances harden — but over-scrimping can gnaw at the life in your life.",
+      "career": "You're focused on defending the seat and the record. Stable — but refuse all change and an opportunity slips by.",
+      "advice": "Take a moment to tell protecting apart from clutching."
+    },
+    "reversed": {
+      "core": "Means control loosening — or lost. It can be liberation from the grip; it can be stability collapsing through unchecked spending and absent management. A two-faced card.",
+      "general": "The clenched hand is relaxing. You may be finding ease beyond the grip on money and control — or the spending may be running loose and rocking the base.",
+      "love": "Putting the grip down can make the relationship breathe easier. Or the holding-on may have tightened until it stifles — balance is the task.",
+      "money": "Money may be leaking faster than planned — or stinginess may be costing you. Time to audit the spending habits.",
+      "career": "Clinging only to the seat can stall the growth. Start by accepting one small change.",
+      "advice": "Of everything you're gripping out of anxiety, sort out what you truly need."
+    }
+  },
+  "pentacles-5": {
+    "name": "Five of Pentacles",
+    "keywords": ["Lack", "Financial hardship", "Feeling left out", "Crisis", "The door of help"],
+    "upright": {
+      "core": "Means a season of lack, hardship and exclusion. Financial difficulty, or the loss of health and belonging — while help stands near, unseen by eyes cast down.",
+      "general": "You may be walking through a cold stretch, materially or inwardly. But like the lit window in the card, the door of help is closer than it seems — you just haven't lifted your head to see it.",
+      "love": "Loneliness or exclusion may be felt inside the relationship. Sharing the hard feelings honestly, rather than swallowing them, can start the repair.",
+      "money": "Reduced income or surprise costs may be pressing. It's time to look for the resources you can use — programmes, people, help nearby.",
+      "career": "It may feel like career winter — a stall. Remember this season doesn't last, and use it to firm the fundamentals.",
+      "advice": "Asking for help isn't weakness — it's the first step of recovery."
+    },
+    "reversed": {
+      "core": "Means the end of hardship and the start of recovery. The turning point out of financial and inner poverty — the closed door of help beginning to open.",
+      "general": "You're coming out of the long tunnel. Signs of recovery — in the finances, in the heart — are appearing bit by bit, and the closed door is starting to open.",
+      "love": "Warmth may return to the relationship that had gone distant. Understanding each other's hardship can deepen it instead.",
+      "money": "The worst of it is passing. Debts easing, a new income lead — recovery signals may appear.",
+      "career": "A way out of the job loss or the slump may open. Even a small opportunity can be the platform for standing back up.",
+      "advice": "Trust the recovery — and write down what this taught you, so the same hardship doesn't repeat."
+    }
+  },
+  "pentacles-6": {
+    "name": "Six of Pentacles",
+    "keywords": ["Sharing", "Generosity", "Give and take", "Fairness", "Support"],
+    "upright": {
+      "core": "Means generosity and the fair exchange of giving and receiving. Resources flowing where they're needed — the healthy circulation that benefits both the giver and the receiver.",
+      "general": "Give and take are balancing out well. What you gave comes back, and when you need it, help arrives — the circulation is flowing.",
+      "love": "Hearts are being exchanged in a healthy rhythm. You can give freely, and the warmth of it makes the bond sturdier.",
+      "money": "Support may come in — or the room to give may open on your side. Fair rewards, bonuses, an approved loan: good news is possible.",
+      "career": "Help from a mentor or backing from above is available. Pass on what you receive to juniors and colleagues and the reputation rises with it.",
+      "advice": "Receive with thanks, give without strings — trust the circulation."
+    },
+    "reversed": {
+      "core": "Means imbalance in the exchange. One-sided sacrifice, kindness with strings attached, debts hard to repay — the circulation of sharing warped.",
+      "general": "The scale of give and take is tipped. Check whether you're pouring out one-way, or whether invisible strings hang from the help you're getting.",
+      "love": "Ask whether it's become a relationship where only one side gives. If generosity has become a means of control, take extra care.",
+      "money": "Money lent may not return, or a deal with unfair terms may entangle you. Keep records of every money promise.",
+      "career": "The reward may feel unfair against the effort. Don't respond in heat — bring the evidence and raise your voice.",
+      "advice": "Weigh your giving and your receiving honestly, once."
+    }
+  },
+  "pentacles-7": {
+    "name": "Seven of Pentacles",
+    "keywords": ["Patience", "Interim review", "The long view", "Waiting", "Reassessment"],
+    "upright": {
+      "core": "Means patience, the long view, the mid-course review. The wait between seed and fruit — and the reflective pause that asks whether the effort's direction is right.",
+      "general": "You're catching your breath, watching what you planted grow. Not harvest yet — but a good moment to confirm the effort hasn't been wasted and to check the bearing.",
+      "love": "The relationship is ripening slowly but steadily. Don't rush it, and it's likely to move to a deeper stage.",
+      "money": "The slow money — long positions, savings plans — is on course. Now is when to trust compounding over the quick win.",
+      "career": "A good time for an interim reckoning of the effort so far. Results feel slow, but if the direction is right it's worth continuing.",
+      "advice": "Don't hurry the harvest — review the process and re-choose where to pour the water."
+    },
+    "reversed": {
+      "core": "Means fruit falling short of the effort, and the doubt that follows. Misplaced investment, impatience, sunk costs — a cold reassessment is due.",
+      "general": "The returns look thin against the effort, and it's wearing you down. The direction may be off, or impatience may be blocking the view — a cold reassessment is due.",
+      "love": "Doubt may be creeping in about whether to keep investing your heart here. Check whether the relationship is growing you both, not just whether the feeling persists.",
+      "money": "Investment and savings results may disappoint. Review the portfolio before the loss widens.",
+      "career": "Effort without visible result — you may be a step from burnout. It's decision time: change the method, or change the board.",
+      "advice": "Don't be held by the sunk cost — judge by the value still ahead."
+    }
+  },
+  "pentacles-8": {
+    "name": "Eight of Pentacles",
+    "keywords": ["Mastery", "Diligence", "Self-improvement", "Deep focus", "Craftsmanship"],
+    "upright": {
+      "core": "Means mastery, diligent effort, the honing of skill. Ability accumulating through repetition — devotion to focus and detail becoming growth.",
+      "general": "This is the craftsman's season — deep in one thing, honing the skill. The repetition looks dull, but real growth is happening inside it; effort is stacking into ability.",
+      "love": "The relationship deepens with the care you put in. Steady tenderness, more than grand gestures, is what hardens the love.",
+      "money": "Skill is converting directly into income. Money invested in craft — a side trade, a licence — is likely to come back.",
+      "career": "Prime time for upskilling, exam prep, study. The care you pour into detail becomes your career's weapon.",
+      "advice": "Don't rush the outcome — focus on today's share of the practice."
+    },
+    "reversed": {
+      "core": "Means effort that lost its aim and the draining of will. Meaningless repetition, perfectionism gripping the ankle, diligence decayed into mere labour.",
+      "general": "The effort's aim may have slipped, the diligence fading into weariness. Check whether you're caught in meaningless repetition, or whether perfectionism has your ankle.",
+      "love": "The relationship may have hardened into habit and the flutter dulled. Look inside — are you moving on duty alone?",
+      "money": "Income has plateaued against the effort. Time to think about raising your rate — or changing the income structure itself.",
+      "career": "The passion has cooled, or a just-get-it-done habit has crept in. Check whether today's work still leads to growth.",
+      "advice": "Before working harder, re-aim — where is this effort actually going?"
+    }
+  },
+  "pentacles-9": {
+    "name": "Nine of Pentacles",
+    "keywords": ["Self-reliance", "Abundance", "Contentment", "Graceful ease", "Savouring achievement"],
+    "upright": {
+      "core": "Means self-reliance and abundance built by your own hand. Economic and inner independence that leans on no one — the mature state of savouring the fruit of effort at leisure.",
+      "general": "You're enjoying an abundance you built yourself. Independence — financial and inner — has ripened; you're sufficient without leaning on anyone.",
+      "love": "You shine fully on your own now, which only raises the appeal. Healthy independence, not dependence, is what matures the love.",
+      "money": "The long effort is returning as financial ease. The base is likely stable enough to enjoy spending on yourself.",
+      "career": "You're nearing the position of working independently, recognised for skill. Good energy for going freelance or building your own name.",
+      "advice": "Don't postpone the savouring — enjoy the ease you can already afford."
+    },
+    "reversed": {
+      "core": "Means a fragile base of self-reliance, or abundance that is only surface. Conspicuous spending, dependence on others, the hollowness behind the achievement.",
+      "general": "It looks abundant outside but may be hollow inside — or the base of the independence thinner than it looks. Check whether spending-for-show has replaced real satisfaction.",
+      "love": "Financial or emotional dependence may be tilting the relationship — or an excess of independence pushing them away.",
+      "money": "Living past your means, spending for the audience, can shake the base. Time to match the lifestyle to the balance.",
+      "career": "Going solo may be premature, or the results may not be fully yours yet. Firm up the skill and the base before rushing the independence.",
+      "advice": "Ask what satisfaction you actually need — not what abundance looks good to others."
+    }
+  },
+  "pentacles-10": {
+    "name": "Ten of Pentacles",
+    "keywords": ["Legacy", "Family", "Long-term security", "Wealth completed", "Across generations"],
+    "upright": {
+      "core": "Means material completion and stability that spans generations. Wealth extending beyond personal achievement into family and community — legacy, tradition, a long-term foundation established.",
+      "general": "Material achievement is reaching its completed stage. Beyond your own success, a solid security that embraces family and community is flowing in.",
+      "love": "The relationship may be moving to the 'family' stage — marriage, meeting the parents, planning the shared future. A steady bond built to last.",
+      "money": "Assets settling onto a stable track, or large sums in motion — inheritance, gifts, family support. A good season for long-term planning.",
+      "career": "Ties forming with stable organisations, solid companies. Choose the base that lasts over the shine that doesn't, and it ends well.",
+      "advice": "Remember where this stability came from — and think about how to pass it onward."
+    },
+    "reversed": {
+      "core": "Means cracks in the foundation and conflict around family and property. Inheritance disputes, tradition as constraint, the instability of a structure stable only in appearance.",
+      "general": "Cracks are showing in what looked like solid ground. Family conflict, property issues, or the suffocation that wears the name of stability may be surfacing.",
+      "love": "Family opposition or hard practicalities may weigh on the relationship. If the two hearts are firm, a way through can be found together.",
+      "money": "Noise around big money — inheritance, loans, family finances — is possible. Mind the paperwork and the procedure carefully.",
+      "career": "The seat you trusted may wobble, or the organisation's customs may be capping your growth. Time to define your own line between security and growth.",
+      "advice": "Redefine stability in your own shape — not the shape others call stable."
+    }
+  },
+  "pentacles-11": {
+    "name": "Page of Pentacles",
+    "keywords": ["Learning", "A new goal", "Curiosity", "Practical plans", "A diligent start"],
+    "upright": {
+      "core": "Means learning and a practical new goal. The beginning of study, skill-building, realistic planning — the student's posture of steady inquiry.",
+      "general": "Your eyes are bright before a new goal and new learning. Nothing grand required — it's a good moment to set a realistic plan and take the first step.",
+      "love": "A connection may approach slowly and sincerely. Not flashy — but the sincerity in it builds trust.",
+      "money": "A fine current for starting to learn about money — study, small investments. A small habit now can become a large asset later.",
+      "career": "The foundation-laying season: study, certifications, internships. The learner's posture itself earns good marks.",
+      "advice": "Don't wait for the perfect plan — start with what you can learn today."
+    },
+    "reversed": {
+      "core": "Means plans without execution and scattered learning. Interest cooling fast, or time sunk into unrealistic goals with no progress.",
+      "general": "Plans are being drawn but execution isn't following. Check whether the interest fades fast, or the hours are going into goals with no footing.",
+      "love": "The feeling is there, but clumsy expression slows the progress. Check whether you're missing their signals.",
+      "money": "Moving money on half-learned information invites loss. Don't get swept into unverified investment fads.",
+      "career": "The studying fizzles, the goal keeps changing. What's needed is the experience of picking one thing and finishing it, however small.",
+      "advice": "Don't stay in the fun of starting — carry one thing through to the end."
+    }
+  },
+  "pentacles-12": {
+    "name": "Knight of Pentacles",
+    "keywords": ["Steadiness", "Responsibility", "Prudence", "Diligence", "Quiet progress"],
+    "upright": {
+      "core": "Means diligence, responsibility, steady progress. Not flashy — but the most trustworthy way of carrying a task through to the end.",
+      "general": "Not glamorous, but the surest road to the goal — that's this season. Unhurried steadiness is what ends up producing the result.",
+      "love": "A dependable current that shows itself in deeds, not words. The pace feels slow — because the feeling is serious, and built to last.",
+      "money": "Steady saving and planned spending are doing the work. This is a season where regular deposits beat the jackpot chase.",
+      "career": "The responsibility that finishes what it takes on is returning as trust. Even routine work, stacked faithfully, becomes the career's base.",
+      "advice": "Don't measure against anyone else's speed — keep your own pace, quietly forward."
+    },
+    "reversed": {
+      "core": "Means stagnation, rigidity, rut. Prudence overgrown until chances are missed — steadiness hardened into standstill.",
+      "general": "The steadiness may have gone stale, the caution stiffened into rigidity. Check whether insisting on only the safe road is letting the growth chances drift past.",
+      "love": "The relationship circles in place and the tedium creeps in. Don't lean on the familiar — try one small new thing.",
+      "money": "Over-conservative management may be running up the opportunity cost. And if laziness has dropped the management entirely — pick it back up.",
+      "career": "Stuck in the rut, the work feels heavy and dull. Even a small change in how you work opens the air back up.",
+      "advice": "Don't confuse standing still with moving forward — try one hand-span of change today."
+    }
+  },
+  "pentacles-13": {
+    "name": "Queen of Pentacles",
+    "keywords": ["Warm embrace", "Practicality", "Practical care", "Abundant stability", "Household wisdom"],
+    "upright": {
+      "core": "Means practical care and abundant stability. Warmth and substance combined — the mature embrace that tends everyone around while keeping its own foundation intact.",
+      "general": "A mature current is flowing that holds warmth and practical sense at once. You're tending yourself and the people around you in real ways — without losing your own footing.",
+      "love": "A comfortable, steady love is ripening. The tenderness that looks after each other's daily life is what deepens it.",
+      "money": "Wise money-keeping — thrifty but never mean — is shining. Stability may reach the point where there's enough to share.",
+      "career": "Practical skill and consideration are earning trust. The energy of the role model — results delivered without the balance lost.",
+      "advice": "Give yourself the same care you give everyone else — schedule it."
+    },
+    "reversed": {
+      "core": "Means the imbalance of care and self-depletion. Losing yourself in tending everyone else — or sinking into material comfort and losing sight of the people around you.",
+      "general": "The balance of care has broken. Check whether tending everyone has drained you — or whether comfort and things have absorbed you until the people slipped from view.",
+      "love": "The devotion has become furniture, and the hurt is stacking. Love that only gives does not keep.",
+      "money": "Supporting family and friends may be rocking your own finances — or anxiety may be getting soothed by shopping. Set a minimum safety line for yourself.",
+      "career": "Overloaded across work, home and relationships. Put down the burden of playing every role perfectly — that first.",
+      "advice": "Put down 'no one else can do it' — and practise letting help be shared."
+    }
+  },
+  "pentacles-14": {
+    "name": "King of Pentacles",
+    "keywords": ["Wealth completed", "Business acumen", "Dependability", "Seasoned skill", "Practical leadership"],
+    "upright": {
+      "core": "Means material success completed and practical leadership. Mature authority that governs wealth with accumulated experience and seasoned skill, and provides stability to everyone around it.",
+      "general": "Like the king at the summit of the material world, the fruits of effort are settling into stability and authority. With realism and seasoned judgement you can carry the people around you too.",
+      "love": "A mature love you can lean on. Practical responsibility, not just words, is drawing the relationship's future on steady ground.",
+      "money": "Seasoned skill is showing in asset management and investing. A good season for handling large sums and building long-term structures of wealth.",
+      "career": "Leadership recognised, business results ripening. Judgement drawn from experience will protect both the organisation and the outcome.",
+      "advice": "Don't settle into what's built — draw up what that strength should protect and grow next."
+    },
+    "reversed": {
+      "core": "Means fixation on the material and authority gone rigid. Wealth and results as the only measure of judgement — leadership curdled into obstinacy and the appetite for control.",
+      "general": "Fixation on material success may be narrowing the view. Check whether money and results have become the only ruler — and whether the authority is hardening into stubbornness.",
+      "love": "Conditions and appearances may be running ahead of the heart. Ask whether the controlling posture is wearing them down.",
+      "money": "Overreach can pull you into risky deals and oversized bets. Right now, protecting may be wiser than growing.",
+      "career": "A rigid style may be capping the team, or the pressure for results breeding conflict. Open the ear to new voices instead of leading with seniority.",
+      "advice": "Ask again — not how big the success is, but who and what it is for."
+    }
+  }
+}

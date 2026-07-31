@@ -14,6 +14,7 @@ import { QUESTION_CARD_COUNT, type Question as QuestionType } from '@/types/ques
 import { NotReady } from './NotReady'
 import styles from './Question.module.css'
 import { useT } from '@/i18n'
+import { useCardText } from '@/i18n/cardText'
 
 /** 질문 타로 — 주최자가 등록한 질문에 카드를 뽑아 답을 본다 (PLANNING.md §2) */
 export function Question() {
@@ -74,14 +75,14 @@ function QuestionFlow({ question }: { question: QuestionType }) {
           className="btn btn--md btn--slight btn--block"
           onClick={() => setRevealed(null)}
         >
-          다시 뽑기
+          {t('다시 뽑기')}
         </button>
         <button
           type="button"
           className="btn btn--sm btn--ghost btn--block"
           onClick={() => go('fortune')}
         >
-          다른 질문 보기
+          {t('다른 질문 보기')}
         </button>
       </div>
 
@@ -96,8 +97,11 @@ const POSITIONS = ['답']
 /** 스크롤로 화면에 들어올 때 뒤집힌다 */
 function AnswerCard({ question, drawn }: { question: QuestionType; drawn: DrawnCard }) {
   const t = useT()
+  const lc = useCardText()
   const [ref, inView] = useInView<HTMLElement>()
-  const answer = answerFor(question, drawn)
+  const card = lc(drawn.card)
+  // 주최자가 쓴 답변은 그분의 글이라 못 번역한다 — 폴백(카드 해석)만 번역이 입혀진다
+  const answer = answerFor(question, { ...drawn, card })
 
   return (
     <section ref={ref} className={styles.result}>
@@ -107,12 +111,12 @@ function AnswerCard({ question, drawn }: { question: QuestionType; drawn: DrawnC
 
       <div className={styles.textSide}>
         <p data-card-name className={`t-title-m ${styles.name}`}>
-          {drawn.card.name}
+          {card.name}
           {drawn.orientation === 'reversed' && <span className="t-text-s t-muted">{t('(역방향)')}</span>}
         </p>
 
         <ul className={styles.keywords}>
-          {drawn.card.keywords.slice(0, 4).map((k) => (
+          {card.keywords.slice(0, 4).map((k) => (
             <li key={k} className="chip">
               {k}
             </li>

@@ -1,0 +1,282 @@
+{
+  "swords-1": {
+    "name": "Ace of Swords",
+    "keywords": ["Clarity", "Breakthrough", "Truth", "Decision", "A new idea"],
+    "upright": {
+      "core": "Means mental clarity and truth's breakthrough. A new idea or decision cuts through the confusion in one stroke — the moment reason pierces to the heart of the matter.",
+      "general": "The fog is lifting and the situation is coming into focus. A new idea or a decisive realisation may arrive and settle the blocked problem in one stroke. Trust today's clear judgement and set the direction.",
+      "love": "Honest conversation is opening the channel. Ambiguous feelings turn definite and the relationship's direction is likely to be set.",
+      "money": "A good time to see the finances coldly and draw a new plan. Set a clear standard and the waste shows itself.",
+      "career": "A new proposal or idea can win recognition. Bring the logic and the breakthrough is likely to open.",
+      "advice": "Focus on facts over feelings, and compress the point into one sentence."
+    },
+    "reversed": {
+      "core": "Means the thinking that should be clear turned cloudy and warped. Confused judgement, misused intellect, words landing differently than intended — the sword's power has lost its true line.",
+      "general": "More thinking is somehow bringing less clarity. A good idea may be aimed wrong, or your words may land differently than you meant. Recheck the information before racing to a conclusion.",
+      "love": "One remark breeds misunderstanding easily now. Confirm their intent directly instead of guessing at it.",
+      "money": "Bad information or a hasty call could cost you. Recheck the terms on contracts and big decisions.",
+      "career": "The idea is there but the execution plan is fuzzy, and it undercuts the pitch. Sharpen the logic before you present.",
+      "advice": "Postpone the decision one day, and look again for the fact you missed."
+    }
+  },
+  "swords-2": {
+    "name": "Two of Swords",
+    "keywords": ["Stalemate", "Avoided decision", "Dilemma", "Balance", "The blindfold"],
+    "upright": {
+      "core": "Means the stalemate between two options and the deliberate avoidance of deciding. A precarious balance held by shutting out feeling and information — and eventually the blindfold must come off and reality be faced.",
+      "general": "You're stopped at the fork, unable to choose either road. The balance holds for now, but it can't hold long. Start preparing, little by little, to face the reality you'd rather not see.",
+      "love": "The relationship marks time while the heart stays undecided. The longer the avoidance, the more the fatigue piles up on both sides.",
+      "money": "You're deferring the investing and spending decisions. It looks safe — but gather the information and build your criteria first.",
+      "career": "You're likely stuck between two options. Write out each one's pros and cons and the thread appears.",
+      "advice": "Don't wait for the perfect answer — make a small decision with what you know now."
+    },
+    "reversed": {
+      "core": "Means the stalemate collapsing and the postponed decision forced. Hidden information surfaces and confusion may grow — but it is also the turning point where the deadlock breaks.",
+      "general": "The long-postponed moment of choice is at the door. What was covered is coming to light and the decision can't be dodged much longer. It's disorienting — and it's the sign the deadlock is breaking.",
+      "love": "The vague arrangement may be asked for a conclusion. Take it as the chance to confirm what you honestly feel.",
+      "money": "The deferred money problem may surface. Sort the facts before it's late and you limit the loss.",
+      "career": "The cost of the delayed decision is compounding. Set priorities and tie things off one by one.",
+      "advice": "Take the blindfold off yourself — start by checking the facts you've been putting off."
+    }
+  },
+  "swords-3": {
+    "name": "Three of Swords",
+    "keywords": ["Heartbreak", "Parting", "Painful truth", "Sorrow", "Wounds"],
+    "upright": {
+      "core": "Means heartbreak, parting, betrayal — pain that pierces, and the facing of a painful truth. The sorrow can't be avoided, but the truth coming out is also what makes the situation clear.",
+      "general": "You're facing a truth or a loss that pierces. Disappointment, parting, the sting of betrayal may arrive sharply now. But this ache lets you see the blurred relationship or situation honestly — and grief fully felt clears the ground for recovery.",
+      "love": "A fight, a parting, a truth that stings. Don't press the feelings down — acknowledge them and let them pass through.",
+      "money": "Expected returns miss, or an unforeseen expense stings. Recovery starts with measuring the loss exactly.",
+      "career": "The work may be frustrated, or a colleague's conflict may cut. This pain can become the pivot that resets your direction.",
+      "advice": "Don't hurry to cover the wound — grieve fully first, then think about the next step."
+    },
+    "reversed": {
+      "core": "Means the deep wound in the process of closing — or an old pain never released. Forgiveness and healing progress, while the leftover feelings remain the unfinished task.",
+      "general": "The deep cut is beginning to close. But unfinished feelings remain, and the old ache may surface without warning. Between forgiveness and recovery, respect your own pace.",
+      "love": "You're coming out of the parting's ache, or mending the conflict. But pretend the residue isn't there and the same wound repeats.",
+      "money": "You're slowly recovering from the shock of the loss. Calm rebuilding beats aggressive win-backs.",
+      "career": "The aftershocks of failure or conflict are settling. Write down what it taught you and it becomes strength for the next chance.",
+      "advice": "Don't act fully healed — look honestly at where it still hurts."
+    }
+  },
+  "swords-4": {
+    "name": "Four of Swords",
+    "keywords": ["Rest", "Recovery", "Regrouping", "Pause", "Meditation"],
+    "upright": {
+      "core": "Means the conscious pause and rest that restore a spent body and mind. The retreat is not escape but the regrouping that prepares the next phase.",
+      "general": "After the intense stretch, it's time to stop and catch your breath. Right now, recovering body and mind is probably the most productive choice available. Deliberate rest is what generates the next stage's energy.",
+      "love": "A little white space in the relationship — time apart, each to their own. The distance can actually help sort the feelings.",
+      "money": "Good season to rest the big spends and investments. Just holding steady is already doing well.",
+      "career": "If burnout signs are showing, recharging comes first. Recover the pace with leave or a lighter load and the efficiency returns.",
+      "advice": "Rest is part of the plan too — give yourself permission to recover."
+    },
+    "reversed": {
+      "core": "Means rest that never truly happened — pushing on without recovery, or a pause stretched so long it became stagnation. The balance between depletion and restart has broken.",
+      "general": "You're trying to move again without real rest — or the stop has stretched into a stall. Force it and the body and mind will send the first warnings. The balance between recovering and restarting needs resetting.",
+      "love": "Running the relationship on empty is making you brittle. Tell them honestly that you're out of slack right now.",
+      "money": "Moving hard when you should be resting invites losses. Don't let impatience cloud the call.",
+      "career": "Accumulated overwork is multiplying mistakes — or a long gap is making the return feel heavy. Recover the rhythm from small tasks.",
+      "advice": "Enduring and recovering are different things — take real rest today."
+    }
+  },
+  "swords-5": {
+    "name": "Five of Swords",
+    "keywords": ["Conflict", "Hollow victory", "Battles of pride", "Discord", "Self-interest"],
+    "upright": {
+      "core": "Means the conflict where even winning loses more — the hollow victory. A quarrel led by pride and self-interest is damaging trust and the relationship itself.",
+      "general": "A quarrel is in the air where winning leaves you with little. Take the upper hand in the argument and the trust still cracks. Right now the question isn't how to win but what to protect.",
+      "love": "Pride battles are trading wounds. Think of the relationship itself before the scoreboard of the argument.",
+      "money": "Money disputes, or chasing a gain and losing something bigger. Set down the forced competition and the greed for a moment.",
+      "career": "Overheated rivalry is souring the team. Remember that reputation is an asset no smaller than results.",
+      "advice": "Ask yourself whether winning this fight is actually the result you want."
+    },
+    "reversed": {
+      "core": "Means the end of a draining conflict and the first signs of reconciliation — or regret over the past quarrel. The movement toward repair, with pride set down.",
+      "general": "The wish to end the draining conflict is growing. A thread of reconciliation shows, or you find yourself regretting the last fight. Set the pride down a little and the knot starts loosening.",
+      "love": "The long cold war ends and conversation reopens. Whoever reaches out first recovers the initiative in the relationship.",
+      "money": "The disputed money matter may find its compromise. Even conceding a little, closing it fast may be the better deal.",
+      "career": "A chance is coming to clear the conflict's residue and repair the relationships. A sincere apology or acknowledgement changes the room.",
+      "advice": "If there's an apology owed, don't postpone it — send even a short word today."
+    }
+  },
+  "swords-6": {
+    "name": "Six of Swords",
+    "keywords": ["Passage", "Journey of recovery", "Leaving", "Transition", "Calmer waters"],
+    "upright": {
+      "core": "Means the passage and transition that leave a hard place behind and cross toward calmer waters. The wound hasn't fully vanished — but the situation is on the gradual mend, a journey of recovery.",
+      "general": "You're leaving the hard place and crossing to stiller water. The heart isn't fully light yet, but things are likely moving toward better. A season of transition — closing out the past and settling into new surroundings.",
+      "love": "The wave of conflict passes and the relationship calms. Cross to the next stage together — or close a painful tie and move on.",
+      "money": "The strained finances are steadying bit by bit. Trust the gentle recovery over any sudden reversal.",
+      "career": "A move, a transfer, a change of scene is likely to work in your favour. Unfamiliar as it is, this crossing can be the step up.",
+      "advice": "Stop glancing back — keep your eyes on the shore you're crossing toward."
+    },
+    "reversed": {
+      "core": "Means the stall of being unable to leave what should be left — transition delayed by attachment or unresolved problems. The baggage of the past is blocking the passage to the new phase.",
+      "general": "You know it's time to go, and your feet won't move. Old attachments or unresolved problems are holding your ankle and delaying the crossing. Worth remembering: you can't cross the river carrying everything.",
+      "love": "You're not free of the ended relationship, or of the conflict that keeps repeating. Face honestly what is blocking the departure.",
+      "money": "The attempt to change the situation keeps getting deferred, and the problem persists. Start by changing one small habit.",
+      "career": "You want to move but terms and fear keep you hovering. Make the preparation concrete and the weight lightens.",
+      "advice": "You have to set it down to cross — sort out one thing you're gripping today."
+    }
+  },
+  "swords-7": {
+    "name": "Seven of Swords",
+    "keywords": ["Deception", "Strategy", "Avoidance", "Moving covertly", "Cunning"],
+    "upright": {
+      "core": "Means deception, covert action, the stratagem that avoids open confrontation. The phase may call for strategy and craft — but dishonest methods collect their fee in trust.",
+      "general": "Something isn't flowing honestly. Someone may be moving behind the scenes — or you yourself may be choosing craft and avoidance over the direct route. Strategy has its moment, but any method that mortgages trust will bill you later.",
+      "love": "Hidden things, less-than-honest communication, growing misunderstanding. If you suspect, don't speculate — verify.",
+      "money": "Deals with murky terms and offers too good to be true need wariness. Read the contract and the fine print.",
+      "career": "Information may be withheld, competition may be running underwater. Keep your own records of your own work.",
+      "advice": "Before taking the shortcut, price in the trust you'd lose on it."
+    },
+    "reversed": {
+      "core": "Means the exposure of what was hidden — or the turn from deception back to honesty. Secrets surface and the situation turns transparent.",
+      "general": "What was hidden is coming out — or you're deciding to come clean yourself. The uncovering is uncomfortable, but the situation turns transparent and sorts itself. The strength to stop avoiding and face it straight on is arriving.",
+      "love": "A hidden fact surfaces and the relationship is tested. How you handle the truth decides the trust that follows.",
+      "money": "The murky money matter is showing its true shape. Correct it now and you prevent the bigger loss.",
+      "career": "Obscured problems and accountability are clarifying. The one who leads with the fix, not the excuse, wins the trust.",
+      "advice": "If there's something to confess, tell it yourself before it's uncovered."
+    }
+  },
+  "swords-8": {
+    "name": "Eight of Swords",
+    "keywords": ["Feeling trapped", "Self-restriction", "Helplessness", "Caged thinking", "Fear"],
+    "upright": {
+      "core": "Means the mental prison built of restriction, helplessness, fear and limiting beliefs. It is your own thinking, more than the situation, that holds you — and the exit already exists.",
+      "general": "You feel walled in on every side, unable to move. But much of the binding is made by the thought 'it won't work anyway', not by the situation itself. Doubt the belief that's covering your eyes and the exit starts to appear.",
+      "love": "You feel stifled in the relationship and don't say so. Look at which words fear has made you swallow.",
+      "money": "It feels like there are no options, but room to adjust likely exists. Go through the fixed costs one at a time.",
+      "career": "The helplessness of can't-quit, can't-continue may set in. The way out starts with the smallest thing you can change right now.",
+      "advice": "Take the sentence 'I can't' and reread it as 'I haven't tried yet'."
+    },
+    "reversed": {
+      "core": "Means the beginning of release from self-restriction. Facing the fear's true shape loosens the bound perspective — the process of taking back the power to choose.",
+      "general": "The knots you tied around yourself are loosening. Face what the fear actually is and you can walk out of the thought-prison. Freedom tends to come not all at once but as a series of small choices reclaimed.",
+      "love": "In the relationship where you only endured, you're starting to speak. Honesty won't shake it — it will let it breathe.",
+      "money": "Realistic solutions to the dead-end money problem are appearing. Remember that asking for help is a skill.",
+      "career": "Options are appearing out of the situation that felt locked. The strength to execute the long-postponed decision is arriving.",
+      "advice": "Take one very small first step today on the thing fear kept postponing."
+    }
+  },
+  "swords-9": {
+    "name": "Nine of Swords",
+    "keywords": ["Anxiety", "Sleepless nights", "Worry", "Self-blame", "The mind's shadows"],
+    "upright": {
+      "core": "Means the mental anguish of anxiety, worry, self-blame and sleeplessness. The pain's source lies less in outer reality than in fear inflated within the mind.",
+      "general": "Worry is pressing on you hard enough to steal sleep. But fear grown large in the head is usually far bigger than the actual thing. Don't hold it alone — take the worry out into the light and check its real size.",
+      "love": "Doubting their feelings, drafting worst-case scripts, wearing yourself out. Don't grow the anxiety alone — check it in conversation.",
+      "money": "The money worry feels bigger than the money problem. Write the numbers down and the vague dread shrinks.",
+      "career": "Anxiety over mistakes and reviews is driving you into a corner. Most of what you're dreading is unlikely to happen.",
+      "advice": "Write every worry on paper — then circle only the ones you can control."
+    },
+    "reversed": {
+      "core": "Means the long anxiety beginning to lift — or suppressed fear reaching its limit. The phase of seeing the worry's true shape and finding it was carryable after all.",
+      "general": "Light is entering the long tunnel of anxiety. Face what the fear really is and it's likely to prove more carryable than you thought. But if the pressed-down worry surges up all at once — it's a season when asking for help is allowed.",
+      "love": "The doubt and unease around the relationship are slowly easing. Honest conversation can melt the long misunderstanding.",
+      "money": "Vague money dread is turning into a concrete plan. Face the problem and the solving speeds up.",
+      "career": "You're locating the stress source and recovering. 'Not perfect is fine' is the mindset that actually lifts the results.",
+      "advice": "Don't carry it alone — share the load with someone you trust."
+    }
+  },
+  "swords-10": {
+    "name": "Ten of Swords",
+    "keywords": ["The end", "Rock bottom", "Loss", "Betrayal", "Dawn of renewal"],
+    "upright": {
+      "core": "Means the complete end of a phase — loss and pain down to the floor. But an end with nowhere lower to go is itself the precondition of a new beginning.",
+      "general": "One phase is ending completely. Betrayal or loss may have you feeling flat on the ground — but nowhere lower to go means the only way left is up. Don't force the ended thing back to life; take this full stop as the opening of a new sentence.",
+      "love": "The relationship may reach its limit or a painful parting come. Admitting the end is likely the first step of recovery.",
+      "money": "A loss may be confirmed, a plan cancelled. Cut what needs cutting and restart with what remains — that's the wise line.",
+      "career": "A project ending, a departure, a heavy setback are possible. This ending can become the moment your career's direction is rebuilt.",
+      "advice": "Don't cling to what's over — take away the one lesson this experience left."
+    },
+    "reversed": {
+      "core": "Means the recovery and comeback that begin once the worst is past. With a warning attached: it can also appear as the clinging that replays the pain of what's already done.",
+      "general": "The worst is passing and you're slowly getting up. Recovery is likely underway — unless you're still gripping the ended thing and replaying the ache. Turn the body toward recovery, not toward the rumination.",
+      "love": "You're gradually stepping out of the parting or the betrayal. Sort the feelings so the old relationship's shadow doesn't fall across the new one.",
+      "money": "The big loss's aftershocks are subsiding and a footing for recovery shows. Set the principle that stops the repeat.",
+      "career": "Strength to restart is returning as the failure's shock fades. The past experience is likely to work as an advantage now.",
+      "advice": "Stop holding the night that's already passed — walk toward the sun coming up."
+    }
+  },
+  "swords-11": {
+    "name": "Page of Swords",
+    "keywords": ["Curiosity", "Fresh news", "Observation", "Vigilance", "Learning"],
+    "upright": {
+      "core": "Means intellectual curiosity, new information and news, the posture of learning and observing. A mind still green but quick, beginning its search for the truth.",
+      "general": "You're watching the world with curious eyes, ready to learn. New information may arrive and widen the map of your thinking. The attitude that isn't afraid to ask questions is what pulls the opportunities in.",
+      "love": "The flutter of wanting to know everything about them. Light conversation and wit can open the channel.",
+      "money": "A good time to study money and investing fresh. You're still learning though — collect information rather than staking big sums.",
+      "career": "Exploration of new fields, chances to learn, are likely. Asking and note-taking read well and earn regard.",
+      "advice": "The courage to ask beats the pretence of knowing — it's the fastest growth route right now."
+    },
+    "reversed": {
+      "core": "Means haste where the words outrun the thinking, unverified rumour, defensive or scattered thought. Curiosity skimming the surface instead of deepening into learning.",
+      "general": "Thought and speech are running ahead and the substance is getting missed. Unverified rumours may sway you, or defensiveness may be pushing the learning away. Audit both your sources and your speech habits.",
+      "love": "Probing remarks and over-suspicion create tension. Don't ask sideways — ask sincerely.",
+      "money": "Hearsay-driven moves can cost you. Only clearly sourced material deserves to ground a decision.",
+      "career": "Talking ahead of the preparation can cost trust. Fact-check once more before the report or the presentation.",
+      "advice": "Check three times before speaking — and make not passing on rumours your rule."
+    }
+  },
+  "swords-12": {
+    "name": "Knight of Swords",
+    "keywords": ["Charge", "Drive", "Ambition", "Haste", "Straight ahead"],
+    "upright": {
+      "core": "Means the swift decision and headlong drive toward the goal. Intellectual ambition unafraid of obstacles — execution at its peak.",
+      "general": "You're racing at the goal like wind. Deciding fast, executing fast, you're likely to pull ahead while others hesitate. But at this speed, the field of view has to widen with it.",
+      "love": "You want to say it straight. The bold approach can work — just honour their pace too.",
+      "money": "Quick judgement can catch the opening. But skip the review in the rush and a condition slips past.",
+      "career": "A fine current for driving results boldly. Push toward the goal — and sync the pace with the team to go further.",
+      "advice": "Before you sprint, spend just five minutes confirming the direction."
+    },
+    "reversed": {
+      "core": "Means speed that has lost its direction — haste and reckless forcing. The charge without deliberation, the aggressive word, leaving conflict and regret behind.",
+      "general": "All speed, unchecked direction — collisions come easily now. Hasty decisions, sharp words, forced pushes may leave conflict and regret. Remember: braking is a skill too.",
+      "love": "Impatience overwhelms them, or an edged remark cuts. Rest a beat and refine the wording.",
+      "money": "Impulse payments and hasty investments lean toward loss. Give decisions a one-day cooling-off.",
+      "career": "Pushing alone breeds friction — or burnout. Time to check sustainability, not speed.",
+      "advice": "That decision you most want to make right now — let it sit 24 hours and look again."
+    }
+  },
+  "swords-13": {
+    "name": "Queen of Swords",
+    "keywords": ["Sharp clarity", "Independence", "Cool judgement", "Honesty", "Boundaries"],
+    "upright": {
+      "core": "Means the cool, fair judgement distilled from experience and intellect. Independence unshaken by feeling, honesty, and the strength to set clear boundaries.",
+      "general": "A lucid current is flowing — seeing through to the facts without being swayed. With the wisdom experience gave you, you can judge the situation precisely and draw the lines that need drawing. Honesty and independence are earning you respect.",
+      "love": "You're seeing the relationship with realistic eyes. Say plainly what you want and don't want, and the relationship gets healthier for it.",
+      "money": "A good season for wise money decisions by cold analysis. Choices by criteria, not feelings, are what work.",
+      "career": "Objective judgement and clear communication are being recognised. A good time to take on hard decisions and mediation.",
+      "advice": "Don't aim to be nice — aim to be precise and fair."
+    },
+    "reversed": {
+      "core": "Means sharpness tipped from wisdom into cynicism and criticism. The defensive wall an old wound built, showing itself as coldness and isolation.",
+      "general": "The edge may be cutting rather than clarifying. The wall built by old pain may be showing as coldness or constant critique. The feelings hidden behind the logic need tending.",
+      "love": "Over-guardedness and a critical tone can push them away. A wall that protects the heart and a wall that blocks it are different things.",
+      "money": "Excess pessimism and mistrust can cost you good chances. Cool-headed and cynical aren't the same — recheck the evidence.",
+      "career": "Criticism running first makes the collaboration creak. Pair the critique with an alternative and the same words land differently.",
+      "advice": "Before the sharp word, look first at what you're trying to protect with it."
+    }
+  },
+  "swords-14": {
+    "name": "King of Swords",
+    "keywords": ["Authority", "Intellect", "Fairness", "Principle", "Strategic leadership"],
+    "upright": {
+      "core": "Means fair authority grounded in mature intellect and principle. Strategic leadership that judges and governs by logic and ethical standards, not by feeling.",
+      "general": "The mature intellect that governs by principle and logic is with you. Fair judgement unswayed by feeling is likely to build both trust and authority. A good season for the big picture and the strategic call.",
+      "love": "A dependable, grown-up relationship. But add warm expression to the logic and the heart travels better.",
+      "money": "Principled money management is producing stable results. An expert's counsel makes the judgement sturdier.",
+      "career": "Leadership and major decisions are likely coming your way. Your fair standard is your greatest weapon.",
+      "advice": "Set the decision criteria in advance — and share them openly with everyone."
+    },
+    "reversed": {
+      "core": "Means intellect and authority curdled into dogmatism and coldness. Overconfidence in one's own judgement, principles without flex, the misuse of power.",
+      "general": "Logic and principle may be tipping into authoritarianism. Believing only your own judgement, measuring people with a cold ruler — both are possible now. Intellect is a tool for understanding, not control. Worth re-reading.",
+      "love": "The habit of adjudicating right and wrong cools the room. Aim for conversation that connects, not conversation that wins.",
+      "money": "Overtrust in your own call can lead to loss. Deliberately seek out the opposing view.",
+      "career": "Unilateral decisions and inflexibility invite friction. Share the authority, ask for opinions — the leadership gets sturdier, not weaker.",
+      "advice": "Keeping one live possibility that you're wrong — that's where real intellect begins."
+    }
+  }
+}
