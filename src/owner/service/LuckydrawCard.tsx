@@ -312,7 +312,7 @@ export function LuckydrawExtra({
               onChange={(e) => setPicker({ borderWidth: Number(e.target.value) })}
               data-picker-border
             >
-              <option value="0">없음</option>
+              <option value="0">{'없음'}</option>
               <option value="1">얇게 (1px)</option>
               <option value="2">보통 (2px)</option>
               <option value="3">굵게 (3px)</option>

@@ -24,7 +24,7 @@ export function WishCard({
   const d = wishDisplay(slot)
 
   return (
-    <Card title="소원나무">
+    <Card title={'소원나무'}>
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
         방문자가 소원을 적으면 등불로 나무에 매달려요. 건 즉시 보이고, 부적절한 건 주최자가 숨겨요.
         아래 색·글꼴은 소원나무 전용이에요 (위 테마와 별개).{' '}
@@ -34,7 +34,7 @@ export function WishCard({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
         <div style={CSS.fieldCol}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
-            <span style={CSS.label}>제목</span>
+            <span style={CSS.label}>{'제목'}</span>
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
           <input value={d.treeTitle} onChange={(e) => patch({ treeTitle: e.target.value })} style={CSS.input} />
@@ -100,7 +100,7 @@ export function WishCard({
 
       <Divided>
         <PaletteField
-          label="등불 색"
+          label={'등불 색'}
           hint="방문자가 소원을 쓸 때 이 중에서 골라요. 비우면 색 선택이 없고 전부 첫 색으로 나가요."
           value={d.lanterns}
           onChange={(lanterns) => patch({ lanterns })}

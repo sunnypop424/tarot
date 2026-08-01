@@ -26,7 +26,7 @@ export function PhotozoneCard({
   const d = photozoneDisplay(slot)
 
   return (
-    <Card title="포토존">
+    <Card title={'포토존'}>
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
         방문자가 찍거나 올린 사진에 프레임을 씌워 자기 폰에 저장해 가요.{' '}
         <b>사진은 방문자 폰 안에서 합성되고 서버로 오지 않아요</b> — 주최자도 저희도 볼 수 없어요.
@@ -35,7 +35,7 @@ export function PhotozoneCard({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
         <div style={CSS.fieldCol}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
-            <span style={CSS.label}>제목</span>
+            <span style={CSS.label}>{'제목'}</span>
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
           <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />

@@ -226,7 +226,9 @@ export function Entries() {
                 </div>
                 {shown.map((e) => (
                   <div key={e.rewardId} className="ad-table__row">
-                    <span className="ad-cell--b">{e.nickname}</span>
+                    <span className="ad-cell--b" data-user-text>
+                      {e.nickname}
+                    </span>
                     {cols.handle && (
                       <span className="ad-cell--mute">
                         {e.handle ? `@${e.handle.replace(/^@/, '')}` : '—'}

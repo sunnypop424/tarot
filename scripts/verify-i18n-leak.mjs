@@ -36,18 +36,38 @@ if (!exe) {
   process.exit(1)
 }
 
-/** 슬롯마다 볼 화면 — 방문자 경로와 관리 경로를 따로 둔다 */
+/**
+ * 슬롯마다 볼 화면 — 방문자 경로와 관리 경로를 따로 둔다.
+ *
+ * **관리 경로는 `AdminRoutes.tsx` 를 그대로 옮긴다.** 예전엔 서비스마다 두세 개만 돌았고,
+ * 그래서 포토카드 카드 관리·뽑기권처럼 **안 도는 화면의 미번역이 통째로 안 보였다**
+ * (검사는 0 인데 화면엔 스무 줄이 한국어였다). 라우트가 늘면 여기도 같이 늘려야 한다 —
+ * 기계가 못 하는 일이라 이 주석이 그 자리다.
+ */
 const SERVICES = {
-  tarot: { visitor: ['', '/cards', '/cards/major-0', '/question'], admin: ['', '/questions', '/qr', '/account'] },
-  luckydraw: { visitor: [''], admin: ['', '/prizes', '/shipping', '/qr'] },
-  rolling: { visitor: [''], admin: ['', '/moderation', '/qr'] },
-  wish: { visitor: [''], admin: ['', '/moderation', '/qr'] },
-  photozone: { visitor: [''], admin: ['', '/guide', '/qr'] },
+  tarot: {
+    visitor: ['', '/cards', '/cards/major-0', '/question', '/fortune'],
+    admin: ['', '/questions', '/qr', '/account'],
+  },
+  luckydraw: { visitor: [''], admin: ['', '/overview', '/shipping', '/qr'] },
+  rolling: { visitor: ['', '/write'], admin: ['', '/messages', '/qr'] },
+  wish: { visitor: ['', '/write'], admin: ['', '/messages', '/qr'] },
+  photozone: { visitor: [''], admin: ['', '/photozone', '/qr'] },
   poll: { visitor: [''], admin: ['', '/polls', '/live', '/qr'] },
-  stamp: { visitor: [''], admin: ['', '/board', '/redeem', '/qr'] },
-  quiz: { visitor: [''], admin: ['', '/questions', '/stats', '/qr'] },
-  photocard: { visitor: [''], admin: ['', '/cards', '/tickets', '/qr'] },
-  cheer: { visitor: [''], admin: ['', '/settings', '/qr'] },
+  stamp: {
+    visitor: [''],
+    admin: ['', '/stamp', '/redeem', '/picker', '/entries', '/qr'],
+  },
+  quiz: {
+    visitor: [''],
+    admin: ['', '/quiz', '/stats', '/redeem', '/picker', '/entries', '/qr'],
+  },
+  photocard: { visitor: [''], admin: ['', '/photocard', '/tickets', '/qr'] },
+  'photocard-sale': {
+    visitor: ['', '/staff'],
+    admin: ['', '/photocard', '/tickets', '/qr'],
+  },
+  cheer: { visitor: ['', '/overlay'], admin: ['', '/cheer', '/messages', '/qr'] },
 }
 
 const arg = process.argv[2]

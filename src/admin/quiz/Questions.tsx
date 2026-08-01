@@ -147,7 +147,7 @@ export function Questions() {
           <div className="ad-empty">
             <div className="ad-empty__title">{t('문항을 읽지 못했어요')}</div>
             <div className="ad-empty__sub">
-              문항과 정답은 로그인한 주최자만 볼 수 있어요. 로그인하고 다시 열어 주세요.
+              {t('문항과 정답은 로그인한 주최자만 볼 수 있어요. 로그인하고 다시 열어 주세요.')}
             </div>
             <div className="ad-fine" style={{ marginTop: 10 }}>
               {loadError}

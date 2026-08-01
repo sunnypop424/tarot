@@ -43,7 +43,7 @@ export function Board() {
         <span className="ad-head__count tnum">{t('칸 {n}개', { n: count })}</span>
       </div>
       <p className="ad-head__desc">
-        각 칸의 현장 암호와 운영 방식을 정해요. 칸 구성은 담당자가 만들어 드려요.
+        {t('각 칸의 현장 암호와 운영 방식을 정해요. 칸 구성은 담당자가 만들어 드려요.')}
       </p>
     </header>
   )
@@ -153,7 +153,7 @@ export function Board() {
                   <div key={c.id} className="ad-row" data-off={code.trim() ? undefined : true}>
                     <span className="ad-row__no ad-row__no--line tnum">{i + 1}</span>
                     <span style={{ flex: 1, minWidth: 140, fontSize: 14, fontWeight: 700 }}>
-                      {c.name}
+                      <span data-user-text>{c.name}</span>
                     </span>
                     <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>
                       <input
@@ -178,7 +178,7 @@ export function Board() {
                           toast(t('새 암호를 만들었어요'))
                         }}
                       >
-                        새로 만들기
+                        {t('새로 만들기')}
                       </button>
                     </div>
                     {!code.trim() && (
@@ -224,7 +224,7 @@ export function Board() {
                   onBlur={() => void save(settings)}
                 />
                 <p className="ad-field__hint">
-                  확정이면 방문자 폰에 교환코드가 뜨고, 스태프가 ‘수령 확인’ 에서 처리해요.
+                  {t('확정이면 방문자 폰에 교환코드가 뜨고, 스태프가 ‘수령 확인’ 에서 처리해요.')}
                 </p>
               </div>
             )}

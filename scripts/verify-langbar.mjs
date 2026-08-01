@@ -59,13 +59,24 @@ const bad = (label, note) => {
 
 const browser = await puppeteer.launch({ executablePath, headless: 'new', args: ['--no-sandbox'] })
 const page = await browser.newPage()
-await page.setViewport({ width: 390, height: 844 })
+/**
+ * **폭을 세 개 본다.** 겹침은 폭에 따라 나타났다 사라진다 — 롤페·소원나무는 넓은 화면에서만
+ * 헤더 오른쪽에 CTA 버튼이 떠서, 폰(390)에서만 재보면 멀쩡해 보였다(실제로 놓쳤다).
+ *
+ *   390  폰 — 대부분의 방문자
+ *   820  태블릿 세로 · 데스크톱 CTA 가 나타나기 시작하는 폭
+ *   1280 데스크톱 — 부스 화면과 관리 도구
+ */
+const WIDTHS = [390, 820, 1280]
 
 // 언어를 켜 둔 상태로 본다 — 한국어면 슬롯에 따라 고르개가 아예 안 뜬다(그게 설계다)
 await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
 await page.evaluate(() => localStorage.setItem('tarot-pocket:lang', 'en'))
 
-for (const [label, path] of PAGES) {
+for (const width of WIDTHS) {
+  await page.setViewport({ width, height: 900 })
+  for (const [label0, path] of PAGES) {
+  const label = `${label0} @${width}`
   try {
     await page.goto(`${BASE}${path}`, { waitUntil: 'networkidle0', timeout: 20000 })
   } catch {
@@ -92,7 +103,24 @@ for (const [label, path] of PAGES) {
     return buttons.map((b) => {
       const r = b.getBoundingClientRect()
       const cs = getComputedStyle(b)
-      // 겹침 — 단추 한가운데를 짚었을 때 나오는 게 자기 자신(또는 자식)인가
+      /**
+       * 겹침 — **중심점만 짚으면 안 된다.**
+       *
+       * 고르개는 `z-index: 2` 로 위에 있어서, 아래 깔린 버튼과 포개져 있어도
+       * `elementFromPoint` 는 늘 자기 자신을 돌려준다. 넓은 화면에서 롤페·소원나무의
+       * 데스크톱 CTA 위에 고르개가 올라앉아 있었는데 검사는 "정상" 이라고 했다.
+       *
+       * 그래서 **누를 수 있는 다른 요소와 사각형이 포개지는지**를 본다.
+       */
+      const clickable = [...document.querySelectorAll('a,button')].filter(
+        (e) => e !== b && !b.contains(e) && !e.contains(b) && e.getBoundingClientRect().width > 0
+      )
+      const overlapWith = clickable
+        .filter((e) => {
+          const o = e.getBoundingClientRect()
+          return !(o.right <= r.left || o.left >= r.right || o.bottom <= r.top || o.top >= r.bottom)
+        })
+        .map((e) => (e.textContent ?? '').trim().slice(0, 20))
       const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)
       /**
        * **제목과 같은 선상인가.**
@@ -121,6 +149,7 @@ for (const [label, path] of PAGES) {
         h: Math.round(r.height),
         vw,
         titleGap: gap,
+        overlapWith,
         overlapped: !(hit && (hit === b || b.contains(hit))),
         color: cs.color,
         bg: cs.backgroundColor,
@@ -145,6 +174,7 @@ for (const [label, path] of PAGES) {
   if (g.x < 0) notes.push(`왼쪽이 ${-g.x}px 잘렸어요`)
   if (g.y < 0) notes.push('화면 위로 넘어갔어요')
   if (g.overlapped) notes.push('다른 요소가 위에 덮고 있어요')
+  if (g.overlapWith.length) notes.push(`누를 수 있는 것과 겹쳐요 — ${g.overlapWith.join(' · ')}`)
   if (g.w < 44) notes.push(`폭 ${g.w}px — 손가락 자리(44px)보다 좁아요`)
   if (g.h < 30) notes.push(`높이 ${g.h}px — 너무 납작해요`)
   /**
@@ -166,6 +196,7 @@ for (const [label, path] of PAGES) {
 
   if (notes.length) bad(label, notes.join(' · '))
   else console.log(`✓ ${label} — (${g.x},${g.y}) ${g.w}×${g.h}`)
+  }
 }
 
 await browser.close()

@@ -18,7 +18,7 @@ export function PollCard({
   const d = pollDisplay(slot)
 
   return (
-    <Card title="실시간 투표">
+    <Card title={'실시간 투표'}>
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
         방문자가 자기 폰으로 찍으면 결과가 그 자리에서 차올라요.{' '}
         <b>설문과 선택지는 주최자가 관리 화면에서 만들어요</b> — 여기서는 색·문구만 정해요.
@@ -27,7 +27,7 @@ export function PollCard({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
         <div style={CSS.fieldCol}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
-            <span style={CSS.label}>제목</span>
+            <span style={CSS.label}>{'제목'}</span>
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
           <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />

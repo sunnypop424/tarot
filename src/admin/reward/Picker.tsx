@@ -247,7 +247,7 @@ export function Picker() {
           </button>
           {!canDraw && (
             <p className="ad-fine" style={{ marginTop: 12 }}>
-              뽑을 후보가 없어요. 응모를 낸 사람만 후보가 돼요.
+              {t('뽑을 후보가 없어요. 응모를 낸 사람만 후보가 돼요.')}
             </p>
           )}
         </div>
@@ -305,7 +305,7 @@ export function Picker() {
             <div className="ad-empty ad-empty--sm">
               <div className="ad-empty__title">{t('아직 추첨한 회차가 없어요')}</div>
               <div className="ad-empty__sub">
-                위에서 인원과 방식을 정하고 추첨하면 회차가 여기에 쌓여요.
+                {t('위에서 인원과 방식을 정하고 추첨하면 회차가 여기에 쌓여요.')}
               </div>
             </div>
           ) : (

@@ -500,4 +500,86 @@ export const ADMIN2_EN: Record<string, string> = {
   '이름·연락처·주소가 그대로 들어 있는 화면이에요. 마감 +14일까지만 열람할 수 있고, +15일이 지나면 저절로 지워져요.': 'This screen holds names, phone numbers and addresses as entered. You can view it until 14 days after the event ends; on day 15 it is deleted automatically.',
   '{n}종': '{n} kinds',
   '남은 수량 {n}장': '{n} left',
+
+  // ── 관리 화면 (넓힌 경로에서 드러난 자리) ──────────
+  '+ 상품 추가': '+ Add a prize',
+  '레어도 간격': 'Rarity spread',
+  '완만': 'Gentle',
+  '가파름': 'Steep',
+  '전설이 기본보다 5배 귀해요': 'Legendary is 5× rarer than Basic',
+  '운영': 'Operation',
+  '프레임': 'Frames',
+  '한 화면': 'Per screen',
+  '새로 만들기': 'Regenerate',
+  '내 페이지 보기 ↗': 'View my page ↗',
+  '오버레이 열기 ↗': 'Open the overlay ↗',
+  '엔딩크레딧 열기 ↗': 'Open the end credits ↗',
+  '남긴 즉시': 'Right away',
+  '{n}종이 올라가 있어요': '{n} kinds are listed',
+  '{a}개 · 숨김 {b}개': '{a} shown · {b} hidden',
+  '{n}명 · 남은 후보 {left}명': '{n} people · {left} still eligible',
+  '확률은 {per} 기준이에요. 여러 장 뽑기의 묶음 상한과 뽑는 도중 재고가 떨어지는 건 안 셈에 넣었어요.': 'The odds are per {per}. Batch caps for multi-draws and stock running out mid-draw are not counted in.',
+  '오늘 이 기기 {n}회': '{n} on this device today',
+
+  // ── 관리 화면 안내문 (넓힌 경로에서 드러난 자리) ────
+  '각 칸의 현장 암호와 운영 방식을 정해요. 칸 구성은 담당자가 만들어 드려요.':
+    'Set the on-site code and how each slot works. The slot layout is built for you by your manager.',
+  '암호를 비워 두면 그 칸은 방문자에게 잠긴 채로 보여요. 암호가 새면 새로 만들기로 바꾸세요 — 바꾸면 예전 암호는 바로 안 먹어요. 칸 이름과 순서는 담당자가 정해요.':
+    'Leave a code blank and that slot shows as locked to visitors. If a code leaks, press Regenerate — the old one stops working immediately. Slot names and order are set by your manager.',
+  '검수는 왼쪽 ‘한마디’ 메뉴에서 해요.':
+    'Moderation is in the ‘Messages’ menu on the left.',
+  '고치면 바로 저장돼요 · 상영 중에 바꿔도 그 자리에서 반영돼요':
+    'Changes save instantly · edits during a screening take effect on the spot',
+  '상영 중에 바꿔도 그 자리에서 반영돼요. 고치면 바로 저장돼요.':
+    'Edits during a screening take effect on the spot. Changes save instantly.',
+  '기기 기준이에요 — 브라우저 기록을 지우면 다시 뽑을 수 있어요.':
+    'Counted per device — clearing browser data lets someone draw again.',
+  '남긴 즉시 방문자 화면에 보여요. 부적절한 것만 숨기거나 지워 주세요.':
+    'It appears on the visitor screen the moment it is posted. Hide or delete only what is inappropriate.',
+  '등수는 줄 순서예요 · 남은 수량에 적은 만큼만 뽑을 수 있어요 · 다음 날 물량을 더할 땐 지금 남은 수량에 더해서 적어 주세요 · 오늘 나감과 누적은 뽑힌 기록에서 센 값이라 고칠 수 없어요.':
+    'Rank follows row order · Only as many as the stock figure can be drawn · To add stock the next day, add to the current figure · Given today and total are counted from draw records and cannot be edited.',
+  '따로 설정할 것이 없는 서비스예요. 방문자는 프레임을 골라 사진을 찍고 저장하면 끝이에요.':
+    'This service has nothing to configure. Visitors pick a frame, take a photo, save it — done.',
+  '럭키는 스태프 화면 라인업에 별이 붙는 표시일 뿐, 확률이 아니에요.':
+    'Lucky only puts a star on the staff line-up — it is not a probability.',
+  '말풍선에 닉네임을 같이 띄워요. 끄면 한마디만 떠요.':
+    'Show the nickname in the speech bubble too. Turn it off and only the message shows.',
+  '문항과 정답은 로그인한 주최자만 볼 수 있어요. 로그인하고 다시 열어 주세요.':
+    'Questions and answers are visible only to a signed-in organiser. Please sign in and open this again.',
+  '바꾸면 방문자 화면이 통째로 달라져요. 행사 중에는 바꾸지 마세요.':
+    'Changing this replaces the visitor screen entirely. Do not change it during the event.',
+  '뽑은 결과는 되돌릴 수 있지만, 회차 단위로만 되돌려요. 후보가 남아 있지 않으면 추첨할 수 없어요.':
+    'A draw can be undone, but only a whole round at a time. With no eligible entrants left, you cannot draw.',
+  '뽑을 후보가 없어요. 응모를 낸 사람만 후보가 돼요.':
+    'There is nobody to draw from. Only people who entered become candidates.',
+  '상품과 수량만 못 고치게 잠가요. 뽑기는 그대로 돼요.':
+    'Locks only the prizes and quantities. Drawing still works.',
+  '실제로는 스태프가 로그인한 기기에서만 열려요.':
+    'In a real event this opens only on a device where staff are signed in.',
+  '오버레이는 배경이 투명해요. OBS·프리즘의 브라우저 소스로 얹거나, 전체화면으로 영상 위에 겹쳐 주세요.':
+    'The overlay has a transparent background. Add it as a browser source in OBS or PRISM, or lay it full-screen over the video.',
+  '위에서 인원과 방식을 정하고 추첨하면 회차가 여기에 쌓여요.':
+    'Set the number and method above and draw — each round stacks up here.',
+  '이미 받은 한마디는 그대로 상영되고, 새로 받는 것만 막혀요.':
+    'Messages already received keep showing; only new ones are blocked.',
+  '이벤트가 끝나고 14일이 지나면 이 화면이 잠기고, 슬롯을 지우면 함께 삭제돼요. 화면을 켜 둔 채 자리를 비우지 말아 주세요.':
+    'This screen locks 14 days after the event ends, and is deleted along with the slot. Please do not leave it open and walk away.',
+  '재고와 운영 방식을 함께 봐요. 이 화면만 아래 저장을 눌러야 반영돼요.':
+    'Stock and settings in one place. This screen alone needs the Save button below.',
+  '줄 안에서 바로 고칠 수 있어요. 고르면 바로 저장돼요. 카드 이름과 이미지는 담당자가 올려 드려요.':
+    'Edit right in the row. Selections save instantly. Card names and images are uploaded for you by your manager.',
+  '카드마다 레어도와 재고를 정해요. 줄 안에서 바로 고칠 수 있어요.':
+    'Set rarity and stock for each card. You can edit right in the row.',
+  '켜면 상품 표에 열이 하나 늘어요. 비워 두면 그 상품은 제한이 없어요.':
+    'Turning this on adds a column to the prize table. Leave it blank and that prize has no cap.',
+  '켜면 한 묶음에 같은 카드가 몰리는 걸 막아요 — “10연차에 스페셜 5장” 같은 사고를 막아요.':
+    'Turning this on stops the same card piling up in one batch — it prevents accidents like “five specials in a ten-pull”.',
+  '켜져 있으면 뽑아도 재고가 줄지 않아요. 행사 전에 꺼 주세요.':
+    'While this is on, draws do not reduce stock. Please turn it off before the event.',
+  '프레임을 바꾸고 싶으면 담당자에게 말씀해 주세요. 원본 이미지를 보내 주시면 교체해 드려요.':
+    'To change the frames, just tell your manager. Send the original images and they will be swapped in.',
+  '합성은 방문자 폰 안에서 끝나고, 결과 이미지도 그 기기에만 남아요. 그래서 주최자가 볼 사진도, 지울 사진도 없어요. 방문자가 물어보면 이대로 답해 주시면 돼요.':
+    'Compositing finishes on the visitor’s phone and the result stays on that device. So there is no photo for the organiser to view or delete. If a visitor asks, this is the answer.',
+  '확정이면 방문자 폰에 교환코드가 뜨고, 스태프가 ‘수령 확인’ 에서 처리해요.':
+    'With a guaranteed gift, a code appears on the visitor’s phone and staff process it under Check-in.',
 }

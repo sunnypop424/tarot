@@ -234,7 +234,7 @@ function AdminShell() {
         * 다른 기능으로 읽었다 (`docs/REVIEW_COMMON.md` 4번).
         */}
       <a className="ad-nav__visit" href={`/${slot.slug}`} target="_blank" rel="noreferrer">
-        내 페이지 보기 ↗
+        {t('내 페이지 보기 ↗')}
       </a>
     </>
   )

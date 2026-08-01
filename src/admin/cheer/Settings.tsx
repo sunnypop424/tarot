@@ -101,14 +101,14 @@ export function Settings() {
           </span>
         </div>
         <p className="ad-head__desc">
-          상영 중에 바꿔도 그 자리에서 반영돼요. 고치면 바로 저장돼요.
+          {t('상영 중에 바꿔도 그 자리에서 반영돼요. 고치면 바로 저장돼요.')}
         </p>
       </header>
 
       <div className="ad-stack">
         <div>
           <span className="ad-note">
-            고치면 바로 저장돼요 · 상영 중에 바꿔도 그 자리에서 반영돼요
+            {t('고치면 바로 저장돼요 · 상영 중에 바꿔도 그 자리에서 반영돼요')}
           </span>
         </div>
 
@@ -168,7 +168,7 @@ export function Settings() {
               <div className="ad-switchrow__text">
                 <div className="ad-switchrow__name">{t('이름 표시')}</div>
                 <div className="ad-switchrow__hint">
-                  말풍선에 닉네임을 같이 띄워요. 끄면 한마디만 떠요.
+                  {t('말풍선에 닉네임을 같이 띄워요. 끄면 한마디만 떠요.')}
                 </div>
               </div>
               <button
@@ -185,7 +185,7 @@ export function Settings() {
               <div className="ad-switchrow__text">
                 <div className="ad-switchrow__name">{t('마감')}</div>
                 <div className="ad-switchrow__hint">
-                  이미 받은 한마디는 그대로 상영되고, 새로 받는 것만 막혀요.
+                  {t('이미 받은 한마디는 그대로 상영되고, 새로 받는 것만 막혀요.')}
                 </div>
               </div>
               <button
@@ -215,7 +215,7 @@ export function Settings() {
               rel="noreferrer"
               data-open-overlay
             >
-              오버레이 열기 ↗
+              {t('오버레이 열기 ↗')}
             </a>
             <a
               className="ad-btn ad-btn--line ad-btn--xl"
@@ -223,11 +223,11 @@ export function Settings() {
               target="_blank"
               rel="noreferrer"
             >
-              엔딩크레딧 열기 ↗
+              {t('엔딩크레딧 열기 ↗')}
             </a>
           </div>
           <p className="ad-sub" style={{ marginTop: 16 }}>
-            검수는 왼쪽 ‘한마디’ 메뉴에서 해요.
+            {t('검수는 왼쪽 ‘한마디’ 메뉴에서 해요.')}
           </p>
         </div>
       </div>

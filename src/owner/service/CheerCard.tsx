@@ -25,7 +25,7 @@ export function CheerCard({
   const d = cheerDisplay(slot)
 
   return (
-    <Card title="영상회 응원">
+    <Card title={'영상회 응원'}>
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
         방문자가 남긴 한마디가 상영 화면에 말풍선으로 떠요.{' '}
         <b>한 화면 개수·교체 간격·글자 수는 주최자가 관리 화면에서 정해요</b> — 여기서는 색과 문구만.

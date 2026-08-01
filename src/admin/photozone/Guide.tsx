@@ -36,7 +36,7 @@ export function Guide() {
             프레임 {display.frames.length}종이 올라가 있어요
           </div>
           <p className="ad-card__desc">
-            따로 설정할 것이 없는 서비스예요. 방문자는 프레임을 골라 사진을 찍고 저장하면 끝이에요.
+            {t('따로 설정할 것이 없는 서비스예요. 방문자는 프레임을 골라 사진을 찍고 저장하면 끝이에요.')}
           </p>
 
           <div className="ad-banner ad-banner--info ad-banner--pad" style={{ marginTop: 20 }}>
@@ -60,7 +60,7 @@ export function Guide() {
             rel="noreferrer"
             data-visit
           >
-            내 페이지 보기 ↗
+            {t('내 페이지 보기 ↗')}
           </a>
         </div>
       </div>

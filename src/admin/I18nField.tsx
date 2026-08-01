@@ -3,7 +3,8 @@ import { Languages } from 'lucide-react'
 
 import { LANGS, useT, type Lang } from '@/i18n'
 import { askLangs, clean, type I18nText } from '@/data/multilingual'
-import { useSlot } from '@/slot/SlotProvider'
+import { useSlotOrNull } from '@/slot/SlotProvider'
+import type { Slot } from '@/types/slot'
 
 /**
  * **주최자가 한 값을 언어별로 적는 칸.**
@@ -31,6 +32,7 @@ export function I18nField({
   placeholder,
   disabled,
   rows,
+  slot: given,
 }: {
   /** 한국어 원문 — 비교용으로 보여준다 (이 컴포넌트가 고치지는 않는다) */
   base: string
@@ -40,10 +42,19 @@ export function I18nField({
   disabled?: boolean
   /** 2 이상이면 여러 줄 입력 (질문 답변처럼 긴 글) */
   rows?: number
+  /**
+   * **슬롯을 직접 넘기는 자리** — 슬롯 편집기.
+   *
+   * 주최자 화면은 URL 이 슬롯을 정하므로 컨텍스트에서 받으면 되지만, 편집기는 저장 전
+   * **초안**을 다룬다. 방금 언어를 켜고 바로 아래 칸을 열면, 컨텍스트의 저장된 슬롯은
+   * 아직 그 언어를 모른다 — 초안을 넘겨야 켠 그 자리에서 칸이 뜬다.
+   */
+  slot?: Slot
 }) {
   const t = useT()
-  const slot = useSlot()
-  const langs = askLangs(slot)
+  const fromCtx = useSlotOrNull()
+  const slot = given ?? fromCtx
+  const langs = slot ? askLangs(slot) : []
   const [open, setOpen] = useState(false)
 
   if (langs.length === 0) return null

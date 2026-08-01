@@ -278,7 +278,7 @@ export function Overview() {
           <span className="ad-head__count tnum">{t('상품 {n}종', { n: rows.length })}</span>
         </div>
         <p className="ad-head__desc">
-          재고와 운영 방식을 함께 봐요. 이 화면만 아래 저장을 눌러야 반영돼요.
+          {t('재고와 운영 방식을 함께 봐요. 이 화면만 아래 저장을 눌러야 반영돼요.')}
         </p>
       </header>
 
@@ -360,7 +360,7 @@ export function Overview() {
                 disabled={rows.length >= MAX_PRIZES}
                 onClick={addRow}
               >
-                + 상품 추가
+                {t('+ 상품 추가')}
               </button>
             </div>
           </div>
@@ -482,7 +482,7 @@ export function Overview() {
 
         <div className="ad-card">
           <div className="ad-card__title" style={{ marginBottom: 0 }}>
-            운영
+            {t('운영')}
           </div>
           <div>
             {/**
@@ -519,7 +519,7 @@ export function Overview() {
               <div className="ad-switchrow__text">
                 <div className="ad-switchrow__name">{t('설정 잠금')}</div>
                 <div className="ad-switchrow__hint">
-                  상품과 수량만 못 고치게 잠가요. 뽑기는 그대로 돼요.
+                  {t('상품과 수량만 못 고치게 잠가요. 뽑기는 그대로 돼요.')}
                 </div>
               </div>
               <button
@@ -609,7 +609,7 @@ export function Overview() {
               <span>
                 <span className="ad-check__name">{t('한 번에 5개 뽑을 때 상품마다 최대 개수를 정하기')}</span>
                 <span className="ad-check__hint">
-                  켜면 상품 표에 열이 하나 늘어요. 비워 두면 그 상품은 제한이 없어요.
+                  {t('켜면 상품 표에 열이 하나 늘어요. 비워 두면 그 상품은 제한이 없어요.')}
                 </span>
               </span>
             </button>

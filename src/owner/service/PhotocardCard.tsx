@@ -117,7 +117,7 @@ export function PhotocardCard({
   }
 
   return (
-    <Card title="포토카드 뽑기">
+    <Card title={'포토카드 뽑기'}>
       <p style={{ margin: '0 0 16px', fontSize: 11.5, color: '#8a8a8a', lineHeight: 1.6 }}>
         레어도에 따라 카드가 뽑히고, 운영 방식에 따라 방문자 화면이 통째로 달라져요.{' '}
         <b>레어도·재고·운영 방식은 주최자가 관리 화면에서 정해요</b> — 여기서는 카드 이미지와
@@ -127,7 +127,7 @@ export function PhotocardCard({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
         <div style={CSS.fieldCol}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
-            <span style={CSS.label}>제목</span>
+            <span style={CSS.label}>{'제목'}</span>
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
           <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />

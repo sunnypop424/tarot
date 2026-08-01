@@ -45,7 +45,7 @@ export function Cards() {
         {rows && <span className="ad-head__count tnum">{rows.length}종</span>}
       </div>
       <p className="ad-head__desc">
-        카드마다 레어도와 재고를 정해요. 줄 안에서 바로 고칠 수 있어요.
+        {t('카드마다 레어도와 재고를 정해요. 줄 안에서 바로 고칠 수 있어요.')}
       </p>
     </header>
   )
@@ -153,7 +153,7 @@ export function Cards() {
            */}
           <div className="ad-btnrow" style={{ marginBottom: 16, alignItems: 'center', flexWrap: 'wrap' }}>
             <span className="ad-field__label" style={{ marginRight: 4 }}>
-              레어도 간격
+              {t('레어도 간격')}
             </span>
             {RARITY_CURVES.map((c) => (
               <button
@@ -203,7 +203,10 @@ export function Cards() {
                       aria-label={r.image ? r.name : undefined}
                     />
                     <div style={{ minWidth: 0 }}>
-                      <div className="ad-cell--b">{r.name}</div>
+                      {/* 카드 이름 — 담당자가 올리는 값이라 사전을 안 거친다 */}
+                      <div className="ad-cell--b" data-user-text>
+                        {r.name}
+                      </div>
                       {r.remaining === 0 && (
                         <span className="ad-tag ad-tag--sm" style={{ marginTop: 6 }}>
                           소진
@@ -281,7 +284,7 @@ export function Cards() {
                 재고가 떨어지는 건 안 셈에 넣었어요.
               </div>
               <div className="ad-bullet">
-                럭키는 스태프 화면 라인업에 별이 붙는 표시일 뿐, 확률이 아니에요.
+                {t('럭키는 스태프 화면 라인업에 별이 붙는 표시일 뿐, 확률이 아니에요.')}
               </div>
             </div>
           </div>
@@ -290,7 +293,7 @@ export function Cards() {
         <div className="ad-card ad-card--form">
           <div className="ad-card__title">{t('운영 방식')}</div>
           <p className="ad-card__desc">
-            바꾸면 방문자 화면이 통째로 달라져요. 행사 중에는 바꾸지 마세요.
+            {t('바꾸면 방문자 화면이 통째로 달라져요. 행사 중에는 바꾸지 마세요.')}
           </p>
           <div className="ad-choices" style={{ marginTop: 12 }}>
             {(
@@ -350,7 +353,7 @@ export function Cards() {
                   <span className="ad-unit">{t('회')}</span>
                 </div>
                 <p className="ad-field__hint">
-                  기기 기준이에요 — 브라우저 기록을 지우면 다시 뽑을 수 있어요.
+                  {t('기기 기준이에요 — 브라우저 기록을 지우면 다시 뽑을 수 있어요.')}
                 </p>
               </div>
             )}
@@ -396,14 +399,14 @@ export function Cards() {
 
         <div className="ad-card">
           <div className="ad-card__title" style={{ marginBottom: 0 }}>
-            운영
+            {t('운영')}
           </div>
           <div>
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
                 <div className="ad-switchrow__name">{t('연습 모드')}</div>
                 <div className="ad-switchrow__hint">
-                  켜져 있으면 뽑아도 재고가 줄지 않아요. 행사 전에 꺼 주세요.
+                  {t('켜져 있으면 뽑아도 재고가 줄지 않아요. 행사 전에 꺼 주세요.')}
                 </div>
               </div>
               <button

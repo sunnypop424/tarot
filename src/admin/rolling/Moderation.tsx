@@ -87,7 +87,7 @@ export function Moderation() {
           </span>
         </div>
         <p className="ad-head__desc">
-          남긴 즉시 방문자 화면에 보여요. 부적절한 것만 숨기거나 지워 주세요.
+          {t('남긴 즉시 방문자 화면에 보여요. 부적절한 것만 숨기거나 지워 주세요.')}
         </p>
       </header>
 
@@ -142,10 +142,13 @@ export function Moderation() {
                         textWrap: 'pretty',
                       }}
                     >
-                      {m.body}
+                      {/* 방문자가 쓴 글 — 검수 화면이라 원문 그대로 보여야 한다 */}
+                      <span data-user-text>{m.body}</span>
                     </div>
                     <div className="ad-row__meta">
-                      <span style={{ fontWeight: 700 }}>{m.nickname || t('익명')}</span>
+                      <span style={{ fontWeight: 700 }} data-user-text>
+                        {m.nickname || t('익명')}
+                      </span>
                       <span className="tnum" style={{ color: 'var(--ad-ink-4)' }}>
                         {new Date(m.createdAt).toLocaleString('ko-KR')}
                       </span>
