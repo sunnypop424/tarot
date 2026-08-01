@@ -152,9 +152,14 @@ function PollHome({ slot }: { slot: Slot }) {
               title={display.title}
               showTitle={display.showTitle}
               align={display.logoAlign}
-              classes={{ head: styles.head, logo: styles.logoTile, title: styles.title }}
+              classes={{ head: styles.head, logo: styles.logoTile, title: styles.title, text: styles.headText }}
+              /* 부제는 **헤더 안**이어야 제목과 같이 정렬된다 — 밖에 두면 혼자 왼쪽에 남는다 */
+              below={
+                display.showSubtitle && display.subtitle ? (
+                  <p className={styles.subtitle}>{display.subtitle}</p>
+                ) : null
+              }
             />
-            {display.showSubtitle && display.subtitle && <p className={styles.intro}>{display.subtitle}</p>}
 
             {polls === null ? (
               <div className={styles.empty} aria-busy="true" />

@@ -1,7 +1,8 @@
 import { wishDisplay, type WishDisplay } from '@/data/wish'
+import { AlignField } from './AlignField'
 import { WEBFONTS, type FontId } from '@/data/luckydraw'
 import type { Slot } from '@/types/slot'
-import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
+import { CSS, Card, Divided, Field, ShowToggle, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { BackgroundField } from './BackgroundField'
 import { StickerField } from '../StickerField'
@@ -137,17 +138,7 @@ export function WishCard({
             hint="헤더에 떠요. 없으면 제목 텍스트가 나와요."
           />
           {/* 롤페와 같은 짝 — 정렬·위 여백을 같은 이름으로 고른다 */}
-          <Field label="정렬" hint="로고·제목·부제가 함께 움직여요.">
-            <select
-              value={d.logoAlign}
-              onChange={(e) => patch({ logoAlign: e.target.value as WishDisplay['logoAlign'] })}
-              style={CSS.select}
-            >
-              <option value="left">왼쪽</option>
-              <option value="center">가운데</option>
-              <option value="right">오른쪽</option>
-            </select>
-          </Field>
+          <AlignField value={d.logoAlign} onChange={(a) => patch({ logoAlign: a })} />
           <Field label="위 여백 (px)" hint="배경 이미지의 나무 위치에 맞춰 제목을 내릴 때 써요.">
             <input
               type="number"
@@ -244,16 +235,3 @@ export function WishCard({
   )
 }
 
-function ShowToggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#8a8a8a', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        style={{ width: 14, height: 14, accentColor: '#816bff', cursor: 'pointer' }}
-      />
-      화면에 보이기
-    </label>
-  )
-}

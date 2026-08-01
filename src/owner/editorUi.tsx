@@ -266,3 +266,23 @@ export function RadiusSlider({
     </div>
   )
 }
+
+/**
+ * **제목·부제를 화면에 보일지** — 로고를 올린 슬롯은 제목 글자를 끄는 게 보통이다.
+ *
+ * 서비스 카드 여섯 벌에 같은 코드가 복사돼 있었다. 응원에 이 토글을 붙이려다 일곱 번째
+ * 사본을 만들 뻔해서 여기로 올린다 — 모양이 갈리면 "이 서비스만 다르게 생겼네" 가 된다.
+ */
+export function ShowToggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#8a8a8a', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        style={{ width: 14, height: 14, accentColor: '#816bff', cursor: 'pointer' }}
+      />
+      화면에 보이기
+    </label>
+  )
+}

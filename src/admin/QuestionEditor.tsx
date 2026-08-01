@@ -448,7 +448,12 @@ function AnswerRow({
   // 검수 중엔 그 자리에서 바로 고칠 수 있다 — 고친 것도 저장을 눌러야 들어간다
   const edit = (orientation: Orientation, text: string) =>
     pending ? onChangePending(orientation, text) : onChange(card.id, orientation, text)
-  /* 검수 중(AI 초안)에는 언어별 칸을 안 건다 — 저장 전 초안이라 저장할 자리가 없다 */
+  /*
+   * **언어별 칸은 검수 중에도 바로 저장된다** (위 `edit` 와 다르다).
+   *
+   * AI 초안(`pending`)은 원문만 만든다 — 번역은 사람이 적는 값이라 초안에 담길 게 없다.
+   * 그래서 여기 적은 건 초안과 무관하게 그 자리에서 저장한다. 초안을 버려도 안 사라진다.
+   */
   const editAlt = (orientation: Orientation, next: Partial<Record<Lang, string>> | null) =>
     onChangeAlt(card.id, orientation, next)
 

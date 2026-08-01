@@ -46,6 +46,13 @@ export interface CheerDisplay {
   subText: string
   buttonColor: string
   logo: string
+  /**
+   * 로고·제목·부제 정렬 — 셋이 **함께** 움직인다 (`ServiceHeader` 의 `align`).
+   *
+   * 다른 서비스는 다 갖고 있는데 여기만 없어서, 로고를 가운데 두고 싶어도 방법이 없었다.
+   * 기본은 `left` — 지금 화면과 같은 모양이라 이미 도는 행사가 안 바뀐다.
+   */
+  logoAlign: 'left' | 'center' | 'right'
   /** 입력 화면 배경 이미지 — 올린 그대로. 비우면 배경색을 쓴다 (다른 서비스와 같은 규칙) */
   bgImage: string
   /** 켜면 원본 크기로 타일링, 끄면 꽉 채우기(cover) */
@@ -92,6 +99,7 @@ export const DEFAULT_CHEER: CheerDisplay = {
   /* 보내기 버튼만 비워 둔다 — 안 고르면 **슬롯 테마의 강조색**을 받는다 (파일 머리말) */
   buttonColor: '',
   logo: '',
+  logoAlign: 'left',
   bgImage: '',
   bgRepeat: false,
   // 예능 자막바 결 — 진한 색 위 흰 글자가 기본이다 (참고 이미지의 문법)
@@ -133,6 +141,7 @@ export function cheerDisplay(slot: Slot): CheerDisplay {
     // 버튼만 슬롯 테마를 받는다 — 나머지 색이 왜 고정인지는 파일 머리말에
     buttonColor: saved.buttonColor || base.button,
     logo: saved.logo ?? DEFAULT_CHEER.logo,
+    logoAlign: saved.logoAlign || DEFAULT_CHEER.logoAlign,
     bgImage: saved.bgImage ?? DEFAULT_CHEER.bgImage,
     bgRepeat: saved.bgRepeat ?? DEFAULT_CHEER.bgRepeat,
     // 빈 배열은 "색을 다 지웠다" 는 뜻이 아니라 대개 실수다 — 비면 기본 팔레트로 되돌린다

@@ -97,6 +97,21 @@ function choiceAlt(alt: Partial<Record<Lang, string[]>> | undefined, i: number):
   return Object.keys(out).length ? out : undefined
 }
 
+/** 보기 하나를 지울 때 언어별 배열에서도 같은 자리를 뺀다 (줄이 밀리면 번역이 어긋난다) */
+function dropChoiceAlt(
+  alt: Partial<Record<Lang, string[]>> | undefined,
+  i: number
+): Partial<Record<Lang, string[]>> | undefined {
+  if (!alt) return undefined
+  const out: Partial<Record<Lang, string[]>> = {}
+  for (const [k, row] of Object.entries(alt)) {
+    if (!Array.isArray(row)) continue
+    const next = row.filter((_, n) => n !== i)
+    if (next.some((x) => x.trim())) out[k as Lang] = next
+  }
+  return Object.keys(out).length ? out : undefined
+}
+
 function setChoiceAlt(
   alt: Partial<Record<Lang, string[]>> | undefined,
   i: number,
@@ -737,6 +752,12 @@ function Editor({
                           choices: q.choices.filter((_, n) => n !== i),
                           // 정답 뒤의 보기를 지우면 인덱스가 밀린다 — 정답을 다시 고르게 비운다
                           answers: [],
+                          /*
+                           * **언어별 보기도 같이 밀어야 한다.** 안 옮기면 2번을 지웠을 때
+                           * 원문은 ['가','다','라'] 인데 영어는 ['A','B','C','D'] 로 남아
+                           * '다' 자리에 'B' 가 붙는다 — 아무것도 안 깨지고 번역만 어긋난다.
+                           */
+                          choicesI18n: dropChoiceAlt(q.choicesI18n, i),
                         })
                       }
                     >

@@ -1,7 +1,8 @@
 import { photozoneDisplay, type PhotozoneDisplay } from '@/data/photozone'
+import { AlignField } from './AlignField'
 import { WEBFONTS, type FontId } from '@/data/luckydraw'
 import type { Slot } from '@/types/slot'
-import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
+import { CSS, Card, Divided, Field, ShowToggle, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { BackgroundField } from './BackgroundField'
 import { FrameField } from './FrameField'
@@ -146,6 +147,12 @@ export function PhotozoneCard({
           onChange={(v) => patch({ logo: v ?? '' })}
           hint="헤더에 떠요. 없으면 제목 텍스트가 나와요."
         />
+        {/*
+          * 이 칸이 **혼자 빠져 있었다.** 타입에도 있고(`PhotozoneDisplay.logoAlign`)
+          * 화면도 읽는데(`PhotozoneApp` 의 `align={display.logoAlign}`) 편집기에만 없어서,
+          * 최고관리자는 기본값('가운데')에서 바꿀 방법이 없었다.
+          */}
+        <AlignField value={d.logoAlign} onChange={(a) => patch({ logoAlign: a })} />
         <BackgroundField
           slug={slot.slug}
           name="photozone-bg"
@@ -179,16 +186,3 @@ export function PhotozoneCard({
   )
 }
 
-function ShowToggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#8a8a8a', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        style={{ width: 14, height: 14, accentColor: '#816bff', cursor: 'pointer' }}
-      />
-      화면에 보이기
-    </label>
-  )
-}

@@ -79,9 +79,19 @@
   cursor: pointer;
   white-space: nowrap;
 }
+/**
+ * **hover 배경을 글자색에서 뽑는다.**
+ *
+ * `--color-wash` 를 쓰면 안 된다. 이 목록은 랜딩처럼 **밝은 서브트리** 안에 뜨는데
+ * `--color-wash` 는 `:root` 의 어두운 값(`#241f45`)이 잡혀서, 밝은 판 위에 검은 칸이
+ * 깔리고 글자는 어두운 채로 남아 안 보였다 — 배경 토큰과 글자 토큰이 서로 다른 벌에서
+ * 왔기 때문이다.
+ *
+ * `currentColor` 에서 섞으면 **어느 벌이든 자기 글자색 기준**이라 그 사고가 안 난다.
+ * 밝은 판에서는 옅은 회색, 어두운 판에서는 옅은 밝은색이 깔린다.
+ */
 .item:hover {
-  background: var(--color-wash);
-  color: var(--color-fg-1);
+  background: color-mix(in srgb, currentColor 9%, transparent);
 }
 .item[data-on] {
   color: var(--color-primary);

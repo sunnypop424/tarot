@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { AlignField } from './AlignField'
 import { Upload, X } from 'lucide-react'
 
 import { photocardDisplay, type PhotocardDisplay } from '@/data/photocard'
@@ -7,7 +8,7 @@ import { repo } from '@/lib/repo'
 import type { Photocard } from '@/lib/repo/types'
 import { cssUrl } from '@/lib/image'
 import type { Slot } from '@/types/slot'
-import { AlphaColor, CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
+import { AlphaColor, CSS, Card, Divided, Field, ShowToggle, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { uploadAsset, deleteAsset, extOf, nameFromUrl } from '../upload'
 import { BoxFields } from './BoxFields'
@@ -284,6 +285,7 @@ export function PhotocardCard({
           onChange={(v) => patch({ logo: v ?? '' })}
           hint="덱 헤더와 안내 화면에 떠요."
         />
+        <AlignField value={d.logoAlign} onChange={(a) => patch({ logoAlign: a })} />
         {/* 덱에 깔리는 뒷면 — 타로 뒷면과 별개다 (비율이 다르고 같이 팔지 않는다) */}
         <ImageField
           slug={slot.slug}
@@ -304,6 +306,19 @@ export function PhotocardCard({
           onRepeat={onRepeat}
           hint="스태프 화면의 박스가 얹힐 자리를 비워둔 사진이 좋아요."
         />
+        <Field label="뽑기 버튼 문구">
+          <input value={d.drawLabel} onChange={(e) => patch({ drawLabel: e.target.value })} style={CSS.input} />
+          {/* 방문자 폰의 '뽑기권 받기' — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="drawLabel" patch={patch} slot={slot} />
+        </Field>
+        <Field label="저장 버튼 문구">
+          <input value={d.saveLabel} onChange={(e) => patch({ saveLabel: e.target.value })} style={CSS.input} />
+          <I18nRow d={d} k="saveLabel" patch={patch} slot={slot} />
+        </Field>
+        <Field label="카운터 안내" hint="뽑기권을 받으러 카운터에 가라는 안내예요.">
+          <input value={d.counterBody} onChange={(e) => patch({ counterBody: e.target.value })} style={CSS.input} />
+          <I18nRow d={d} k="counterBody" patch={patch} slot={slot} />
+        </Field>
         <Field label="보관함 이름">
           <input value={d.lockerLabel} onChange={(e) => patch({ lockerLabel: e.target.value })} style={CSS.input} />
           {/* 보관함 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
@@ -388,16 +403,3 @@ export function PhotocardCard({
   )
 }
 
-function ShowToggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#8a8a8a', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        style={{ width: 14, height: 14, accentColor: '#816bff', cursor: 'pointer' }}
-      />
-      화면에 보이기
-    </label>
-  )
-}

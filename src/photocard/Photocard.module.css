@@ -36,15 +36,14 @@
 }
 
 /* ── 헤더 ── */
+/* 여백은 일곱 서비스가 같다 (`scripts/verify-header-uniform.mjs`) — 위 24 · 옆 20.
+   예전엔 위가 44 라 고르개도 44 로 내려야 했는데, 맞추고 나니 그 재정의가 필요 없다 */
 .head {
   flex: none;
-  padding: 44px 20px 0;
+  padding: var(--space-lg) var(--layout-pad) 0;
   display: flex;
   align-items: center;
   gap: 11px;
-  /* 이 헤더는 위 여백이 44px — 언어 고르개도 그만큼 내려와야 제목과 같은 선상이다
-     (`src/styles/components.css` 의 `.svc-lang`) */
-  --svc-lang-top: 44px;
 }
 .logo {
   width: 40px;

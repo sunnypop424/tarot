@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { AlignField } from './AlignField'
 import { I18nField } from '@/admin/I18nField'
 import { GripVertical, Image as ImageIcon, Plus, Upload, X } from 'lucide-react'
 
@@ -6,7 +7,7 @@ import { stampDisplay, type StampCell, type StampDisplay } from '@/data/stamp'
 import { WEBFONTS, type FontId } from '@/data/luckydraw'
 import { cssUrl } from '@/lib/image'
 import type { Slot } from '@/types/slot'
-import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
+import { CSS, Card, Divided, Field, ShowToggle, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { uploadAsset, deleteAsset, extOf, nameFromUrl } from '../upload'
 import { I18nRow } from './I18nRow'
@@ -312,32 +313,9 @@ export function StampCard({
           onChange={(v) => patch({ logo: v ?? '' })}
           hint="헤더에 떠요. 없으면 제목 텍스트가 나와요."
         />
-        <Field label="로고 정렬">
-          <select
-            value={d.logoAlign}
-            onChange={(e) => patch({ logoAlign: e.target.value as StampDisplay['logoAlign'] })}
-            style={CSS.select}
-          >
-            <option value="left">왼쪽</option>
-            <option value="center">가운데</option>
-            <option value="right">오른쪽</option>
-          </select>
-        </Field>
+        <AlignField value={d.logoAlign} onChange={(a) => patch({ logoAlign: a })} />
       </Divided>
     </Card>
   )
 }
 
-function ShowToggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#8a8a8a', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        style={{ width: 14, height: 14, accentColor: '#816bff', cursor: 'pointer' }}
-      />
-      화면에 보이기
-    </label>
-  )
-}

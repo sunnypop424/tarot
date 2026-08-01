@@ -136,7 +136,12 @@ export function ServiceHeader({
     return (
       <header className={classes.head} data-align={align}>
         {mark}
-        <div className={classes.text} style={{ minWidth: 0 }}>
+        {/*
+          * **부제도 제목과 같이 움직인다.** `textAlign` 을 안 걸어 두면 제목 상자만
+          * 가운데로 가고 그 안의 글자는 왼쪽에 남는다 — 제목은 상자 폭과 같아 티가 안 나는데
+          * 짧은 부제가 혼자 왼쪽에 붙어 두 줄이 어긋나 보였다. `mark` 변형은 원래 걸려 있다.
+          */}
+        <div className={classes.text} data-align={align} style={{ textAlign: align, minWidth: 0 }}>
           {heading}
           {below}
         </div>

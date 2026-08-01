@@ -55,6 +55,9 @@
   justify-content: center;
   color: var(--st-sub);
 }
+.headText {
+  min-width: 0;
+}
 .title {
   margin: 0;
   font-size: 19px;
@@ -62,12 +65,8 @@
   line-height: 1.3;
   word-break: keep-all;
 }
-.intro {
-  margin: 12px var(--layout-pad) 0;
-  font-size: 13px;
-  line-height: 1.6;
+.subtitle {
   color: var(--st-sub);
-  word-break: keep-all;
 }
 
 /* ── 판 ── */

@@ -111,7 +111,7 @@ export const DEFAULT_PHOTOZONE: PhotozoneDisplay = {
   bgImage: '',
   bgRepeat: false,
   logo: '',
-  logoAlign: 'center',
+  logoAlign: 'left',
 }
 
 /**

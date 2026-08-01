@@ -86,7 +86,7 @@ export const DEFAULT_QUIZ: QuizDisplay = {
   bg: '',
   resultBg: '',
   logo: '',
-  logoAlign: 'center',
+  logoAlign: 'left',
   startLabel: '시작하기',
   nextLabel: '다음',
   submitLabel: '제출하기',

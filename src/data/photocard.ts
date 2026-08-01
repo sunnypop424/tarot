@@ -48,6 +48,13 @@ export interface PhotocardDisplay {
   buttonColor: string
   logo: string
   /**
+   * 로고·제목·부제 정렬 — 셋이 **함께** 움직인다 (`ServiceHeader` 의 `align`).
+   *
+   * 다른 서비스는 다 갖고 있는데 여기만 없어서, 로고를 가운데 두고 싶어도 방법이 없었다.
+   * 기본은 `left` — 지금 화면과 같은 모양이라 이미 도는 행사가 안 바뀐다.
+   */
+  logoAlign: 'left' | 'center' | 'right'
+  /**
    * 덱에 깔리는 **카드 뒷면** 이미지 — 비우면 내장 무늬(덱 색에서 파생한 그러데이션).
    *
    * 타로 뒷면(`theme.assets.cardBack`)과 **별개다.** 카드 비율이 다르고(55×85 vs 63×88),
@@ -126,6 +133,7 @@ export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
   subText: '',
   buttonColor: '',
   logo: '',
+  logoAlign: 'left',
   cardBack: '',
   picker: {},
   // 럭키드로우와 같은 출발점 (`DEFAULT_DISPLAY`) — 같은 무대라 기본값도 같아야 한다
@@ -176,6 +184,7 @@ export function photocardDisplay(slot: Slot): PhotocardDisplay {
     subText: saved.subText || base.subText,
     buttonColor: saved.buttonColor || base.button,
     logo: saved.logo ?? DEFAULT_PHOTOCARD.logo,
+    logoAlign: saved.logoAlign || DEFAULT_PHOTOCARD.logoAlign,
     cardBack: saved.cardBack ?? DEFAULT_PHOTOCARD.cardBack,
     // 저장값만 든다 — 안 고른 색의 기본값은 화면이 자기 팔레트로 채운다
     picker: saved.picker ?? {},

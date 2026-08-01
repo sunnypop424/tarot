@@ -441,6 +441,7 @@ function Deck({
         logo={display.logo}
         title={display.title}
         showTitle={display.showTitle}
+        align={display.logoAlign}
         classes={{ head: styles.head, logo: styles.logo, title: styles.title }}
       />
       {display.deckGuide && <p className={styles.deckGuide}>{display.deckGuide}</p>}

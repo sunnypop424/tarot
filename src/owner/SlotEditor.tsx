@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { AlignField } from './service/AlignField'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { AlertCircle, ArrowLeft, Check, Download, ExternalLink, Eye, Sparkles } from 'lucide-react'
 
@@ -1294,26 +1295,9 @@ export function SlotEditor() {
                     <span style={{ ...CSS.label, minHeight: 19, display: 'flex', alignItems: 'center' }}>로고</span>
                     <ImageField slug={saved.slug} label="로고" name="rolling-logo" value={rd.logo || null} onChange={(v) => patchRolling({ logo: v ?? '' })} hint="벽 헤더에 떠요. 없으면 제목 텍스트가 나와요." />
                     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
-                      <div style={{ ...CSS.fieldCol, flex: 1, minWidth: 130 }}>
-                        <span style={CSS.label}>위치</span>
-                        <div role="radiogroup" aria-label="로고 위치" style={{ display: 'inline-flex', background: '#f7f7f7', border: '1px solid #eeeeee', borderRadius: 9999, padding: 3, gap: 2 }}>
-                          {(['left', 'center', 'right'] as const).map((a) => {
-                            const on = rd.logoAlign === a
-                            return (
-                              <button
-                                key={a}
-                                type="button"
-                                role="radio"
-                                aria-checked={on}
-                                onClick={() => patchRolling({ logoAlign: a })}
-                                style={{ flex: 1, height: 28, padding: '0 12px', border: 'none', borderRadius: 9999, fontSize: 12, fontWeight: 700, cursor: 'pointer', background: on ? '#fff' : 'transparent', color: on ? '#121212' : '#8a8a8a' }}
-                              >
-                                {a === 'left' ? '왼쪽' : a === 'center' ? '가운데' : '오른쪽'}
-                              </button>
-                            )
-                          })}
+                      <div style={{ flex: 1, minWidth: 130 }}>
+                          <AlignField value={rd.logoAlign} onChange={(a) => patchRolling({ logoAlign: a })} label="위치" hint="" />
                         </div>
-                      </div>
                       <label style={{ ...CSS.fieldCol, width: 110 }}>
                         <span style={CSS.label}>위 여백 (px)</span>
                         <input type="number" min={0} max={200} value={rd.logoMarginTop} onChange={(e) => patchRolling({ logoMarginTop: Math.max(0, Number(e.target.value) || 0) })} style={CSS.input} />
