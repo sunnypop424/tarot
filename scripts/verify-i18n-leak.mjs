@@ -24,7 +24,12 @@ import puppeteer from 'puppeteer-core'
 import { existsSync } from 'node:fs'
 
 const BASE = 'http://localhost:5174'
-const LANG = 'en'
+
+/**
+ * **세 언어를 다 돈다.** 영어만 보면 zh·ja 에만 빠진 문장을 못 잡는다 — 사전이 없으면
+ * 한국어로 폴백하므로 화면이 깨지지 않아 눈으로도 안 보인다.
+ */
+const LANGS = ['en', 'zh', 'ja']
 
 const exe = [
   'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -46,8 +51,17 @@ if (!exe) {
  */
 const SERVICES = {
   tarot: {
-    visitor: ['', '/cards', '/cards/major-0', '/question', '/fortune'],
-    admin: ['', '/questions', '/qr', '/account'],
+    // `/draw/:categoryId` 는 카테고리 id (`src/data/categories.ts`) — 뽑기 화면이 여기다
+    visitor: [
+      '',
+      '/fortune',
+      '/cards',
+      '/cards/major-0',
+      '/draw/today',
+      '/draw/love',
+      '/draw/yesno',
+    ],
+    admin: ['', '/questions', '/qr', '/account', '/login'],
   },
   luckydraw: { visitor: [''], admin: ['', '/overview', '/shipping', '/qr'] },
   rolling: { visitor: ['', '/write'], admin: ['', '/messages', '/qr'] },
@@ -70,6 +84,16 @@ const SERVICES = {
   cheer: { visitor: ['', '/overlay'], admin: ['', '/cheer', '/messages', '/qr'] },
 }
 
+/**
+ * **모든 슬롯에 있는 관리 화면** — 서비스마다 적지 않고 여기 한 번 적어 붙인다.
+ * `staff-accounts` 는 체험 슬롯엔 라우트가 없다(`AdminRoutes` 의 `!slot.demo`) — 열면
+ * 대시보드로 되돌아가므로 검사에 넣어도 해가 없고, 고객 슬롯에서 빠뜨리지 않게 남겨 둔다.
+ */
+const COMMON_ADMIN = ['', '/qr', '/login']
+
+/** 슬롯 밖 화면 — 랜딩은 배포 루트다 */
+const ROOT_PAGES = ['/']
+
 const arg = process.argv[2]
 const onlyVisitor = process.argv.includes('--visitor')
 const onlyAdmin = process.argv.includes('--admin')
@@ -81,11 +105,8 @@ const browser = await puppeteer.launch({ executablePath: exe, headless: 'new', a
 const page = await browser.newPage()
 await page.setViewport({ width: 420, height: 900 })
 
-// 언어를 먼저 심어 둔다 — 첫 렌더부터 영어여야 폴백과 구분된다
-await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
-await page.evaluate((l) => localStorage.setItem('tarot-pocket:lang', l), LANG)
-
-const leaks = new Map() // 문장 → 나온 경로들
+const leaks = new Map() // 문장 → 나온 (언어·경로)들
+let curLang = 'en'
 
 async function sweep(path) {
   try {
@@ -114,20 +135,34 @@ async function sweep(path) {
   })
   for (const s of found) {
     if (!leaks.has(s)) leaks.set(s, new Set())
-    leaks.get(s).add(path)
+    leaks.get(s).add(`${curLang}:${path}`)
   }
 }
 
-for (const key of targets) {
-  const conf = SERVICES[key]
-  if (!conf) {
-    console.error(`모르는 서비스: ${key}`)
-    continue
+for (const lang of LANGS) {
+  curLang = lang
+  // 언어를 먼저 심어 둔다 — 첫 렌더부터 그 언어여야 폴백과 구분된다
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
+  await page.evaluate((l) => localStorage.setItem('tarot-pocket:lang', l), lang)
+
+  if (!onlyAdmin && !arg) for (const p of ROOT_PAGES) await sweep(p)
+
+  for (const key of targets) {
+    const conf = SERVICES[key]
+    if (!conf) {
+      console.error(`모르는 서비스: ${key}`)
+      continue
+    }
+    const slug = `demo-${key}`
+    if (!onlyAdmin) for (const p of conf.visitor) await sweep(`/${slug}${p}`)
+    if (!onlyVisitor) {
+      // 공통 관리 화면은 서비스마다 안 적는다 — 여기서 합쳐 중복 없이 돈다
+      for (const p of new Set([...COMMON_ADMIN, ...conf.admin])) {
+        await sweep(`/${slug}/admin${p}`)
+      }
+    }
   }
-  const slug = `demo-${key}`
-  if (!onlyAdmin) for (const p of conf.visitor) await sweep(`/${slug}${p}`)
-  if (!onlyVisitor) for (const p of conf.admin) await sweep(`/${slug}/admin${p}`)
-  process.stderr.write(`· ${slug}\n`)
+  process.stderr.write(`· ${lang} 끝\n`)
 }
 
 await browser.close()
