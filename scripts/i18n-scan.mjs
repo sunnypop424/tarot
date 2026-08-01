@@ -88,7 +88,7 @@ if (onlyMissing) {
    * 이미 번역한 것을 "아직 없음" 으로 세어, 다 해놓고도 안 끝난 것처럼 보인다.
    * 사전 파일을 새로 만들면 **이 목록에도 넣는다** (`index.tsx` 의 `DICTS` 와 짝이다).
    */
-  const dict = ['src/i18n/en.ts', 'src/i18n/admin.en.ts', 'src/i18n/admin2.en.ts']
+  const dict = ['src/i18n/en.ts', 'src/i18n/admin.en.ts', 'src/i18n/admin2.en.ts', 'src/i18n/landing.en.ts']
     .map((p) => readFileSync(p, 'utf8'))
     .join('\n')
   keys = keys.filter((k) => !dict.includes(`'${k}'`) && !dict.includes(`"${k}"`))

@@ -15,9 +15,9 @@ import { readFileSync } from 'node:fs'
 
 /** 언어 → 그 언어의 사전 파일들 (`src/i18n/index.tsx` 의 `DICTS` 와 짝이다) */
 const FILES = {
-  en: ['src/i18n/en.ts', 'src/i18n/admin.en.ts', 'src/i18n/admin2.en.ts'],
-  zh: ['src/i18n/zh.ts', 'src/i18n/admin.zh.ts', 'src/i18n/admin2.zh.ts'],
-  ja: ['src/i18n/ja.ts', 'src/i18n/admin.ja.ts', 'src/i18n/admin2.ja.ts'],
+  en: ['src/i18n/en.ts', 'src/i18n/admin.en.ts', 'src/i18n/admin2.en.ts', 'src/i18n/landing.en.ts'],
+  zh: ['src/i18n/zh.ts', 'src/i18n/admin.zh.ts', 'src/i18n/admin2.zh.ts', 'src/i18n/landing.zh.ts'],
+  ja: ['src/i18n/ja.ts', 'src/i18n/admin.ja.ts', 'src/i18n/admin2.ja.ts', 'src/i18n/landing.ja.ts'],
 }
 
 const stripComments = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')

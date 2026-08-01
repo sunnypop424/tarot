@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
@@ -15,6 +16,8 @@ import {
 import { josa } from '@/lib/josa'
 import { InquiryModal } from './InquiryModal'
 import styles from './Landing.module.css'
+import { useT } from '@/i18n'
+import { LangPicker } from '@/components/LangPicker'
 
 /**
  * 배포 루트(`/`) 랜딩 — **개인 커미션 안내 글.**
@@ -38,7 +41,26 @@ import styles from './Landing.module.css'
  */
 const BEZEL = 6
 
+/**
+ * **링크가 문장 한가운데 있는 자리.**
+ *
+ * 앞뒤를 따로 감싸면 언어마다 어순이 달라 조각이 어긋난다 — 실제로 이 파일에
+ * `문의` + `를 통해 편하게 말씀해 주세요.` 처럼 조사만 밖에 나와 있던 자리가 셋 있었다.
+ * 통문장을 키로 두고 **`{link}` 가 어디 오는지는 사전이 정한다.**
+ */
+function withLink(text: string, link: ReactNode): ReactNode {
+  const [before, after = ''] = text.split('{link}')
+  return (
+    <>
+      {before}
+      {link}
+      {after}
+    </>
+  )
+}
+
 export default function Landing() {
+  const t = useT()
   const [cur, setCur] = useState(SERVICES[0].key)
   const [openFaq, setOpenFaq] = useState<number | null>(0)
   const [inquiry, setInquiry] = useState<null | 'any' | 'custom'>(null)
@@ -72,10 +94,11 @@ export default function Landing() {
     )
     els.forEach((el) => io.observe(el))
     // 관찰이 어떤 이유로든 안 걸리면(스크롤 없는 짧은 화면) 1초 뒤 그냥 보여준다
-    const t = window.setTimeout(() => els.forEach((el) => el.setAttribute('data-in', '')), 1000)
+    // `t` 로 받지 않는다 — 번역 함수를 가린다 (Qr.tsx 에서 실제로 그 사고가 났다)
+    const timer = window.setTimeout(() => els.forEach((el) => el.setAttribute('data-in', '')), 1000)
     return () => {
       io.disconnect()
-      clearTimeout(t)
+      clearTimeout(timer)
     }
   }, [])
 
@@ -147,35 +170,55 @@ export default function Landing() {
       {/* 단 폭은 `landingData.PAGE_MAX` 가 원본이다 — 목업 크기가 여기서 나와 CSS 에 또 적으면 어긋난다 */}
       <div className={styles.page} style={{ maxWidth: PAGE_MAX }}>
         <div className={styles.top}>
-          <span className={styles.brand}>생일카페 웹페이지 제작 커미션</span>
-          <span className={styles.footerNote}>OLUCKY!</span>
+          <span className={styles.brand}>{t('생일카페 웹페이지 제작 커미션')}</span>
+          {/*
+            * 고르개를 `.top` 에 **바로 넣지 않는다.** 이 줄은 `align-items: baseline` 이라
+            * 36px 짜리 단추가 글자 기준선에 맞춰져 혼자 아래로 내려간다. 오른쪽 둘을 묶어
+            * 그 안에서만 가운데 정렬한다 — 브랜드와 'OLUCKY!' 의 기준선은 그대로 둔다.
+            *
+            * `LangBar` 가 아니라 `LangPicker` 인 이유: LangBar 는 슬롯이 켠 언어를 보는데
+            * 랜딩엔 슬롯이 없고(배포 루트다), 자기 줄을 따로 만들어 여백이 벌어진다.
+            */}
+          <span className={styles.topRight}>
+            <span className={styles.footerNote}>OLUCKY!</span>
+            <LangPicker />
+          </span>
         </div>
 
         <div className={styles.rv} data-rv>
           <h1 className={styles.h1}>
-            생일카페를 더 특별하게 만들어 줄
-            <br />
-            단 하나의 웹페이지를 제작합니다
+            {/* 줄바꿈 자리는 언어마다 다르다 — 한 키로 두고 사전이 정한 자리에서 접는다 */}
+            {t('생일카페를 더 특별하게 만들어 줄|단 하나의 웹페이지를 제작합니다')
+              .split('|')
+              .map((line, i) => (
+                <Fragment key={line}>
+                  {i > 0 && <br />}
+                  {line}
+                </Fragment>
+              ))}
           </h1>
           <p className={styles.p}>
-            카페에 방문한 팬들이 QR 코드만 찍으면 스마트폰에서 바로 열리는 전용 웹페이지입니다.
-            번거로운 앱 설치 없이,{' '}
-            <span className={styles.mk}>웹 페이지 하나가 곧 하나의 특별한 이벤트가 됩니다.</span> 대기
-            줄에서도 30초면 참여할 수 있도록 직관적으로 설계되며, 행사 기간이 끝나면 페이지는
-            안전하게 닫힙니다.
+            {withLink(
+              t(
+                '카페에 방문한 팬들이 QR 코드만 찍으면 스마트폰에서 바로 열리는 전용 웹페이지입니다. 번거로운 앱 설치 없이, {link} 대기 줄에서도 30초면 참여할 수 있도록 직관적으로 설계되며, 행사 기간이 끝나면 페이지는 안전하게 닫힙니다.'
+              ),
+              <span className={styles.mk}>{t('웹 페이지 하나가 곧 하나의 특별한 이벤트가 됩니다.')}</span>
+            )}
           </p>
           <p className={styles.p}>
-            행사의 컨셉과 분위기에 맞춰 맞춤형으로 페이지를 디자인한 후, 전용 웹 페이지와 관리자
-            계정을 함께 전달해 드립니다. 생일카페 주최가 처음이신 분들도 쉽게 운영하실 수 있도록
-            꼼꼼하게 안내해 드립니다.
+            {t(
+              '행사의 컨셉과 분위기에 맞춰 맞춤형으로 페이지를 디자인한 후, 전용 웹 페이지와 관리자 계정을 함께 전달해 드립니다. 생일카페 주최가 처음이신 분들도 쉽게 운영하실 수 있도록 꼼꼼하게 안내해 드립니다.'
+            )}
           </p>
           <p className={`${styles.p} ${styles.pLast}`}>
-            1인 체제로 운영되어 한 번에 많은 의뢰를 받지는 못합니다. 하지만 행사 기간 동안 문제가
-            생기거나 확인이 필요할 때 최대한 빠르게 대응해 드립니다. 궁금한 점이 있으시다면 언제든{' '}
-            <button type="button" className={styles.link} onClick={openInquiry}>
-              문의
-            </button>
-            를 통해 편하게 말씀해 주세요.
+            {withLink(
+              t(
+                '1인 체제로 운영되어 한 번에 많은 의뢰를 받지는 못합니다. 하지만 행사 기간 동안 문제가 생기거나 확인이 필요할 때 최대한 빠르게 대응해 드립니다. 궁금한 점이 있으시다면 언제든 {link}를 통해 편하게 말씀해 주세요.'
+              ),
+              <button type="button" className={styles.link} onClick={openInquiry}>
+                {t('문의')}
+              </button>
+            )}
           </p>
         </div>
 
@@ -185,12 +228,12 @@ export default function Landing() {
 
         {/* ── 만들 수 있는 것 ── */}
         <h2 className={`${styles.h2} ${styles.h2First}`} data-rv>
-          만들 수 있는 것
+          {t('만들 수 있는 것')}
         </h2>
         <p className={styles.lead} data-rv>
-          현재 10가지의 이벤트 페이지가 준비되어 있습니다. 항목을 누르시면 아래 목업 화면에서
-          페이지가 바로 실행됩니다. 체험용이므로 마음껏 눌러보셔도 서버에 기록이 남지 않으니
-          안심하셔도 됩니다.
+          {t(
+            '현재 10가지의 이벤트 페이지가 준비되어 있습니다. 항목을 누르시면 아래 목업 화면에서 페이지가 바로 실행됩니다. 체험용이므로 마음껏 눌러보셔도 서버에 기록이 남지 않으니 안심하셔도 됩니다.'
+          )}
         </p>
 
         <div className={styles.list} data-rv>
@@ -205,14 +248,14 @@ export default function Landing() {
               <span className={styles.rowNo}>{String(i + 1).padStart(2, '0')}</span>
               <span className={styles.rowBody}>
                 <span className={styles.rowHead}>
-                  <span className={styles.rowName}>{s.name}</span>
+                  <span className={styles.rowName}>{t(s.name)}</span>
                   {s.devices.length > 1 && (
                     <span className={styles.rowDevices}>
-                      {s.devices.map((d) => d.label.replace(/\s*\(.*\)$/, '')).join(' + ')}
+                      {s.devices.map((d) => t(d.label).replace(/\s*[(（].*[)）]$/, '')).join(' + ')}
                     </span>
                   )}
                 </span>
-                <span className={styles.rowDesc}>{s.desc}</span>
+                <span className={styles.rowDesc}>{t(s.desc)}</span>
                 <span className={styles.rowSlug}>{s.slug}</span>
               </span>
               <span className={styles.rowArrow}>→</span>
@@ -221,22 +264,31 @@ export default function Landing() {
         </div>
 
         <p className={styles.tail} data-rv>
-          목록에 없는 새로운 이벤트를 구상하고 계신가요? 원하시는 진행 방식을{' '}
-          <button type="button" className={styles.link} onClick={openCustom}>
-            적어 보내 주시면
-          </button>{' '}
-          제작 가능 여부를 친절히 안내해 드립니다.
+          {withLink(
+            t(
+              '목록에 없는 새로운 이벤트를 구상하고 계신가요? 원하시는 진행 방식을 {link} 제작 가능 여부를 친절히 안내해 드립니다.'
+            ),
+            <button type="button" className={styles.link} onClick={openCustom}>
+              {t('적어 보내 주시면')}
+            </button>
+          )}
         </p>
 
         {/* ── 눌러 보기 ── */}
         <h2 className={styles.h2} data-rv>
-          여기서 바로 눌러 보기
+          {t('여기서 바로 눌러 보기')}
         </h2>
         <p className={styles.lead} data-rv>
           실제로 구동되는 페이지입니다. 현재 선택하신{' '}
           {/* 조사는 이름 끝 받침에 따라 갈린다 — 박아 두면 "포토카드 뽑기을" 이 된다 */}
-          <span className={styles.mk}>{service.name}</span>
-          {josa(service.name, '을', '를')} 직접 눌러 보세요.
+          {/*
+            * 조사는 이름 끝 받침에 따라 갈린다 — 박아 두면 "포토카드 뽑기을" 이 된다.
+            * 다른 언어엔 조사가 없으므로 `{josa}` 는 한국어에서만 값이 찬다.
+            */}
+          {withLink(
+            t('{link}{josa} 직접 눌러 보세요.', { josa: josa(service.name, '을', '를') }),
+            <span className={styles.mk}>{t(service.name)}</span>
+          )}
         </p>
 
         <div className={styles.stage} ref={stageRef} data-rv>
@@ -250,7 +302,7 @@ export default function Landing() {
                 data-on={s.key === cur || undefined}
                 onClick={() => setCur(s.key)}
               >
-                {s.name}
+                {t(s.name)}
               </button>
             ))}
           </div>
@@ -277,12 +329,12 @@ export default function Landing() {
                   >
                     {d.kind === 'overlay' && (
                       <div className={styles.backdrop} aria-hidden="true">
-                        영상 자리
+                        {t('영상 자리')}
                       </div>
                     )}
                     <iframe
                       src={d.path}
-                      title={`${service.name} — ${d.label}`}
+                      title={`${t(service.name)} — ${t(d.label)}`}
                       loading="lazy"
                       style={{
                         width: bw,
@@ -292,7 +344,7 @@ export default function Landing() {
                       }}
                     />
                   </div>
-                  <span className={styles.deviceLabel}>{d.label}</span>
+                  <span className={styles.deviceLabel}>{t(d.label)}</span>
                 </div>
               )
             })}
@@ -314,34 +366,33 @@ export default function Landing() {
             </p>
           )}
           <p className={styles.stageNote}>
-            체험용이므로 입력하신 내용은 저장되지 않습니다.{' '}
+            {t('체험용이므로 입력하신 내용은 저장되지 않습니다.')}{' '}
             {service.devices.length > 1 ? (
               <>
-                화면이 작아 불편하시다면 새 탭에서 직접 열어 보시길 추천합니다 —{' '}
+                {t('화면이 작아 불편하시다면 새 탭에서 직접 열어 보시길 추천합니다 —')}{' '}
                 {service.devices.map((d, i) => (
                   <Fragment key={d.path}>
                     {i > 0 && ' · '}
                     <a className={styles.link} href={d.path} target="_blank" rel="noreferrer">
-                      {d.label}
+                      {t(d.label)}
                     </a>
                   </Fragment>
                 ))}
               </>
             ) : (
-              <>
-                화면이 작아 불편하시다면{' '}
+              withLink(
+                t('화면이 작아 불편하시다면 {link}을 추천합니다.'),
                 <a className={styles.link} href={service.slug} target="_blank" rel="noreferrer">
-                  직접 열어 보시는 편
+                  {t('직접 열어 보시는 편')}
                 </a>
-                을 추천합니다.
-              </>
+              )
             )}
           </p>
         </div>
 
         {/* ── 진행 ── */}
         <h2 className={styles.h2} data-rv>
-          어떻게 진행되나
+          {t('어떻게 진행되나')}
         </h2>
         <div className={styles.steps}>
           {STEPS.map((p, i) => (
@@ -354,10 +405,10 @@ export default function Landing() {
                 className={`${styles.stepBody} ${i === STEPS.length - 1 ? styles.stepLast : ''}`}
               >
                 <div className={styles.stepHead}>
-                  <span className={styles.stepName}>{p.name}</span>
-                  {p.tag && <span className={styles.stepTag}>{p.tag}</span>}
+                  <span className={styles.stepName}>{t(p.name)}</span>
+                  {p.tag && <span className={styles.stepTag}>{t(p.tag)}</span>}
                 </div>
-                <p className={styles.stepDesc}>{p.desc}</p>
+                <p className={styles.stepDesc}>{t(p.desc)}</p>
               </div>
             </div>
           ))}
@@ -365,15 +416,15 @@ export default function Landing() {
 
         {/* ── 역할 ── */}
         <h2 className={styles.h2} data-rv>
-          누가 무엇을 하나
+          {t('누가 무엇을 하나')}
         </h2>
         <div data-rv>
           {/* 앞머리를 굵게 떼어 두 문단이 '나 / 주최자' 로 갈린다는 걸 눈으로 알게 한다 */}
           <p className={styles.p}>
-            <b>{ROLE_MINE.label}:</b> {ROLE_MINE.body}
+            <b>{t(ROLE_MINE.label)}:</b> {t(ROLE_MINE.body)}
           </p>
           <p className={`${styles.p} ${styles.pLast}`}>
-            <b>{ROLE_YOURS.label}:</b> {ROLE_YOURS.body}
+            <b>{t(ROLE_YOURS.label)}:</b> {t(ROLE_YOURS.body)}
           </p>
           <div className={styles.note}>
             <p className={styles.noteText}>{ROLE_NOTE}</p>
@@ -382,7 +433,7 @@ export default function Landing() {
 
         {/* ── 자주 묻는 것 ── */}
         <h2 className={styles.h2} data-rv>
-          자주 묻는 것
+          {t('자주 묻는 것')}
         </h2>
         <div className={styles.faq} data-rv>
           {FAQS.map((f, i) => (
@@ -393,28 +444,28 @@ export default function Landing() {
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 aria-expanded={openFaq === i}
               >
-                <span className={styles.faqQ}>{f.q}</span>
+                <span className={styles.faqQ}>{t(f.q)}</span>
                 <span className={styles.faqSign} aria-hidden="true">
                   {openFaq === i ? '−' : '+'}
                 </span>
               </button>
-              {openFaq === i && <p className={styles.faqA}>{f.a}</p>}
+              {openFaq === i && <p className={styles.faqA}>{t(f.a)}</p>}
             </div>
           ))}
         </div>
 
         {/* ── 문의 ── */}
         <h2 className={styles.h2} id="contact" data-rv>
-          문의
+          {t('문의')}
         </h2>
         <div data-rv>
           <p className={`${styles.p} ${styles.pLast}`}>
-            카카오톡 오픈채팅으로 문의를 받고 있습니다. 아래 버튼을 누르시면 원하시는 서비스를
-            선택할 수 있는 창이 열리며, 선택에 맞춰 문의 양식이 자동 생성됩니다. 생성된 양식을
-            복사하여 채팅방에 남겨주시면 금액과 일정을 안내해 드립니다.
+            {t(
+              '카카오톡 오픈채팅으로 문의를 받고 있습니다. 아래 버튼을 누르시면 원하시는 서비스를 선택할 수 있는 창이 열리며, 선택에 맞춰 문의 양식이 자동 생성됩니다. 생성된 양식을 복사하여 채팅방에 남겨주시면 금액과 일정을 안내해 드립니다.'
+            )}
           </p>
           <button type="button" className={styles.cta} onClick={openInquiry}>
-            문의하기
+            {t('문의하기')}
           </button>
         </div>
 

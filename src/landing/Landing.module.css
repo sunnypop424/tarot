@@ -610,3 +610,40 @@
     animation: none;
   }
 }
+
+/**
+ * 상단 오른쪽 묶음 — 'OLUCKY!' 와 언어 고르개.
+ *
+ * `.top` 은 `align-items: baseline` 이다(브랜드와 표기가 기준선으로 맞아야 한다). 그 줄에
+ * 36px 짜리 단추를 그냥 넣으면 **기준선에 맞춰져 혼자 아래로 내려간다.** 그래서 오른쪽 둘만
+ * 묶어 이 안에서 가운데 정렬한다 — 바깥 줄의 기준선 정렬은 건드리지 않는다.
+ */
+.topRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/**
+ * 언어 고르개를 **랜딩 팔레트로 덮는다.**
+ *
+ * `LangPicker` 는 앱의 색 토큰(`--color-*`)을 쓴다 — 슬롯마다 색이 갈아끼워지는 화면에서는
+ * 그게 맞다. 그런데 랜딩은 슬롯이 없어서 그 토큰이 `:root` 기본값(어두운 쪽)으로 떨어지고,
+ * 크림색 종이 위에 혼자 검은 알약이 앉는다. 여기서만 랜딩 색으로 다시 칠한다.
+ *
+ * **컴포넌트를 고치지 않는다** — 그러면 앱 쪽 색이 같이 흔들린다. 쓰는 자리에서 덮는다.
+ */
+.topRight :global(button) {
+  border-color: var(--line);
+  background: var(--paper);
+  color: var(--ink-mid);
+}
+.topRight :global(button:hover) {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+/* 펼침 목록도 같은 종이 위에 있다 */
+.topRight :global(ul) {
+  border-color: var(--line);
+  background: var(--paper);
+}

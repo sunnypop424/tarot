@@ -37,7 +37,7 @@ function walk(dir) {
 const stripComments = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
 
 /** 사전에 있는 문장들 — 방문자·주최자 사전을 합쳐 본다 */
-const dictSrc = ['src/i18n/en.ts', 'src/i18n/admin.en.ts', 'src/i18n/admin2.en.ts']
+const dictSrc = ['src/i18n/en.ts', 'src/i18n/admin.en.ts', 'src/i18n/admin2.en.ts', 'src/i18n/landing.en.ts']
   .map((p) => readFileSync(p, 'utf8'))
   .join('\n')
 const KEYS = [...dictSrc.matchAll(/^ {2}'([^']+)':/gm)].map((m) => m[1])
