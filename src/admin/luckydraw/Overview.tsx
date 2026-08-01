@@ -322,7 +322,7 @@ export function Overview() {
           <div className="ad-card__head" style={{ marginBottom: 6 }}>
             <div className="ad-card__titleRow">
               <span className="ad-card__title">{t('상품')}</span>
-              <span className="ad-card__num tnum">{rows.length}종</span>
+              <span className="ad-card__num tnum">{t('{n}종', { n: rows.length })}</span>
             </div>
             <div className="ad-btnrow">
               {/* 문의 양식·엑셀에서 그대로 옮겨 붙이는 자리 — 상품이 여덟 종이면 여덟 번 누르지 않는다 */}

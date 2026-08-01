@@ -211,4 +211,8 @@ export const LANDING_EN: Record<string, string> = {
     'Open the chat',
   '복사하신 양식을 채팅방에 그대로 붙여넣어 주시면 됩니다.':
     'Just paste the copied form into the chat room as it is.',
+
+  // ── 조각을 통문장으로 바꾼 자리 ────────────────────
+  '실제로 구동되는 페이지입니다. 현재 선택하신':
+    'These are live pages. Go ahead and try the',
 }

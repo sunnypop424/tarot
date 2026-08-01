@@ -423,7 +423,7 @@ function Staff({ slot }: { slot: Slot }) {
           */}
         <div className={styles.footRow}>
           <span className={styles.tally} data-tally>
-            오늘 이 기기 {log.count}회
+            {t('오늘 이 기기 {n}회', { n: log.count })}
           </span>
           {stock !== null && (
             <span className={styles.tally} data-stock>

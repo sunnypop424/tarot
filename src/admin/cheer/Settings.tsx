@@ -97,7 +97,7 @@ export function Settings() {
         <div className="ad-head__row">
           <h1 className="ad-head__title">{t('상영 설정')}</h1>
           <span className="ad-head__count tnum">
-            한 화면 {s.bubbles}개 · {s.intervalSec}초
+            {t('한 화면 {n}개 · {sec}초', { n: s.bubbles, sec: s.intervalSec })}
           </span>
         </div>
         <p className="ad-head__desc">

@@ -425,7 +425,8 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
                 onClick={() => setFont('')}
                 title={t('기본 글씨체')}
               >
-                {display.fontSample}
+                {/* 글씨체를 보여주는 게 목적인 견본 — 번역하면 그 글씨체의 한글 모양을 못 본다 */}
+                <span data-user-text>{display.fontSample}</span>
               </button>
               {HANDWRITING_FONTS.map((id) => (
                 <button
@@ -439,7 +440,7 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
                   onClick={() => setFont(id)}
                   title={WEBFONTS[id].label}
                 >
-                  {display.fontSample}
+                  <span data-user-text>{display.fontSample}</span>
                 </button>
               ))}
             </div>

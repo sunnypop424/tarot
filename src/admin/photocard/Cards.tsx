@@ -60,7 +60,7 @@ export function Cards() {
     <header className="ad-head">
       <div className="ad-head__row">
         <h1 className="ad-head__title">{t('카드')}</h1>
-        {rows && <span className="ad-head__count tnum">{rows.length}종</span>}
+        {rows && <span className="ad-head__count tnum">{t('{n}종', { n: rows.length })}</span>}
       </div>
       <p className="ad-head__desc">
         {t('카드마다 레어도와 재고를 정해요. 줄 안에서 바로 고칠 수 있어요.')}

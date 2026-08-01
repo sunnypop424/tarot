@@ -5,7 +5,7 @@ import type { RollingMessage } from '@/lib/repo'
 import { getSlotService } from '@/data/services'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
-import { useT } from '@/i18n'
+import { useT, useLocale } from '@/i18n'
 
 /**
  * **이 화면은 롤링페이퍼·소원나무·영상회 한마디가 같이 쓴다** (같은 테이블·같은 repo).
@@ -27,6 +27,7 @@ const COPY = {
  */
 export function Moderation() {
   const t = useT()
+  const loc = useLocale()
   const slot = useSlot()
   const slug = slot.slug
   const service = getSlotService(slot)
@@ -106,7 +107,7 @@ export function Moderation() {
             <div className="ad-card__titleRow">
               <span className="ad-card__title">{t('전체')}</span>
               <span className="ad-card__num tnum">
-                {list.length}개 · 숨김 {hiddenCount}개
+                {t('{a}개 · 숨김 {b}개', { a: list.length, b: hiddenCount })}
               </span>
             </div>
           </div>
@@ -153,7 +154,7 @@ export function Moderation() {
                         {m.nickname || t('익명')}
                       </span>
                       <span className="tnum" style={{ color: 'var(--ad-ink-4)' }}>
-                        {new Date(m.createdAt).toLocaleString('ko-KR')}
+                        {new Date(m.createdAt).toLocaleString(loc)}
                       </span>
                       {m.hidden && <span className="ad-tag ad-tag--sm">{t('숨김')}</span>}
                     </div>

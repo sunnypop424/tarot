@@ -474,4 +474,10 @@ export const EN: Record<string, string> = {
   '관리자': 'Admin',
   '남은 기회 {n}회': '{n} draws left',
   '아직 스탬프 칸이 준비되지 않았어요.': 'No stamp slots have been set up yet.',
+
+  // ── 조각을 통문장으로 바꾼 자리 ────────────────────
+  '결과 보기':
+    'See results',
+  '{total}장 중 {n}장 골랐어요':
+    'Picked {n} of {total}',
 }

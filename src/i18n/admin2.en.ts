@@ -586,4 +586,16 @@ export const ADMIN2_EN: Record<string, string> = {
     'A higher rarity number means it {em} — Legendary (5) is the rarest.',
   '확률은 {em} 기준이에요. 여러 장 뽑기의 묶음 상한과 뽑는 도중 재고가 떨어지는 건 안 셈에 넣었어요.':
     'The odds are {em}. Batch caps for multi-draws and stock running out mid-draw are not counted in.',
+
+  // ── 조각을 통문장으로 바꾼 자리 ────────────────────
+  '남긴 즉시 {place}에 보여요. 부적절한 것만 숨기거나 지워 주세요.':
+    'It appears on the {place} the moment it is posted. Hide or delete only what is inappropriate.',
+  '응모자 {n}명 · 남은 후보 {left}명':
+    '{n} entrants · {left} still eligible',
+  '남은 후보 {pool}명 중에서 {n}명을 뽑아요. 뽑힌 사람은 후보에서 빠지고, 회차 단위로만 되돌릴 수 있어요.':
+    'Draw {n} from the {pool} still eligible. Those drawn leave the pool, and it can only be undone a whole round at a time.',
+  '한 화면 {n}개 · {sec}초':
+    '{n} per screen · {sec}s',
+  '보기 {a}개 · 정답 {b}개':
+    '{a} options · {b} answers',
 }

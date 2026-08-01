@@ -337,7 +337,10 @@ export function Questions() {
                       <span>
                         {q.kind === 'choice' ? t('객관식') : t('주관식')} · {q.points}점 ·{' '}
                         {q.kind === 'choice'
-                          ? `보기 ${q.choices.length}개 · 정답 ${q.answers.length}개`
+                          ? t('보기 {a}개 · 정답 {b}개', {
+                              a: q.choices.length,
+                              b: q.answers.length,
+                            })
                           : `인정 답 ${q.answers.length}개`}
                       </span>
                       {q.answers.length === 0 && (

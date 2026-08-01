@@ -45,7 +45,10 @@ export function Picker() {
         <h1 className="ad-head__title">{t('추첨')}</h1>
         {list && (
           <span className="ad-head__count tnum">
-            응모자 {list.length}명 · 남은 후보 {list.filter((e) => !e.won).length}명
+            {t('응모자 {n}명 · 남은 후보 {left}명', {
+              n: list.length,
+              left: list.filter((e) => !e.won).length,
+            })}
           </span>
         )}
       </div>
@@ -83,7 +86,10 @@ export function Picker() {
     if (busy || !canDraw) return
     const ok = await confirmAction({
       title: `지금 ${picking}명을 뽑을까요?`,
-      desc: `남은 후보 ${pool.length}명 중에서 ${picking}명을 뽑아요. 뽑힌 사람은 후보에서 빠지고, 회차 단위로만 되돌릴 수 있어요.`,
+      desc: t(
+        '남은 후보 {pool}명 중에서 {n}명을 뽑아요. 뽑힌 사람은 후보에서 빠지고, 회차 단위로만 되돌릴 수 있어요.',
+        { pool: pool.length, n: picking }
+      ),
       okLabel: `${picking}명 뽑기`,
     })
     if (!ok) return

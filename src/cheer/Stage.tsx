@@ -274,7 +274,9 @@ function Bubble({
     return (
       <div className={styles.chipBar} style={style}>
         <span className={styles.chip}>{name || t('한마디')}</span>
-        <span className={styles.chipBody}>{message.body}</span>
+        <span className={styles.chipBody} data-user-text>
+          <span data-user-text>{message.body}</span>
+        </span>
       </div>
     )
   if (shape === 'solidBar')
@@ -291,7 +293,9 @@ function Bubble({
        * `border` + `clip-path` 로는 잘려 나간 쪽(꼬리)에 선이 안 남는다 (clip 이 테두리째 자른다).
        */
       <div className={styles.banner} style={style}>
-        <span className={styles.bannerBody}>{message.body}</span>
+        <span className={styles.bannerBody} data-user-text>
+          {message.body}
+        </span>
       </div>
     )
   if (shape === 'burst')
