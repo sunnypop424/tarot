@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { useCallback, useEffect, useState } from 'react'
 
 import { repo } from '@/lib/repo'
@@ -18,6 +19,23 @@ import { useT } from '@/i18n'
  *
  * 재고는 행사 도중 실제로 손대는 값이다(실물이 더 왔거나, 상한 카드가 남았거나).
  */
+/**
+ * **문장 한가운데를 굵게** — 통문장 키에 `{em}` 자리를 두고 그 자리만 `<b>` 로 바꾼다.
+ *
+ * 조각을 셋으로 갈라 각각 `t()` 하던 자리가 있었는데, 어순이 다른 언어에서 순서가
+ * 뒤집혀 읽을 수 없는 문장이 됐다. **어디를 강조하는지는 사전이 정한다.**
+ */
+function emphasize(text: string, em: string): ReactNode {
+  const [before, after = ''] = text.split('{em}')
+  return (
+    <>
+      {before}
+      <b>{em}</b>
+      {after}
+    </>
+  )
+}
+
 export function Cards() {
   const t = useT()
   const slot = useSlot()
@@ -277,11 +295,24 @@ export function Cards() {
             <div className="ad-bullets">
               <div className="ad-bullet">{t('재고를 비우면 무제한이에요.')}</div>
               <div className="ad-bullet">{t('0이면 그 카드는 더 나오지 않아요.')}</div>
-              <div className="ad-bullet">{t('레어도 숫자가')}<b>{t('클수록 덜')}</b>{t('나와요 — 전설(5)이 가장 귀해요.')}</div>
+              {/*
+                * 조각내지 않는다 — 셋으로 갈라 두었더니 어순이 다른 언어에서 순서가 뒤집혔다.
+                * 통문장을 키로 두고 강조할 부분만 `{em}` 자리로 넘긴다.
+                */}
+              <div className="ad-bullet">
+                {emphasize(
+                  t('레어도 숫자가 {em} 나와요 — 전설(5)이 가장 귀해요.'),
+                  t('클수록 덜')
+                )}
+              </div>
               <div className="ad-bullet">{t('재고는 나올지 말지만 정하고 확률은 건드리지 않아요.')}</div>
               <div className="ad-bullet">
-                확률은 <b>{t('한 번 뽑을 때')}</b> 기준이에요. 여러 장 뽑기의 묶음 상한과 뽑는 도중
-                재고가 떨어지는 건 안 셈에 넣었어요.
+                {emphasize(
+                  t(
+                    '확률은 {em} 기준이에요. 여러 장 뽑기의 묶음 상한과 뽑는 도중 재고가 떨어지는 건 안 셈에 넣었어요.'
+                  ),
+                  t('한 번 뽑을 때')
+                )}
               </div>
               <div className="ad-bullet">
                 {t('럭키는 스태프 화면 라인업에 별이 붙는 표시일 뿐, 확률이 아니에요.')}

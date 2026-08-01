@@ -826,22 +826,32 @@
   flex-direction: column;
   gap: 10px;
 }
+/**
+ * 불릿 한 줄 — **flex 가 아니라 block 이다.**
+ *
+ * flex 였을 때 안의 `<b>` 가 flex 아이템이 되어 자기 줄을 차지했다. flex 자식은
+ * `display: inline` 을 줘도 **강제로 blockify** 되므로(CSS 사양) 그 방향으로는 못 고친다.
+ * 한국어는 강조가 짧아("한 번 뽑을 때") 눈에 안 띄었지만, 영어("per single draw")는
+ * 37px 상자에 세 줄로 접혀 문장이 읽히지 않았다.
+ *
+ * 점은 `::before` 를 절대 배치로 찍고, 글자는 그냥 흐르게 둔다.
+ */
 .ad-bullet {
-  display: flex;
-  gap: 9px;
-  align-items: flex-start;
+  position: relative;
+  padding-left: 14px;
   font-size: 13px;
   color: var(--ad-ink-2);
   line-height: 1.7;
 }
 .ad-bullet::before {
   content: '';
-  flex-shrink: 0;
+  position: absolute;
+  left: 0;
+  top: 8px;
   width: 5px;
   height: 5px;
   border-radius: var(--radius-full);
   background: var(--ad-key);
-  margin-top: 8px;
 }
 /* 목록 전체에 걸리는 규칙 상자 */
 .ad-rules {
@@ -1769,13 +1779,24 @@
   text-align: center;
 }
 /* 등수 (럭키드로우 상품 표) — 1등만 강조색 */
+/**
+ * 등수 뱃지 — **폭을 고정하지 않는다.**
+ *
+ * `width: 34px` 이었는데 한국어 "1등"(2자)에 맞춘 값이라, 다른 언어에서 글자가 그 안에서
+ * 두 줄로 접혀 뱃지 밖으로 삐져나왔다 ("Rank 2" · "第 3 名"). 넘침이 아니라 줄바꿈이라
+ * 눈으로 보기 전엔 안 잡혔다 (`scripts/verify-i18n-fit.mjs` 가 이제 잰다).
+ *
+ * 최소 폭만 두고 여백으로 늘어나게 하고, `nowrap` 으로 접히지 않게 못박는다.
+ */
 .ad-rank {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 34px;
+  min-width: 34px;
   height: 24px;
+  padding: 0 8px;
+  white-space: nowrap;
   border-radius: var(--radius-full);
   background: var(--ad-mute-bg);
   color: var(--ad-ink-3);

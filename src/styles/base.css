@@ -97,3 +97,20 @@ body {
   white-space: nowrap;
   border: 0;
 }
+
+/**
+ * **`word-break: keep-all` 은 한국어 전용 규칙이다.**
+ *
+ * 한국어에서는 어절이 통째로 넘어가야 읽기 좋아서 60곳에 걸어 두었다. 그런데 그게 모든
+ * 언어에 적용돼서, 영어의 긴 카드 이름("The Hanged Man")이 좁은 타일에서 세 줄로 접히고
+ * 일본어 안내문이 상자를 34px 넘쳤다 — 쪼갤 자리가 있는데 안 쪼갠 것이다.
+ *
+ * `<html lang>` 은 `LangProvider` 가 고른 언어로 맞춰 둔다(`src/i18n/index.tsx`).
+ * 그래서 **한국어가 아닐 때만 되돌리면** 60곳을 하나하나 고칠 필요가 없다.
+ *
+ * `!important` 를 쓰는 이유: CSS 모듈의 규칙이 뒤에 오고 특정성도 높아, 여기서
+ * 이기려면 이 방법뿐이다. 언어에 따른 조판 규칙이라 예외로 둘 만하다.
+ */
+:root:not(:lang(ko)) * {
+  word-break: normal !important;
+}

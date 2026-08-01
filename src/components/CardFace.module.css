@@ -29,9 +29,20 @@
   letter-spacing: 0.08em;
 }
 
+/**
+ * 카드 이름 — **긴 이름은 글자를 줄여 담는다.**
+ *
+ * 카드 앞면은 크기가 고정이라 이름 길이에 따라 줄 수가 달라진다. 한국어는 "매달린 사람"
+ * 처럼 짧지만 영어는 "The Hanged Man" 이라 세 줄이 되고, 그러면 숫자·역방향 배지와
+ * 겹쳐 보인다. `clamp` 로 좁은 카드에서만 작아지게 둔다 — 넓은 화면에선 원래 크기다.
+ *
+ * `word-break: keep-all` 은 한국어일 때만 산다 (`base.css` 의 `:lang(ko)` 규칙).
+ */
 .name {
   color: var(--color-accent);
   word-break: keep-all;
+  font-size: clamp(13px, 3.4vw, var(--text-l));
+  line-height: 1.25;
 }
 
 .nameEn {

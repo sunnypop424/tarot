@@ -88,10 +88,10 @@ export const ADMIN2_EN: Record<string, string> = {
   // ── 포토카드 ──────────────────────────────────────
   '레어도': 'Rarity',
   '레어도 숫자가': 'A higher rarity number means it',
-  '클수록 덜': 'appears less',
+  '클수록 덜': 'appears less often',
   '나와요 — 전설(5)이 가장 귀해요.': ' — Legendary (5) is the rarest.',
   '나올 확률': 'Chance',
-  '한 번 뽑을 때': 'per draw',
+  '한 번 뽑을 때': 'per single draw',
   '럭키': 'Lucky',
   '✓ 럭키': '✓ Lucky',
   '재고': 'Stock',
@@ -582,4 +582,8 @@ export const ADMIN2_EN: Record<string, string> = {
     'Compositing finishes on the visitor’s phone and the result stays on that device. So there is no photo for the organiser to view or delete. If a visitor asks, this is the answer.',
   '확정이면 방문자 폰에 교환코드가 뜨고, 스태프가 ‘수령 확인’ 에서 처리해요.':
     'With a guaranteed gift, a code appears on the visitor’s phone and staff process it under Check-in.',
+  '레어도 숫자가 {em} 나와요 — 전설(5)이 가장 귀해요.':
+    'A higher rarity number means it {em} — Legendary (5) is the rarest.',
+  '확률은 {em} 기준이에요. 여러 장 뽑기의 묶음 상한과 뽑는 도중 재고가 떨어지는 건 안 셈에 넣었어요.':
+    'The odds are {em}. Batch caps for multi-draws and stock running out mid-draw are not counted in.',
 }
