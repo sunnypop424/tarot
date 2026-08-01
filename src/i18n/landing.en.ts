@@ -175,4 +175,40 @@ export const LANDING_EN: Record<string, string> = {
     'Enquiries come through KakaoTalk Open Chat. Press the button below and a window opens where you pick the services you want; a form is generated to match. Copy it into the chat room and I will come back with pricing and a schedule.',
   '현재 10가지의 이벤트 페이지가 준비되어 있습니다. 항목을 누르시면 아래 목업 화면에서 페이지가 바로 실행됩니다. 체험용이므로 마음껏 눌러보셔도 서버에 기록이 남지 않으니 안심하셔도 됩니다.':
     'Ten event pages are ready to try. Tap one and it runs right away in the mock-up below. These are demos, so press whatever you like — nothing is recorded on the server.',
+
+  // ── 문의 창 (양식 본문은 한국어로 둔다 — 머리말 참조) ──
+  '닫기':
+    'Close',
+  '카카오톡 오픈채팅으로 문의를 받고 있습니다':
+    'Enquiries come through KakaoTalk Open Chat',
+  '오픈채팅방 닉네임을 [{rule}] 형식으로 설정해 주세요. (예: {example})':
+    'Set your Open Chat nickname in the form [{rule}] — event dates / the name being celebrated. Keep it in Korean so it reads in the chat room. (e.g. {example})',
+  '원하시는 서비스(또는 주문 제작)를 선택하신 후, 하단의 양식을 복사해 주세요.':
+    'Pick the services you want (or a custom build), then copy the form below.',
+  '복사한 양식을 채팅방에 붙여넣고 내용을 채워 보내주시면, 일정과 견적을 안내해 드립니다.':
+    'Paste the form into the chat room, fill it in and send it, and I will come back with a schedule and a quote.',
+  '긴급 작업 여부는 [자료 전달 예정일]과 [시연/검수 희망일] 사이의 기간을 기준으로 산정됩니다.':
+    'Whether the job counts as rush work is judged by the gap between [when you send materials] and [your preferred review date].',
+  '검수일에 완성된 사이트를 전달해 드립니다. 그날 처음 보시고 수정 사항을 말씀해 주시는 흐름이라, 고칠 시간이 남도록 검수일은 행사일보다 여유 있게 잡아 주시는 편을 권해 드립니다.':
+    'I hand over the finished site on the review date. You see it for the first time that day and tell me what to change, so please set the review date comfortably before the event, leaving room for those changes.',
+  '양식은 한국어로 만들어져요 — 채우지 않고 그대로 보내주셔도 괜찮습니다.':
+    'The form itself is generated in Korean — sending it as is, unfilled, is fine too.',
+  '문의할 서비스':
+    'Services to ask about',
+  '중복 선택이 가능합니다':
+    'you can pick more than one',
+  '보낼 양식':
+    'The form to send',
+  '{n}개 항목':
+    '{n} items',
+  '아직 구체적으로 정하지 못하셨어도 괜찮습니다.':
+    'It is fine if you have not settled on the details yet.',
+  '양식 복사하기':
+    'Copy the form',
+  '복사되었습니다':
+    'Copied',
+  '오픈채팅 열기':
+    'Open the chat',
+  '복사하신 양식을 채팅방에 그대로 붙여넣어 주시면 됩니다.':
+    'Just paste the copied form into the chat room as it is.',
 }
