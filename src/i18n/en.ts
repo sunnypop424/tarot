@@ -467,4 +467,8 @@ export const EN: Record<string, string> = {
   // ── 도감 · 없는 페이지 ──────────────────────────
   '도감으로': 'Back to the index',
   '주소를 다시 확인해 주세요. 카페에 비치된 QR로 들어오시면 돼요.': 'Please check the address again. Scanning the QR code at the cafe will get you there.',
+
+  // ── 남은 자리 ───────────────────────────────────
+  '섞기': 'Shuffle',
+  '실시간 갱신 중': 'Updating live',
 }

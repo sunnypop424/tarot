@@ -269,7 +269,7 @@ function PollView({
           !poll.closed && (
             <span className={styles.livePill}>
               <span className={styles.liveDot} aria-hidden="true" />
-              실시간 갱신 중
+              {t('실시간 갱신 중')}
             </span>
           )
         ) : (

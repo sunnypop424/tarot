@@ -106,8 +106,9 @@ export function Shipping() {
         <div className="ad-banner ad-banner--warn ad-banner--pad">
           <div className="ad-banner__title">{t('배송이 끝나면 반드시 지워 주세요')}</div>
           <div className="ad-banner__body">
-            이름·연락처·주소가 그대로 들어 있는 화면이에요. 마감 +14일까지만 열람할 수 있고, +15일이
-            지나면 저절로 지워져요.
+            {t(
+              '이름·연락처·주소가 그대로 들어 있는 화면이에요. 마감 +14일까지만 열람할 수 있고, +15일이 지나면 저절로 지워져요.'
+            )}
           </div>
         </div>
 
@@ -193,7 +194,7 @@ export function Shipping() {
                   disabled={busy}
                   onClick={() => void clearAll()}
                 >
-                  전체 지우기
+                  {t('전체 지우기')}
                 </button>
               </div>
             </>

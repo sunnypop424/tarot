@@ -510,7 +510,7 @@ function Deck({
             data-shuffle-btn
           >
             <Shuffle size={15} strokeWidth={1.9} aria-hidden="true" />
-            섞기
+            {t('섞기')}
           </button>
           {kept > 0 && (
             <button type="button" onClick={onLocker} data-open-locker>

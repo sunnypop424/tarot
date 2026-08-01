@@ -487,4 +487,15 @@ export const ADMIN2_EN: Record<string, string> = {
   '배송이 필요한 상품에 당첨된 방문자가 주소를 넣으면 여기에 쌓여요.': 'When a winner of a prize that needs shipping enters an address, it appears here.',
   '방문자가 조건을 채우면 교환코드가 발급되고 여기 한 줄씩 쌓여요.': 'When a visitor meets the conditions, a code is issued and appears here as a row.',
   '한 번 처리한 코드는 다시 쓸 수 없어요.': 'A code that has been processed cannot be used again.',
+
+  // ── 남은 자리 ───────────────────────────────────
+  '남긴 쪽지': 'Notes left',
+  '남긴 소원': 'Wishes left',
+  '남긴 한마디': 'Messages left',
+  '실시간': 'Live',
+  '전체 지우기': 'Delete all',
+  '{what} 여러 개 붙여넣기': 'Paste several {what} at once',
+  '방문자 폰에 뜬 코드를 그대로 입력하세요. 소문자·하이픈·공백은 알아서 맞춰져요.': 'Type the code shown on the visitor’s phone. Lower case, hyphens and spaces are handled for you.',
+  '방문자 이름은 여기 안 나와요 — 카운터 화면은 계속 켜져 있으니까요. 응모하신 분들의 정보는 ‘응모자’ 화면에서 보실 수 있어요.': 'Visitor names are not shown here — this counter screen stays on all day. You can see entrants’ details on the Entrants screen.',
+  '이름·연락처·주소가 그대로 들어 있는 화면이에요. 마감 +14일까지만 열람할 수 있고, +15일이 지나면 저절로 지워져요.': 'This screen holds names, phone numbers and addresses as entered. You can view it until 14 days after the event ends; on day 15 it is deleted automatically.',
 }

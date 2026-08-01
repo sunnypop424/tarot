@@ -71,7 +71,7 @@ export function Live() {
         <div className={styles.headRight}>
           <span className={styles.livePill}>
             <span className={styles.dot} aria-hidden="true" />
-            실시간
+            {t('실시간')}
           </span>
           {display.showCount && <span className={styles.total}>{t('{n}표', { n: sum.toLocaleString(loc) })}</span>}
         </div>

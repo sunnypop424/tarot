@@ -169,7 +169,7 @@ export function Redeem() {
         <form className="ad-card ad-card--form" onSubmit={(e) => void ask(e)} data-redeem-form>
           <div className="ad-card__title ad-card__title--lg">{t('코드 확인하고 수령 처리')}</div>
           <p className="ad-card__desc">
-            방문자 폰에 뜬 코드를 그대로 입력하세요. 소문자·하이픈·공백은 알아서 맞춰져요.
+            {t('방문자 폰에 뜬 코드를 그대로 입력하세요. 소문자·하이픈·공백은 알아서 맞춰져요.')}
           </p>
 
           <div className="ad-inline" style={{ marginTop: 16 }}>
@@ -250,8 +250,9 @@ export function Redeem() {
             </div>
           </div>
           <p className="ad-fine" style={{ marginBottom: 14 }}>
-            방문자 이름은 여기 안 나와요 — 카운터 화면은 계속 켜져 있으니까요. 응모하신 분들의 정보는
-            ‘응모자’ 화면에서 보실 수 있어요.
+            {t(
+              '방문자 이름은 여기 안 나와요 — 카운터 화면은 계속 켜져 있으니까요. 응모하신 분들의 정보는 ‘응모자’ 화면에서 보실 수 있어요.'
+            )}
           </p>
 
           {!rows ? (

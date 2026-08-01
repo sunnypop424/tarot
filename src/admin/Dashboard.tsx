@@ -476,11 +476,11 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
   },
   async rolling(slug) {
     const all = await repo.rolling.listAll(slug)
-    return messageStats(all, '쪽지')
+    return messageStats(all, '남긴 쪽지')
   },
   async wish(slug) {
     const all = await repo.rolling.listAll(slug)
-    return messageStats(all, '소원')
+    return messageStats(all, '남긴 소원')
   },
   // 서버에 쌓이는 게 없다 — 사진은 방문자 폰에서 합성되고 올라오지 않는다
   async photozone() {
@@ -538,7 +538,7 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
   },
   // 한마디는 롤페 테이블에 산다 — 세는 코드도 같다
   async cheer(slug) {
-    return messageStats(await repo.rolling.listAll(slug), '한마디')
+    return messageStats(await repo.rolling.listAll(slug), '남긴 한마디')
   },
   async photocard(slug) {
     if (!repo.photocard.ready()) return []
@@ -568,11 +568,19 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
   },
 }
 
-function messageStats(all: { hidden?: boolean; createdAt: string }[], unit: string): Stat[] {
+/**
+ * 쪽지·소원·한마디의 공통 통계.
+ *
+ * **낱말을 문장에 끼워 넣지 않는다.** 한때 `ph('남긴 {what}', { what: '쪽지' })` 였는데,
+ * `{what}` 에 들어간 한국어는 사전을 통과하지 않아 영어 화면에 **"쪽지 left"** 로 나왔다 —
+ * 문장을 조각내면 안 된다는 이 작업의 교훈을 그대로 다시 밟은 자리다.
+ * 완성된 문장을 **키째로** 받는다.
+ */
+function messageStats(all: { hidden?: boolean; createdAt: string }[], label: string): Stat[] {
   const today = new Date().toISOString().slice(0, 10)
   return [
     {
-      label: ph('남긴 {what}', { what: unit }),
+      label,
       value: n(all.filter((m) => !m.hidden).length),
       unit: '개',
       note: '숨김 제외',

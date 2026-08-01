@@ -85,7 +85,8 @@ export function BulkPaste<T>({
   return (
     <div className="ad-bulk" data-bulk>
       <div className="ad-bulk__head">
-        <span className="ad-bulk__title">{label} 여러 개 붙여넣기</span>
+        {/* 낱말을 끼워 넣지 않는다 — 그러면 영어 화면에 "선택지 Paste several" 처럼 반쪽이 남는다 */}
+        <span className="ad-bulk__title">{t('{what} 여러 개 붙여넣기', { what: label })}</span>
         <button
           type="button"
           className="ad-x"

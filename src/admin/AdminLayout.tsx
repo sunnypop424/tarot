@@ -284,7 +284,7 @@ function AdminShell() {
               onClick={() => void handleSignOut()}
               data-signout
             >
-              로그아웃
+              {t('로그아웃')}
             </button>
           </div>
         </div>

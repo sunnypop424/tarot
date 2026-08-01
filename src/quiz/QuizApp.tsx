@@ -325,7 +325,7 @@ function Start({
           <div className={styles.facts}>
             <div className={styles.fact}>
               <div className={styles.factLabel}>{t('문항 수')}</div>
-              <div className={`${styles.factValue} ${styles.tnum}`}>{count}문항</div>
+              <div className={`${styles.factValue} ${styles.tnum}`}>{t('{n}문항', { n: count })}</div>
             </div>
             <div className={styles.fact}>
               <div className={styles.factLabel}>{t('제한시간')}</div>
