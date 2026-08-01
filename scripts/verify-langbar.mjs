@@ -26,23 +26,43 @@ const CHROME = [
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
 ]
 
-/** 볼 화면 — 고르개가 붙는 자리가 서로 다른 것들만 고른다 */
+/**
+ * 볼 화면 — **서비스별로 묶는다.**
+ *
+ * 예전엔 서비스마다 첫 화면 하나씩만 봤다. 그런데 방문자는 첫 화면에서 끝나지 않는다 —
+ * 벽에서 쓰기로, 나무에서 소원 적기로, 도감에서 카드 상세로 넘어간다. 그 **다음 화면들이
+ * 각자 다른 헤더를 갖고 있어서**, 넘어갈 때마다 고르개가 위아래로 몇 px 씩 튀었다
+ * (롤페는 벽 24 → 쓰기 12 였다). 화면 하나만 보면 다 정상이라 안 잡힌다.
+ *
+ * 그래서 첫 칸이 **서비스 이름**이다 — 같은 이름끼리 자리가 같은지 아래에서 견줘 본다.
+ */
 const PAGES = [
-  ['랜딩', '/'],
-  ['타로 · 홈', '/demo-tarot'],
-  ['타로 · 도감', '/demo-tarot/cards'],
-  ['럭키드로우', '/demo-luckydraw'],
-  ['롤링페이퍼', '/demo-rolling'],
-  ['롤링페이퍼 · 쓰기', '/demo-rolling/write'],
-  ['소원나무 · 쓰기', '/demo-wish/write'],
-  ['포토존', '/demo-photozone'],
-  ['실시간 투표', '/demo-poll'],
-  ['방문 스탬프', '/demo-stamp'],
-  ['최애 모의고사', '/demo-quiz'],
-  ['포토카드', '/demo-photocard'],
-  ['영상회 응원', '/demo-cheer'],
-  ['관리 · 대시보드', '/demo-tarot/admin'],
-  ['관리 · 로그인', '/demo-tarot/admin/login'],
+  ['랜딩', '랜딩', '/'],
+  ['타로', '타로 · 홈', '/demo-tarot'],
+  ['타로', '타로 · 운세', '/demo-tarot/fortune'],
+  ['타로', '타로 · 도감', '/demo-tarot/cards'],
+  ['타로', '타로 · 카드', '/demo-tarot/cards/major-0'],
+  ['타로', '타로 · 뽑기', '/demo-tarot/draw/today'],
+  ['럭키드로우', '럭키드로우', '/demo-luckydraw'],
+  ['롤링페이퍼', '롤링페이퍼 · 벽', '/demo-rolling'],
+  ['롤링페이퍼', '롤링페이퍼 · 쓰기', '/demo-rolling/write'],
+  ['소원나무', '소원나무 · 나무', '/demo-wish'],
+  ['소원나무', '소원나무 · 쓰기', '/demo-wish/write'],
+  ['포토존', '포토존', '/demo-photozone'],
+  ['실시간 투표', '실시간 투표', '/demo-poll'],
+  ['방문 스탬프', '방문 스탬프', '/demo-stamp'],
+  ['최애 모의고사', '최애 모의고사', '/demo-quiz'],
+  ['포토카드', '포토카드', '/demo-photocard'],
+  ['포토카드 판매', '포토카드 판매', '/demo-photocard-sale'],
+  ['영상회 응원', '영상회 응원', '/demo-cheer'],
+  ['관리', '관리 · 대시보드', '/demo-tarot/admin'],
+  ['관리', '관리 · 질문', '/demo-tarot/admin/questions'],
+  /**
+   * 로그인만 묶음을 따로 둔다 — **셸이 없는 화면**이라서다. 대시보드는 좌우 여백을 가진
+   * 관리 셸 안이라 고르개가 안쪽(옆 110)에 앉고, 로그인은 셸 없이 카드 하나만 뜬다.
+   * 같은 자리를 요구하면 로그인 화면을 억지로 망가뜨리게 된다.
+   */
+  ['관리 로그인', '관리 · 로그인', '/demo-tarot/admin/login'],
 ]
 
 const executablePath = CHROME.find((p) => existsSync(p))
@@ -50,6 +70,9 @@ if (!executablePath) {
   console.error('크롬을 못 찾았어요')
   process.exit(1)
 }
+
+/** 서비스 → 그 서비스 화면들의 고르개 자리 (아래 ② 에서 견준다) */
+const seats = {}
 
 let failed = 0
 const bad = (label, note) => {
@@ -75,7 +98,7 @@ await page.evaluate(() => localStorage.setItem('tarot-pocket:lang', 'en'))
 
 for (const width of WIDTHS) {
   await page.setViewport({ width, height: 900 })
-  for (const [label0, path] of PAGES) {
+  for (const [svc, label0, path] of PAGES) {
   const label = `${label0} @${width}`
   try {
     await page.goto(`${BASE}${path}`, { waitUntil: 'networkidle0', timeout: 20000 })
@@ -196,7 +219,31 @@ for (const width of WIDTHS) {
 
   if (notes.length) bad(label, notes.join(' · '))
   else console.log(`✓ ${label} — (${g.x},${g.y}) ${g.w}×${g.h}`)
+  // 서비스 안에서 자리가 흔들리는지 보려고 남겨 둔다 (아래 ②)
+  ;(seats[`${svc} @${width}`] ??= []).push({ label: label0, top: g.y, right: g.vw - g.right })
   }
+}
+
+/**
+ * ② **같은 서비스 안에서 자리가 흔들리나.**
+ *
+ * 위까지는 화면 하나하나가 멀쩡한지만 봤다. 그런데 방문자는 화면을 **넘어다닌다** —
+ * 벽에서 쓰기로 가는 순간 고르개가 12px 튀어 올라도, 두 화면 다 "잘리지 않고 안 겹치니"
+ * 전부 통과였다. 자리가 틀린 게 아니라 **자리가 안 맞는** 것이라 화면 하나로는 못 잡는다.
+ *
+ * 그래서 서비스별로 모아 위·오른쪽 여백을 견준다. 헤더 생김새가 서비스마다 다른 건
+ * 괜찮다(포토카드는 위 여백이 44px 다) — 같은 서비스 **안에서** 같으면 된다.
+ */
+for (const [key, list] of Object.entries(seats)) {
+  if (list.length < 2) continue
+  const tops = new Set(list.map((s) => s.top))
+  const rights = new Set(list.map((s) => s.right))
+  if (tops.size === 1 && rights.size === 1) {
+    console.log(`✓ ${key} — 화면 ${list.length}개가 같은 자리 (위 ${list[0].top} · 옆 ${list[0].right})`)
+    continue
+  }
+  const detail = list.map((s) => `${s.label} 위${s.top}·옆${s.right}`).join(' / ')
+  bad(key, `화면끼리 자리가 달라요 — ${detail}`)
 }
 
 await browser.close()

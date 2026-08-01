@@ -372,8 +372,26 @@
   right: var(--svc-lang-right, 20px);
   z-index: 2;
 }
-/* 제목이 고르개 아래로 파고들지 않게 자리를 비운다 (고르개 폭 62 + 여백) */
-:where(header):has(> .svc-lang) {
+/**
+ * 제목·버튼이 고르개 아래로 파고들지 않게 자리를 비운다 (고르개 폭 62 + 여백).
+ *
+ * **`:where()` 로 감싸면 안 된다.** `:where()` 는 특이도를 0 으로 만들어서,
+ * 서비스 모듈의 `.head { padding: … }` **축약 한 줄이 이 `padding-right` 를 통째로 지운다.**
+ * 그러면 자리가 안 비워지고, 헤더 오른쪽 끝에 있는 데스크톱 CTA 위에 고르개가 올라앉는다
+ * (소원나무 '소원 걸기' · 롤링페이퍼 '남기기' 가 넓은 화면에서 실제로 그랬다 —
+ * `scripts/verify-langbar.mjs` 가 잡았다).
+ *
+ * `header` 를 그냥 두면 특이도가 0,1,1 이라 `.head`(0,1,0)를 이긴다.
+ */
+header:has(> .svc-lang) {
   position: relative;
-  padding-right: 74px;
+  /**
+   * 비울 폭 = **고르개가 화면 끝에서 떨어진 만큼 + 고르개 폭(62) + 사이 여백.**
+   *
+   * 예전엔 `74px`(62+12)이었다 — 고르개가 오른쪽 끝에서 20px 안쪽에 앉는다는 걸 빼먹어서,
+   * 헤더 오른쪽 끝 버튼이 고르개 안으로 8px 파고들었다. 잘리지도 겹쳐 보이지도 않을 만큼만
+   * 물려서 눈으로는 못 잡고, `scripts/verify-langbar.mjs` 의 사각형 겹침 검사가 찾았다.
+   */
+  --svc-lang-gutter: calc(var(--svc-lang-right, 20px) + 62px + var(--space-md));
+  padding-right: var(--svc-lang-gutter);
 }

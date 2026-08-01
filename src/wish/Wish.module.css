@@ -524,7 +524,9 @@
    * `1` 로는 안 된다 — `.app__scroll`(layout.css)이 이미 `z-index: 1` 이라 비기면 뒤가 이긴다.
    */
   z-index: 2;
-  padding: var(--space-lg) 18px 0;
+  /* 좌우는 나무 화면 헤더와 같은 `--layout-pad`(20) — 18 이면 나무에서 소원 적기로
+     넘어갈 때 고르개가 2px 옆으로 튄다 (`scripts/verify-langbar.mjs` 의 ②) */
+  padding: var(--space-lg) var(--layout-pad) 0;
   display: flex;
   align-items: center;
   gap: 10px;

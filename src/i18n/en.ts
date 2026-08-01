@@ -176,6 +176,7 @@ export const EN: Record<string, string> = {
   '이 표현은 남길 수 없어요': "That wording isn't allowed",
   '첫 메시지를 남겨 보세요': 'Be the first to leave a message',
   '아직 걸린 소원이 없어요': 'No wishes yet',
+  '지금까지 걸린 소원 {n}': '{n} wishes so far',
   '첫 소원을 걸어 보세요.': 'Be the first to hang one.',
   '아직 한마디가 없어요': 'No messages yet',
   '아직 한마디가 없어요 — QR 로 들어와 남기면 여기에 떠요':

@@ -103,7 +103,22 @@ const HANGUL = /[\uac00-\ud7a3]/
 
 const browser = await puppeteer.launch({ executablePath: exe, headless: 'new', args: ['--no-sandbox'] })
 const page = await browser.newPage()
-await page.setViewport({ width: 420, height: 900 })
+
+/**
+ * **폭을 두 개 본다.**
+ *
+ * 420 만 보다가 **넓은 화면에서만 뜨는 줄**을 통째로 놓쳤다 — 소원나무의
+ * "지금까지 걸린 소원 8" 은 900px 이상에서만 나와서, 검사는 0 인데 데스크톱 화면엔
+ * 한국어가 떠 있었다. 데스크톱 CTA·부스 화면용 카운터가 다 이 부류다.
+ *
+ * 넓은 쪽은 **영어 한 번만** 돈다. 여기서 찾는 건 "사전에 물어보지도 않은 문장"(감싸기가
+ * 빠진 자리)이고, 그건 어느 언어로 열든 똑같이 한국어로 뜬다. 사전에 키는 있는데 특정
+ * 언어만 빈 경우는 `i18n-parity.mjs` 가 따로 본다 — 세 언어를 다 돌면 시간만 세 배다.
+ */
+const PASSES = [
+  { width: 420, langs: LANGS },
+  { width: 1280, langs: ['en'] },
+]
 
 const leaks = new Map() // 문장 → 나온 (언어·경로)들
 let curLang = 'en'
@@ -139,7 +154,9 @@ async function sweep(path) {
   }
 }
 
-for (const lang of LANGS) {
+for (const { width, langs } of PASSES) {
+  await page.setViewport({ width, height: 900 })
+  for (const lang of langs) {
   curLang = lang
   // 언어를 먼저 심어 둔다 — 첫 렌더부터 그 언어여야 폴백과 구분된다
   await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
@@ -162,7 +179,8 @@ for (const lang of LANGS) {
       }
     }
   }
-  process.stderr.write(`· ${lang} 끝\n`)
+  process.stderr.write(`· ${lang} @${width} 끝\n`)
+  }
 }
 
 await browser.close()

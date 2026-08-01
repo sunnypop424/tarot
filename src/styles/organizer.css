@@ -2289,6 +2289,17 @@
 .ad-i18n {
   margin-top: 8px;
 }
+/**
+ * **편집기에서는 더 붙인다.**
+ *
+ * 편집기 필드는 `CSS.fieldCol` 로 이미 6px 짜리 세로 간격을 두고 쌓인다
+ * (`src/owner/editorUi.tsx`). 거기에 8px 을 더하면 원문 칸과 '다른 언어' 단추가 14px 이나
+ * 벌어져 **서로 다른 항목처럼** 보인다 — 같은 값의 이어짐인데.
+ * 주최자 화면(`.admin-portal`)은 그런 간격이 없으니 8px 그대로 둔다.
+ */
+.owner .ad-i18n {
+  margin-top: 0;
+}
 .ad-i18n__toggle {
   display: inline-flex;
   align-items: center;

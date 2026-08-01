@@ -458,8 +458,21 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
         }
       >
         {wishes.length > 0 && (
+          /**
+           * **숫자만 굵게 — 그런데 숫자가 오는 자리는 언어마다 다르다.**
+           *
+           * "지금까지 걸린 소원 8" 은 뒤, "8 wishes so far" 는 앞이다. 그래서 문장을
+           * 토막 내 이어 붙이면 어순이 틀어진다. 자리 표시자가 든 **한 문장**을 옮긴 뒤,
+           * 그 자리에서 가른다 (`t()` 는 vars 를 안 주면 `{n}` 을 그대로 남긴다).
+           *
+           * 넓은 화면에서만 뜨는 줄이라, 폰 폭만 보던 `verify-i18n-leak` 이 오래 못 봤다.
+           */
           <span className={styles.count}>
-            지금까지 걸린 소원 <b>{wishes.length}</b>
+            {t('지금까지 걸린 소원 {n}')
+              .split('{n}')
+              .flatMap((part, i) =>
+                i === 0 ? [part] : [<b key={i}>{wishes.length}</b>, part]
+              )}
           </span>
         )}
         <button type="button" className={styles.headCta} onClick={() => navigate(`/${slug}/write`)}>
