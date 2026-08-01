@@ -36,29 +36,31 @@ export function CheerCard({
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
-        <Field label="입력 화면 제목">
+        <div style={CSS.fieldCol}>
+          {/* 라벨 줄 오른쪽에 토글 — `Field` 를 쓰면 라벨이 자기 줄을 차지해 토글이 밑으로 밀린다 */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
+            <span style={CSS.label}>{'입력 화면 제목'}</span>
+            <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
+          </div>
           {/*
             * 제목·부제를 **끌 수 있어야 한다.** 다른 여덟 서비스는 다 있는 토글인데
             * 여기만 없어서, 로고를 올려도 그 아래 제목 글자가 계속 따라 나왔다
             * (`CheerApp` 이 `showTitle` 을 읽고 있는데도 켠 값에서 못 바꿨다).
             */}
-          {/* 토글 자신이 '화면에 보이기' 라고 적혀 있다 — 앞에 라벨을 또 두면 두 번 읽힌다 */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 19 }}>
-            <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
-          </div>
           <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />
           {/* 방문자 작성 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
           <I18nRow d={d} k="title" patch={patch} slot={slot} />
-        </Field>
-        <Field label="부제">
-          {/* 토글 자신이 '화면에 보이기' 라고 적혀 있다 — 앞에 라벨을 또 두면 두 번 읽힌다 */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 19 }}>
+        </div>
+        <div style={CSS.fieldCol}>
+          {/* 라벨 줄 오른쪽에 토글 — `Field` 를 쓰면 라벨이 자기 줄을 차지해 토글이 밑으로 밀린다 */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
+            <span style={CSS.label}>{'부제'}</span>
             <ShowToggle checked={d.showSubtitle} onChange={(v) => patch({ showSubtitle: v })} />
           </div>
           <input value={d.subtitle} onChange={(e) => patch({ subtitle: e.target.value })} style={CSS.input} />
           {/* 그 아래 부제 — 방문자가 읽는 글자라 언어별로 받는다 */}
           <I18nRow d={d} k="subtitle" patch={patch} slot={slot} />
-        </Field>
+        </div>
         <Field label="입력칸 안내">
           <input value={d.prompt} onChange={(e) => patch({ prompt: e.target.value })} style={CSS.input} />
           {/* 한마디 입력칸 안내 — 방문자가 읽는 글자라 언어별로 받는다 */}

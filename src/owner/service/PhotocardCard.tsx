@@ -136,15 +136,16 @@ export function PhotocardCard({
           {/* 방문자 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
           <I18nRow d={d} k="title" patch={patch} slot={slot} />
         </div>
-        <Field label="부제">
-          {/* 토글 자신이 '화면에 보이기' 라고 적혀 있다 — 앞에 라벨을 또 두면 두 번 읽힌다 */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 19 }}>
+        <div style={CSS.fieldCol}>
+          {/* 라벨 줄 오른쪽에 토글 — `Field` 를 쓰면 라벨이 자기 줄을 차지해 토글이 밑으로 밀린다 */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
+            <span style={CSS.label}>{'부제'}</span>
             <ShowToggle checked={d.showSubtitle} onChange={(v) => patch({ showSubtitle: v })} />
           </div>
           <input value={d.subtitle} onChange={(e) => patch({ subtitle: e.target.value })} style={CSS.input} />
           {/* 덱 위 안내 — 방문자가 읽는 글자라 언어별로 받는다 */}
           <I18nRow d={d} k="subtitle" patch={patch} slot={slot} />
-        </Field>
+        </div>
         <Field label="덱에 깔 뒷면 장수" hint="연출용이에요 — 실제 카드 종류와 상관없어요 (3~21장).">
           <input
             type="number"
