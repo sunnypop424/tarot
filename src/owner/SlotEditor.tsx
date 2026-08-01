@@ -42,6 +42,7 @@ import { PREVIEW_SCREENS } from './previewScreens'
 import { checkReadiness, type ReadyIssue } from './readiness'
 import { BackgroundField, bgRepeatValues } from './service/BackgroundField'
 import { LUCKYDRAW_GROUPS, LUCKYDRAW_NEUTRALS, WEBFONTS, type FontId } from '@/data/luckydraw'
+import { BODY_FONTS } from '@/data/fonts'
 import { rollingDisplay } from '@/data/rolling'
 import { photozoneDisplay, type PhotozoneDisplay } from '@/data/photozone'
 import { wishDisplay, type WishDisplay } from '@/data/wish'
@@ -521,6 +522,28 @@ export function SlotEditor() {
       {(Object.keys(SHAPE_LABELS) as (keyof ThemeShape)[]).map((k) => (
         <RadiusSlider key={k} label={SHAPE_LABELS[k]} value={draft.theme.shape[k]} max={40} onChange={(n) => patchShape(k, n)} />
       ))}
+      {/*
+        * **슬롯의 기본 글꼴** — 색·radius 와 같은 자리에 둔다.
+        *
+        * 글꼴이 서비스별 설정에만 있던 동안은 **자기 설정이 없는 서비스가 글꼴을 못 골랐다**
+        * (타로가 그랬다). 여기 두면 아홉 서비스가 다 덮이고, 서비스가 자기 글꼴을 따로
+        * 고르면 그쪽이 이긴다.
+        */}
+      <Field label="기본 글꼴" hint="서비스가 자기 글꼴을 고르면 그쪽이 먼저예요.">
+        <select
+          value={draft.theme.font ?? 'pretendard'}
+          onChange={(e) =>
+            patchSlot((prev) => ({ theme: { ...prev.theme, font: e.target.value as FontId } }))
+          }
+          style={CSS.select}
+        >
+          {BODY_FONTS.map((id) => (
+            <option key={id} value={id}>
+              {WEBFONTS[id].label}
+            </option>
+          ))}
+        </select>
+      </Field>
     </div>
   )
 

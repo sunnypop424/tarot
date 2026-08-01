@@ -183,63 +183,76 @@ export const FORM_ORDER: ServiceId[] = [
  * 공통 칸(일정·계정·디자인)은 **서비스를 몇 개 고르든 한 번만** 나온다 — 슬롯이 여럿이어도
  * 행사는 하나고, 같은 걸 두 번 묻는 양식은 채우다 만다.
  */
-export function buildInquiry(picked: ServiceId[], custom = false): string {
-  const names = [...picked.map((id) => SERVICE_FORM[id].name), ...(custom ? [CUSTOM_FORM.name] : [])]
+export function buildInquiry(
+  picked: ServiceId[],
+  custom = false,
+  /**
+   * **번역 함수를 받아 온다.**
+   *
+   * 이 파일은 모듈 상수로만 되어 있어 훅(`useT`)을 못 쓴다. 그렇다고 한국어로 두면
+   * 중국어·일본어로 보는 사람이 **읽을 수 없는 양식**을 통째로 붙여넣게 된다 —
+   * 양식은 우리가 쓴 문구라 사전이 옮길 수 있는 자리다.
+   *
+   * 안 넘기면 한국어 그대로다 (`t()` 의 폴백과 같은 결).
+   */
+  t: (ko: string) => string = (ko) => ko
+): string {
+  const names = [...picked.map((id) => t(SERVICE_FORM[id].name)), ...(custom ? [t(CUSTOM_FORM.name)] : [])]
   const out: string[] = []
 
-  out.push(`[문의] ${names.length ? names.join(' · ') : '서비스 미정'}`)
+  out.push(`[${t('문의')}] ${names.length ? names.join(' · ') : t('서비스 미정')}`)
   out.push('')
   out.push(LINE)
   out.push('')
-  out.push('1) 일정')
+  out.push(t('1) 일정'))
   out.push('')
-  out.push('희망 운영일 (행사기간, 마지막 날짜 기입 필수):')
+  out.push(t('희망 운영일 (행사기간, 마지막 날짜 기입 필수):'))
   out.push('')
-  out.push('자료 전달 예정일:')
+  out.push(t('자료 전달 예정일:'))
   out.push('')
-  out.push('시연/검수 희망일:')
+  out.push(t('시연/검수 희망일:'))
   out.push('')
   /*
    * 긴급 여부는 **방문자가 고르는 값이 아니라 위 두 날짜에서 나오는 값**이다.
    * 고르게 두면 "일반" 을 골라 놓고 3일 뒤 검수를 원하는 일이 생긴다.
    */
-  out.push('※ 긴급 여부(일반 / 10일 이내 / 3일 이내)는 자료 전달 예정일과')
-  out.push('　시연/검수 희망일 사이 기간으로 계산됩니다.')
+  out.push(t('※ 긴급 여부(일반 / 10일 이내 / 3일 이내)는 자료 전달 예정일과'))
+  out.push(t('　시연/검수 희망일 사이 기간으로 계산됩니다.'))
   out.push('')
   // 검수일에 완성본을 처음 보시게 된다 — 여기서 여유가 없으면 수정 두 번이 안 돌아간다
-  out.push('※ 검수일에 완성된 사이트를 전달해 드립니다. 그날 처음 보시고 수정 사항을')
-  out.push('　말씀해 주시는 흐름이라, 고칠 시간이 남도록 검수일은 행사일보다')
-  out.push('　여유 있게 잡아 주시는 편을 권해 드립니다.')
+  out.push(t('※ 검수일에 완성된 사이트를 전달해 드립니다. 그날 처음 보시고 수정 사항을'))
+  out.push(t('　말씀해 주시는 흐름이라, 고칠 시간이 남도록 검수일은 행사일보다'))
+  out.push(t('　여유 있게 잡아 주시는 편을 권해 드립니다.'))
   out.push('')
   out.push(LINE)
   out.push('')
-  out.push('2) 관리자 로그인 정보')
+  out.push(t('2) 관리자 로그인 정보'))
   out.push('')
-  out.push('관리자 이메일:')
+  out.push(t('관리자 이메일:'))
   out.push('')
-  out.push('관리자 비밀번호:')
+  out.push(t('관리자 비밀번호:'))
   out.push('')
   out.push(LINE)
   out.push('')
-  out.push('3) 디자인 (공통)')
+  out.push(t('3) 디자인 (공통)'))
   out.push('')
-  out.push('행사명:')
+  out.push(t('행사명:'))
   out.push('')
-  out.push('디자인 요소(로고, 포인트 컬러, 버튼 스타일 등):')
+  out.push(t('디자인 요소(로고, 포인트 컬러, 버튼 스타일 등):'))
   out.push('')
-  out.push('배경 이미지/파일(있다면 오픈채팅으로 전달):')
+  out.push(t('배경 이미지/파일(있다면 오픈채팅으로 전달):'))
   out.push('')
   out.push(LINE)
   out.push('')
 
   if (names.length) {
-    out.push('4) 서비스별 설정')
+    out.push(t('4) 서비스별 설정'))
     out.push('')
     for (const svc of [...picked.map((id) => SERVICE_FORM[id]), ...(custom ? [CUSTOM_FORM] : [])]) {
-      out.push(`■ ${svc.name}`)
+      out.push(`■ ${t(svc.name)}`)
       out.push('')
       for (const line of svc.lines) {
-        out.push(line)
+        out.push(t(line))
         // `※` 안내는 답을 적는 칸이 아니라 빈 줄을 안 넣는다
         if (!line.startsWith('※') && !line.startsWith('　')) out.push('')
       }
@@ -249,17 +262,17 @@ export function buildInquiry(picked: ServiceId[], custom = false): string {
       out.push('')
     }
   } else {
-    out.push('4) 서비스별 설정')
+    out.push(t('4) 서비스별 설정'))
     out.push('')
-    out.push('쓰고 싶은 서비스 (아직 못 정하셨다면 하시려는 이벤트를 적어 주세요):')
+    out.push(t('쓰고 싶은 서비스 (아직 못 정하셨다면 하시려는 이벤트를 적어 주세요):'))
     out.push('')
     out.push(LINE)
     out.push('')
   }
 
-  out.push('5) 기타')
+  out.push(t('5) 기타'))
   out.push('')
-  out.push('추가 요청 사항:')
+  out.push(t('추가 요청 사항:'))
   out.push('')
 
   return out.join('\n')

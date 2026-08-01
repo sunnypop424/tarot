@@ -1,3 +1,5 @@
+import type { FontId } from '@/data/fonts'
+
 /**
  * 이벤트별 테마 — 생일카페마다 색·로고·패턴·카드 이미지가 전부 달라진다.
  * 여기 정의된 값이 CSS 커스텀 프로퍼티로 주입되어 tokens.css 의 기본값을 덮어쓴다.
@@ -112,4 +114,14 @@ export interface Theme {
   colors: ThemeColors
   shape: ThemeShape
   assets: ThemeAssets
+  /**
+   * **슬롯의 기본 글꼴** — 서비스가 자기 글꼴을 안 고르면 이걸 쓴다.
+   *
+   * 예전엔 글꼴이 서비스별 설정에만 있어서 (`<Svc>Display.font`), **자기 설정이 없는
+   * 서비스는 글꼴을 고를 길이 없었다** — 타로가 그랬다. 색·radius 와 같은 결의 값이라
+   * (서비스와 무관한 슬롯의 겉모습) 여기가 제자리다.
+   *
+   * `applyTheme` 이 `--font-sans` 로 주입한다 — 화면은 이미 그 토큰만 본다.
+   */
+  font?: FontId
 }

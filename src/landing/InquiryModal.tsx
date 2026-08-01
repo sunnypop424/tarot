@@ -31,7 +31,8 @@ export function InquiryModal({
   const [copied, setCopied] = useState(false)
   const boxRef = useRef<HTMLDivElement>(null)
 
-  const text = useMemo(() => buildInquiry(picked, custom), [picked, custom])
+  /* 양식은 우리가 쓴 문구다 — 지금 언어로 만들어 준다 (`buildInquiry` 머리말) */
+  const text = useMemo(() => buildInquiry(picked, custom, t), [picked, custom, t])
 
   /** 열릴 때마다 눌러 들어온 버튼에 맞춘다 (닫았다 다시 열면 그때의 뜻을 따른다) */
   useEffect(() => {

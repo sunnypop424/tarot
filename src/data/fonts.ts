@@ -136,6 +136,11 @@ export const HANDWRITING_FONTS = (Object.keys(WEBFONTS) as FontId[]).filter(
   (id) => (WEBFONTS[id] as WebFont).handwriting
 )
 
+/** 본문에 쓸 글꼴 id 들 — 손글씨는 뺀다 (제목·본문에 쓰면 읽기가 나빠진다) */
+export const BODY_FONTS = (Object.keys(WEBFONTS) as FontId[]).filter(
+  (id) => !(WEBFONTS[id] as WebFont).handwriting
+)
+
 /** id → font-family 값 (없는 id 는 기본 산세리프로 폴백) */
 export function fontStack(id: string | undefined): string {
   const f = id ? (WEBFONTS as Record<string, WebFont>)[id] : undefined

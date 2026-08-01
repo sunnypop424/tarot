@@ -1,4 +1,5 @@
 import defaultThemeJson from '@/data/slot-default.json'
+import { WEBFONTS, fontStack, loadWebfont } from '@/data/fonts'
 import { cardRadius } from './card'
 import { isLight, readableShade, withAlpha } from './color'
 import type { Theme, ThemeColors, ThemeShape } from '@/types/theme'
@@ -127,6 +128,20 @@ export function applyTheme(raw: Theme): void {
    * 슬롯이 고른 radiusLg 는 홈 카드 기준이고, 나머지 화면은 여기서 나온 퍼센트로 자동으로 줄어든다.
    */
   root.style.setProperty('--card-radius', cardRadius(clampRadius(theme.shape.radiusLg)))
+
+  /**
+   * **슬롯의 기본 글꼴** — 안 고르면 토큰 기본값(Pretendard 스택)이 그대로 산다.
+   *
+   * 화면은 이미 `--font-sans` 하나만 보므로 여기서 갈아 끼우면 서비스 코드를 안 고쳐도
+   * 전부 따라온다 — 자기 글꼴 설정이 없는 서비스(타로)도 이걸로 덮인다.
+   * 웹폰트 파일은 `loadWebfont` 가 받아 온다 (안 받으면 스택의 다음 글꼴로 떨어질 뿐이다).
+   */
+  if (theme.font && WEBFONTS[theme.font]) {
+    root.style.setProperty('--font-sans', fontStack(theme.font))
+    void loadWebfont(theme.font)
+  } else {
+    root.style.removeProperty('--font-sans')
+  }
 
   // 인터랙션 글로우는 primary 에서 파생 — 테마 색이 바뀌면 글로우도 따라간다
   root.style.setProperty(
