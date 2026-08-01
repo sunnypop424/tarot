@@ -79,10 +79,9 @@ export function ShippingForm({ slug, prizes, onClose }: Props) {
                   <ul className={styles.shipList}>
                     {prizes.map((p) => (
                       <li key={`${p.rank}-${p.name}`} className={styles.shipItem}>
-                        <span>
-                          {p.rank}등 · {p.name}
-                        </span>
-                        <b className={styles.shipCount}>{p.count}개</b>
+                        {/* 경품 이름은 주최자가 쓴 말 — 언어별로 적었으면 그걸 (0046) */}
+                        <span>{t('{n}등 · {name}', { n: p.rank, name: p.name })}</span>
+                        <b className={styles.shipCount}>{t('{n}개', { n: p.count })}</b>
                       </li>
                     ))}
                   </ul>
@@ -125,7 +124,7 @@ export function ShippingForm({ slug, prizes, onClose }: Props) {
                 <span className={styles.agreeText}>
                   <b className="t-text-s">{t('개인정보 수집·이용 동의')}</b>
                   <span className="t-text-xs t-muted">
-                    목적: 경품 배송 · 이벤트가 끝나면 즉시 폐기돼요.
+                    {t('목적: 경품 배송 · 이벤트가 끝나면 즉시 폐기돼요.')}
                   </span>
                 </span>
               </label>
@@ -138,7 +137,7 @@ export function ShippingForm({ slug, prizes, onClose }: Props) {
 
               <div className={styles.sheetActions}>
                 <button type="button" className="btn btn--ghost" onClick={onClose}>
-                  취소
+                  {t('취소')}
                 </button>
                 <button type="submit" className="btn btn--primary" disabled={!ready}>
                   {busy ? t('보내는 중…') : t('보내기')}

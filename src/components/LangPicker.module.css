@@ -2,6 +2,11 @@
  * 언어 고르개 — **방문자 화면과 관리 화면이 같이 쓴다.**
  * 그래서 색을 토큰으로만 쓴다: 방문자 쪽에선 슬롯 테마를, 관리 쪽에선 `.admin` 이 덮은
  * 고정 라이트 값을 자동으로 따라간다 (`admin.css` 가 subtree 에서 토큰을 덮는다).
+ *
+ * ⚠ **토큰 이름은 `--color-fg-1` 이다** (하이픈이 있다). 여기 `--color-fg2` 라고 적혀 있어서
+ * 어두운 배경 슬롯에서 언어 단추 글자가 안 읽혔다 — 없는 변수를 쓰면 그 `color` 선언이
+ * 통째로 무효가 되고, 색이 부모에서 상속돼 무대 배경과 같아진다. 화면이 깨지지 않고
+ * **글자만 사라지는** 종류의 오타라 눈으로만 봐서는 원인을 못 찾는다.
  */
 .wrap {
   position: relative;
@@ -19,7 +24,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   background: var(--color-surface);
-  color: var(--color-fg2);
+  color: var(--color-fg-2);
   font-family: inherit;
   font-size: var(--text-xs);
   font-weight: var(--weight-bold);
@@ -27,7 +32,7 @@
   cursor: pointer;
 }
 .btn:hover {
-  color: var(--color-fg1);
+  color: var(--color-fg-1);
   border-color: var(--color-border-hover);
 }
 
@@ -66,17 +71,17 @@
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--color-fg2);
+  color: var(--color-fg-2);
   font-family: inherit;
   font-size: var(--text-s);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-normal);
   text-align: left;
   cursor: pointer;
   white-space: nowrap;
 }
 .item:hover {
   background: var(--color-wash);
-  color: var(--color-fg1);
+  color: var(--color-fg-1);
 }
 .item[data-on] {
   color: var(--color-primary);

@@ -458,4 +458,9 @@ export const EN: Record<string, string> = {
   '바꾸지 못했어요': "We couldn't change it",
   '오늘 함께해 주신 분들': 'Everyone who joined us today',
   '화면에서 만나요!': 'See you on screen!',
+
+  // ── 배송 폼 ──────────────────────────────────────
+  '취소': 'Cancel',
+  '{n}등 · {name}': 'Rank {n} · {name}',
+  '목적: 경품 배송 · 이벤트가 끝나면 즉시 폐기돼요.': 'Purpose: shipping your prize · Deleted as soon as the event ends.',
 }

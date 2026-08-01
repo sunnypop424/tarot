@@ -26,14 +26,14 @@
 
 alter table public.prizes add column if not exists name_i18n jsonb;
 alter table public.photocards add column if not exists name_i18n jsonb;
-alter table public.polls add column if not exists title_i18n jsonb;
+alter table public.poll_polls add column if not exists title_i18n jsonb;
 alter table public.poll_options add column if not exists label_i18n jsonb;
 
 comment on column public.prizes.name_i18n is
   '언어 코드 → 그 언어로 적은 경품 이름. 없으면 name 을 쓴다 (src/data/multilingual.ts)';
 comment on column public.photocards.name_i18n is
   '언어 코드 → 그 언어로 적은 카드 이름. 없으면 name 을 쓴다';
-comment on column public.polls.title_i18n is
+comment on column public.poll_polls.title_i18n is
   '언어 코드 → 그 언어로 적은 설문 제목. 없으면 title 을 쓴다';
 comment on column public.poll_options.label_i18n is
   '언어 코드 → 그 언어로 적은 선택지. 없으면 label 을 쓴다';
