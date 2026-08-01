@@ -4,7 +4,7 @@
 
 ## 0) 범위
 
-- 대상: `4bfd474..ed9771d` (162 파일, +13,846 / −1,165)
+- 대상: `4bfd474..36b4b34`
 - 호출 형태: 단일 경로 (`@path1` 만). **코드 퀄리티 변화 분석은 수행하지 않는다** —
   비교 기준(`@path2`)이 주어지지 않았다.
 - 리뷰 축: 다국어(사전·입력값·고르개 배치)와 그에 딸린 DB 마이그레이션·검증 스크립트.
@@ -12,14 +12,13 @@
 
 ## 1) 결론 (상태 + 근거)
 
-**조건부 통과.** Blocking 1건, Non-blocking 4건.
+**통과.** Blocking 0건(1건은 고침), Non-blocking 3건 남음.
 
 근거:
 
 - 빌드·타입 검사 통과 (`npm run build`, `tsc --noEmit` 무출력).
-- Blocking 1건이 남는다: 보기 삭제 경로에서 `choicesI18n` 이 재정렬되지 않아
-  **번역이 다른 보기에 붙는다** (아래 2-1). 검증 스크립트가 못 잡는 자리다 —
-  스크립트는 화면에 한국어가 남았는지를 보지, *엉뚱한 번역이 붙었는지*는 안 본다.
+- 아래 2-1 (보기 삭제 시 번역이 밀림)과 3-1 (주석이 코드와 반대)은 **이 리뷰 뒤 고쳤다** —
+  기록을 남기려고 항목은 지우지 않고 「고침」 표시만 단다.
 
 ### 실행 기록 (근거 아님 — 재현용)
 
@@ -32,10 +31,18 @@
 | `scripts/verify-i18n-usertext.mjs` | 5/5 |
 | `scripts/verify-i18n-select.mjs` | 0곳 |
 | `scripts/verify-noimg.mjs` | 전부 통과 |
+| `scripts/verify-editor-fields.mjs` | 설정 220개 전부 칸 있음 |
+| `scripts/verify-editor-toggle.mjs` | Field 51개 확인 |
+| `scripts/verify-subtitle.mjs` | 7개 서비스 전부 |
+| `scripts/verify-header-uniform.mjs` | 일곱 헤더 동일 |
+| `scripts/verify-header-align.mjs` | 정렬 셋 전부 |
+| `scripts/verify-group-apply.mjs` | 6/6 |
+| `scripts/verify-quiz.mjs` | 전부 통과 |
+| `scripts/verify-tokens.mjs` | 0자리 |
 
 ## 2) Blocking (필수 수정)
 
-### 2-1. 보기를 지우면 언어별 보기가 한 칸씩 밀린다
+### 2-1. 보기를 지우면 언어별 보기가 한 칸씩 밀린다 — **고침**
 
 - 근거: `src/admin/quiz/Questions.tsx:735-741` (보기 삭제 `onClick`)
 - 관찰: 삭제 핸들러가 `choices` 는 `filter` 하고 `answers` 는 비우는데,
@@ -48,10 +55,11 @@
 - 심각도 근거: 요구사항 위반 (주최자가 적은 값이 다른 항목으로 표시된다).
 - 수정 방향: 삭제 핸들러에서 같은 인덱스를 `choicesI18n` 의 모든 언어 배열에서도 뺀다.
   `answers` 를 비우는 것과 같은 이유·같은 자리다.
+- **처리:** `dropChoiceAlt` 를 더해 삭제 핸들러에서 같이 민다 (`src/admin/quiz/Questions.tsx`).
 
 ## 3) Non-blocking (권장)
 
-### 3-1. 주석이 코드와 반대로 적혀 있다
+### 3-1. 주석이 코드와 반대로 적혀 있다 — **고침**
 
 - 근거: `src/admin/QuestionEditor.tsx:451-453`
 - 관찰: 주석은 "검수 중(AI 초안)에는 언어별 칸을 안 건다" 인데, 바로 아래 `editAlt` 는
@@ -60,6 +68,7 @@
 - 영향: 이 저장소는 주석을 판단 근거로 쓰는 문서 문화다(CLAUDE.md). 반대로 적힌 주석은
   다음 사람이 "안 걸리는구나" 하고 그 경로를 안 보게 만든다.
 - 성격: Non-blocking (동작은 의도대로 — 원문은 초안, 번역은 즉시 저장).
+- **처리:** 주석을 실제 동작대로 다시 썼다.
 
 ### 3-2. `myReward` 가 보상마다 설정 행을 한 번 더 읽는다
 
