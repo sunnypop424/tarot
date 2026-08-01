@@ -32,12 +32,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  /**
-   * 이 헤더는 좌우 여백을 **부모가 준다**(자기 패딩이 0 이다). 그래서 언어 고르개의 기본
-   * 안쪽 여백 20px 을 쓰면 혼자 더 들어와 제목 오른쪽 끝과 안 맞는다 — 여기선 0 이 맞다
-   * (`src/styles/components.css` 의 `.svc-lang`).
-   */
-  --svc-lang-right: 0;
 }
 .logo {
   width: 44px;
@@ -531,4 +525,17 @@
   .creditsRoll {
     animation-duration: calc(var(--roll, 40s) * 2);
   }
+}
+
+/**
+ * 언어 고르개 줄 — **좌우 여백을 지운다.**
+ *
+ * 이 서비스는 무대 전체를 부모가 감싸며 좌우 여백을 준다. 고르개 줄의 기본 여백(20px)이
+ * 거기에 더해지면 혼자 42px 안쪽으로 들어와, 제목 왼쪽 끝과 오른쪽 끝이 안 맞아 보인다
+ * (`src/styles/components.css` 의 `.svc-lang`).
+ */
+/* `.phone` 안으로 스코프를 준다 — 최상위에 쓰면 전역이 되어 다른 서비스까지 지운다 */
+.phone :global(.svc-lang) {
+  padding-left: 0;
+  padding-right: 0;
 }

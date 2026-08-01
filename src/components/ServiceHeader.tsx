@@ -76,20 +76,26 @@ export function ServiceHeader({
    */
   const slot = useSlotOrNull()
   /**
-   * **자리를 여기서 못박는다** — 헤더 오른쪽 위 한 곳.
+   * **고르개는 헤더 위 자기 줄에 앉는다.**
    *
-   * 예전엔 고르개를 헤더의 마지막 자식으로 그냥 흘려 두었다. 그런데 `classes.head` 가
-   * 서비스마다 달라서(가로 flex · 세로 stack · 가운데 정렬) **흐르는 자리도 제각각**이 됐다:
-   * 투표는 제목 바로 옆에 딱 붙고, 응원은 부제 아래 왼쪽에 혼자 떴다.
+   * 두 번 틀린 자리라 이유를 적어 둔다.
    *
-   * 그래서 배치를 부모에게 맡기지 않고 `.svc-lang` 이 절대 좌표로 잡는다 —
-   * 일곱 서비스가 같은 자리에 갖는다는 이 부품의 약속이 그제야 실제로 지켜진다.
-   * 겹침은 `scripts/verify-langbar.mjs` 가 화면에서 재서 잡는다.
+   *  1. 처음엔 헤더의 **마지막 자식**으로 그냥 흘려 두었다. `classes.head` 가 서비스마다
+   *     달라서(가로 flex · 세로 stack · 가운데 정렬) 흐르는 자리도 제각각이 됐다 —
+   *     투표는 제목 옆에 딱 붙고, 응원은 부제 아래 왼쪽에 혼자 떴다.
+   *  2. 그래서 **절대 좌표**(`top:0; right:0`)로 잡았더니 이번엔 헤더의 안쪽 여백을
+   *     건너뛰었다. 포토카드는 고르개가 제목보다 위로 올라갔고, 타로는 가운데 정렬된
+   *     제목 옆에 혼자 오른쪽 끝으로 붕 떴다. `right` 는 변수로 맞췄지만 `top` 은
+   *     서비스마다 값이 달라 그 방법으로는 끝이 없었다.
+   *
+   * 결국 **흐름 안에 자기 줄**을 주는 게 맞다. 헤더 앞에 오른쪽 정렬 한 줄을 두면
+   * 헤더가 어떤 모양이든(가로든 세로든 가운데든) 고르개는 늘 같은 자리다.
+   * 자리는 `scripts/verify-langbar.mjs` 가 화면에서 재서 지킨다.
    */
-  const langPicker = slot?.langs?.length ? (
-    <span className="svc-lang">
+  const langRow = slot?.langs?.length ? (
+    <div className="svc-lang">
       <LangPicker only={slot.langs} />
-    </span>
+    </div>
   ) : null
 
   /**
@@ -113,15 +119,17 @@ export function ServiceHeader({
 
   if (variant === 'tile') {
     return (
-      <header className={classes.head} data-align={align}>
-        {mark}
-        <div className={classes.text} style={{ minWidth: 0 }}>
-          {heading}
-          {below}
-        </div>
-        {children}
-        {langPicker}
-      </header>
+      <>
+        {langRow}
+        <header className={classes.head} data-align={align}>
+          {mark}
+          <div className={classes.text} style={{ minWidth: 0 }}>
+            {heading}
+            {below}
+          </div>
+          {children}
+        </header>
+      </>
     )
   }
 
@@ -134,20 +142,22 @@ export function ServiceHeader({
     </>
   )
   return (
-    <header className={classes.head} data-align={align}>
-      {classes.text ? (
-        <div
-          className={classes.text}
-          data-align={align}
-          style={{ textAlign: align, marginTop: marginTop || undefined }}
-        >
-          {body}
-        </div>
-      ) : (
-        body
-      )}
-      {children}
-      {langPicker}
-    </header>
+    <>
+      {langRow}
+      <header className={classes.head} data-align={align}>
+        {classes.text ? (
+          <div
+            className={classes.text}
+            data-align={align}
+            style={{ textAlign: align, marginTop: marginTop || undefined }}
+          >
+            {body}
+          </div>
+        ) : (
+          body
+        )}
+        {children}
+      </header>
+    </>
   )
 }

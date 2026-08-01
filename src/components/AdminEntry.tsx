@@ -1,5 +1,6 @@
 import { Settings } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useT } from '@/i18n'
 
 /**
  * 방문자 화면 구석의 **관리자 진입 한 줄.**
@@ -33,10 +34,11 @@ export function AdminEntry({
   className?: string
   to?: string
 }) {
+  const t = useT()
   return (
     <Link to={`/${slug}/admin${to ? `/${to}` : ''}`} className={`admin-entry ${className ?? ''}`}>
       <Settings size={12} strokeWidth={1.7} aria-hidden="true" />
-      관리자
+      {t('관리자')}
     </Link>
   )
 }

@@ -248,4 +248,5 @@ export const ADMIN_EN: Record<string, string> = {
   '한정 {a}종 · 소진 {b}종': '{a} limited · {b} gone',
   '발급 {n}장': '{n} issued',
   '남긴 {what}': '{what} left',
+  '로그아웃': 'Sign out',
 }

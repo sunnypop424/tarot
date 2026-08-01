@@ -238,4 +238,5 @@ export const ADMIN_JA: Record<string, string> = {
   '한정 {a}종 · 소진 {b}종': '限定{a}種 · 完売{b}種',
   '발급 {n}장': '発行{n}枚',
   '남긴 {what}': '投稿された{what}',
+  '로그아웃': 'ログアウト',
 }

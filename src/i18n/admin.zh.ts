@@ -238,4 +238,5 @@ export const ADMIN_ZH: Record<string, string> = {
   '한정 {a}종 · 소진 {b}종': '限定 {a} 种 · 售罄 {b} 种',
   '발급 {n}장': '已发放 {n} 张',
   '남긴 {what}': '留下的{what}',
+  '로그아웃': '退出登录',
 }

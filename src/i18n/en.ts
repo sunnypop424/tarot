@@ -471,4 +471,5 @@ export const EN: Record<string, string> = {
   // ── 남은 자리 ───────────────────────────────────
   '섞기': 'Shuffle',
   '실시간 갱신 중': 'Updating live',
+  '관리자': 'Admin',
 }
