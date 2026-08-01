@@ -94,7 +94,7 @@ export function QuestionList() {
           <div className="ad-card__titleRow">
             <span className="ad-card__title">{t('질문')}</span>
             <span className="ad-card__num tnum">
-              전체 {total} · 공개 {open}
+              {t('전체 {total} · 공개 {open}', { total, open })}
             </span>
           </div>
           <button type="button" className="ad-btn ad-btn--soft ad-btn--sm" onClick={() => void handleAdd()}>

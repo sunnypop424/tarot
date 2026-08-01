@@ -220,7 +220,11 @@ export function Dashboard() {
               <div key={phKey(s.label)} className="ad-stat" data-hot={s.warn || undefined}>
                 <div className="ad-stat__label">{say(s.label, t)}</div>
                 <div className="ad-stat__row">
-                  <span className="ad-stat__value tnum">{s.value}</span>
+                  {/*
+                    * 값은 대개 숫자지만 '무제한'·'—' 처럼 **낱말이 오는 자리도 있다**.
+                    * 숫자는 사전에 없어 그대로 지나가므로 통과시켜도 안전하다.
+                    */}
+                  <span className="ad-stat__value tnum">{t(s.value)}</span>
                   {s.unit && <span className="ad-stat__unit">{t(s.unit)}</span>}
                 </div>
                 {s.note && <div className="ad-stat__sub">{say(s.note, t)}</div>}
@@ -303,7 +307,7 @@ export function Dashboard() {
               <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div className="ad-kv">
                   <span>{t('기간')}</span>
-                  <span className="tnum">{periodLabel(slot)}</span>
+                  <span className="tnum">{periodLabel(slot, t)}</span>
                 </div>
                 {period.left !== null && (
                   <div className="ad-kv">
@@ -386,7 +390,7 @@ function periodLine(
   if (status === 'expired')
     return { badge: t('종료'), detail: `${t('기간이 끝났어요')} · ${keep}`, tone: 'mute', left: null }
   if (status === 'upcoming')
-    return { badge: t('시작 전'), detail: t('{period} 에 열려요', { period: periodLabel(slot) }), tone: 'warn', left: days }
+    return { badge: t('시작 전'), detail: t('{period} 에 열려요', { period: periodLabel(slot, t) }), tone: 'warn', left: days }
   if (status === 'unlimited')
     return { badge: t('진행 중'), detail: t('기간 제한 없음'), tone: 'key', left: null }
   return {
@@ -394,8 +398,8 @@ function periodLine(
     // 마지막 사흘은 남은 날을 말한다 — 그때부터는 날짜보다 "며칠 남았나" 가 급하다
     detail:
       days !== null && days <= 3
-        ? `${periodLabel(slot)} · ${t('종료까지 {n}일', { n: days })} · ${keep}`
-        : `${periodLabel(slot)} · ${keep}`,
+        ? `${periodLabel(slot, t)} · ${t('종료까지 {n}일', { n: days })} · ${keep}`
+        : `${periodLabel(slot, t)} · ${keep}`,
     tone: days !== null && days <= 3 ? 'warn' : 'key',
     left: days,
   }

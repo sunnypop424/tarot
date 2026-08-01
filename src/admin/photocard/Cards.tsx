@@ -133,7 +133,9 @@ export function Cards() {
           <div className="ad-card__head" style={{ marginBottom: 6 }}>
             <div className="ad-card__titleRow">
               <span className="ad-card__title">
-                {rows.length}종 · {anyFinite ? `남은 수량 ${totalLeft}장` : t('수량 무제한')}
+                {/* 조각내지 않는다 — 앞 조각만 감싸면 "5종 · Unlimited" 처럼 반만 번역된다 */}
+                {t('{n}종', { n: rows.length })} ·{' '}
+                {anyFinite ? t('남은 수량 {n}장', { n: totalLeft }) : t('수량 무제한')}
               </span>
             </div>
           </div>

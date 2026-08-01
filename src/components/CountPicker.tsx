@@ -89,7 +89,7 @@ export function CountPicker({
               data-on={count === n || undefined}
               onClick={() => onCount(n)}
             >
-              {n}개
+              {t('{n}개', { n })}
             </button>
           ))}
         </div>

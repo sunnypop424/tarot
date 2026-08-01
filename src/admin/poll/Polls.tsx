@@ -263,7 +263,8 @@ export function Polls() {
                             })
                           }
                         >
-                          {label}
+                          {/* 라벨은 위 배열의 한국어 상수 — 번역은 여기 렌더에서 */}
+                          {t(label)}
                         </button>
                       ))}
                     </div>

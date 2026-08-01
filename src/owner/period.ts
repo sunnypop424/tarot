@@ -35,13 +35,26 @@ const STATUS_LABEL: Record<SlotStatus, string> = {
   unlimited: '기간 없음',
 }
 
-/** 목록 한 줄에 들어갈 말 — '열림 · 7.16~7.20' */
-export function periodLabel(slot: Slot, today: string = todayKst()): string {
+/**
+ * 목록 한 줄에 들어갈 말 — '열림 · 7.16~7.20'
+ *
+ * **`t` 를 인자로 받는다.** 모듈 함수라 훅을 못 쓰는데, 그렇다고 한국어로 조립해 돌려주면
+ * 부르는 쪽에서 `t()` 를 씌워도 소용이 없다 — 사전에 있는 건 '기간 없음' 이고 화면이 묻는
+ * 건 이미 조립된 '기간 없음 · 7.16~7.20' 이라 영영 안 맞는다. **조립하기 전에** 옮긴다.
+ *
+ * 안 넘기면 한국어 그대로다 — 편집기(한국어 고정)는 그대로 부르면 된다.
+ */
+export function periodLabel(
+  slot: Slot,
+  t: (ko: string) => string = (ko) => ko,
+  today: string = todayKst()
+): string {
   const status = slotStatus(slot, today)
   const rent = rangeLabel(slot.period?.rent)
   const test = rangeLabel(slot.period?.test)
-  const span = rent ?? (test ? `테스트 ${test}` : null)
-  return span ? `${STATUS_LABEL[status]} · ${span}` : STATUS_LABEL[status]
+  const span = rent ?? (test ? `${t('테스트')} ${test}` : null)
+  const label = t(STATUS_LABEL[status])
+  return span ? `${label} · ${span}` : label
 }
 
 /**

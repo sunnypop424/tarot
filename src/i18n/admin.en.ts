@@ -249,4 +249,7 @@ export const ADMIN_EN: Record<string, string> = {
   '발급 {n}장': '{n} issued',
   '남긴 {what}': '{what} left',
   '로그아웃': 'Sign out',
+  '열림': 'Open',
+  '종료됨': 'Ended',
+  '테스트': 'Test',
 }
