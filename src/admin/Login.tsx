@@ -6,22 +6,27 @@ import { Sparkles, TriangleAlert } from 'lucide-react'
 import { useSlot } from '@/slot/SlotProvider'
 import { hasSupabase } from '@/lib/repo/client'
 import { useAdminAuth } from './useAdminAuth'
+import { useT } from '@/i18n'
 import styles from '@/styles/auth.module.css'
 import { LangBar } from '@/components/LangBar'
 
 /**
  * Supabase 에러를 사람 말로. 원문은 영어인 데다 사용자가 할 수 있는 게 뭔지 안 알려준다.
  * "이 슬롯 관리자가 아니다"는 우리가 던진 말이라 그대로 쓴다.
+ *
+ * **`t` 를 인자로 받는다** — 모듈 함수라 훅을 못 쓰고, 그렇다고 한국어를 그대로 돌려주면
+ * 로그인 실패 메시지만 한국어로 남는다 (여기가 다른 언어 사용자의 첫 화면이다).
  */
-function reasonOf(message: string): string {
-  if (/Invalid login credentials/i.test(message)) return '이메일이나 비밀번호가 맞지 않아요.'
-  if (/Email not confirmed/i.test(message)) return '아직 확인되지 않은 계정이에요.'
-  if (/관리자 계정이 아니에요/.test(message)) return '이 슬롯의 관리자 계정이 아니에요.'
-  return '로그인하지 못했어요. 잠시 후 다시 시도해 주세요.'
+function reasonOf(message: string, t: (ko: string) => string): string {
+  if (/Invalid login credentials/i.test(message)) return t('이메일이나 비밀번호가 맞지 않아요.')
+  if (/Email not confirmed/i.test(message)) return t('아직 확인되지 않은 계정이에요.')
+  if (/관리자 계정이 아니에요/.test(message)) return t('이 슬롯의 관리자 계정이 아니에요.')
+  return t('로그인하지 못했어요. 잠시 후 다시 시도해 주세요.')
 }
 
 export function Login() {
   const slot = useSlot()
+  const t = useT()
   const navigate = useNavigate()
   const { signIn } = useAdminAuth(slot.slug)
   const [email, setEmail] = useState('')
@@ -45,7 +50,7 @@ export function Login() {
       navigate(`/${slot.slug}/admin`, { replace: true })
     } catch (e) {
       // 왜 안 되는지 말한다 — "이 슬롯 관리자가 아니에요" 와 "비번이 틀렸어요"는 다른 문제다
-      setError(e instanceof Error ? reasonOf(e.message) : '로그인하지 못했어요.')
+      setError(e instanceof Error ? reasonOf(e.message, t) : t('로그인하지 못했어요.'))
     } finally {
       setBusy(false)
     }

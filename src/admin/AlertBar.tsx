@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { Link } from 'react-router-dom'
 
 import { loadAlerts, type Alert } from './alerts'
+import { useT } from '@/i18n'
 import { useVisibleInterval } from './useVisibleInterval'
 import type { ServiceId } from '@/data/services'
 import type { Slot } from '@/types/slot'
@@ -66,20 +67,22 @@ const TONE: Record<Alert['level'], string> = {
 
 export function AlertBar({ slug }: { slug: string }) {
   const { alerts } = useAlerts()
+  const t = useT()
   if (alerts.length === 0) return null
 
   return (
     <div className="ad-alerts" data-alerts role="status" aria-live="polite">
       {alerts.map((a) => (
         <div key={a.id} className={`ad-banner ${TONE[a.level]} ad-alert`} data-level={a.level}>
-          <span className="ad-alert__text">{a.text}</span>
+          {/* 알림 문장은 `alerts.ts` 모듈 상수라 한국어로 온다 — 번역은 여기서 */}
+          <span className="ad-alert__text">{t(a.text)}</span>
           {/*
             * 링크는 **고칠 수 있는 화면**으로만 건다. 기한 알림처럼 손댈 자리가 없는 건
             * 문장만 남긴다 — 눌러도 아무것도 못 하는 링크는 알림을 못 미덥게 만든다.
             */}
           {a.to && (
             <Link className="ad-alert__go" to={`/${slug}/admin/${a.to}`}>
-              고치러 가기 →
+              {t('고치러 가기 →')}
             </Link>
           )}
         </div>

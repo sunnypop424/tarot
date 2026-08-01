@@ -134,14 +134,14 @@ export function QuestionEditor() {
       )
       setPending(toAnswers(generated, draft.allowReversed))
     } catch (e) {
-      setGenError(e instanceof Error ? e.message : '생성하지 못했어요')
+      setGenError(e instanceof Error ? e.message : t('생성하지 못했어요'))
     } finally {
       setGen(null)
     }
   }, [draft, cards, slug])
 
   if (draft === null) {
-    return <p className="ad-sub">질문을 찾을 수 없어요.</p>
+    return <p className="ad-sub">{t('질문을 찾을 수 없어요.')}</p>
   }
 
   const error = validate(draft, effDeck)
@@ -150,11 +150,11 @@ export function QuestionEditor() {
   const applyPending = async () => {
     if (!pending) return
     const ok = await confirmAction({
-      title: '생성한 답변을 저장할까요?',
+      title: t('생성한 답변을 저장할까요?'),
       desc:
         overwrites > 0
           ? `이미 써 두신 답변 ${overwrites}장이 덮어써져요.`
-          : '검수한 내용 그대로 방문자에게 나가요.',
+          : t('검수한 내용 그대로 방문자에게 나가요.'),
       okLabel: t('저장'),
       danger: overwrites > 0,
     })
@@ -188,7 +188,7 @@ export function QuestionEditor() {
           ‹ 질문 목록
         </button>
         <div className="ad-head__row">
-          <h1 className="ad-head__title">질문 편집</h1>
+          <h1 className="ad-head__title">{t('질문 편집')}</h1>
         </div>
         <p className="ad-head__desc">
           고치는 즉시 저장돼요. 저장을 잊어 날리는 편이 더 나쁘니까요.
@@ -204,7 +204,7 @@ export function QuestionEditor() {
 
         <div className="ad-card ad-card--form">
           <label className="ad-card__title" htmlFor="q-text">
-            질문
+            {t('질문')}
           </label>
           <input
             id="q-text"
@@ -227,16 +227,16 @@ export function QuestionEditor() {
         </div>
 
         <div className="ad-card ad-card--form">
-          <div className="ad-card__title">뽑기 설정</div>
+          <div className="ad-card__title">{t('뽑기 설정')}</div>
           {/* 뽑는 수(항상 1장)·카드 범위·역방향 확률(50%)은 주최자가 고르지 않는다.
               범위는 슬롯 설정이라 최고관리자만 바꾼다 — 여긴 결과만 알려준다 */}
           <p className="ad-card__desc">
-            이 슬롯의 카드 범위({effDeck === 'major' ? t('메이저 22장') : '전체 78장'})는 여기서 바꿀 수
+            이 슬롯의 카드 범위({effDeck === 'major' ? t('메이저 22장') : t('전체 78장')})는 여기서 바꿀 수
             없어요 · 한 장 뽑고 역방향 50%로 나와요.
           </p>
 
           <div style={{ marginTop: 18 }}>
-            <span className="ad-field__label">펼치는 카드 수</span>
+            <span className="ad-field__label">{t('펼치는 카드 수')}</span>
             <div className="ad-inline">
               <input
                 className="ad-input ad-input--num"
@@ -256,7 +256,7 @@ export function QuestionEditor() {
           </div>
 
           <div style={{ marginTop: 18 }}>
-            <span className="ad-field__label">답변을 안 채웠을 때 쓸 관점</span>
+            <span className="ad-field__label">{t('답변을 안 채웠을 때 쓸 관점')}</span>
             <div className="ad-choices">
               {ASPECTS.map(({ value, label }) => (
                 <button
@@ -283,15 +283,15 @@ export function QuestionEditor() {
               {draft.allowReversed ? '✓' : ''}
             </span>
             <span>
-              <span className="ad-check__name">역방향 사용</span>
-              <span className="ad-check__hint">켜면 카드마다 답변을 두 배로 써야 해요.</span>
+              <span className="ad-check__name">{t('역방향 사용')}</span>
+              <span className="ad-check__hint">{t('켜면 카드마다 답변을 두 배로 써야 해요.')}</span>
             </span>
           </button>
         </div>
 
         <div className="ad-card ad-card--form">
           <div className="ad-card__head">
-            <div className="ad-card__title">카드별 답변</div>
+            <div className="ad-card__title">{t('카드별 답변')}</div>
             {/* 플랜에 AI 생성이 없으면 버튼 자체를 안 보여준다 — 눌러도 안 되는 버튼은 잡음이다 */}
             {plan.answerGenLimit > 0 && (
               <button
@@ -301,7 +301,7 @@ export function QuestionEditor() {
                 onClick={() => void generate()}
                 data-generate
               >
-                {gen ? `${gen.done} / ${gen.total}장째 만드는 중…` : 'AI로 전체 생성'}
+                {gen ? `${gen.done} / ${gen.total}장째 만드는 중…` : t('AI로 전체 생성')}
               </button>
             )}
           </div>
@@ -314,7 +314,7 @@ export function QuestionEditor() {
             </p>
           ) : plan.answerGenLimit === 0 ? (
             <p className="ad-sub" style={{ marginBottom: 14 }}>
-              {plan.label} 플랜은 답변을 <b>직접 입력</b>해요. AI 일괄 생성은 라이트 플랜부터예요.
+              {plan.label} 플랜은 답변을 <b>{t('직접 입력')}</b>해요. AI 일괄 생성은 라이트 플랜부터예요.
             </p>
           ) : (
             !aiReady && (
@@ -353,7 +353,7 @@ export function QuestionEditor() {
                   className="ad-btn ad-btn--line ad-btn--lg"
                   onClick={() => {
                     setPending(null)
-                    toast('생성한 답변을 버렸어요')
+                    toast(t('생성한 답변을 버렸어요'))
                   }}
                 >
                   {t('버리기')}
@@ -424,7 +424,7 @@ function AnswerRow({
           </span>
         ) : (
           <span className="ad-tag ad-tag--sm" data-tone={filled === 0 ? undefined : filled < total ? 'warn' : 'on'}>
-            {filled === 0 ? '폴백 사용 중' : `${filled}/${total} 입력됨`}
+            {filled === 0 ? t('폴백 사용 중') : `${filled}/${total} 입력됨`}
           </span>
         )}
       </button>

@@ -15,6 +15,7 @@ import { LangPicker } from '@/components/LangPicker'
 import { useT } from '@/i18n'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Rolling.module.css'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 롤링페이퍼 (세 번째 서비스) — 방문자가 응원 메시지를 **포스트잇**으로 남기고, 남긴 즉시
@@ -46,7 +47,9 @@ function useRollingVars(display: RollingDisplay): React.CSSProperties {
 
 function Rolling({ slot }: { slot: Slot }) {
   const location = useLocation()
-  const display = useMemo(() => rollingDisplay(slot), [slot])
+  const rawDisplay = useMemo(() => rollingDisplay(slot), [slot])
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const composing = location.pathname.replace(/\/+$/, '').endsWith('/write')
 
   // 벽 기본 폰트는 늘 로드 (제목·UI·작성 폼)

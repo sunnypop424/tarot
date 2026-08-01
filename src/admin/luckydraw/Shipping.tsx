@@ -53,7 +53,7 @@ export function Shipping() {
      * 이 데이터는 다른 어디에도 사본이 없다 (방문자도 자기가 넣은 걸 못 읽는다).
      */
     const ok = await confirmAction({
-      title: `배송 정보 ${list.length}건을 전부 지울까요?`,
+      title: t('배송 정보 {n}건을 전부 지울까요?', { n: list.length }),
       desc: t('다른 곳에 사본이 없어요. 방문자도 자기가 넣은 내용을 다시 볼 수 없어요. 먼저 CSV로 내려받으셨나요?'),
       okLabel: t('전부 지우기'),
       danger: true,
@@ -91,7 +91,7 @@ export function Shipping() {
       <header className="ad-head">
         <div className="ad-head__row">
           <h1 className="ad-head__title">{t('배송 정보')}</h1>
-          <span className="ad-head__count tnum">배송 {list.length}건</span>
+          <span className="ad-head__count tnum">{t('배송 {n}건', { n: list.length })}</span>
         </div>
         <p className="ad-head__desc">
           당첨자가 직접 남긴 배송지예요. 방문자 개인정보가 나오는 유일한 화면이에요.
@@ -116,7 +116,7 @@ export function Shipping() {
             <div className="ad-card__titleRow">
               <span className="ad-card__title">{t('배송 정보')}</span>
               <span className="ad-card__num tnum">
-                {shown.length} / {list.length}건
+                {t('{a} / {b}건', { a: shown.length, b: list.length })}
               </span>
             </div>
             <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>

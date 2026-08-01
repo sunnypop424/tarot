@@ -38,7 +38,7 @@ export function Staff() {
     try {
       setList(await repo.organizers.list(slug))
     } catch (e) {
-      setError(e instanceof Error ? e.message : '계정을 불러오지 못했어요')
+      setError(e instanceof Error ? e.message : t('계정을 불러오지 못했어요'))
       setList([])
     }
   }, [slug])
@@ -53,7 +53,7 @@ export function Staff() {
         <h1 className="ad-head__title">{t('스태프 계정')}</h1>
         {list && list.length > 0 && <span className="ad-head__count tnum">계정 {list.length}개</span>}
       </div>
-      <p className="ad-head__desc">현장에서 이 도구를 쓸 계정을 사람마다 따로 만들어요.</p>
+      <p className="ad-head__desc">{t('현장에서 이 도구를 쓸 계정을 사람마다 따로 만들어요.')}</p>
     </header>
   )
 
@@ -63,7 +63,7 @@ export function Staff() {
         {head}
         <div className="ad-card">
           <div className="ad-empty">
-            <div className="ad-empty__title">지금 빌드에서는 계정을 만들 수 없어요</div>
+            <div className="ad-empty__title">{t('지금 빌드에서는 계정을 만들 수 없어요')}</div>
             <div className="ad-empty__sub">{t('백엔드가 연결된 배포에서만 동작해요.')}</div>
           </div>
         </div>
@@ -87,12 +87,12 @@ export function Staff() {
       await load()
       setEmail('')
       if (made.linked) {
-        toast('이미 있는 계정을 이 이벤트에 연결했어요 (비밀번호는 그대로예요)')
+        toast(t('이미 있는 계정을 이 이벤트에 연결했어요 (비밀번호는 그대로예요)'))
       } else {
         setTemp({ email: made.email, password })
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : '계정을 만들지 못했어요')
+      setError(e instanceof Error ? e.message : t('계정을 만들지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -102,8 +102,8 @@ export function Staff() {
     if (
       !(await confirmAction({
         title: `${o.email} 의 비밀번호를 새로 만들까요?`,
-        desc: '지금 쓰던 비밀번호는 바로 못 쓰게 돼요. 새 비밀번호는 이 화면에 한 번만 보여요.',
-        okLabel: '재발급',
+        desc: t('지금 쓰던 비밀번호는 바로 못 쓰게 돼요. 새 비밀번호는 이 화면에 한 번만 보여요.'),
+        okLabel: t('재발급'),
         danger: true,
       }))
     )
@@ -113,7 +113,7 @@ export function Staff() {
       const password = await repo.organizers.resetPassword(o.userId)
       setTemp({ email: o.email, password })
     } catch (e) {
-      toast(e instanceof Error ? e.message : '재발급하지 못했어요')
+      toast(e instanceof Error ? e.message : t('재발급하지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -123,7 +123,7 @@ export function Staff() {
     if (
       !(await confirmAction({
         title: `${o.email} 을 이 이벤트에서 뺄까요?`,
-        desc: '이 이벤트 관리 화면에 못 들어오게 돼요. 이 계정이 남긴 처리 기록은 그대로 남아요.',
+        desc: t('이 이벤트 관리 화면에 못 들어오게 돼요. 이 계정이 남긴 처리 기록은 그대로 남아요.'),
         okLabel: t('빼기'),
         danger: true,
       }))
@@ -147,7 +147,7 @@ export function Staff() {
 
       <div className="ad-stack">
         <div className="ad-banner ad-banner--info ad-banner--pad">
-          <div className="ad-banner__title">계정은 사람마다 따로 만들어 주세요</div>
+          <div className="ad-banner__title">{t('계정은 사람마다 따로 만들어 주세요')}</div>
           <div className="ad-banner__body">
             누가 어떤 처리를 했는지 기록에 남아요. 하나를 돌려 쓰면 문제가 생겼을 때 확인할 수
             없어요.
@@ -166,7 +166,7 @@ export function Staff() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="staff@example.com"
-              aria-label="스태프 이메일"
+              aria-label={t('스태프 이메일')}
               data-staff-email
             />
             <button
@@ -192,7 +192,7 @@ export function Staff() {
               style={{ marginTop: 16, background: 'var(--ad-key-wash-2)' }}
               data-temp-password
             >
-              <div className="ad-card__title">임시 비밀번호가 만들어졌어요</div>
+              <div className="ad-card__title">{t('임시 비밀번호가 만들어졌어요')}</div>
               <div className="ad-banner__body" style={{ color: 'var(--ad-bad)', fontWeight: 700 }}>
                 {temp.email} · 이 화면을 벗어나면 다시 볼 수 없어요. 지금 복사해서 전달해 주세요.
               </div>
@@ -241,7 +241,7 @@ export function Staff() {
             </div>
           ) : list.length === 0 ? (
             <div className="ad-empty">
-              <div className="ad-empty__title">아직 계정이 없어요</div>
+              <div className="ad-empty__title">{t('아직 계정이 없어요')}</div>
               <div className="ad-empty__sub">
                 위에 이메일을 넣으면 계정과 임시 비밀번호가 만들어져요.
               </div>
@@ -282,7 +282,7 @@ export function Staff() {
                         onClick={() => void remove(o)}
                         data-staff-remove
                       >
-                        {me ? '나는 뺄 수 없어요' : t('빼기')}
+                        {me ? t('나는 뺄 수 없어요') : t('빼기')}
                       </button>
                     </div>
                   </div>

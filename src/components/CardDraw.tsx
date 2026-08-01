@@ -86,7 +86,7 @@ export function CardDraw({
             ? t('카드를 섞고 있어요…')
             : done
               ? t('다 골랐어요')
-              : `${cardCount}장 중 ${selected.length}장 골랐어요`}
+              : t('{total}장 중 {n}장 골랐어요', { total: cardCount, n: selected.length })}
         </p>
       </div>
 

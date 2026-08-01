@@ -15,6 +15,7 @@ import { Stage } from './Stage'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Cheer.module.css'
 import { useT } from '@/i18n'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 영상회 라이브 응원 — 화면 셋이 한 파일 아래 있다.
@@ -48,7 +49,9 @@ interface Sent {
 
 function Cheer({ slot }: { slot: Slot }) {
   const { slug } = slot
-  const display = useMemo(() => cheerDisplay(slot), [slot])
+  const rawDisplay = useMemo(() => cheerDisplay(slot), [slot])
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const { pathname } = useLocation()
   const preview = useLivePreview()
 

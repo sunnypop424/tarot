@@ -31,7 +31,8 @@ import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Photocard.module.css'
-import { useT } from '@/i18n'
+import { useT, useLocale } from '@/i18n'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 포토카드 뽑기 — **운영 방식 셋이 한 파일에 있다** (`photocardRules` 가 가른다).
@@ -88,7 +89,9 @@ interface Kept {
 function Photocard({ slot }: { slot: Slot }) {
   const t = useT()
   const { slug } = slot
-  const display = useMemo(() => photocardDisplay(slot), [slot])
+  const rawDisplay = useMemo(() => photocardDisplay(slot), [slot])
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const subject = useMemo(() => visitorId(), [])
 
   const [settings, setSettings] = useState<PhotocardSettings | null>(null)
@@ -488,7 +491,7 @@ function Deck({
           </p>
         ) : (
           <div className={`${styles.deckLeft} ${styles.tnum}`}>
-            {closed ? t('마감됐어요') : left > 0 ? `남은 기회 ${left}회` : t('뽑을 수 있는 횟수를 다 쓰셨어요')}
+            {closed ? t('마감됐어요') : left > 0 ? t('남은 기회 {n}회', { n: left }) : t('뽑을 수 있는 횟수를 다 쓰셨어요')}
           </div>
         )}
         {/**
@@ -765,7 +768,7 @@ function Locker({
           onClick={onDraw}
           data-draw-more
         >
-          {left > 0 ? `한 번 더 뽑기 (${left}회 남음)` : t('뽑을 수 있는 횟수를 다 쓰셨어요')}
+          {left > 0 ? t('한 번 더 뽑기 ({n}회 남음)', { n: left }) : t('뽑을 수 있는 횟수를 다 쓰셨어요')}
         </button>
       </div>
     </>
@@ -852,6 +855,7 @@ function TicketView({
   onRefresh: () => void
 }) {
   const t = useT()
+  const loc = useLocale()
   return (
     <>
       <div style={{ height: 32, flex: 'none' }} />
@@ -898,7 +902,7 @@ function TicketView({
       </div>
 
       <div className={`${styles.stamp} ${styles.tnum}`}>
-        발급 {new Date(ticket.issuedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+        {t('발급 {time}', { time: new Date(ticket.issuedAt).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' }) })}
       </div>
       <div className={styles.adminRow} style={{ textAlign: 'center' }}>
         <AdminEntry slug={slug} className={`${styles.adminLink} ${styles.adminLinkLight}`} />

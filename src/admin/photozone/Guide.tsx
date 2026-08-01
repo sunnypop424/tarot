@@ -1,6 +1,7 @@
 import { photozoneDisplay } from '@/data/photozone'
 import { useSlot } from '@/slot/SlotProvider'
 import { useT } from '@/i18n'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 포토존 주최자 화면 — **만질 데이터가 하나도 없다.**
@@ -15,7 +16,9 @@ import { useT } from '@/i18n'
 export function Guide() {
   const t = useT()
   const slot = useSlot()
-  const display = photozoneDisplay(slot)
+  const rawDisplay = photozoneDisplay(slot)
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
 
   return (
     <>

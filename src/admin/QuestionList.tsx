@@ -59,7 +59,7 @@ export function QuestionList() {
 
   async function handleRemove(q: Question) {
     const ok = await confirmAction({
-      title: '이 질문을 지울까요?',
+      title: t('이 질문을 지울까요?'),
       desc: `“${q.question.trim() || t('제목 없음')}” 과 여기에 적어 둔 답변이 모두 사라져요.`,
       okLabel: t('지우기'),
       danger: true,
@@ -67,7 +67,7 @@ export function QuestionList() {
     if (!ok) return
     await repo.questions.remove(slug, q.id)
     await load()
-    toast('질문을 지웠어요')
+    toast(t('질문을 지웠어요'))
   }
 
   const total = questions?.length ?? 0
@@ -80,7 +80,7 @@ export function QuestionList() {
           <h1 className="ad-head__title">{t('질문 타로')}</h1>
           {questions && (
             <span className="ad-head__count tnum">
-              전체 {total} · 공개 {open}
+              {t('전체 {total} · 공개 {open}', { total, open })}
             </span>
           )}
         </div>
@@ -92,7 +92,7 @@ export function QuestionList() {
       <div className="ad-card">
         <div className="ad-card__head">
           <div className="ad-card__titleRow">
-            <span className="ad-card__title">질문</span>
+            <span className="ad-card__title">{t('질문')}</span>
             <span className="ad-card__num tnum">
               전체 {total} · 공개 {open}
             </span>
@@ -110,7 +110,7 @@ export function QuestionList() {
           </div>
         ) : questions.length === 0 ? (
           <div className="ad-empty">
-            <div className="ad-empty__title">아직 질문이 없어요</div>
+            <div className="ad-empty__title">{t('아직 질문이 없어요')}</div>
             <div className="ad-empty__sub">
               질문을 만들면 방문자가 그 중 하나를 골라 카드를 뽑게 돼요.
             </div>
@@ -152,8 +152,8 @@ export function QuestionList() {
                   </div>
                   {/* 장수는 안 쓴다 — 질문 타로는 전부 한 장이라 줄마다 "1장"이 붙으면 잡음이다 */}
                   <div className="ad-row__meta">
-                    {majorOnly || q.deck === 'major' ? t('메이저 22장') : '전체 78장'} ·{' '}
-                    {answeredCount(q)}개 답변 입력됨
+                    {majorOnly || q.deck === 'major' ? t('메이저 22장') : t('전체 78장')} ·{' '}
+                    {t('{n}개 답변 입력됨', { n: answeredCount(q) })}
                     {!q.published && (
                       <span className="ad-tag ad-tag--sm">{t('비공개')}</span>
                     )}
@@ -163,7 +163,7 @@ export function QuestionList() {
                 <button
                   type="button"
                   className="ad-x"
-                  aria-label="삭제"
+                  aria-label={t('삭제')}
                   onClick={() => void handleRemove(q)}
                 >
                   ×

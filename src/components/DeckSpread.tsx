@@ -3,6 +3,7 @@ import type { CSSProperties, MouseEvent } from 'react'
 
 import { CARD_RATIO } from '@/lib/card'
 import { CardBack } from './CardBack'
+import { useT } from '@/i18n'
 import styles from './DeckSpread.module.css'
 
 /** 셔플 연출 타이밍 — 합계 1200ms (PLANNING.md §2: 1.2초, 스킵 가능) */
@@ -105,6 +106,7 @@ interface DeckSpreadProps {
  * 고르지 않은 카드는 끝까지 공개하지 않는다 (PLANNING.md §2).
  */
 export function DeckSpread({ count, taken, onPick, disabled, phase }: DeckSpreadProps) {
+  const t = useT()
   const maxRows = useMaxRows()
   const fullRow = perRow(count, maxRows)
   const rows = toRows(count, maxRows)
@@ -154,7 +156,7 @@ export function DeckSpread({ count, taken, onPick, disabled, phase }: DeckSpread
                   } as CSSProperties
                 }
                 disabled={disabled || isTaken}
-                aria-label={`${i + 1}번 카드 고르기`}
+                aria-label={t('{n}번 카드 고르기', { n: i + 1 })}
                 onClick={handleClick(i)}
               >
                 <span className="play-card" style={{ display: 'block' }}>

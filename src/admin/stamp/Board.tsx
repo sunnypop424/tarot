@@ -6,6 +6,7 @@ import { stampDisplay } from '@/data/stamp'
 import { useSlot } from '@/slot/SlotProvider'
 import { toast } from '../AdminFeedback'
 import { useT } from '@/i18n'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 스탬프 운영 — **주최자의 자리다.**
@@ -17,7 +18,9 @@ export function Board() {
   const t = useT()
   const slot = useSlot()
   const slug = slot.slug
-  const display = stampDisplay(slot)
+  const rawDisplay = stampDisplay(slot)
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const [codes, setCodes] = useState<Record<string, string>>({})
   const [settings, setSettings] = useState<StampSettings | null>(null)
   const [shown, setShown] = useState(false)
@@ -37,7 +40,7 @@ export function Board() {
     <header className="ad-head">
       <div className="ad-head__row">
         <h1 className="ad-head__title">{t('스탬프')}</h1>
-        <span className="ad-head__count tnum">칸 {count}개</span>
+        <span className="ad-head__count tnum">{t('칸 {n}개', { n: count })}</span>
       </div>
       <p className="ad-head__desc">
         각 칸의 현장 암호와 운영 방식을 정해요. 칸 구성은 담당자가 만들어 드려요.
@@ -51,7 +54,7 @@ export function Board() {
         {head(0)}
         <div className="ad-card">
           <div className="ad-empty">
-            <div className="ad-empty__title">지금 빌드에서는 스탬프를 쓸 수 없어요</div>
+            <div className="ad-empty__title">{t('지금 빌드에서는 스탬프를 쓸 수 없어요')}</div>
           </div>
         </div>
       </>
@@ -123,8 +126,8 @@ export function Board() {
         <div className="ad-card" data-stamp-panel>
           <div className="ad-card__head">
             <div className="ad-card__titleRow">
-              <span className="ad-card__title">현장 암호</span>
-              <span className="ad-card__num tnum">칸 {display.stamps.length}개</span>
+              <span className="ad-card__title">{t('현장 암호')}</span>
+              <span className="ad-card__num tnum">{t('칸 {n}개', { n: display.stamps.length })}</span>
             </div>
             <button
               type="button"
@@ -137,7 +140,7 @@ export function Board() {
 
           {display.stamps.length === 0 ? (
             <div className="ad-empty">
-              <div className="ad-empty__title">아직 스탬프 칸이 없어요</div>
+              <div className="ad-empty__title">{t('아직 스탬프 칸이 없어요')}</div>
               <div className="ad-empty__sub">
                 칸 구성은 담당자가 정해요 — 필요하시면 말씀해 주세요.
               </div>
@@ -159,7 +162,7 @@ export function Board() {
                         type={shown ? 'text' : 'password'}
                         value={code}
                         maxLength={8}
-                        placeholder="현장 암호"
+                        placeholder={t('현장 암호')}
                         aria-label={`${c.name} 암호`}
                         onChange={(e) => setCodes({ ...codes, [c.id]: e.target.value.toUpperCase() })}
                         onBlur={() => code && void repo.stamp.saveCode(slug, c.id, code)}
@@ -172,7 +175,7 @@ export function Board() {
                           setCodes({ ...codes, [c.id]: next })
                           await repo.stamp.saveCode(slug, c.id, next)
                           setShown(true)
-                          toast('새 암호를 만들었어요')
+                          toast(t('새 암호를 만들었어요'))
                         }}
                       >
                         새로 만들기
@@ -197,20 +200,20 @@ export function Board() {
         <div className="ad-card ad-card--form">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
             {choice(
-              '다 모으면',
-              '응모로 정하면 응모 때 받을 정보를 고를 수 있어요.',
+              t('다 모으면'),
+              t('응모로 정하면 응모 때 받을 정보를 고를 수 있어요.'),
               settings.rewardMode,
               [
-                { v: 'none' as const, n: '선물 없음 (축하 화면만)' },
-                { v: 'guaranteed' as const, n: '확정 선물 (교환권 발급)' },
-                { v: 'raffle' as const, n: '응모 (나중에 추첨)' },
+                { v: 'none' as const, n: t('선물 없음 (축하 화면만)') },
+                { v: 'guaranteed' as const, n: t('확정 선물 (교환권 발급)') },
+                { v: 'raffle' as const, n: t('응모 (나중에 추첨)') },
               ],
               (v) => void save({ ...settings, rewardMode: v })
             )}
 
             {settings.rewardMode !== 'none' && (
               <div>
-                <div className="ad-card__title">선물 이름</div>
+                <div className="ad-card__title">{t('선물 이름')}</div>
                 <input
                   className="ad-input"
                   style={{ marginTop: 12 }}
@@ -232,7 +235,7 @@ export function Board() {
               settings.dailyReset ? 'on' : 'off',
               [
                 { v: 'off' as const, n: t('한 번만 (계속 모아요)') },
-                { v: 'on' as const, n: '매일 새로 (자정에 초기화)' },
+                { v: 'on' as const, n: t('매일 새로 (자정에 초기화)') },
               ],
               (v) => void save({ ...settings, dailyReset: v === 'on' })
             )}
@@ -243,14 +246,14 @@ export function Board() {
               settings.closed ? 'on' : 'off',
               [
                 { v: 'off' as const, n: t('진행 중') },
-                { v: 'on' as const, n: '마감 (도장을 못 찍어요)' },
+                { v: 'on' as const, n: t('마감 (도장을 못 찍어요)') },
               ],
               (v) => void save({ ...settings, closed: v === 'on' })
             )}
 
             {settings.rewardMode === 'raffle' && (
               <div className="ad-subset">
-                <div className="ad-subset__title">응모 때 받을 정보</div>
+                <div className="ad-subset__title">{t('응모 때 받을 정보')}</div>
                 <div className="ad-checks">
                   {(
                     [

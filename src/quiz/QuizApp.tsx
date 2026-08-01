@@ -26,6 +26,7 @@ import { AdminEntry } from '@/components/AdminEntry'
 import styles from './Quiz.module.css'
 import { useT } from '@/i18n'
 import { LangBar } from '@/components/LangBar'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 최애 모의고사 — 문제를 풀고 칭호를 받는다.
@@ -82,7 +83,9 @@ const SAMPLE_REWARD: MyReward = {
 function Quiz({ slot }: { slot: Slot }) {
   const t = useT()
   const { slug } = slot
-  const display = useMemo(() => quizDisplay(slot), [slot])
+  const rawDisplay = useMemo(() => quizDisplay(slot), [slot])
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const subject = useMemo(() => visitorId(), [])
 
   const [questions, setQuestions] = useState<QuizQuestion[] | null>(null)
@@ -327,7 +330,7 @@ function Start({
             <div className={styles.fact}>
               <div className={styles.factLabel}>{t('제한시간')}</div>
               <div className={`${styles.factValue} ${styles.tnum}`}>
-                {settings.timeLimitSec ? `${mins}분` : t('없음')}
+                {settings.timeLimitSec ? t('{n}분', { n: mins }) : t('없음')}
               </div>
             </div>
           </div>
@@ -625,7 +628,7 @@ function Result({
         {/* 화면에 안 그리지만 저장·공유의 원본이다 — 코드베이스에서 <img> 가 나는 유일한 자리 */}
         {image && (
           <div style={{ display: 'none' }} aria-hidden="true">
-            <SavableImage image={image} alt={`${title} 칭호 카드`} />
+            <SavableImage image={image} alt={t('{title} 칭호 카드', { title })} />
           </div>
         )}
 

@@ -434,4 +434,33 @@ export const ADMIN2_EN: Record<string, string> = {
   '5분': '5 min',
   '3분': '3 min',
   '필요': 'Required',
+
+  // ── QR 만들기 ────────────────────────────────────
+  '복사': 'Copy',
+  'PNG 내려받기': 'Download PNG',
+  'CSV 내려받기': 'Download CSV',
+  '{note} · 실제 QR은 내려받은 PNG에 들어 있어요':
+    '{note} · The real QR code is in the PNG you download',
+  '인쇄 전에 화면의 QR을 폰으로 한 번 찍어 주소가 맞는지 확인해 주세요.':
+    'Before printing, scan the QR on screen with your phone once to confirm the address is right.',
+  '방문자용과 스태프·관리용을 같이 붙이면 방문자가 관리 화면으로 들어와요.':
+    'If you post the visitor and staff QR codes together, visitors will end up on the admin screen.',
+  '스태프 기기는 QR 대신 주소를 직접 열어 로그인해 두시는 게 편해요.':
+    'For staff devices, it is easier to open the address directly and stay signed in rather than scanning.',
+
+  // ── 수량이 든 문장 (조각내지 않는다) ──────────────
+  '상품 {n}종': '{n} prizes',
+  '배송 {n}건': '{n} shipments',
+  '배송 정보 {n}건을 전부 지울까요?': 'Delete all {n} shipping records?',
+  '{a} / {b}건': '{a} / {b}',
+  '{n}표': '{n} votes',
+  '지금까지 {n}표': '{n} votes so far',
+  '받은 {n}표도 함께 사라져요.': 'The {n} votes it received will go too.',
+  '전체 {total} · 공개 {open}': 'All {total} · Public {open}',
+  '{n}개 답변 입력됨': '{n} answers filled in',
+  '공개 {open}문항 · 만점 {score}점 · 전체 {total}문항': 'Public {open} · Max {score} pts · All {total}',
+  '발급 {a}건 · 수령 {b}건': 'Issued {a} · Collected {b}',
+  '칸 {n}개': '{n} slots',
+  '발급 {time}': 'Issued at {time}',
+  '오늘 이 기기 {n}건': '{n} on this device today',
 }

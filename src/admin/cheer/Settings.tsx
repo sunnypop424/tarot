@@ -113,7 +113,7 @@ export function Settings() {
         </div>
 
         <div className="ad-card ad-card--form">
-          <div className="ad-card__title">말풍선</div>
+          <div className="ad-card__title">{t('말풍선')}</div>
           <div className="ad-formgrid">
             {FIELDS.map((f) => (
               <div key={f.k}>
@@ -145,7 +145,7 @@ export function Settings() {
         </div>
 
         <div className="ad-card ad-card--form">
-          <div className="ad-card__title">영상 비율</div>
+          <div className="ad-card__title">{t('영상 비율')}</div>
           <div className="ad-choices">
             {RATIOS.map((r) => (
               <button
@@ -161,7 +161,7 @@ export function Settings() {
               </button>
             ))}
           </div>
-          <p className="ad-field__hint">가운데를 이 비율만큼 비워 둬요 — 영상이 뜨는 자리예요.</p>
+          <p className="ad-field__hint">{t('가운데를 이 비율만큼 비워 둬요 — 영상이 뜨는 자리예요.')}</p>
 
           <div style={{ marginTop: 6 }}>
             <div className="ad-switchrow">
@@ -202,7 +202,7 @@ export function Settings() {
         </div>
 
         <div className="ad-card ad-card--form">
-          <div className="ad-card__title">상영 화면 열기</div>
+          <div className="ad-card__title">{t('상영 화면 열기')}</div>
           <p className="ad-card__desc">
             오버레이는 배경이 투명해요. OBS·프리즘의 브라우저 소스로 얹거나, 전체화면으로 영상 위에
             겹쳐 주세요.

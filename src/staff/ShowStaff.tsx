@@ -136,7 +136,7 @@ export function ShowStaff({ slot }: { slot: Slot }) {
               <span className={styles.clockMain}>{hhmmss(elapsed)}</span>
               {left !== null && (
                 <span className={styles.clockSub} data-soon={left <= 60 || undefined}>
-                  {left > 0 ? `크레딧까지 ${hhmmss(left)}` : t('크레딧 시점이 지났어요')}
+                  {left > 0 ? t('크레딧까지 {time}', { time: hhmmss(left) }) : t('크레딧 시점이 지났어요')}
                 </span>
               )}
             </div>

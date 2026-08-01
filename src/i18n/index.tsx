@@ -49,6 +49,20 @@ export const LANGS = [
 export type Lang = (typeof LANGS)[number]['id']
 
 /**
+ * 언어 → BCP 47 로케일. **숫자·날짜도 언어를 따라가야 한다.**
+ *
+ * `toLocaleString('ko-KR')` 이 25곳에 박혀 있었다. 글자는 영어로 바뀌는데 시각만
+ * "오후 12:57" 로 남아서, 영어 화면에 한국어가 섞여 있다는 게 여기서도 새어 나왔다.
+ * 형식은 사전의 일이 아니라 **런타임의 일**이라 `t()` 로는 못 잡는다 — 로케일을 넘겨야 한다.
+ */
+export const LOCALE: Record<Lang, string> = {
+  ko: 'ko-KR',
+  en: 'en-US',
+  zh: 'zh-CN',
+  ja: 'ja-JP',
+}
+
+/**
  * 언어별 사전 — **한국어는 사전이 없다.** 키가 곧 한국어 원문이라 돌려줄 게 자기 자신이다.
  * `Record<Lang, …>` 가 아니라 부분 맵인 이유가 그것이다.
  *
@@ -178,4 +192,13 @@ export function useLang(): LangState {
 /** 문장 하나만 필요한 흔한 경우 — `const t = useT()` */
 export function useT(): (ko: string, vars?: Vars) => string {
   return useContext(Ctx).t
+}
+
+/**
+ * 지금 언어의 로케일 — `const loc = useLocale()` 뒤에 `n.toLocaleString(loc)`.
+ *
+ * 모듈 함수(훅을 못 쓰는 자리)는 이걸 **인자로 받는다** — `fmt(iso, loc)`.
+ */
+export function useLocale(): string {
+  return LOCALE[useContext(Ctx).lang]
 }

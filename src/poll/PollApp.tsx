@@ -14,7 +14,8 @@ import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Poll.module.css'
-import { useT } from '@/i18n'
+import { useT, useLocale } from '@/i18n'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 실시간 투표 — 방문자가 자기 폰으로 찍고 결과가 그 자리에서 차오른다.
@@ -52,7 +53,9 @@ const SAMPLE_POLL: Poll = {
 function PollHome({ slot }: { slot: Slot }) {
   const t = useT()
   const { slug } = slot
-  const display = useMemo(() => pollDisplay(slot), [slot])
+  const rawDisplay = useMemo(() => pollDisplay(slot), [slot])
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const [polls, setPolls] = useState<Poll[] | null>(null)
   const [mine, setMine] = useState<MyVote[]>([])
   const [openId, setOpenId] = useState<string | null>(null)
@@ -177,13 +180,13 @@ function PollHome({ slot }: { slot: Slot }) {
                         <div className={styles.cardTop}>
                           <span className={styles.badge}>{p.closed ? t('마감') : t('진행 중')}</span>
                           <span className={styles.meta}>
-                            {p.kind === 'multi' ? `최대 ${p.maxPick}개` : t('하나만 고르기')}
+                            {p.kind === 'multi' ? t('최대 {n}개', { n: p.maxPick }) : t('하나만 고르기')}
                           </span>
                         </div>
                         <div className={styles.cardQ}>{p.title}</div>
                         <div className={styles.cardFoot}>
                           <span className={`${styles.cardCount} ${styles.tnum}`}>
-                            {display.showCount ? `${total.toLocaleString('ko-KR')}표` : ''}
+                            {display.showCount ? t('{n}표', { n: total.toLocaleString() }) : ''}
                           </span>
                           <span className={styles.cardCta} data-done={voted || undefined}>
                             {p.closed ? t('마감됨') : voted ? t('참여함 · 결과 보기') : display.voteLabel}
@@ -234,6 +237,7 @@ function PollView({
   notice: string | null
 }) {
   const t = useT()
+  const loc = useLocale()
   const [picked, setPicked] = useState<string[]>([])
   const voted = !!mine
   const result = showResult(display, poll, voted)
@@ -290,7 +294,7 @@ function PollView({
         {!result && (
           <div className={styles.qHint}>
             <span>
-              {poll.kind === 'multi' ? `${poll.maxPick}개까지 고를 수 있어요` : t('하나만 고를 수 있어요')}
+              {poll.kind === 'multi' ? t('{n}개까지 고를 수 있어요', { n: poll.maxPick }) : t('하나만 고를 수 있어요')}
             </span>
             {poll.kind === 'multi' && (
               <span className={`${styles.pickCount} ${styles.tnum}`}>
@@ -301,7 +305,7 @@ function PollView({
         )}
         {result && (
           <div className={`${styles.total} ${styles.tnum}`}>
-            {display.showCount ? `총 ${sum.toLocaleString('ko-KR')}표` : t('표 수는 공개하지 않아요')}
+            {display.showCount ? t('총 {n}표', { n: sum.toLocaleString() }) : t('표 수는 공개하지 않아요')}
           </div>
         )}
       </div>
@@ -338,7 +342,7 @@ function PollView({
                   </div>
                 )}
                 {display.showCount && (
-                  <div className={`${styles.votes} ${styles.tnum}`}>{o.votes.toLocaleString('ko-KR')}표</div>
+                  <div className={`${styles.votes} ${styles.tnum}`}>{t('{n}표', { n: o.votes.toLocaleString(loc) })}</div>
                 )}
               </li>
             )

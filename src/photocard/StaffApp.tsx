@@ -17,6 +17,7 @@ import type { Slot } from '@/types/slot'
 import styles from './Staff.module.css'
 import { useT } from '@/i18n'
 import { LangBar } from '@/components/LangBar'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 스태프 기기 — `/{slug}/staff`. **관리 화면이 아니다.**
@@ -38,7 +39,9 @@ export default function StaffApp() {
 function Staff({ slot }: { slot: Slot }) {
   const t = useT()
   const { slug } = slot
-  const display = useMemo(() => photocardDisplay(slot), [slot])
+  const rawDisplay = useMemo(() => photocardDisplay(slot), [slot])
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const { status } = useAdminAuth(slug)
 
   const [settings, setSettings] = useState<PhotocardSettings | null>(null)

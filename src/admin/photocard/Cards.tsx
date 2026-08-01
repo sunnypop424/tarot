@@ -371,7 +371,7 @@ export function Cards() {
                   />
                   <span className="ad-unit">{t('장')}</span>
                 </div>
-                <p className="ad-field__hint">N연차의 상한이에요 (최대 50장).</p>
+                <p className="ad-field__hint">{t('N연차의 상한이에요 (최대 50장).')}</p>
               </div>
             )}
           </div>
@@ -417,7 +417,7 @@ export function Cards() {
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
                 <div className="ad-switchrow__name">{t('마감')}</div>
-                <div className="ad-switchrow__hint">켜면 방문자가 더 뽑을 수 없어요.</div>
+                <div className="ad-switchrow__hint">{t('켜면 방문자가 더 뽑을 수 없어요.')}</div>
               </div>
               <button
                 type="button"

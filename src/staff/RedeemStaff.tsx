@@ -230,7 +230,7 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
         {/* 박스 아래는 스태프만 보는 줄이다 — 포토카드 스태프 화면과 같은 자리 */}
         <div className={styles.footRow}>
           <span className={styles.tally} data-tally>
-            오늘 이 기기 {log.count}건
+            {t('오늘 이 기기 {n}건', { n: log.count })}
           </span>
           <a className={styles.adminLink} href={`/${slug}/admin/redeem`}>
             {t('관리자 페이지로 이동')}

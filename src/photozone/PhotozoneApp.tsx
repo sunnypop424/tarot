@@ -38,6 +38,7 @@ import { AdminEntry } from '@/components/AdminEntry'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Photozone.module.css'
 import { useT } from '@/i18n'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 포토존 프레임 — 카페 포토존에서 찍은 사진에 **이벤트 프레임을 씌워 저장해 가는** 인증샷.
@@ -87,7 +88,9 @@ function fit(r: number): { w: number; h: number } {
 
 function Photozone({ slot }: { slot: Slot }) {
   const t = useT()
-  const display = useMemo(() => photozoneDisplay(slot), [slot])
+  const rawDisplay = useMemo(() => photozoneDisplay(slot), [slot])
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const [stage, setStage] = useState<Stage>('ready')
   const [frameIdx, setFrameIdx] = useState(0)
   const [facing, setFacing] = useState(display.facing)

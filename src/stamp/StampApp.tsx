@@ -26,6 +26,7 @@ import { AdminEntry } from '@/components/AdminEntry'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Stamp.module.css'
 import { useT } from '@/i18n'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 방문 스탬프 — 현장 암호로 도장을 찍고, 다 모으면 보상(공용 인프라)으로 넘어간다.
@@ -61,7 +62,9 @@ const SAMPLE_REWARD: MyReward = {
 function Board({ slot }: { slot: Slot }) {
   const t = useT()
   const { slug } = slot
-  const display = useMemo(() => stampDisplay(slot), [slot])
+  const rawDisplay = useMemo(() => stampDisplay(slot), [slot])
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const subject = useMemo(() => visitorId(), [])
 
   const [settings, setSettings] = useState<StampSettings | null>(null)
@@ -228,7 +231,7 @@ function Board({ slot }: { slot: Slot }) {
                     <div className={styles.toastSub}>
                       {complete
                         ? t('판을 다 채웠어요!')
-                        : `${cells.length - got}개만 더 모으면 완성이에요`}
+                        : t('{n}개만 더 모으면 완성이에요', { n: cells.length - got })}
                     </div>
                   </div>
                 </div>

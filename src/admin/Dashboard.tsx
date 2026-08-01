@@ -12,7 +12,7 @@ import { toast } from './AdminFeedback'
 import { useAlerts } from './AlertBar'
 import { useVisibleInterval } from './useVisibleInterval'
 import type { Slot } from '@/types/slot'
-import { useT } from '@/i18n'
+import { useT, useLocale } from '@/i18n'
 
 /**
  * 주최자 대시보드 — `/{slug}/admin`. **행사장에서 제일 먼저 여는 화면이다.**
@@ -56,6 +56,7 @@ const REFRESH_MS = 30_000
 
 export function Dashboard() {
   const t = useT()
+  const loc = useLocale()
   const slot = useSlot()
   const service = getSlotService(slot)
   const [stats, setStats] = useState<Stat[] | null>(null)
@@ -127,7 +128,8 @@ export function Dashboard() {
 
   const period = periodLine(slot, service, t)
   const deadline = exportDeadline(slot, service)
-  const serviceName = SERVICES.find((s) => s.id === service)?.label ?? service
+  // 서비스 이름은 모듈 상수(`services.ts`)라 한국어로 산다 — 번역은 여기 렌더에서
+  const serviceName = t(SERVICES.find((s) => s.id === service)?.label ?? service)
 
   return (
     <>
@@ -144,7 +146,10 @@ export function Dashboard() {
           <span className="ad-head__tools">
             {readAt && (
               <span className="ad-sub tnum" data-read-at>
-                {readAt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 기준
+                {/* 시각 형식도 언어를 따라간다 — 영어 화면에 "오후 12:57" 이 남으면 안 된다 */}
+                {t('{time} 기준', {
+                  time: readAt.toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' }),
+                })}
               </span>
             )}
             <button
@@ -159,7 +164,7 @@ export function Dashboard() {
           </span>
         </div>
         <p className="ad-head__desc">
-          오늘 이 행사에서 무엇이 얼마나 돌고 있는지 한눈에 봐요. 30초마다 저절로 갱신돼요.
+          {t('오늘 이 행사에서 무엇이 얼마나 돌고 있는지 한눈에 봐요. 30초마다 저절로 갱신돼요.')}
         </p>
       </header>
 
@@ -284,7 +289,7 @@ export function Dashboard() {
                 {period.left !== null && (
                   <div className="ad-kv">
                     <span>{t('남은 일수')}</span>
-                    <span className="tnum">{period.left}일</span>
+                    <span className="tnum">{t('{n}일', { n: period.left })}</span>
                   </div>
                 )}
                 {/*
@@ -295,22 +300,24 @@ export function Dashboard() {
                 <div className="ad-kv">
                   <span>{t('자료 보관')}</span>
                   <span className="tnum">
-                    {deadline ? `${deadline.date} 까지` : `종료 후 ${graceDays(service)}일`}
+                    {deadline
+                      ? t('{date} 까지', { date: deadline.date })
+                      : t('종료 후 {n}일', { n: graceDays(service) })}
                   </span>
                 </div>
               </div>
               <div className="ad-hr" />
               <p className="ad-fine">
-                종료되면 방문자 화면은 종료 안내로 바뀌고, 보관 기간이 지나면 자료가 파기돼요.
-                관리 화면은 보관 기간 동안 그대로 열려 있어요.
+                {t(
+                  '종료되면 방문자 화면은 종료 안내로 바뀌고, 보관 기간이 지나면 자료가 파기돼요. 관리 화면은 보관 기간 동안 그대로 열려 있어요.'
+                )}
               </p>
             </div>
 
             <div className="ad-card">
               <div className="ad-card__title">{t('행사 자료 내보내기')}</div>
               <p className="ad-card__desc">
-                CSV 여러 개로 떨어져요 · 개인정보가 든 파일이 섞여 있어요 · 종료 +14일이 지나면
-                꺼낼 수 없어요
+                {t('CSV 여러 개로 떨어져요 · 개인정보가 든 파일이 섞여 있어요 · 종료 +14일이 지나면 꺼낼 수 없어요')}
               </p>
               <button
                 type="button"

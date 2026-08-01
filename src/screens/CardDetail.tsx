@@ -34,7 +34,9 @@ export function CardDetail() {
       {/* 타이틀·리드는 다른 화면과 같은 자리에 둔다 — 이동할 때 어긋나 보이지 않게 */}
       <h1 className="t-title-l screen__title">{card.name}</h1>
       <p className="t-text-m screen__lead">
-        {card.nameEn} · {arcanaLabel(card, t)}
+        {/* 영어에서는 이름이 곧 nameEn 이라 같은 글자가 두 번 뜬다 — 다를 때만 병기 */}
+        {card.name !== card.nameEn && <>{card.nameEn} · </>}
+        {arcanaLabel(card, t)}
       </p>
 
       <div className={`play-card ${styles.detailCard}`}>

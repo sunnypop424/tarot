@@ -16,6 +16,7 @@ import { PrizePreview } from './PrizePreview'
 import styles from './Luckydraw.module.css'
 import { useT } from '@/i18n'
 import { LangBar } from '@/components/LangBar'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /** 한 번에 뽑을 수 있는 최대 — 서버도 같은 값으로 막는다 (`draw_prizes`) */
 const MAX_DRAW = 100
@@ -63,7 +64,9 @@ function sampleResult(display: LuckydrawDisplay): DrawResult {
 export default function LuckydrawApp() {
   const t = useT()
   const slot = useSlot()
-  const display = luckydrawDisplay(slot)
+  const rawDisplay = luckydrawDisplay(slot)
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const { status: authStatus } = useAdminAuth(slot.slug)
   const preview = useLivePreview()
 
@@ -299,7 +302,7 @@ export default function LuckydrawApp() {
                     <div className={styles.band}>
                       <span className={styles.bandMsg} data-low={lowStock || undefined}>
                         {lowStock
-                          ? `남은 경품 ${remaining}개, 서둘러요!`
+                          ? t('남은 경품 {n}개, 서둘러요!', { n: remaining })
                           : t('어떤 경품이 있는지 확인해보세요!')}
                       </span>
                       {canPreview && (
@@ -318,9 +321,8 @@ export default function LuckydrawApp() {
                   {rehearsal && (
                     <div className={styles.infoBanner} data-rehearsal>
                       <Info size={16} aria-hidden="true" />
-                      <span>
-                        지금은 <b>{t('리허설')}</b>이에요. 뽑아도 실제 재고는 줄지 않아요.
-                      </span>
+                      {/* 조각내지 않는다 — 예전엔 "리허설" 만 감싸서 앞뒤 조사가 한국어로 남았다 */}
+                      <span>{t('지금은 리허설이에요. 뽑아도 실제 재고는 줄지 않아요.')}</span>
                     </div>
                   )}
 

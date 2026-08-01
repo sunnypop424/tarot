@@ -274,7 +274,7 @@ export function Overview() {
       <header className="ad-head">
         <div className="ad-head__row">
           <h1 className="ad-head__title">{t('상품 · 운영')}</h1>
-          <span className="ad-head__count tnum">상품 {rows.length}종</span>
+          <span className="ad-head__count tnum">{t('상품 {n}종', { n: rows.length })}</span>
         </div>
         <p className="ad-head__desc">
           재고와 운영 방식을 함께 봐요. 이 화면만 아래 저장을 눌러야 반영돼요.
@@ -289,7 +289,7 @@ export function Overview() {
               <span className="ad-stat__value tnum">{totalRemaining.toLocaleString()}</span>
               <span className="ad-stat__unit">{t('개')}</span>
             </div>
-            <div className="ad-stat__sub">상품 {rows.length}종</div>
+            <div className="ad-stat__sub">{t('상품 {n}종', { n: rows.length })}</div>
           </div>
           <div className="ad-stat">
             <div className="ad-stat__label">{t('오늘 나간 수량')}</div>
@@ -331,7 +331,7 @@ export function Overview() {
                 placeholder={'1\t스페셜 포토북\t3\n2\t아크릴 스탠드\t10\n3\t엽서 세트\t50'}
                 hint={
                   <>
-                    한 줄에 하나씩 <b>이름, 수량</b> 순서로 적어 주세요. 앞에 등수를 적어도 되고
+                    한 줄에 하나씩 <b>{t('이름, 수량')}</b> 순서로 적어 주세요. 앞에 등수를 적어도 되고
                     안 적어도 돼요(줄 순서대로 매겨져요). 탭·쉼표·세로줄 다 돼요. 수량 뒤에{' '}
                     <b>{t('배송')}</b>이라고 적으면 그 상품은 배송 정보를 받아요.
                   </>
@@ -433,7 +433,7 @@ export function Overview() {
                     aria-label={`${r.rank}등 배송 필요`}
                     onClick={() => patchRow(i, { requiresShipping: !r.requiresShipping })}
                   >
-                    {r.requiresShipping ? '필요' : t('아니요')}
+                    {r.requiresShipping ? t('필요') : t('아니요')}
                   </button>
                   <button
                     type="button"
@@ -492,7 +492,7 @@ export function Overview() {
             <div className="ad-switchrow">
               <div className="ad-switchrow__text">
                 <div className="ad-switchrow__name">{t('행사 마감')}</div>
-                <div className="ad-switchrow__hint">켜면 방문자가 더 못 뽑아요. 언제든 다시 열 수 있어요.</div>
+                <div className="ad-switchrow__hint">{t('켜면 방문자가 더 못 뽑아요. 언제든 다시 열 수 있어요.')}</div>
               </div>
               <button
                 type="button"

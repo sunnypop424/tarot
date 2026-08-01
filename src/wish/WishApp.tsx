@@ -16,6 +16,7 @@ import { LangPicker } from '@/components/LangPicker'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Wish.module.css'
 import { useT } from '@/i18n'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 소원 나무 — 방문자가 소원을 적어 **등불**로 나무에 매단다.
@@ -51,7 +52,9 @@ function useWishVars(d: WishDisplay): React.CSSProperties {
 
 function Wish({ slot }: { slot: Slot }) {
   const location = useLocation()
-  const display = useMemo(() => wishDisplay(slot), [slot])
+  const rawDisplay = useMemo(() => wishDisplay(slot), [slot])
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const composing = location.pathname.replace(/\/+$/, '').endsWith('/write')
 
   useEffect(() => {

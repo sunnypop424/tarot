@@ -225,4 +225,19 @@ export const ADMIN_EN: Record<string, string> = {
   '자료를 꺼낼 수 있는 기한이 지났어요. 남은 기록은 곧 파기돼요.':
     'The window for exporting your data has passed. What remains will be deleted soon.',
   '오늘까지예요': 'today is the last day',
+
+  '고치러 가기 →': 'Go fix it →',
+
+  // ── 대시보드 · 기간 ────────────────────────────────
+  '{n}일': '{n} days',
+  '{date} 까지': 'until {date}',
+  '종료 후 {n}일': '{n} days after it ends',
+  '{time} 기준': 'as of {time}',
+  '기간 없음': 'No date limit',
+  '오늘 이 행사에서 무엇이 얼마나 돌고 있는지 한눈에 봐요. 30초마다 저절로 갱신돼요.':
+    'See at a glance what is happening at your event today. Refreshes itself every 30 seconds.',
+  '종료되면 방문자 화면은 종료 안내로 바뀌고, 보관 기간이 지나면 자료가 파기돼요. 관리 화면은 보관 기간 동안 그대로 열려 있어요.':
+    'When the event ends, the visitor screen switches to a closing notice, and your data is destroyed once the retention period is over. The admin screens stay open for the whole retention period.',
+  'CSV 여러 개로 떨어져요 · 개인정보가 든 파일이 섞여 있어요 · 종료 +14일이 지나면 꺼낼 수 없어요':
+    'Comes as several CSV files · Some contain personal data · Unavailable 14 days after the event ends',
 }

@@ -46,7 +46,10 @@ export function CardFace({ card: raw, orientation }: DrawnCard) {
         {card.arcana === 'major' ? card.number : card.nameEn.split(' of ')[0]}
       </span>
       <span className={`t-text-l ${styles.name}`}>{card.name}</span>
-      <span className={`t-text-xxs t-muted ${styles.nameEn}`}>{card.nameEn}</span>
+      {/* 영어에서는 이름이 곧 nameEn — 같은 글자를 두 번 그리지 않는다 */}
+      {card.name !== card.nameEn && (
+        <span className={`t-text-xxs t-muted ${styles.nameEn}`}>{card.nameEn}</span>
+      )}
       {reversed && <span className={`t-text-xxs ${styles.reversed}`}>{t('역방향')}</span>}
     </div>
   )

@@ -67,9 +67,9 @@ export function Redeem() {
     const v = code.trim()
     if (!v || busy) return
     const ok = await confirmAction({
-      title: '이 코드를 수령 처리할까요?',
+      title: t('이 코드를 수령 처리할까요?'),
       desc: `${v.toUpperCase()} · 처리하면 이 코드는 다시 쓸 수 없어요. 실물을 방문자에게 건넨 뒤 눌러 주세요.`,
-      okLabel: '수령 처리',
+      okLabel: t('수령 처리'),
       danger: true,
     })
     if (!ok) return
@@ -130,21 +130,21 @@ export function Redeem() {
   const RESULT_TONE = { ok: undefined, already: 'warn', none: 'mute', error: 'bad' } as const
   const RESULT_TITLE = {
     ok: t('수령 처리했어요'),
-    already: '이미 수령한 코드예요',
+    already: t('이미 수령한 코드예요'),
     none: t('없는 코드예요'),
-    error: '처리하지 못했어요',
+    error: t('처리하지 못했어요'),
   } as const
 
   return (
     <>
       <header className="ad-head">
         <div className="ad-head__row">
-          <h1 className="ad-head__title">교환권 수령 확인</h1>
+          <h1 className="ad-head__title">{t('교환권 수령 확인')}</h1>
           <span className="ad-head__count tnum">
-            발급 {guaranteed.length}건 · 수령 {done.length}건
+            {t('발급 {a}건 · 수령 {b}건', { a: guaranteed.length, b: done.length })}
           </span>
         </div>
-        <p className="ad-head__desc">방문자가 보여준 코드를 입력해 실물 수령을 처리해요.</p>
+        <p className="ad-head__desc">{t('방문자가 보여준 코드를 입력해 실물 수령을 처리해요.')}</p>
       </header>
 
       <div className="ad-stack">
@@ -152,7 +152,7 @@ export function Redeem() {
           {[
             { label: t('발급'), value: guaranteed.length, attr: 'data-issued' },
             { label: t('수령 완료'), value: done.length, attr: 'data-redeemed' },
-            { label: '아직 안 받음', value: left, attr: 'data-left' },
+            { label: t('아직 안 받음'), value: left, attr: 'data-left' },
           ].map((k) => (
             <div key={k.label} className="ad-stat">
               <div className="ad-stat__label">{k.label}</div>
@@ -167,7 +167,7 @@ export function Redeem() {
         </div>
 
         <form className="ad-card ad-card--form" onSubmit={(e) => void ask(e)} data-redeem-form>
-          <div className="ad-card__title ad-card__title--lg">코드 확인하고 수령 처리</div>
+          <div className="ad-card__title ad-card__title--lg">{t('코드 확인하고 수령 처리')}</div>
           <p className="ad-card__desc">
             방문자 폰에 뜬 코드를 그대로 입력하세요. 소문자·하이픈·공백은 알아서 맞춰져요.
           </p>
@@ -177,11 +177,11 @@ export function Redeem() {
               className="ad-input ad-input--entry"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="예: XK4T-9P2M"
+              placeholder={t('예: XK4T-9P2M')}
               autoFocus
               autoCapitalize="characters"
               autoComplete="off"
-              aria-label="교환코드"
+              aria-label={t('교환코드')}
               data-redeem-code
             />
             <button
@@ -189,7 +189,7 @@ export function Redeem() {
               className="ad-btn ad-btn--primary ad-btn--hero"
               disabled={!code.trim() || busy}
             >
-              {busy ? t('확인 중…') : '수령 처리'}
+              {busy ? t('확인 중…') : t('수령 처리')}
             </button>
           </div>
           <p className="ad-fine" style={{ marginTop: 10 }}>
@@ -232,13 +232,13 @@ export function Redeem() {
         <div className="ad-card">
           <div className="ad-card__head">
             <div className="ad-card__titleRow">
-              <span className="ad-card__title">발급된 교환권</span>
+              <span className="ad-card__title">{t('발급된 교환권')}</span>
               <span className="ad-card__num tnum">
-                {shown.length} / {guaranteed.length}건
+                {t('{a} / {b}건', { a: shown.length, b: guaranteed.length })}
               </span>
             </div>
             <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>
-              <SearchBox value={query} onChange={setQuery} placeholder="코드·내용으로 찾기" />
+              <SearchBox value={query} onChange={setQuery} placeholder={t('코드·내용으로 찾기')} />
               <button
                 type="button"
                 className="ad-btn ad-btn--line ad-btn--md"
@@ -262,14 +262,14 @@ export function Redeem() {
             </div>
           ) : guaranteed.length === 0 ? (
             <div className="ad-empty">
-              <div className="ad-empty__title">아직 발급된 교환권이 없어요</div>
+              <div className="ad-empty__title">{t('아직 발급된 교환권이 없어요')}</div>
               <div className="ad-empty__sub">
                 방문자가 조건을 채우면 교환코드가 발급되고 여기 한 줄씩 쌓여요.
               </div>
             </div>
           ) : shown.length === 0 ? (
             <div className="ad-empty ad-empty--sm">
-              <div className="ad-empty__title">찾는 교환권이 없어요</div>
+              <div className="ad-empty__title">{t('찾는 교환권이 없어요')}</div>
               <div className="ad-empty__sub">{t('검색어를 지우거나 다른 코드로 찾아보세요.')}</div>
             </div>
           ) : (
@@ -280,7 +280,7 @@ export function Redeem() {
                   <span>{t('내용')}</span>
                   <span>{t('상태')}</span>
                   <span>{t('발급')}</span>
-                  <span>수령</span>
+                  <span>{t('수령')}</span>
                 </div>
                 {shown.map((r) => (
                   <div
@@ -293,7 +293,7 @@ export function Redeem() {
                     <span className="ad-cell">{r.label}</span>
                     <span>
                       <span className="ad-tag" data-tone={r.redeemedAt ? 'on' : undefined}>
-                        {r.redeemedAt ? t('수령 완료') : '아직 안 받음'}
+                        {r.redeemedAt ? t('수령 완료') : t('아직 안 받음')}
                       </span>
                     </span>
                     <span className="ad-cell--mute tnum">{when(r.createdAt)}</span>

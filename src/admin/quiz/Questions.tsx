@@ -176,7 +176,7 @@ export function Questions() {
       }
       toast(`${done}문항을 넣었어요 · 전부 비공개예요`)
     } catch (e) {
-      toast(`${done}문항까지 넣었어요 — ${e instanceof Error ? e.message : '나머지는 실패했어요'}`)
+      toast(`${done}문항까지 넣었어요 — ${e instanceof Error ? e.message : t('나머지는 실패했어요')}`)
     } finally {
       await load()
       setBusy(false)
@@ -264,7 +264,7 @@ export function Questions() {
         <div className="ad-card">
           <div className="ad-card__head">
             <span className="ad-card__title">
-              공개 {open.length}문항 · 만점 {maxScore}점 · 전체 {list.length}문항
+              {t('공개 {open}문항 · 만점 {score}점 · 전체 {total}문항', { open: open.length, score: maxScore, total: list.length })}
             </span>
             <div className="ad-btnrow">
               {/*
@@ -366,7 +366,7 @@ export function Questions() {
                     type="button"
                     className="ad-x"
                     disabled={busy}
-                    aria-label="삭제"
+                    aria-label={t('삭제')}
                     onClick={async () => {
                       if (
                         !(await confirmAction({
@@ -401,9 +401,9 @@ export function Questions() {
               t('응모로 정하면 응모 때 받을 정보를 고를 수 있어요.'),
               settings.rewardMode,
               [
-                { v: 'none' as const, n: '없음 (점수·칭호만)' },
+                { v: 'none' as const, n: t('없음 (점수·칭호만)') },
                 { v: 'threshold' as const, n: t('기준 점수 이상 확정 선물') },
-                { v: 'raffle' as const, n: '응모 (나중에 추첨)' },
+                { v: 'raffle' as const, n: t('응모 (나중에 추첨)') },
               ],
               (v) => void saveSettings({ ...settings, rewardMode: v })
             )}
@@ -434,7 +434,7 @@ export function Questions() {
 
             {rewardOn && (
               <div>
-                <div className="ad-card__title">선물 이름</div>
+                <div className="ad-card__title">{t('선물 이름')}</div>
                 <input
                   className="ad-input"
                   style={{ marginTop: 12 }}
@@ -453,9 +453,9 @@ export function Questions() {
               String(settings.timeLimitSec),
               [
                 { v: '0', n: t('없음') },
-                { v: '180', n: '3분' },
-                { v: '300', n: '5분' },
-                { v: '600', n: '10분' },
+                { v: '180', n: t('3분') },
+                { v: '300', n: t('5분') },
+                { v: '600', n: t('10분') },
               ],
               (v) => void saveSettings({ ...settings, timeLimitSec: Number(v) })
             )}
@@ -497,7 +497,7 @@ export function Questions() {
 
             {settings.rewardMode === 'raffle' && (
               <div className="ad-subset">
-                <div className="ad-subset__title">응모 때 받을 정보</div>
+                <div className="ad-subset__title">{t('응모 때 받을 정보')}</div>
                 <div className="ad-checks">
                   {(
                     [

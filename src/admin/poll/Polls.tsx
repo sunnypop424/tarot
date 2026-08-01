@@ -5,7 +5,7 @@ import type { Poll } from '@/lib/repo/types'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
 import { BulkPaste, splitCells, toLines, type BulkResult } from '../BulkPaste'
-import { useT } from '@/i18n'
+import { useT, useLocale } from '@/i18n'
 
 /**
  * 붙여넣기 → 선택지들.
@@ -34,6 +34,7 @@ function parseOptions(text: string): BulkResult<string> {
  */
 export function Polls() {
   const t = useT()
+  const loc = useLocale()
   const slot = useSlot()
   const slug = slot.slug
   const [saved, setSaved] = useState<Poll[] | null>(null)
@@ -73,8 +74,8 @@ export function Polls() {
         </header>
         <div className="ad-card">
           <div className="ad-empty">
-            <div className="ad-empty__title">지금 빌드에서는 투표를 쓸 수 없어요</div>
-            <div className="ad-empty__sub">서버가 붙어야 집계가 정확해요. 담당자에게 문의해 주세요.</div>
+            <div className="ad-empty__title">{t('지금 빌드에서는 투표를 쓸 수 없어요')}</div>
+            <div className="ad-empty__sub">{t('서버가 붙어야 집계가 정확해요. 담당자에게 문의해 주세요.')}</div>
           </div>
         </div>
       </>
@@ -101,14 +102,17 @@ export function Polls() {
         options: [],
       },
     ])
-    toast('새 설문은 준비 중으로 시작해요')
+    toast(t('새 설문은 준비 중으로 시작해요'))
   }
 
   async function removePoll(p: Poll) {
     const total = p.options.reduce((n, o) => n + o.votes, 0)
     const ok = await confirmAction({
-      title: '이 설문을 지울까요?',
-      desc: total > 0 ? `받은 ${total.toLocaleString()}표도 함께 사라져요.` : '아직 받은 표가 없어요.',
+      title: t('이 설문을 지울까요?'),
+      desc:
+        total > 0
+          ? t('받은 {n}표도 함께 사라져요.', { n: total.toLocaleString(loc) })
+          : t('아직 받은 표가 없어요.'),
       okLabel: t('지우기'),
       danger: true,
     })
@@ -178,7 +182,7 @@ export function Polls() {
         {drafts.length === 0 ? (
           <div className="ad-card" style={{ borderStyle: 'dashed' }}>
             <div className="ad-empty" style={{ border: 'none', padding: '24px 20px' }}>
-              <div className="ad-empty__title">아직 설문이 없어요</div>
+              <div className="ad-empty__title">{t('아직 설문이 없어요')}</div>
               <div className="ad-empty__sub">
                 새 설문은 준비 중으로 시작해요. 선택지를 채운 뒤 공개해 주세요.
               </div>
@@ -195,8 +199,8 @@ export function Polls() {
                       className="ad-input ad-input--grow"
                       style={{ height: 44, fontWeight: 700 }}
                       value={p.title}
-                      placeholder="설문 제목"
-                      aria-label="설문 제목"
+                      placeholder={t('설문 제목')}
+                      aria-label={t('설문 제목')}
                       onChange={(e) => patch(p.id, { title: e.target.value })}
                     />
                     <button
@@ -218,7 +222,7 @@ export function Polls() {
                     <button
                       type="button"
                       className="ad-x"
-                      aria-label="설문 지우기"
+                      aria-label={t('설문 지우기')}
                       onClick={() => void removePoll(p)}
                     >
                       ×
@@ -260,7 +264,7 @@ export function Polls() {
                           style={{ width: 70 }}
                           inputMode="numeric"
                           value={p.maxPick}
-                          aria-label="최대 개수"
+                          aria-label={t('최대 개수')}
                           onChange={(e) =>
                             patch(p.id, {
                               maxPick: Math.max(2, Number(e.target.value.replace(/[^0-9]/g, '')) || 2),
@@ -299,7 +303,7 @@ export function Polls() {
                             color: 'var(--ad-ink-3)',
                           }}
                         >
-                          {o.votes.toLocaleString('ko-KR')}표
+                          {t('{n}표', { n: o.votes.toLocaleString(loc) })}
                         </span>
                         <button
                           type="button"
@@ -368,7 +372,7 @@ export function Polls() {
                       </button>
                     </div>
                     <span className="ad-card__num tnum">
-                      지금까지 {total.toLocaleString('ko-KR')}표
+                      {t('지금까지 {n}표', { n: total.toLocaleString(loc) })}
                     </span>
                   </div>
 

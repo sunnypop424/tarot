@@ -37,7 +37,8 @@ export function Cards() {
     <div className="screen">
       <h1 className="t-title-l screen__title">{t('카드 도감')}</h1>
       <p className="t-text-m screen__lead">
-        {majorOnly ? t('메이저 22장') : t('78장')}의 의미를 살펴보세요.
+        {/* 조사까지 한 키로 — 앞 조각만 감싸면 "All 78의 의미를…" 처럼 반만 번역된다 */}
+        {t('{deck}의 의미를 살펴보세요.', { deck: majorOnly ? t('메이저 22장') : t('78장') })}
       </p>
 
       {!majorOnly && (

@@ -158,9 +158,9 @@ export function Tickets() {
         <div className="ad-card">
           <div className="ad-card__head" style={{ marginBottom: 12 }}>
             <div className="ad-card__titleRow">
-              <span className="ad-card__title">발급 목록</span>
+              <span className="ad-card__title">{t('발급 목록')}</span>
               <span className="ad-card__num tnum">
-                {shown.length} / {rows.length}건
+                {t('{a} / {b}건', { a: shown.length, b: rows.length })}
               </span>
             </div>
             <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>
@@ -237,7 +237,7 @@ export function Tickets() {
                           )}
                         </>
                       ) : (
-                        <span className="ad-tag">아직 안 뽑음</span>
+                        <span className="ad-tag">{t('아직 안 뽑음')}</span>
                       )}
                     </div>
                     <span className="ad-cell--mute tnum">{when(r.issuedAt)}</span>

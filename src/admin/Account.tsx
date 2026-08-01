@@ -42,7 +42,7 @@ export function Account() {
       setConfirm('')
       setDone(true)
     } catch (e) {
-      setError(e instanceof Error ? e.message : '비밀번호를 바꾸지 못했어요')
+      setError(e instanceof Error ? e.message : t('비밀번호를 바꾸지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -56,13 +56,13 @@ export function Account() {
         <div className="ad-head__row">
           <h1 className="ad-head__title">{t('내 계정')}</h1>
         </div>
-        <p className="ad-head__desc">이 행사에서 쓰는 내 비밀번호를 바꿔요.</p>
+        <p className="ad-head__desc">{t('이 행사에서 쓰는 내 비밀번호를 바꿔요.')}</p>
       </header>
 
       <div className="ad-stack">
         {/* 임시 비번을 받아 들어왔을 수 있다 — 바꾸라고 말해주는 게 이 화면의 일이다 */}
         <div className="ad-banner ad-banner--warn ad-banner--pad">
-          <div className="ad-banner__title">받은 비밀번호를 그대로 쓰고 있다면 지금 바꿔 주세요</div>
+          <div className="ad-banner__title">{t('받은 비밀번호를 그대로 쓰고 있다면 지금 바꿔 주세요')}</div>
           <div className="ad-banner__body">
             현장에서 공유된 비밀번호는 누가 알고 있는지 알 수 없어요.
           </div>
@@ -86,12 +86,12 @@ export function Account() {
         </div>
 
         <div className="ad-card ad-card--form">
-          <div className="ad-card__title ad-card__title--lg">비밀번호 바꾸기</div>
-          <p className="ad-card__desc">바꾸면 다음 로그인부터 새 비밀번호를 써요.</p>
+          <div className="ad-card__title ad-card__title--lg">{t('비밀번호 바꾸기')}</div>
+          <p className="ad-card__desc">{t('바꾸면 다음 로그인부터 새 비밀번호를 써요.')}</p>
 
           <div className="ad-formgrid" style={{ marginTop: 18 }}>
             <div>
-              <span className="ad-field__label">새 비밀번호</span>
+              <span className="ad-field__label">{t('새 비밀번호')}</span>
               <input
                 type="password"
                 className="ad-input ad-input--lg"
@@ -111,17 +111,17 @@ export function Account() {
                   ? `${MIN_PASSWORD}자 이상으로 정해 주세요`
                   : tooShort
                     ? `${MIN_PASSWORD}자 이상이어야 해요`
-                    : '조건을 만족해요'}
+                    : t('조건을 만족해요')}
               </div>
             </div>
             <div>
-              <span className="ad-field__label">한 번 더</span>
+              <span className="ad-field__label">{t('한 번 더')}</span>
               <input
                 type="password"
                 className="ad-input ad-input--lg"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                placeholder="같은 비밀번호"
+                placeholder={t('같은 비밀번호')}
                 disabled={busy}
                 autoComplete="new-password"
                 data-confirm-password
@@ -132,7 +132,7 @@ export function Account() {
                   !confirm ? 'ad-field__hint--mute' : mismatch ? 'ad-field__hint--bad' : 'ad-field__hint--good'
                 }`}
               >
-                {!confirm ? '위와 같은 비밀번호를 한 번 더 입력해 주세요' : mismatch ? '두 값이 서로 달라요' : '일치해요'}
+                {!confirm ? t('위와 같은 비밀번호를 한 번 더 입력해 주세요') : mismatch ? t('두 값이 서로 달라요') : t('일치해요')}
               </div>
             </div>
           </div>
@@ -152,7 +152,7 @@ export function Account() {
             onClick={() => void handleSubmit()}
             data-change-password
           >
-            비밀번호 바꾸기
+            {t('비밀번호 바꾸기')}
           </button>
         </div>
       </div>

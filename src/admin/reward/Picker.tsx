@@ -49,7 +49,7 @@ export function Picker() {
           </span>
         )}
       </div>
-      <p className="ad-head__desc">응모자 중에서 당첨자를 뽑고, 회차별로 관리해요.</p>
+      <p className="ad-head__desc">{t('응모자 중에서 당첨자를 뽑고, 회차별로 관리해요.')}</p>
     </header>
   )
 
@@ -59,7 +59,7 @@ export function Picker() {
         {head}
         <div className="ad-card">
           <div className="ad-empty">
-            <div className="ad-empty__title">지금 빌드에서는 추첨을 쓸 수 없어요</div>
+            <div className="ad-empty__title">{t('지금 빌드에서는 추첨을 쓸 수 없어요')}</div>
           </div>
         </div>
       </>
@@ -94,7 +94,7 @@ export function Picker() {
       await load()
       toast(`${result.length}명을 뽑았어요`)
     } catch (e) {
-      toast(e instanceof Error ? e.message : '추첨하지 못했어요')
+      toast(e instanceof Error ? e.message : t('추첨하지 못했어요'))
     } finally {
       setBusy(false)
     }
@@ -154,7 +154,7 @@ export function Picker() {
         <div className="ad-stats">
           {[
             { label: t('응모자'), value: list.length },
-            { label: '남은 후보', value: pool.length },
+            { label: t('남은 후보'), value: pool.length },
             { label: t('당첨자'), value: winners.length },
           ].map((k) => (
             <div key={k.label} className="ad-stat">
@@ -168,7 +168,7 @@ export function Picker() {
         </div>
 
         <div className="ad-card ad-card--form" data-picker>
-          <div className="ad-card__title ad-card__title--lg">추첨하기</div>
+          <div className="ad-card__title ad-card__title--lg">{t('추첨하기')}</div>
           <p className="ad-card__desc">
             뽑은 결과는 되돌릴 수 있지만, 회차 단위로만 되돌려요. 후보가 남아 있지 않으면 추첨할 수
             없어요.
@@ -181,7 +181,7 @@ export function Picker() {
                 <button
                   type="button"
                   className="ad-step"
-                  aria-label="한 명 줄이기"
+                  aria-label={t('한 명 줄이기')}
                   onClick={() => setCount((c) => Math.max(1, c - 1))}
                 >
                   −
@@ -198,7 +198,7 @@ export function Picker() {
                 <button
                   type="button"
                   className="ad-step"
-                  aria-label="한 명 늘리기"
+                  aria-label={t('한 명 늘리기')}
                   onClick={() => setCount((c) => Math.min(50, c + 1))}
                 >
                   +
@@ -228,8 +228,8 @@ export function Picker() {
                 </div>
                 <p className="ad-field__hint">
                   {method === 'random'
-                    ? '남은 후보 중에서 무작위로 뽑아요.'
-                    : '점수가 높은 순으로 뽑고, 커트라인 동점자 안에서만 무작위로 갈려요 — 정원은 정확히 맞아요.'}
+                    ? t('남은 후보 중에서 무작위로 뽑아요.')
+                    : t('점수가 높은 순으로 뽑고, 커트라인 동점자 안에서만 무작위로 갈려요 — 정원은 정확히 맞아요.')}
                 </p>
               </div>
             )}
@@ -243,7 +243,7 @@ export function Picker() {
             onClick={() => void draw()}
             data-pick-go
           >
-            {canDraw ? `${picking}명 추첨하기` : '남은 후보가 없어요'}
+            {canDraw ? `${picking}명 추첨하기` : t('남은 후보가 없어요')}
           </button>
           {!canDraw && (
             <p className="ad-fine" style={{ marginTop: 12 }}>
@@ -296,14 +296,14 @@ export function Picker() {
         <div className="ad-card">
           <div className="ad-card__head">
             <div className="ad-card__titleRow">
-              <span className="ad-card__title">지난 회차</span>
+              <span className="ad-card__title">{t('지난 회차')}</span>
               <span className="ad-card__num tnum">{rounds.length}회</span>
             </div>
           </div>
 
           {rounds.length === 0 ? (
             <div className="ad-empty ad-empty--sm">
-              <div className="ad-empty__title">아직 추첨한 회차가 없어요</div>
+              <div className="ad-empty__title">{t('아직 추첨한 회차가 없어요')}</div>
               <div className="ad-empty__sub">
                 위에서 인원과 방식을 정하고 추첨하면 회차가 여기에 쌓여요.
               </div>

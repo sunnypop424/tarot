@@ -4,7 +4,9 @@ import { repo } from '@/lib/repo'
 import type { Poll } from '@/lib/repo/types'
 import { pollDisplay } from '@/data/poll'
 import { useSlot } from '@/slot/SlotProvider'
+import { useT, useLocale } from '@/i18n'
 import styles from './Live.module.css'
+import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
  * 스크린 — **부스에 세워두는 화면.** 조작 버튼이 없다.
@@ -15,8 +17,12 @@ import styles from './Live.module.css'
  */
 export function Live() {
   const slot = useSlot()
+  const t = useT()
+  const loc = useLocale()
   const slug = slot.slug
-  const display = pollDisplay(slot)
+  const rawDisplay = pollDisplay(slot)
+  /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
+  const display = useLocalizedDisplay(rawDisplay)
   const [polls, setPolls] = useState<Poll[]>([])
   const [idx, setIdx] = useState(0)
 
@@ -46,7 +52,7 @@ export function Live() {
   if (!poll) {
     return (
       <div className={styles.board}>
-        <div className={styles.empty}>공개된 설문이 없어요</div>
+        <div className={styles.empty}>{t('공개된 설문이 없어요')}</div>
       </div>
     )
   }
@@ -67,7 +73,7 @@ export function Live() {
             <span className={styles.dot} aria-hidden="true" />
             실시간
           </span>
-          {display.showCount && <span className={styles.total}>{sum.toLocaleString('ko-KR')}표</span>}
+          {display.showCount && <span className={styles.total}>{t('{n}표', { n: sum.toLocaleString(loc) })}</span>}
         </div>
       </header>
 

@@ -100,6 +100,7 @@ export const EN: Record<string, string> = {
   '마이너 아르카나': 'Minor Arcana',
   '메이저 22장': 'Major Arcana (22)',
   '78장': 'All 78',
+  '{deck}의 의미를 살펴보세요.': 'Browse the meanings of {deck}.',
   '질문 타로': 'Ask a question',
   '무엇이 궁금한가요?': 'What would you like to ask?',
   '타로는 재미와 성찰을 위한 것이에요.': 'Tarot is for fun and reflection.',
@@ -382,6 +383,7 @@ export const EN: Record<string, string> = {
   '{n}등': 'Rank {n}',
   '{n}개': '{n}',
   '리허설이라 재고는 줄지 않았어요.': 'This was a rehearsal — stock was not reduced.',
+  '지금은 리허설이에요. 뽑아도 실제 재고는 줄지 않아요.': 'This is a rehearsal — drawing will not reduce real stock.',
   '{name}{josa} 종료됐어요. 찾아와 주셔서 고마워요!': '{name} has ended. Thank you for stopping by!',
 
   // ── 포토카드 ─────────────────────────────────────

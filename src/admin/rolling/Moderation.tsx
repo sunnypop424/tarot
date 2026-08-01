@@ -58,7 +58,7 @@ export function Moderation() {
   async function remove(m: RollingMessage) {
     const ok = await confirmAction({
       title: `이 ${c.unit}를 지울까요?`,
-      desc: '숨기기만 해도 방문자에겐 보이지 않아요.',
+      desc: t('숨기기만 해도 방문자에겐 보이지 않아요.'),
       okLabel: t('지우기'),
       danger: true,
     })
@@ -110,8 +110,8 @@ export function Moderation() {
 
           {list.length === 0 ? (
             <div className="ad-empty">
-              <div className="ad-empty__title">아직 아무도 남기지 않았어요</div>
-              <div className="ad-empty__sub">방문자가 남기면 여기에 바로 올라와요.</div>
+              <div className="ad-empty__title">{t('아직 아무도 남기지 않았어요')}</div>
+              <div className="ad-empty__sub">{t('방문자가 남기면 여기에 바로 올라와요.')}</div>
             </div>
           ) : (
             <div className="ad-rows" data-rolling-mod>
@@ -166,7 +166,7 @@ export function Moderation() {
                       className="ad-x"
                       disabled={busy}
                       onClick={() => void remove(m)}
-                      aria-label="삭제"
+                      aria-label={t('삭제')}
                     >
                       ×
                     </button>
@@ -213,7 +213,7 @@ function BannedWords({ slug, unit }: { slug: string; unit: string }) {
     if (!word || busy) return
     // 이미 있는 말을 또 넣으면 DB 가 거절한다 — 그 전에 화면이 말해 준다
     if (words?.includes(word)) {
-      toast('이미 넣은 말이에요')
+      toast(t('이미 넣은 말이에요'))
       return
     }
     setBusy(true)
@@ -221,7 +221,7 @@ function BannedWords({ slug, unit }: { slug: string; unit: string }) {
       await repo.rolling.addBannedWord(slug, word)
       setDraft('')
       await load()
-      toast('이제 이 말이 든 글은 안 올라와요')
+      toast(t('이제 이 말이 든 글은 안 올라와요'))
     } catch (e) {
       toast(e instanceof Error ? e.message : t('넣지 못했어요'))
     } finally {
@@ -246,7 +246,7 @@ function BannedWords({ slug, unit }: { slug: string; unit: string }) {
     <div className="ad-card">
       <div className="ad-card__head">
         <div className="ad-card__titleRow">
-          <span className="ad-card__title">금칙어</span>
+          <span className="ad-card__title">{t('금칙어')}</span>
           <span className="ad-card__num tnum">{count}개</span>
         </div>
         <button
@@ -262,8 +262,8 @@ function BannedWords({ slug, unit }: { slug: string; unit: string }) {
       {open && (
         <div style={{ marginTop: 16 }} data-banned>
           <p className="ad-fine" style={{ marginBottom: 12 }}>
-            흔한 욕설은 <b>이미 막고 있어요.</b> 여기에는 이 행사에서만 막고 싶은 말을 넣어 주세요.
-            띄어쓰기와 문장부호는 무시하고 찾으니 <b>붙여 쓴 형태</b>로 한 번만 넣으면 돼요.
+            흔한 욕설은 <b>{t('이미 막고 있어요.')}</b> 여기에는 이 행사에서만 막고 싶은 말을 넣어 주세요.
+            띄어쓰기와 문장부호는 무시하고 찾으니 <b>{t('붙여 쓴 형태')}</b>로 한 번만 넣으면 돼요.
             {/*
               * 한계를 적어 둔다 — 이걸 안 적으면 주최자가 "필터가 있으니 검수는 안 해도 되겠다"
               * 로 읽는다. 이 필터는 검수를 대신하지 않는다.
@@ -277,7 +277,7 @@ function BannedWords({ slug, unit }: { slug: string; unit: string }) {
               className="ad-input"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              placeholder="막을 말"
+              placeholder={t('막을 말')}
               maxLength={40}
               style={{ flex: 1, minWidth: 0 }}
               data-banned-input
@@ -292,7 +292,7 @@ function BannedWords({ slug, unit }: { slug: string; unit: string }) {
           </form>
 
           {count === 0 ? (
-            <div className="ad-fine">아직 넣은 말이 없어요. 기본 목록만 걸려 있어요.</div>
+            <div className="ad-fine">{t('아직 넣은 말이 없어요. 기본 목록만 걸려 있어요.')}</div>
           ) : (
             <div className="ad-btnrow" style={{ flexWrap: 'wrap' }}>
               {words!.map((w) => (
