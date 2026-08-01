@@ -1,7 +1,14 @@
 {
   "pentacles-1": {
     "name": "Ace of Pentacles",
-    "keywords": ["A new opportunity", "Material beginnings", "Seed of prosperity", "Stability", "Making it real"],
+    "keywords": [
+      "A new opportunity",
+      "Material beginnings",
+      "Seed of prosperity",
+      "Stability",
+      "Making it real"
+    ],
+    "symbolism": "A divine hand reaching out of a cloud holds up a great golden pentacle, and below it lies a garden of lilies with an arched gate covered in climbing roses. It shows a material opportunity given from above like a gift, and the garden gate stands for the road to prosperity that opens through it.",
     "upright": {
       "core": "Means a new beginning and opportunity in the material world. The moment a seed is planted in the practical realms — money, work, health — with the potential to grow into solid fruit if tended steadily.",
       "general": "The seed of a practical opportunity is being placed in your hand. A new income source, an offer, a beginning is likely to appear — and this start can become a foundation that lasts.",
@@ -21,7 +28,14 @@
   },
   "pentacles-2": {
     "name": "Two of Pentacles",
-    "keywords": ["Balance", "Juggling", "Flexibility", "Priorities", "Adapting to change"],
+    "keywords": [
+      "Balance",
+      "Juggling",
+      "Flexibility",
+      "Priorities",
+      "Adapting to change"
+    ],
+    "symbolism": "A young man handles two pentacles joined by a cord in the shape of an infinity sign, as though juggling them, while behind him ships ride up and down high waves at sea. The infinity sign stands for the unbroken cycle of life, and the ships on the waves for the ability to keep balance flexibly through changing conditions.",
     "upright": {
       "core": "Means the balance among many duties and priorities. The ability to adapt flexibly to constant change while keeping your own rhythm.",
       "general": "You're spinning several plates without losing the beat. Even as things keep shifting, the current is with you to keep a flexible balance.",
@@ -41,7 +55,14 @@
   },
   "pentacles-3": {
     "name": "Three of Pentacles",
-    "keywords": ["Collaboration", "Teamwork", "Skill recognised", "Craft-building", "Joint work"],
+    "keywords": [
+      "Collaboration",
+      "Teamwork",
+      "Skill recognised",
+      "Craft-building",
+      "Joint work"
+    ],
+    "symbolism": "Inside a cathedral a young mason stands on a bench carving, while a monk and an architect holding plans watch his work and confer. It is a scene of expert skill being recognised, and stands for the teamwork by which different roles cooperate to complete one great work.",
     "upright": {
       "core": "Means collaboration and the recognition of skill. The process where different specialities interlock to build what no one could alone — the first fruits of learning and craft.",
       "general": "Together beats alone this season. As each person's expertise meshes, your skill is set to be recognised.",
@@ -61,7 +82,14 @@
   },
   "pentacles-4": {
     "name": "Four of Pentacles",
-    "keywords": ["Possession", "Seeking security", "Thrift", "Control", "Holding tight"],
+    "keywords": [
+      "Possession",
+      "Seeking security",
+      "Thrift",
+      "Control",
+      "Holding tight"
+    ],
+    "symbolism": "A crowned figure sits with his back to the city, one pentacle balanced on his head, one clutched tight to his chest and one under each foot. Holding all four with his whole body stands for a need for security that guards possessions, and the city turned away from for the isolation and rigidity that clinging produces.",
     "upright": {
       "core": "Means the desire to possess, preserve and be secure. The solidity that guards what was built — with the warning that, taken too far, it becomes the grip that blocks change and flow.",
       "general": "The urge to hold tight to what you've built is strong. The security grows — but check whether the clenched hand is also blocking the new current.",
@@ -81,7 +109,14 @@
   },
   "pentacles-5": {
     "name": "Five of Pentacles",
-    "keywords": ["Lack", "Financial hardship", "Feeling left out", "Crisis", "The door of help"],
+    "keywords": [
+      "Lack",
+      "Financial hardship",
+      "Feeling left out",
+      "Crisis",
+      "The door of help"
+    ],
+    "symbolism": "In a snowstorm a man on crutches and a barefoot, poorly clad woman pass beneath a church window of stained glass set with five pentacles. The two figures stand for material and spiritual want and exclusion, and the lit window they do not look up at stands for help and refuge that is right beside them and goes unnoticed.",
     "upright": {
       "core": "Means a season of lack, hardship and exclusion. Financial difficulty, or the loss of health and belonging — while help stands near, unseen by eyes cast down.",
       "general": "You may be walking through a cold stretch, materially or inwardly. But like the lit window in the card, the door of help is closer than it seems — you just haven't lifted your head to see it.",
@@ -101,7 +136,14 @@
   },
   "pentacles-6": {
     "name": "Six of Pentacles",
-    "keywords": ["Sharing", "Generosity", "Give and take", "Fairness", "Support"],
+    "keywords": [
+      "Sharing",
+      "Generosity",
+      "Give and take",
+      "Fairness",
+      "Support"
+    ],
+    "symbolism": "A wealthy merchant holds a pair of scales in one hand while giving coins to two beggars kneeling before him. The scales stand for fair distribution and balance, and the giving hand and receiving hand for the circulation of resources towards where they are needed and for a relationship of give and take.",
     "upright": {
       "core": "Means generosity and the fair exchange of giving and receiving. Resources flowing where they're needed — the healthy circulation that benefits both the giver and the receiver.",
       "general": "Give and take are balancing out well. What you gave comes back, and when you need it, help arrives — the circulation is flowing.",
@@ -121,7 +163,14 @@
   },
   "pentacles-7": {
     "name": "Seven of Pentacles",
-    "keywords": ["Patience", "Interim review", "The long view", "Waiting", "Reassessment"],
+    "keywords": [
+      "Patience",
+      "Interim review",
+      "The long view",
+      "Waiting",
+      "Reassessment"
+    ],
+    "symbolism": "A farmer stands leaning on his hoe, gazing at seven pentacles hanging on a thick vine. The pause in labour stands for the patience of waiting for fruit to ripen, and the eyes fixed on the crop for a time of taking stock — looking back over the effort made so far.",
     "upright": {
       "core": "Means patience, the long view, the mid-course review. The wait between seed and fruit — and the reflective pause that asks whether the effort's direction is right.",
       "general": "You're catching your breath, watching what you planted grow. Not harvest yet — but a good moment to confirm the effort hasn't been wasted and to check the bearing.",
@@ -141,7 +190,14 @@
   },
   "pentacles-8": {
     "name": "Eight of Pentacles",
-    "keywords": ["Mastery", "Diligence", "Self-improvement", "Deep focus", "Craftsmanship"],
+    "keywords": [
+      "Mastery",
+      "Diligence",
+      "Self-improvement",
+      "Deep focus",
+      "Craftsmanship"
+    ],
+    "symbolism": "A young craftsman sits at his bench carving pentacles one by one with chisel and hammer, the finished ones hung in a neat row on the post beside him. It stands for the craftsman's spirit that perfects a skill through repeated practice, and for faithful absorption in a single occupation.",
     "upright": {
       "core": "Means mastery, diligent effort, the honing of skill. Ability accumulating through repetition — devotion to focus and detail becoming growth.",
       "general": "This is the craftsman's season — deep in one thing, honing the skill. The repetition looks dull, but real growth is happening inside it; effort is stacking into ability.",
@@ -161,7 +217,14 @@
   },
   "pentacles-9": {
     "name": "Nine of Pentacles",
-    "keywords": ["Self-reliance", "Abundance", "Contentment", "Graceful ease", "Savouring achievement"],
+    "keywords": [
+      "Self-reliance",
+      "Abundance",
+      "Contentment",
+      "Graceful ease",
+      "Savouring achievement"
+    ],
+    "symbolism": "A woman in elegant dress stands alone in a garden full of grapes and pentacles, a falcon perched on her gloved hand. The rich garden stands for an abundance she has made herself, the tamed falcon for restrained instinct and self-command; together they show an elegant self-sufficiency that is complete even alone.",
     "upright": {
       "core": "Means self-reliance and abundance built by your own hand. Economic and inner independence that leans on no one — the mature state of savouring the fruit of effort at leisure.",
       "general": "You're enjoying an abundance you built yourself. Independence — financial and inner — has ripened; you're sufficient without leaning on anyone.",
@@ -181,7 +244,14 @@
   },
   "pentacles-10": {
     "name": "Ten of Pentacles",
-    "keywords": ["Legacy", "Family", "Long-term security", "Wealth completed", "Across generations"],
+    "keywords": [
+      "Legacy",
+      "Family",
+      "Long-term security",
+      "Wealth completed",
+      "Across generations"
+    ],
+    "symbolism": "In a rich courtyard inside the castle gate a white-haired old man sits with two dogs while a young couple and a child pass by, ten pentacles arranged in the shape of the Kabbalistic Tree of Life. Three generations held in one scene stand for wealth and legacy handed down the line, and the solid gate for the settled security of a family community.",
     "upright": {
       "core": "Means material completion and stability that spans generations. Wealth extending beyond personal achievement into family and community — legacy, tradition, a long-term foundation established.",
       "general": "Material achievement is reaching its completed stage. Beyond your own success, a solid security that embraces family and community is flowing in.",
@@ -201,7 +271,14 @@
   },
   "pentacles-11": {
     "name": "Page of Pentacles",
-    "keywords": ["Learning", "A new goal", "Curiosity", "Practical plans", "A diligent start"],
+    "keywords": [
+      "Learning",
+      "A new goal",
+      "Curiosity",
+      "Practical plans",
+      "A diligent start"
+    ],
+    "symbolism": "A young man standing in a green field holds a pentacle up in both hands and studies it intently. The gaze fixed on the pentacle stands for curiosity about the material world and an appetite for learning, and the ploughed field visible behind for a diligent first step towards a practical goal.",
     "upright": {
       "core": "Means learning and a practical new goal. The beginning of study, skill-building, realistic planning — the student's posture of steady inquiry.",
       "general": "Your eyes are bright before a new goal and new learning. Nothing grand required — it's a good moment to set a realistic plan and take the first step.",
@@ -221,7 +298,14 @@
   },
   "pentacles-12": {
     "name": "Knight of Pentacles",
-    "keywords": ["Steadiness", "Responsibility", "Prudence", "Diligence", "Quiet progress"],
+    "keywords": [
+      "Steadiness",
+      "Responsibility",
+      "Prudence",
+      "Diligence",
+      "Quiet progress"
+    ],
+    "symbolism": "An armoured knight sits on a black horse standing still, quietly regarding the pentacle in his hand, with well-ploughed fields spread out behind. The only motionless horse among the four knights stands for prudence and unwavering constancy, and the tilled field for a base of harvest that diligent labour has prepared.",
     "upright": {
       "core": "Means diligence, responsibility, steady progress. Not flashy — but the most trustworthy way of carrying a task through to the end.",
       "general": "Not glamorous, but the surest road to the goal — that's this season. Unhurried steadiness is what ends up producing the result.",
@@ -241,7 +325,14 @@
   },
   "pentacles-13": {
     "name": "Queen of Pentacles",
-    "keywords": ["Warm embrace", "Practicality", "Practical care", "Abundant stability", "Household wisdom"],
+    "keywords": [
+      "Warm embrace",
+      "Practicality",
+      "Practical care",
+      "Abundant stability",
+      "Household wisdom"
+    ],
+    "symbolism": "A queen sits enthroned in a garden thick with flowers and fruit, looking down fondly at the pentacle in her lap, a rabbit at play by her feet. The abundant garden and the way she cradles the pentacle stand for warm care backed by material security and a sense of the practical, and the rabbit for fertility and life force.",
     "upright": {
       "core": "Means practical care and abundant stability. Warmth and substance combined — the mature embrace that tends everyone around while keeping its own foundation intact.",
       "general": "A mature current is flowing that holds warmth and practical sense at once. You're tending yourself and the people around you in real ways — without losing your own footing.",
@@ -261,7 +352,14 @@
   },
   "pentacles-14": {
     "name": "King of Pentacles",
-    "keywords": ["Wealth completed", "Business acumen", "Dependability", "Seasoned skill", "Practical leadership"],
+    "keywords": [
+      "Wealth completed",
+      "Business acumen",
+      "Dependability",
+      "Seasoned skill",
+      "Practical leadership"
+    ],
+    "symbolism": "A king in a robe embroidered with grapes sits on a throne ornamented with carved bulls, a sceptre in one hand and a pentacle in the other, his castle visible behind. The grapes and bulls stand for material abundance and the solidity of the element of earth, and the castle for the completion of wealth built by effort and of settled authority.",
     "upright": {
       "core": "Means material success completed and practical leadership. Mature authority that governs wealth with accumulated experience and seasoned skill, and provides stability to everyone around it.",
       "general": "Like the king at the summit of the material world, the fruits of effort are settling into stability and authority. With realism and seasoned judgement you can carry the people around you too.",

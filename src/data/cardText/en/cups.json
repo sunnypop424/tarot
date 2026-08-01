@@ -1,7 +1,14 @@
 {
   "cups-1": {
     "name": "Ace of Cups",
-    "keywords": ["New feelings", "Love's beginning", "Intuition", "Fullness", "An open heart"],
+    "keywords": [
+      "New feelings",
+      "Love's beginning",
+      "Intuition",
+      "Fullness",
+      "An open heart"
+    ],
+    "symbolism": "A hand from a cloud holds up a chalice while a dove descends towards it with a host in its beak, and five streams pour from the cup into a lake of lotuses. This stands for divine love, a source of feeling that never runs dry, and a heart newly opening.",
     "upright": {
       "core": "Means the wellspring of feeling opening anew. The pure beginning energy of love, empathy, intuition and spiritual fullness overflowing — a sign that the heart is ready to open and receive.",
       "general": "Your heart is filling up again. New feelings, a new connection, or a heart long closed finally opening — that current is flowing. It's fine to accept the flutter exactly as it is.",
@@ -21,7 +28,14 @@
   },
   "cups-2": {
     "name": "Two of Cups",
-    "keywords": ["Mutual connection", "Partnership", "Bond", "Attraction", "Reconciliation"],
+    "keywords": [
+      "Mutual connection",
+      "Partnership",
+      "Bond",
+      "Attraction",
+      "Reconciliation"
+    ],
+    "symbolism": "A man and a woman stand facing each other, exchanging their cups as though clasping them together; between them float the caduceus of Hermes wound with two serpents and a winged lion's head. This stands for the union and communion of two equals, and the healing power a relationship carries.",
     "upright": {
       "core": "Means the mutual exchange of two beings meeting as equals. Harmony and trust in love, friendship and partnership — a balanced union built on respect.",
       "general": "Two hearts are meeting at the same height. Whether romance, friendship or collaboration, a balanced, mutually respectful relationship is likely to form. Honest conversation is the key this season.",
@@ -41,7 +55,14 @@
   },
   "cups-3": {
     "name": "Three of Cups",
-    "keywords": ["Celebration", "Friendship", "Gathering", "Shared joy", "Community"],
+    "keywords": [
+      "Celebration",
+      "Friendship",
+      "Gathering",
+      "Shared joy",
+      "Community"
+    ],
+    "symbolism": "Three women raise their cups high and dance together as if tracing a circle, with harvested fruit and flowers spread richly at their feet. This stands for the joy of sharing what has ripened, and the festive energy that friendship and community bring.",
     "upright": {
       "core": "Means celebration and communal bonds — joy shared together. The abundance that friendship, gathering and cooperation bring, and the happiness that grows larger for not being alone.",
       "general": "Something worth celebrating together is in the air. You'll draw energy from friends, colleagues, community. Step in among people rather than toiling alone and the good things multiply.",
@@ -61,7 +82,14 @@
   },
   "cups-4": {
     "name": "Four of Cups",
-    "keywords": ["Apathy", "Listlessness", "Re-evaluation", "Missed chances", "Turning inward"],
+    "keywords": [
+      "Apathy",
+      "Listlessness",
+      "Re-evaluation",
+      "Missed chances",
+      "Turning inward"
+    ],
+    "symbolism": "A young man sits under a tree with his arms folded, looking without interest at three cups before him, while a hand from a cloud offers a fourth. This stands for boredom and indifference, and a new opportunity passed by without being noticed.",
     "upright": {
       "core": "Means emotional weariness and dissatisfaction with the present. A listless state that has lost interest in what's given — a period of inward sinking that fails to notice the new opportunity being held out.",
       "general": "What you have may have gone stale, the days dull. Yet a new cup may be extended right in front of you, unnoticed. Boredom is also an invitation to look again at your direction.",
@@ -81,7 +109,14 @@
   },
   "cups-5": {
     "name": "Five of Cups",
-    "keywords": ["Loss", "Regret", "Sorrow", "Disappointment", "Hope that remains"],
+    "keywords": [
+      "Loss",
+      "Regret",
+      "Sorrow",
+      "Disappointment",
+      "Hope that remains"
+    ],
+    "symbolism": "A figure in a black cloak stands looking down at three cups fallen and spilled, while two still upright remain behind him; a bridge over a river and a castle can be seen in the distance. This stands for loss and regret, and the hope and chance of recovery that nevertheless remain at one's back.",
     "upright": {
       "core": "Means loss and the sorrow and regret that follow. Eyes fixed on what was spilled, blind to what still stands — while reminding you that not everything is lost.",
       "general": "Your heart is lingering on what was lost. Staring at the three spilled cups, you may be missing the two still standing behind you. Grieve fully — and remember, too, that you have not lost everything.",
@@ -101,7 +136,14 @@
   },
   "cups-6": {
     "name": "Six of Cups",
-    "keywords": ["Memories", "Nostalgia", "Innocence", "Reunion", "Childhood"],
+    "keywords": [
+      "Memories",
+      "Nostalgia",
+      "Innocence",
+      "Reunion",
+      "Childhood"
+    ],
+    "symbolism": "In the garden of an old village a child hands another a cup filled with white star-shaped flowers, with more flower-filled cups set around them. This stands for the innocence of childhood, warm memory and nostalgia, and a kindness handed down from the past.",
     "upright": {
       "core": "Means the comfort that warm memory and an innocent heart bring to the present. Reminiscence, nostalgia, reunion with old ties — recovering the unconditional tenderness of childhood giving and receiving.",
       "general": "Warm memories are lending strength to the present. An old friend may reach out, or comfort may come from familiar things. Recovering that innocent heart may be exactly today's assignment.",
@@ -121,7 +163,14 @@
   },
   "cups-7": {
     "name": "Seven of Cups",
-    "keywords": ["Too many options", "Illusion", "Imagination", "Indecision", "Reality check"],
+    "keywords": [
+      "Too many options",
+      "Illusion",
+      "Imagination",
+      "Indecision",
+      "Reality check"
+    ],
+    "symbolism": "A figure stands facing seven cups floating on cloud, each holding something different — a human face, a veiled shape, a serpent, a castle, jewels, a laurel wreath, a dragon. This stands for the many temptations and illusions laid out before one, and the confusion among choices with no substance.",
     "upright": {
       "core": "Means the confusion and illusion of standing before too many options. Among the attractive possibilities float mirages with no substance — imagination and reality need telling apart.",
       "general": "So many tempting options that you can't decide. Some are real openings; some are mirage. Imagine freely — but decide on evidence that stands in reality.",
@@ -141,7 +190,14 @@
   },
   "cups-8": {
     "name": "Eight of Cups",
-    "keywords": ["Departure", "Closure", "Seeking deeper meaning", "Parting", "Inner journey"],
+    "keywords": [
+      "Departure",
+      "Closure",
+      "Seeking deeper meaning",
+      "Parting",
+      "Inner journey"
+    ],
+    "symbolism": "A figure in red turns away from eight cups stacked in neat order and walks towards the mountains under moonlight, leaning on a staff, while a waning moon looks down from the sky. This stands for an inward journey that leaves behind what has already been achieved to seek a deeper meaning.",
     "upright": {
       "core": "Means the resolve to leave behind what does not fill you. An inner journey in search of deeper meaning and emotional satisfaction over material security — the mature relinquishment, the turn.",
       "general": "The sense is arriving that it's time to walk away from what you worked to build. It may look fine on the outside while your heart says 'this isn't it.' Leaving isn't fleeing — it's the journey toward a deeper satisfaction.",
@@ -161,7 +217,14 @@
   },
   "cups-9": {
     "name": "Nine of Cups",
-    "keywords": ["Wish fulfilled", "Satisfaction", "Abundance", "Contentment", "Joy"],
+    "keywords": [
+      "Wish fulfilled",
+      "Satisfaction",
+      "Abundance",
+      "Contentment",
+      "Joy"
+    ],
+    "symbolism": "A satisfied-looking man sits with his arms folded, nine cups ranged in a neat arch behind him. This stands for a wish fulfilled, material and emotional satisfaction, and abundance enjoyed at the end of effort.",
     "upright": {
       "core": "Means the wish achieved and deep satisfaction. Enjoying the emotional and material abundance earned by effort — traditionally called the 'wish card', the realisation of what was hoped for.",
       "general": "They call this the wish card, and its current is running strong — what you hoped for is coming true. You're likely to enjoy the fruit of your effort, satisfied in heart and in hand. Go ahead and savour the abundance.",
@@ -181,7 +244,14 @@
   },
   "cups-10": {
     "name": "Ten of Cups",
-    "keywords": ["Happy completion", "Family harmony", "Emotional fullness", "Concord", "Lasting love"],
+    "keywords": [
+      "Happy completion",
+      "Family harmony",
+      "Emotional fullness",
+      "Concord",
+      "Lasting love"
+    ],
+    "symbolism": "A couple raise their arms towards a rainbow in the sky while two children dance hand in hand beside them, ten cups floating along the rainbow; a snug house and peaceful country lie in the distance. This stands for the completion a journey of feeling arrives at, the concord of a home, and a happiness that lasts.",
     "upright": {
       "core": "Means the happy completion of the emotional journey. Harmony within family and community, lasting love, emotional fullness — the most settled fruit a relationship can bear.",
       "general": "The journey of the heart is completing beautifully. Deep steadiness and happiness are likely with family, partner, the people close in. Like the rainbow — the relationships you tended are bearing fruit.",
@@ -201,7 +271,14 @@
   },
   "cups-11": {
     "name": "Page of Cups",
-    "keywords": ["A heartfelt message", "Innocent curiosity", "Creativity", "Flutter", "Imagination"],
+    "keywords": [
+      "A heartfelt message",
+      "Innocent curiosity",
+      "Creativity",
+      "Flutter",
+      "Imagination"
+    ],
+    "symbolism": "A young page in flowered clothes holds up a cup, and from within it a fish lifts its head to look at him; a rolling sea stretches out behind. This stands for unexpected inspiration rising from the unconscious, messages of feeling, and pure imagination.",
     "upright": {
       "core": "Means an unexpected heartfelt message and creative inspiration. Innocent curiosity, imagination, the sprout of a new feeling — the open posture that receives intuition's signals.",
       "general": "An unexpected message that knocks at the heart is arriving. New feelings, creative inspiration, innocent curiosity are budding. Like the fish popping out of the cup — open up to the surprising, welcome signal.",
@@ -221,7 +298,14 @@
   },
   "cups-12": {
     "name": "Knight of Cups",
-    "keywords": ["A romantic offer", "Charm", "Pursuing ideals", "The heart's approach", "Invitation"],
+    "keywords": [
+      "A romantic offer",
+      "Charm",
+      "Pursuing ideals",
+      "The heart's approach",
+      "Invitation"
+    ],
+    "symbolism": "A knight with winged helm and winged shoes rides a white horse slowly across a plain crossed by a river, holding a cup out before him; the garment over his armour is patterned with fish. This stands for an offer or invitation carried with feeling, and a romantic bearing that follows an ideal.",
     "upright": {
       "core": "Means an offer carried with the heart, a romantic approach. The graceful pursuit of feeling and ideals — the invitation of love or opportunity drawing near.",
       "general": "An offer or invitation with real heart in it is approaching. It's a romantic, appealing current, and you'll want to move as the feeling leads. Advance gracefully toward the ideal — and mind the ground under your feet as you go.",
@@ -241,7 +325,14 @@
   },
   "cups-13": {
     "name": "Queen of Cups",
-    "keywords": ["Empathy", "Intuition", "Emotional maturity", "Care", "Healing"],
+    "keywords": [
+      "Empathy",
+      "Intuition",
+      "Emotional maturity",
+      "Care",
+      "Healing"
+    ],
+    "symbolism": "A queen sits on a throne by the sea, gazing at an ornate chalice — the only lidded cup in the suit. Her throne is carved with water spirits and shells, and the water reaches to her feet. This stands for the deep unconscious and intuition, and the mature empathy and healing power that holds feeling within itself.",
     "upright": {
       "core": "Means deep empathy, intuition and emotional maturity. The power to read feelings — your own and others' — finely and hold them warmly; the wisdom that sees a problem's essence with the heart's eye.",
       "general": "Deep empathy and intuition are shining. You're reading feelings finely and holding the people around you warmly. A problem logic couldn't crack may show its answer to the heart's eye.",
@@ -261,7 +352,14 @@
   },
   "cups-14": {
     "name": "King of Cups",
-    "keywords": ["Emotional balance", "Tolerance", "Composure", "Wise counsellor", "Mature leadership"],
+    "keywords": [
+      "Emotional balance",
+      "Tolerance",
+      "Composure",
+      "Wise counsellor",
+      "Mature leadership"
+    ],
+    "symbolism": "A king sits on a throne afloat in the midst of a heaving sea, a cup in one hand and a sceptre in the other, a fish-shaped pendant at his neck; behind him a fish leaps and a ship sails on. This stands for a mature restraint that stays steady even above turbulent feeling, and a wise leadership.",
     "upright": {
       "core": "Means the mature command and balance of feeling. Wisdom that keeps composure and tolerance in heated moments — leadership in which heart and head have found their harmony.",
       "general": "Like the king steady on a heaving sea, the mature power to govern feeling is with you. Even in heated moments you can hold the centre with calm and generosity. People are likely to lean on your counsel and your steadiness.",

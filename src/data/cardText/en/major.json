@@ -1,7 +1,14 @@
 {
   "major-0": {
     "name": "The Fool",
-    "keywords": ["New beginnings", "Innocence", "Adventure", "Freedom", "Possibility"],
+    "keywords": [
+      "New beginnings",
+      "Innocence",
+      "Adventure",
+      "Freedom",
+      "Possibility"
+    ],
+    "symbolism": "A young traveller stands at the edge of a cliff, eyes on the sky, one foot already lifted; a small bundle hangs from the staff on their shoulder and a white dog leaps at their heels. The cliff stands for the leap into the unknown, the bundle for past experience pared down to the bare minimum, and the white dog for pure instinct and a faithful warning. The white rose in hand means untouched innocence, and the number 0 an open potential where nothing has yet been decided.",
     "upright": {
       "core": "Symbolises the pure energy of a beginning — leaping into an unknown journey without calculation or fear. The outcome is not guaranteed, but that blank page is exactly what makes the possibilities infinite. As the starting point of the Major Arcana journey, it stands for a free spirit and a deep, original optimism.",
       "general": "The energy of a brand-new journey is stirring. You can't know how it ends yet, but that open space is precisely what can become infinite possibility for you. This is a good time to trust the flutter in your chest over the maths and take the first step.",
@@ -21,7 +28,14 @@
   },
   "major-1": {
     "name": "The Magician",
-    "keywords": ["Creation", "Execution", "Talent", "Focus", "Will"],
+    "keywords": [
+      "Creation",
+      "Execution",
+      "Talent",
+      "Focus",
+      "Will"
+    ],
+    "symbolism": "The Magician stands with the wand in his right hand raised to the sky and his left hand pointing to the earth; on the table before him lie the tools of all four suits — wand, cup, sword and pentacle. The posture linking sky and earth stands for a channel drawing cosmic energy down into the real world, and the four tools for the fact that everything needed to realise a goal is already at hand. The infinity sign above his head and the serpent belt at his waist mean limitless potential and eternal cycle.",
     "upright": {
       "core": "Symbolises the creative power to turn thought into reality through will and focus. The talent, resources and skills you need are already in your hands; this card means the ability to gather them into one and act. It marks the moment potential converts into concrete results.",
       "general": "The ingredients to make what you want real are already in your hands. Talent, resources and timing are lining up — gather your will and move, and good results are likely to follow.",
@@ -41,7 +55,14 @@
   },
   "major-2": {
     "name": "The High Priestess",
-    "keywords": ["Intuition", "Inner wisdom", "Secrets", "Stillness", "The subconscious"],
+    "keywords": [
+      "Intuition",
+      "Inner wisdom",
+      "Secrets",
+      "Stillness",
+      "The subconscious"
+    ],
+    "symbolism": "The High Priestess sits between a black pillar (Boaz) and a white one (Jachin), a Torah scroll half hidden in her lap and a crescent moon at her feet. The two pillars stand for the balance of duality and the border between the revealed world and the hidden one, while the pomegranate veil behind her stands for the subconscious and mystery beyond it. The half-concealed scroll and the crescent mean wisdom and intuition not yet fully disclosed.",
     "upright": {
       "core": "Symbolises the wisdom of intuition and the subconscious that lies beyond reason and logic. It means truths and secrets not yet visible, and an inner knowing that can only be reached through quiet contemplation. A card of still wisdom that asks for receptivity and observation rather than action.",
       "general": "Right now your inner voice is more accurate than the visible facts. Don't rush — step back and watch quietly, and truths you couldn't see are likely to reveal themselves bit by bit.",
@@ -61,7 +82,14 @@
   },
   "major-3": {
     "name": "The Empress",
-    "keywords": ["Abundance", "Love", "Creativity", "Nurture", "Fruition"],
+    "keywords": [
+      "Abundance",
+      "Love",
+      "Creativity",
+      "Nurture",
+      "Fruition"
+    ],
+    "symbolism": "The Empress, crowned with twelve stars, reclines on a comfortable throne surrounded by ripe wheat, woodland and a running stream. The ripened field and lush nature stand for the abundance of an earth that bears and raises life, and the heart-shaped shield marked with the sign of Venus for the principle of love and beauty. Her pomegranate-patterned gown means the maternal energy of fertility and creation.",
     "upright": {
       "core": "The archetype of the mother who bears and nurtures life — a symbol of nature's abundance and creativity. It means the ripening of what was sown into fruit, sensory and material plenty, and unconditional care and love.",
       "general": "What you planted is ripening — an abundant current is flowing. It's an especially good season for loving and being loved, and for growing and making things. The more generous you are with yourself, the better this flow gets.",
@@ -81,7 +109,14 @@
   },
   "major-4": {
     "name": "The Emperor",
-    "keywords": ["Stability", "Leadership", "Responsibility", "Structure", "Authority"],
+    "keywords": [
+      "Stability",
+      "Leadership",
+      "Responsibility",
+      "Structure",
+      "Authority"
+    ],
+    "symbolism": "The Emperor sits firmly on a stone throne carved with rams' heads, a red robe over his armour, an ankh sceptre in one hand and an orb in the other. The hard stone throne and the rugged mountains behind him stand for unshakeable authority and solid order, and the ram for the force of Mars and pioneering leadership. The armour beneath the robe means responsibility and defence, always ready to keep order.",
     "upright": {
       "core": "The archetype of the father who governs the world with order, structure and discipline. It means rule grounded in reason and principle, an unshakeable foundation, and the authority and leadership that carry responsibility.",
       "general": "The energy to build an unshakeable foundation is with you. Sort the situation with reason and principle rather than emotion, and you can create stability and achievement that last. You have more than enough strength to take the lead.",
@@ -101,7 +136,14 @@
   },
   "major-5": {
     "name": "The Hierophant",
-    "keywords": ["Tradition", "Teaching", "Counsel", "Trust", "Spiritual anchor"],
+    "keywords": [
+      "Tradition",
+      "Teaching",
+      "Counsel",
+      "Trust",
+      "Spiritual anchor"
+    ],
+    "symbolism": "The Hierophant, wearing a triple crown, sits enthroned between two pillars, his right hand raised in blessing and a triple cross staff in his left, with two priests kneeling before him. The triple crown and triple cross stand for a sacred authority spanning three worlds, and the two crossed keys at his feet for the keys of wisdom that open hidden teaching. The two kneeling priests mean tradition and knowledge passed from teacher to student.",
     "upright": {
       "core": "Symbolises institutional tradition, proven teaching, and spiritual guidance. It means following the norms and wisdom a community has built over time rather than personal improvisation, and learning through teachers and mentors. The card of the mediator between heaven and humanity.",
       "general": "Proven paths and the wisdom of those who've gone before will carry you now. Rather than wrestling alone, ask a trusted mentor or an expert — the answer will come much clearer. The orthodox route may be the fastest one right now.",
@@ -121,7 +163,14 @@
   },
   "major-6": {
     "name": "The Lovers",
-    "keywords": ["Love", "Choice", "Harmony", "Union", "Values"],
+    "keywords": [
+      "Love",
+      "Choice",
+      "Harmony",
+      "Union",
+      "Values"
+    ],
+    "symbolism": "Beneath the sun the archangel Raphael spreads both arms in blessing over a naked man and woman; behind her stands the tree of knowledge with a serpent coiled about it, behind him the tree of life in flame. The composition, recalling Eden, stands for union and pure love under a sacred blessing. The two trees mean the fundamental choice every person meets — feeling and reason, temptation and passion.",
     "upright": {
       "core": "Symbolises the harmonious union and deep bond of two beings — and at the same time, the major life choice made at a crossroads according to your values. Love and choice overlap here: a card about following the truth of the heart.",
       "general": "The energy of a meeting of minds and a harmonious union is flowing. At the same time, this is a season that asks for a decision at an important fork in the road. Choose the side your heart truly wants over the side the sums recommend, and you're less likely to regret it.",
@@ -141,7 +190,14 @@
   },
   "major-7": {
     "name": "The Chariot",
-    "keywords": ["Drive", "Victory", "Will", "Overcoming", "Advance"],
+    "keywords": [
+      "Drive",
+      "Victory",
+      "Will",
+      "Overcoming",
+      "Advance"
+    ],
+    "symbolism": "An armoured warrior stands in a chariot beneath a star-strewn canopy, and before it two sphinxes, one black and one white, sit facing different ways. The two sphinxes of opposing colour stand for inner forces pulling against each other, and the warrior who drives them without reins for control by sheer will. The crescent ornaments on his shoulders and the starry canopy mean a victorious journey made under the guidance of the heavens.",
     "upright": {
       "core": "Symbolises advance and victory — controlling opposing forces with strong will and driving toward the goal. It means the momentum that overcomes inner conflict and outer obstacles, and a self-assured, decisive breakthrough.",
       "general": "A powerful forward current is running — you're charging at the goal. Hold the reins on the forces pulling in different directions and push on, and you can win even against competition. This is the time to pick up speed.",
@@ -161,7 +217,14 @@
   },
   "major-8": {
     "name": "Strength",
-    "keywords": ["Inner strength", "Patience", "Courage", "Gentle mastery", "Self-trust"],
+    "keywords": [
+      "Inner strength",
+      "Patience",
+      "Courage",
+      "Gentle mastery",
+      "Self-trust"
+    ],
+    "symbolism": "A woman in white, garlanded with flowers, gently strokes a lion's jaws closed with her bare hands. The lion stands for raw instinct, desire and fear; the woman who handles it with mildness rather than force stands for the true strength that tames instinct through inner courage and love instead of violence. The infinity sign above her head means that this strength of spirit comes from a limitless source.",
     "upright": {
       "core": "Symbolises the inner courage that masters instinctive force with gentleness and patience, not muscle. It means mature self-command — taming fear and desire kindly rather than crushing them — and a quiet, unshakeable trust in yourself.",
       "general": "This is a season when real strength shines: steering the situation with softness and patience rather than force. The energy to gently tame the lion inside — fear, desire — is flowing with you. You are far sturdier than you think.",
@@ -181,7 +244,14 @@
   },
   "major-9": {
     "name": "The Hermit",
-    "keywords": ["Reflection", "Solitude", "Inner search", "Wisdom", "Regrouping"],
+    "keywords": [
+      "Reflection",
+      "Solitude",
+      "Inner search",
+      "Wisdom",
+      "Regrouping"
+    ],
+    "symbolism": "An old man in a grey cloak stands alone on a snow-covered peak, holding a lantern lit by a six-pointed star and leaning on his staff. The summit stands for a high spiritual ground withdrawn from the world, and the lantern with its hexagram (Solomon's seal) for the light of inner wisdom he has kindled himself. Standing alone means that solitude here is not a lack but a chosen condition for seeking truth.",
     "upright": {
       "core": "Symbolises the time of reflection spent withdrawing from the outer world to seek truth alone. It means the deep wisdom only solitude can give, self-guidance by an inner light, and regrouping for the next stage.",
       "general": "You need a moment away from the noise to face yourself. In your own quiet, you're likely to find the answer you'd been missing. This solitude isn't loneliness — it's a regrouping for growth.",
@@ -201,7 +271,14 @@
   },
   "major-10": {
     "name": "Wheel of Fortune",
-    "keywords": ["Turning point", "Luck", "Cycles", "Change", "Timing"],
+    "keywords": [
+      "Turning point",
+      "Luck",
+      "Cycles",
+      "Change",
+      "Timing"
+    ],
+    "symbolism": "A great wheel hangs in the sky; a sword-bearing sphinx rides atop it while a descending serpent (Typhon) and a rising Anubis turn with it, and four creatures holding books (angel, eagle, lion and bull) occupy the corners. The turning wheel stands for the cycle of fortune, rising and falling in turn, and the sphinx above it for a balance and a riddle that hold steady through change. The four creatures at the corners mean the four pillars of the cosmos that do not change even as fortune does.",
     "upright": {
       "core": "Symbolises the turning points of fate beyond human will, and the law of cycles. It means the moment a stalled current starts to move, luck rotating into an upswing, and the timing that must not be missed.",
       "general": "You're standing at a turning point — the wheel of life is making a big rotation. What was stuck is coming loose, and unexpected luck and opportunity are likely. This current belongs to whoever grabs it, so don't miss the signals of change.",
@@ -221,7 +298,14 @@
   },
   "major-11": {
     "name": "Justice",
-    "keywords": ["Fairness", "Balance", "Cause and effect", "Responsibility", "Truth"],
+    "keywords": [
+      "Fairness",
+      "Balance",
+      "Cause and effect",
+      "Responsibility",
+      "Truth"
+    ],
+    "symbolism": "A figure in a red robe sits enthroned between two pillars, an upright sword in the right hand and a pair of scales in the left. The raised sword stands for clear judgement unswayed by feeling and for the decision that cuts to the truth, and the scales for the balance of cause and effect, weighed exactly. The two pillars and the veil between them mean the sacred order within which a verdict is reached.",
     "upright": {
       "core": "Symbolises the law of cause and effect — reaping what you sowed — and fair judgement. It means decisions grounded in fact and principle rather than emotion, just responsibility and reward for what was done, and the restoration of balance as truth comes to light.",
       "general": "The scales of cause and effect are weighing precisely right now. If you've built steadily, a fair reward is likely on its way back to you. It's a good time to make big decisions leaning on facts and principles, not feelings.",
@@ -241,7 +325,14 @@
   },
   "major-12": {
     "name": "The Hanged Man",
-    "keywords": ["New perspective", "Patience", "Sacrifice", "Pause", "Letting go"],
+    "keywords": [
+      "New perspective",
+      "Patience",
+      "Sacrifice",
+      "Pause",
+      "Letting go"
+    ],
+    "symbolism": "A man hangs upside down from a living T-shaped tree, one foot bound, his face calm and a halo shining about his head. The inverted posture stands for a reversal of view that turns the world over, and the serene face and halo for a pause that is not forced suffering but a willing sacrifice that gives rise to insight. The loose binding, which he could undo himself, means this state has been chosen.",
     "upright": {
       "core": "Symbolises the new perspective gained through voluntary pause and sacrifice. It means the insight reached by suspending action and turning the situation upside down, and the deeper understanding bought by putting down immediate gain.",
       "general": "This pause is not waste — it's precious time for gaining a new way of seeing. Hang upside down and the world shows answers it was hiding; flip your perspective and the whole situation may read completely differently.",
@@ -261,7 +352,14 @@
   },
   "major-13": {
     "name": "Death",
-    "keywords": ["Endings and beginnings", "Change", "Rebirth", "Clearing", "Transition"],
+    "keywords": [
+      "Endings and beginnings",
+      "Change",
+      "Rebirth",
+      "Clearing",
+      "Transition"
+    ],
+    "symbolism": "A skeletal knight in black armour rides forward on a white horse, carrying a black banner marked with a white rose; a king lies fallen at the hooves, and far off the sun rises between two towers. The skeletal knight stands for the unavoidable end that comes regardless of rank, and the white rose on the black banner for the cleansing and new life that follow death. The sun rising between the towers means that an ending is itself the gate to rebirth.",
     "upright": {
       "core": "Symbolises the complete closing of one cycle and the rebirth that follows. It means the natural passing of what has run its course, parting with an old identity, and the fundamental transformation that begins in that cleared space. A card of transition, not of physical death.",
       "general": "A big transitional energy is moving — one chapter closing, a new one opening. The ending isn't something to fear: it's the natural process of releasing what no longer fits you so you can be born again. Clear what needs clearing and a new door opens.",
@@ -281,7 +379,14 @@
   },
   "major-14": {
     "name": "Temperance",
-    "keywords": ["Balance", "Harmony", "Moderation", "Recovery", "Blending"],
+    "keywords": [
+      "Balance",
+      "Harmony",
+      "Moderation",
+      "Recovery",
+      "Blending"
+    ],
+    "symbolism": "A winged angel stands with one foot in the water and one on the land, pouring water between two cups; a sun sign marks the brow and a triangle within a square the breast. The stance across water and earth stands for balance between feeling and reality, the unconscious and the conscious, and the water passing between the cups for an alchemical fusion that blends unlike elements into a new harmony. The lit path and crown in the distance mean the completion that lies at the end of the middle way.",
     "upright": {
       "core": "Symbolises the alchemical balance that blends opposing elements into a higher harmony. It means the moderate stance that avoids extremes, the fusion of unlike things, and the healing and recovery that come through patient adjustment.",
       "general": "Different things are blending harmoniously and settling into stability. Staying off the extremes softens the whole situation, and a tired body and mind can slowly recover in this current.",
@@ -301,7 +406,14 @@
   },
   "major-15": {
     "name": "The Devil",
-    "keywords": ["Obsession", "Temptation", "Bondage", "Addiction", "The shadow"],
+    "keywords": [
+      "Obsession",
+      "Temptation",
+      "Bondage",
+      "Addiction",
+      "The shadow"
+    ],
+    "symbolism": "A devil with goat's horns and bat wings (Baphomet) sits on a dais in the dark, and at his feet stand a naked man and woman, horned and tailed, chains about their necks. The inverted pentagram above his head stands for an overturned order in which matter rules spirit, and the chained pair for people bound of their own accord to desire and addiction. That the chains are loose enough to slip off means the bondage was chosen — and so can leaving be.",
     "upright": {
       "core": "Symbolises the realm of shadow and bondage created by desire, obsession and addiction. It means a state of lost freedom, gripped by material temptation and instinctive impulse — while holding this truth: the chain was fastened by your own hand, so your own hand can remove it.",
       "general": "Something has a strong pull on you — a person, a habit, a desire. It's time to check whether a chain hides behind the sweetness. The good news this card carries: that chain is loose enough for you to slip off yourself.",
@@ -321,7 +433,14 @@
   },
   "major-16": {
     "name": "The Tower",
-    "keywords": ["Upheaval", "Collapse", "Awakening", "Dismantling", "Rebuilding"],
+    "keywords": [
+      "Upheaval",
+      "Collapse",
+      "Awakening",
+      "Dismantling",
+      "Rebuilding"
+    ],
+    "symbolism": "A tower on a craggy peak burns after a lightning strike; the crown at its top is thrown clear and two figures fall away below. The lightning stands for a stroke from above that overturns human plans in an instant and for sudden awakening, and the falling crown for the collapse of false authority and pride. That the tower was raised on a narrow crag at all means it was a structure on an unstable footing from the start.",
     "upright": {
       "core": "Symbolises the sudden collapse of a structure built on false foundations. It means upheaval and dismantling that arrive without warning, and the awakening in which illusion shatters and truth stands exposed. The destruction is painful — and the precondition of a sturdier rebuild.",
       "general": "The familiar structure is shaking — sudden change is in the air. It can shock and it can hurt, but what falls was standing on unstable ground to begin with. This shaking is also a forceful invitation: rebuild on firmer ground.",
@@ -341,7 +460,14 @@
   },
   "major-17": {
     "name": "The Star",
-    "keywords": ["Hope", "Healing", "Inspiration", "Recovery", "Optimism"],
+    "keywords": [
+      "Hope",
+      "Healing",
+      "Inspiration",
+      "Recovery",
+      "Optimism"
+    ],
+    "symbolism": "A naked woman kneels at a pool, pouring water from two jars onto the water and the land, while one great star and seven smaller ones shine overhead. Her nakedness stands for a purity and truth that hides nothing, and the water poured onto both water and earth for a healing that soaks feeling and reality alike. The great star means hope and guiding light arriving after darkness; the seven small stars mean the harmony of the seven chakras.",
     "upright": {
       "core": "Symbolises the hope, healing and purified faith that follow an ordeal. It means the recovering process of wounds closing and the heart opening toward the future again, and a quiet but unmistakable light of inspiration and guidance.",
       "general": "Like stars after a storm, a gentle current of hope and healing is flowing. A tired heart recovers and belief in the future revives. Even without dazzling results yet, you may hold the conviction that the direction is right.",
@@ -361,7 +487,14 @@
   },
   "major-18": {
     "name": "The Moon",
-    "keywords": ["Anxiety", "Illusion", "The unconscious", "Ambiguity", "Tested intuition"],
+    "keywords": [
+      "Anxiety",
+      "Illusion",
+      "The unconscious",
+      "Ambiguity",
+      "Tested intuition"
+    ],
+    "symbolism": "Beneath a moon dripping dew, a path runs far off between two towers; a dog and a wolf howl at the moon, and a crayfish crawls out of the pool. Moonlight stands for illusion and distorted perception that make things look other than they are, and the dog and wolf for tamed fear and wild fear. The crayfish crawling from the water means primal unease rising from deep in the unconscious, and the path between the towers a trial that has to be walked through that ambiguity.",
     "upright": {
       "core": "Symbolises the ambiguous passage ruled by uncertainty, illusion and the unconscious. It means a state where fact and imagination blur and perception distorts, suppressed anxieties surfacing, and a period when judgement should be held until things turn clear.",
       "general": "Under moonlight everything looks larger and blurrier than it is. Anxiety and imagination can eclipse the facts right now, and judging by what you see risks illusion. Until things clarify, wisdom is postponing the big decisions.",
@@ -381,7 +514,14 @@
   },
   "major-19": {
     "name": "The Sun",
-    "keywords": ["Success", "Vitality", "Joy", "Positivity", "Achievement"],
+    "keywords": [
+      "Success",
+      "Vitality",
+      "Joy",
+      "Positivity",
+      "Achievement"
+    ],
+    "symbolism": "Under a sky filled by a great sun, a naked child rides a white horse holding a red banner, with a wall of sunflowers behind. The naked child stands for a pure joy and release that needs to hide nothing, and the white horse for a purified life force. The sun's rays reaching in every direction and the sunflowers in full bloom mean the clarity, success and overflowing vitality that follow once the dark has lifted.",
     "upright": {
       "core": "Symbolises the clarity, success and life-force after darkness and confusion have cleared. It means truth in the open and unmixed joy, and achievement in which effort finally shines in full light. Counted the brightest, most positive card of the Major Arcana.",
       "general": "Bright, warm success fills the air like a cloudless sky. What you worked for is coming into the light, and you're likely to share the joy with the people around you. This is a season to be confident and shine as much as you please.",
@@ -401,7 +541,14 @@
   },
   "major-20": {
     "name": "Judgement",
-    "keywords": ["Rebirth", "Awakening", "Reckoning", "Calling", "Reappraisal"],
+    "keywords": [
+      "Rebirth",
+      "Awakening",
+      "Reckoning",
+      "Calling",
+      "Reappraisal"
+    ],
+    "symbolism": "Above the clouds the archangel Gabriel sounds a trumpet hung with a cross banner, and below a man, a woman and a child rise from their coffins, arms spread, looking up. The trumpet call stands for a summons that wakes sleeping souls, and the figures rising from coffins for a resurrection into a new order of being, past behind them. The mountains in the distance mean a moment of judgement and reckoning that cannot be undone.",
     "upright": {
       "core": "Symbolises the reckoning of the life lived so far and the resurrection beyond it. It means answering the calling that sounds from deep within, and the awakening in which past experience integrates and rises to a new level. The card of comebacks and second chances.",
       "general": "The energy of revival is flowing — settling accounts with the past and waking into something new. Long-awaited news or a second chance is likely on its way, and everything you've been through becomes an asset for the next stage. It's time to answer the call inside.",
@@ -421,7 +568,14 @@
   },
   "major-21": {
     "name": "The World",
-    "keywords": ["Completion", "Achievement", "Integration", "Journey's end", "New dimension"],
+    "keywords": [
+      "Completion",
+      "Achievement",
+      "Integration",
+      "Journey's end",
+      "New dimension"
+    ],
+    "symbolism": "A figure draped in violet cloth dances within an oval laurel wreath, a wand in each hand, and at the four corners sit the angel, eagle, lion and bull. The oval wreath stands for a completed cycle and the honour of victory, and the dance within it for the freedom and delight of a being that has reached completion. The four creatures at the corners mean that the four elements and the order of the cosmos have been made one; the two wands mean that the power of the beginning (the Magician) has been raised into completion.",
     "upright": {
       "core": "As the terminus of the Major Arcana journey, symbolises the completion and integration of a great cycle. It means the achievement in which scattered experience and effort click into one whole — and that this completion itself becomes the start of a wider dimension.",
       "general": "The long journey is finally completing — achievement is in the air. The scattered pieces of your effort are fitting together into a whole, full fruition. And this completion isn't an ending: it's the departure point into a wider world.",

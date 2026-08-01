@@ -1,7 +1,14 @@
 {
   "swords-1": {
     "name": "Ace of Swords",
-    "keywords": ["Clarity", "Breakthrough", "Truth", "Decision", "A new idea"],
+    "keywords": [
+      "Clarity",
+      "Breakthrough",
+      "Truth",
+      "Decision",
+      "A new idea"
+    ],
+    "symbolism": "A hand reaching out of a cloud holds a sword straight up through a crown, and on the crown hang laurel and palm, signs of victory. The sword stands for the power of reason that cuts to the truth, and the crown for the triumph and attainment that a clear mind leads to.",
     "upright": {
       "core": "Means mental clarity and truth's breakthrough. A new idea or decision cuts through the confusion in one stroke — the moment reason pierces to the heart of the matter.",
       "general": "The fog is lifting and the situation is coming into focus. A new idea or a decisive realisation may arrive and settle the blocked problem in one stroke. Trust today's clear judgement and set the direction.",
@@ -21,7 +28,14 @@
   },
   "swords-2": {
     "name": "Two of Swords",
-    "keywords": ["Stalemate", "Avoided decision", "Dilemma", "Balance", "The blindfold"],
+    "keywords": [
+      "Stalemate",
+      "Avoided decision",
+      "Dilemma",
+      "Balance",
+      "The blindfold"
+    ],
+    "symbolism": "A blindfolded woman sits with her back to the sea, two swords crossed before her breast, a crescent moon in the sky. The covered eyes stand for a refusal to look at what is real, and the crossed swords for a taut deadlock and defence held because neither side can be chosen.",
     "upright": {
       "core": "Means the stalemate between two options and the deliberate avoidance of deciding. A precarious balance held by shutting out feeling and information — and eventually the blindfold must come off and reality be faced.",
       "general": "You're stopped at the fork, unable to choose either road. The balance holds for now, but it can't hold long. Start preparing, little by little, to face the reality you'd rather not see.",
@@ -41,7 +55,14 @@
   },
   "swords-3": {
     "name": "Three of Swords",
-    "keywords": ["Heartbreak", "Parting", "Painful truth", "Sorrow", "Wounds"],
+    "keywords": [
+      "Heartbreak",
+      "Parting",
+      "Painful truth",
+      "Sorrow",
+      "Wounds"
+    ],
+    "symbolism": "A red heart floats pierced by three swords against rain clouds and falling rain. The pierced heart stands for the wound that rational truth inflicts on feeling, and the pouring rain for grief let out and the cleansing that follows it.",
     "upright": {
       "core": "Means heartbreak, parting, betrayal — pain that pierces, and the facing of a painful truth. The sorrow can't be avoided, but the truth coming out is also what makes the situation clear.",
       "general": "You're facing a truth or a loss that pierces. Disappointment, parting, the sting of betrayal may arrive sharply now. But this ache lets you see the blurred relationship or situation honestly — and grief fully felt clears the ground for recovery.",
@@ -61,7 +82,14 @@
   },
   "swords-4": {
     "name": "Four of Swords",
-    "keywords": ["Rest", "Recovery", "Regrouping", "Pause", "Meditation"],
+    "keywords": [
+      "Rest",
+      "Recovery",
+      "Regrouping",
+      "Pause",
+      "Meditation"
+    ],
+    "symbolism": "Inside a chapel the effigy of a knight lies on a stone tomb with hands joined; three swords hang on the wall and one lies beside the tomb. The sleeping knight stands for deliberate rest and regrouping after battle, and the sword laid down for a mind recovering by withdrawing from conflict.",
     "upright": {
       "core": "Means the conscious pause and rest that restore a spent body and mind. The retreat is not escape but the regrouping that prepares the next phase.",
       "general": "After the intense stretch, it's time to stop and catch your breath. Right now, recovering body and mind is probably the most productive choice available. Deliberate rest is what generates the next stage's energy.",
@@ -81,7 +109,14 @@
   },
   "swords-5": {
     "name": "Five of Swords",
-    "keywords": ["Conflict", "Hollow victory", "Battles of pride", "Discord", "Self-interest"],
+    "keywords": [
+      "Conflict",
+      "Hollow victory",
+      "Battles of pride",
+      "Discord",
+      "Self-interest"
+    ],
+    "symbolism": "A man stands gathering up three swords with a scornful look, while two defeated figures leave their swords on the ground and walk away with their backs turned. The rough sky of torn cloud stands for the aftermath conflict leaves, and the victor's expression for a hollow win bought at the cost of relationship and trust.",
     "upright": {
       "core": "Means the conflict where even winning loses more — the hollow victory. A quarrel led by pride and self-interest is damaging trust and the relationship itself.",
       "general": "A quarrel is in the air where winning leaves you with little. Take the upper hand in the argument and the trust still cracks. Right now the question isn't how to win but what to protect.",
@@ -101,7 +136,14 @@
   },
   "swords-6": {
     "name": "Six of Swords",
-    "keywords": ["Passage", "Journey of recovery", "Leaving", "Transition", "Calmer waters"],
+    "keywords": [
+      "Passage",
+      "Journey of recovery",
+      "Leaving",
+      "Transition",
+      "Calmer waters"
+    ],
+    "symbolism": "A ferryman poles a boat stuck with six swords towards calm water, carrying a woman and child huddled together. The swords in the boat stand for past experience and wounds carried along, and the crossing from rough water to still water for the passage from pain to recovery.",
     "upright": {
       "core": "Means the passage and transition that leave a hard place behind and cross toward calmer waters. The wound hasn't fully vanished — but the situation is on the gradual mend, a journey of recovery.",
       "general": "You're leaving the hard place and crossing to stiller water. The heart isn't fully light yet, but things are likely moving toward better. A season of transition — closing out the past and settling into new surroundings.",
@@ -121,7 +163,14 @@
   },
   "swords-7": {
     "name": "Seven of Swords",
-    "keywords": ["Deception", "Strategy", "Avoidance", "Moving covertly", "Cunning"],
+    "keywords": [
+      "Deception",
+      "Strategy",
+      "Avoidance",
+      "Moving covertly",
+      "Cunning"
+    ],
+    "symbolism": "A man tiptoes away from an enemy camp with five swords in his arms, glancing back over his shoulder; two swords are left standing where they were. The swords carried off in secret stand for deception and covert scheming, and the ones left behind for the gap in a plan that is not complete.",
     "upright": {
       "core": "Means deception, covert action, the stratagem that avoids open confrontation. The phase may call for strategy and craft — but dishonest methods collect their fee in trust.",
       "general": "Something isn't flowing honestly. Someone may be moving behind the scenes — or you yourself may be choosing craft and avoidance over the direct route. Strategy has its moment, but any method that mortgages trust will bill you later.",
@@ -141,7 +190,14 @@
   },
   "swords-8": {
     "name": "Eight of Swords",
-    "keywords": ["Feeling trapped", "Self-restriction", "Helplessness", "Caged thinking", "Fear"],
+    "keywords": [
+      "Feeling trapped",
+      "Self-restriction",
+      "Helplessness",
+      "Caged thinking",
+      "Fear"
+    ],
+    "symbolism": "A woman, blindfolded and bound, stands in a puddle ringed by eight swords — but her feet are not tied and there are gaps between the blades. The binding and blindfold stand for a prison of thought she has made herself, and the open gaps for an exit that opens as soon as she changes how she sees it.",
     "upright": {
       "core": "Means the mental prison built of restriction, helplessness, fear and limiting beliefs. It is your own thinking, more than the situation, that holds you — and the exit already exists.",
       "general": "You feel walled in on every side, unable to move. But much of the binding is made by the thought 'it won't work anyway', not by the situation itself. Doubt the belief that's covering your eyes and the exit starts to appear.",
@@ -161,7 +217,14 @@
   },
   "swords-9": {
     "name": "Nine of Swords",
-    "keywords": ["Anxiety", "Sleepless nights", "Worry", "Self-blame", "The mind's shadows"],
+    "keywords": [
+      "Anxiety",
+      "Sleepless nights",
+      "Worry",
+      "Self-blame",
+      "The mind's shadows"
+    ],
+    "symbolism": "A figure sits up in bed in the middle of the night with both hands over the face, nine swords hung in rows on the dark wall behind. The swords on the wall stand for worry and dread multiplied in the head rather than in fact, and the deep darkness for sleeplessness and mental pain borne alone.",
     "upright": {
       "core": "Means the mental anguish of anxiety, worry, self-blame and sleeplessness. The pain's source lies less in outer reality than in fear inflated within the mind.",
       "general": "Worry is pressing on you hard enough to steal sleep. But fear grown large in the head is usually far bigger than the actual thing. Don't hold it alone — take the worry out into the light and check its real size.",
@@ -181,7 +244,14 @@
   },
   "swords-10": {
     "name": "Ten of Swords",
-    "keywords": ["The end", "Rock bottom", "Loss", "Betrayal", "Dawn of renewal"],
+    "keywords": [
+      "The end",
+      "Rock bottom",
+      "Loss",
+      "Betrayal",
+      "Dawn of renewal"
+    ],
+    "symbolism": "A figure lies face down on the ground with ten swords in his back, while beyond the black sky dawn breaks along the horizon. The ten swords stand for a complete end that cannot be undone, and the rising dawn light for the renewal that always comes after the bottom.",
     "upright": {
       "core": "Means the complete end of a phase — loss and pain down to the floor. But an end with nowhere lower to go is itself the precondition of a new beginning.",
       "general": "One phase is ending completely. Betrayal or loss may have you feeling flat on the ground — but nowhere lower to go means the only way left is up. Don't force the ended thing back to life; take this full stop as the opening of a new sentence.",
@@ -201,7 +271,14 @@
   },
   "swords-11": {
     "name": "Page of Swords",
-    "keywords": ["Curiosity", "Fresh news", "Observation", "Vigilance", "Learning"],
+    "keywords": [
+      "Curiosity",
+      "Fresh news",
+      "Observation",
+      "Vigilance",
+      "Learning"
+    ],
+    "symbolism": "A young man stands on a windy hill holding a sword upright in both hands, scanning about him as if on guard, with scattered cloud and flocks of birds in the sky. The hair and trees blown by the wind stand for lively mental activity and curiosity, and the searching gaze for a stance of observation and watchfulness.",
     "upright": {
       "core": "Means intellectual curiosity, new information and news, the posture of learning and observing. A mind still green but quick, beginning its search for the truth.",
       "general": "You're watching the world with curious eyes, ready to learn. New information may arrive and widen the map of your thinking. The attitude that isn't afraid to ask questions is what pulls the opportunities in.",
@@ -221,7 +298,14 @@
   },
   "swords-12": {
     "name": "Knight of Swords",
-    "keywords": ["Charge", "Drive", "Ambition", "Haste", "Straight ahead"],
+    "keywords": [
+      "Charge",
+      "Drive",
+      "Ambition",
+      "Haste",
+      "Straight ahead"
+    ],
+    "symbolism": "An armoured knight charges at full gallop under a storming sky, his sword raised high. The racing white horse and the lifted sword stand for headlong drive and ambition towards a goal, and the hard wind and torn cloud for the danger of recklessness that comes with that speed.",
     "upright": {
       "core": "Means the swift decision and headlong drive toward the goal. Intellectual ambition unafraid of obstacles — execution at its peak.",
       "general": "You're racing at the goal like wind. Deciding fast, executing fast, you're likely to pull ahead while others hesitate. But at this speed, the field of view has to widen with it.",
@@ -241,7 +325,14 @@
   },
   "swords-13": {
     "name": "Queen of Swords",
-    "keywords": ["Sharp clarity", "Independence", "Cool judgement", "Honesty", "Boundaries"],
+    "keywords": [
+      "Sharp clarity",
+      "Independence",
+      "Cool judgement",
+      "Honesty",
+      "Boundaries"
+    ],
+    "symbolism": "A queen sits in profile on a high throne above the clouds, a sword held straight up in her right hand and her left hand extended forward. The upright sword stands for lucid judgement unswayed by feeling, and the outstretched hand for an openness willing to accept the truth and for wisdom won from experience.",
     "upright": {
       "core": "Means the cool, fair judgement distilled from experience and intellect. Independence unshaken by feeling, honesty, and the strength to set clear boundaries.",
       "general": "A lucid current is flowing — seeing through to the facts without being swayed. With the wisdom experience gave you, you can judge the situation precisely and draw the lines that need drawing. Honesty and independence are earning you respect.",
@@ -261,7 +352,14 @@
   },
   "swords-14": {
     "name": "King of Swords",
-    "keywords": ["Authority", "Intellect", "Fairness", "Principle", "Strategic leadership"],
+    "keywords": [
+      "Authority",
+      "Intellect",
+      "Fairness",
+      "Principle",
+      "Strategic leadership"
+    ],
+    "symbolism": "A king sits facing forward on a throne decorated with butterflies and crescent moons, a sword held upright in his right hand. The straight-on gaze stands for unshaken intellectual authority and fair judgement, and the butterflies carved on the throne for transformation of the soul — the plane of wisdom a matured mind has reached.",
     "upright": {
       "core": "Means fair authority grounded in mature intellect and principle. Strategic leadership that judges and governs by logic and ethical standards, not by feeling.",
       "general": "The mature intellect that governs by principle and logic is with you. Fair judgement unswayed by feeling is likely to build both trust and authority. A good season for the big picture and the strategic call.",

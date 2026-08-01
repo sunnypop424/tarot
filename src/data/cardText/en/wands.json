@@ -1,7 +1,14 @@
 {
   "wands-1": {
     "name": "Ace of Wands",
-    "keywords": ["New beginnings", "Inspiration", "Passion", "Creative energy", "Opportunity"],
+    "keywords": [
+      "New beginnings",
+      "Inspiration",
+      "Passion",
+      "Creative energy",
+      "Opportunity"
+    ],
+    "symbolism": "A hand emerges from a cloud gripping a staff in fresh leaf, with a castle on a distant hill. The wand with living leaves stands for vitality and creative potential breaking into bud, and the hand from the cloud for divine inspiration given as a gift from outside. The falling leaves, shaped like the Hebrew letter Yod, mean sacred energy pouring down into the material world.",
     "upright": {
       "core": "The pure expression of creative energy — the seed of every beginning. It marks the moment a new passion, inspiration or opportunity quickens, and symbolises potential not yet shaped, waiting to be realised through action.",
       "general": "A new spark is flaring up inside you. The opportunity or idea you've long waited for may well appear in front of you. Trust the flutter you're feeling and take the first step.",
@@ -21,7 +28,14 @@
   },
   "wands-2": {
     "name": "Two of Wands",
-    "keywords": ["Planning", "Future vision", "Choice", "Expansion", "Potential"],
+    "keywords": [
+      "Planning",
+      "Future vision",
+      "Choice",
+      "Expansion",
+      "Potential"
+    ],
+    "symbolism": "A figure standing on a castle wall holds a globe in one hand and looks out past the sea, the other hand resting on an upright staff. The globe stands for the potential and large ambition of a world held in the hand, and the wall for a secure base already won. The two wands — one fixed to the wall, one held in the hand — mean the choice between settling and setting out.",
     "upright": {
       "core": "Means the planning and outlook toward a wider world after a first achievement. It marks the stage of designing the future on ground already secured, choosing the next move — personal will expanding into long-term vision.",
       "general": "The first step is taken; now you're drawing the bigger picture. Your view is widening as if the world sat in your palm. The plan you set now is likely to decide the direction of what follows.",
@@ -41,7 +55,14 @@
   },
   "wands-3": {
     "name": "Three of Wands",
-    "keywords": ["Expansion", "Outlook", "Waiting", "Progress", "Cooperation"],
+    "keywords": [
+      "Expansion",
+      "Outlook",
+      "Waiting",
+      "Progress",
+      "Cooperation"
+    ],
+    "symbolism": "A figure on a high cliff looks down between three staves at ships sailing the sea. The ships stand for plans already set in motion — enterprises and trade that have begun to move — and the figure seen from behind means a widened view, waiting on results while looking further ahead. The three wands planted firmly in the ground mark a base of effort that has settled into place.",
     "upright": {
       "core": "Means the stage where an executed plan expands and the first signs of fruit appear. You can see the results of effort approaching in the distance and survey wider possibilities — a growth midpoint where waiting and progress coexist.",
       "general": "You're watching the seeds you planted begin to grow. The fruits of effort are approaching on the horizon. Widen your view and a bigger opportunity is likely to show itself.",
@@ -61,7 +82,14 @@
   },
   "wands-4": {
     "name": "Four of Wands",
-    "keywords": ["Celebration", "Stability", "Harmony", "Achievement", "Rest"],
+    "keywords": [
+      "Celebration",
+      "Stability",
+      "Harmony",
+      "Achievement",
+      "Rest"
+    ],
+    "symbolism": "A garland of flowers and fruit hangs across four staves; beyond it two figures raise bouquets in celebration, with a castle behind. The four pillared wands recall the structure of a wedding canopy (chuppah), standing for a settled foundation and a place of celebration. The garland and the dancing figures mean the joy of harvest, the concord of a community, and one stage brought to a successful close.",
     "upright": {
       "core": "Means the celebration, stability and harmony that mark a completed stage. Joy and rest enjoyed on foundations built by effort — happiness shared in harmony with home and community.",
       "general": "A stage has closed safely and there's something to celebrate. Stability is settling into home, relationships and work. It's a lovely time to share the joy with the people who saw you through.",
@@ -81,7 +109,14 @@
   },
   "wands-5": {
     "name": "Five of Wands",
-    "keywords": ["Competition", "Conflict", "Clashing views", "Challenge", "Growing pains"],
+    "keywords": [
+      "Competition",
+      "Conflict",
+      "Clashing views",
+      "Challenge",
+      "Growing pains"
+    ],
+    "symbolism": "Five young men, each with a staff, tangle together in a contest. The staves pointing in different directions stand for wills and opinions that have not been brought into line, and the scuffle that leaves no wounds means a conflict in the nature of competition, training and growing pains rather than real war. Their mismatched clothing marks a situation where varied positions and interests collide.",
     "upright": {
       "core": "Means the competition and conflict of many wills and energies colliding. Closer to a healthy clash that sharpens everyone than to a destructive fight — the process in which skill is tested and growth happens amid the noise.",
       "general": "Opinions and energies are colliding all around you. The rivalry can be tiring, but inside it your skills are being honed. Healthy competition can be fuel.",
@@ -101,7 +136,14 @@
   },
   "wands-6": {
     "name": "Six of Wands",
-    "keywords": ["Victory", "Recognition", "Success", "Confidence", "Honour"],
+    "keywords": [
+      "Victory",
+      "Recognition",
+      "Success",
+      "Confidence",
+      "Honour"
+    ],
+    "symbolism": "A rider crowned with laurel advances on a white horse, a victor's wreath hung on his staff as well, while the crowd around him raises their staves in acclaim. The laurel wreath has stood for victory and honour since antiquity, and the white horse for power successfully mastered and a clean win. The crowd's cheering means a personal achievement widening into public recognition.",
     "upright": {
       "core": "Means victory won through effort and the public recognition that follows. The moment of success arriving after conflict and competition — achievement turning into confidence and honour, becoming fuel for the next challenge.",
       "general": "Your efforts are being recognised in front of everyone. Visible results — promotion, a pass, applause — are in the air. You're likely to see proof that the hard stretch wasn't wasted.",
@@ -121,7 +163,14 @@
   },
   "wands-7": {
     "name": "Seven of Wands",
-    "keywords": ["Defence", "Meeting challenges", "Conviction", "Holding on", "Competitive edge"],
+    "keywords": [
+      "Defence",
+      "Meeting challenges",
+      "Conviction",
+      "Holding on",
+      "Competitive edge"
+    ],
+    "symbolism": "A figure on a hilltop wields a staff against six staves rising from below. The high ground stands for the advantageous position and the legitimacy he holds, and the six wands thrusting up from below for the challenges and rivals threatening his place. The mismatched shoes mark a resolve that does not give ground even when caught unprepared.",
     "upright": {
       "core": "Means the defence and endurance that protect a won position and one's convictions. Holding the high ground against challenge and pressure — confident resistance as the force that keeps the competitive edge.",
       "general": "This is a season for defending the position you've built. Challenges and pressure crowd in, but the high ground is yours. The strength to hold without wavering is likely what decides this.",
@@ -141,7 +190,14 @@
   },
   "wands-8": {
     "name": "Eight of Wands",
-    "keywords": ["Swift progress", "News", "Momentum", "Movement", "Rapid current"],
+    "keywords": [
+      "Swift progress",
+      "News",
+      "Momentum",
+      "Movement",
+      "Rapid current"
+    ],
+    "symbolism": "Eight staves fly together across a clear sky, with a river and peaceful fields spread below. In one of the few cards without a person, the wands in flight stand for events moving quickly without obstruction and for news and energy in transit. That they are on the point of landing means results and word are about to arrive.",
     "upright": {
       "core": "Means events accelerating and momentum meeting no resistance. Blockages clear and messages, contacts and results fly back and forth — a season when quick movement itself creates the progress.",
       "general": "What was stalled is suddenly riding a rapid current. Contact, news, results — everything is arriving fast. Catch the flow and a short time can bring big progress.",
@@ -161,7 +217,14 @@
   },
   "wands-9": {
     "name": "Nine of Wands",
-    "keywords": ["Perseverance", "Grit", "The last hurdle", "Vigilance", "Resilience"],
+    "keywords": [
+      "Perseverance",
+      "Grit",
+      "The last hurdle",
+      "Vigilance",
+      "Resilience"
+    ],
+    "symbolism": "A figure with a bandaged head leans on one staff, keeping watch over eight more ranged behind. The bandage stands for wounds from battles already fought and for the resilience that has not fallen despite them, and the wands set up like a palisade for what has been held so far and for a last line of defence. The wary eyes within a tired stance mark a will that does not let go to the end.",
     "upright": {
       "core": "Means the perseverance and resilience that refuse to retreat despite wounds. The grit summoned at the final hurdle before completion — accumulated experience become a defensive wisdom that carries you to the end.",
       "general": "You're worn through — and the finish line is right there. Everything you've endured has become the armour protecting you now. Very likely there's just one more hurdle to clear.",
@@ -181,7 +244,14 @@
   },
   "wands-10": {
     "name": "Ten of Wands",
-    "keywords": ["Heavy burden", "Responsibility", "Overwork", "Pressure", "Final stretch"],
+    "keywords": [
+      "Heavy burden",
+      "Responsibility",
+      "Overwork",
+      "Pressure",
+      "Final stretch"
+    ],
+    "symbolism": "A figure walks towards a village in the distance, bent at the waist under ten staves gathered all at once in his arms. The bundle held so high it blocks his view stands for excessive responsibility and burden shouldered alone, and the bowed back for being pressed down by the weight success has brought. The village drawing near marks a destination not far off — a heavy journey soon to end.",
     "upright": {
       "core": "Means the state of shouldering excessive responsibility alone. The load that grew as the price of achievement now presses toward overwork — the weight of the final stretch, and the question of whether this way of carrying it can last.",
       "general": "You're carrying far too much by yourself. The stronger your sense of duty, the heavier the body and heart get. The destination is close — but it's time to ask if this way of carrying is sustainable.",
@@ -201,7 +271,14 @@
   },
   "wands-11": {
     "name": "Page of Wands",
-    "keywords": ["Curiosity", "Exploration", "Seed of passion", "Fresh news", "Free spirit"],
+    "keywords": [
+      "Curiosity",
+      "Exploration",
+      "Seed of passion",
+      "Fresh news",
+      "Free spirit"
+    ],
+    "symbolism": "Against a desert, a young man in a robe patterned with bright salamanders holds a staff upright and looks at the new shoot at its tip. The salamander, spirit of fire, stands for the element of the wands suit and for burning passion, and the gaze fixed on the tip of the staff means a curiosity and appetite for enquiry that is young but pure. The pyramids and desert behind mark the possibility of adventure towards an unknown world.",
     "upright": {
       "core": "Means the unrefined seed of passion and pure curiosity. An explorer's spirit toward new possibility and the arrival of welcome news — short on experience, but carrying the free, fearless energy of a beginning.",
       "general": "Everything looks interesting and you want to try it all. A new interest or welcome news is on its way. It's fine to be clumsy — this is the time to just dive in.",
@@ -221,7 +298,14 @@
   },
   "wands-12": {
     "name": "Knight of Wands",
-    "keywords": ["Charge", "Adventure", "Boldness", "Drive", "Passionate action"],
+    "keywords": [
+      "Charge",
+      "Adventure",
+      "Boldness",
+      "Drive",
+      "Passionate action"
+    ],
+    "symbolism": "A knight in salamander-patterned cloth over his armour is about to charge across the desert on a horse rearing on its forelegs. The leaping horse stands for a drive that cannot be held back and the energy of advance, and the plume scattering like flame from his helm for burning passion. The bare desert behind means a bold temperament that throws itself into adventure even at risk.",
     "upright": {
       "core": "Means the bold charge toward a goal and passionate power to act. Momentum that leaps into adventure without hesitation, energy at its crest — the dynamic force by which action itself creates opportunity.",
       "general": "You're full of energy that runs at the goal without flinching. The drive to leap into what you'd been hesitating over is flowing now. That boldness is likely to draw people and chances to you.",
@@ -241,7 +325,14 @@
   },
   "wands-13": {
     "name": "Queen of Wands",
-    "keywords": ["Confidence", "Charisma", "Independence", "Warm passion", "Charm"],
+    "keywords": [
+      "Confidence",
+      "Charisma",
+      "Independence",
+      "Warm passion",
+      "Charm"
+    ],
+    "symbolism": "A queen sits enthroned with a staff in one hand and a sunflower in the other, a black cat at her feet. The sunflower stands for a bright vitality turned towards the sun and for a warm charm that draws people in, and the throne carved with lions and salamanders for the confident authority of the fire element. The black cat marks intuition and independence, and a power on the underside that is not on show.",
     "upright": {
       "core": "Means confidence and charisma that combine warmth with backbone. An independent charm grounded in self-belief, an energy that vitalises everyone nearby — passion expressed maturely, through sociability and care.",
       "general": "You're shining as the lead of your own life. Your warm, firm energy is drawing people in. The more you act like yourself, the better both work and relationships flow.",
@@ -261,7 +352,14 @@
   },
   "wands-14": {
     "name": "King of Wands",
-    "keywords": ["Leadership", "Vision", "Decisiveness", "Command", "Mature passion"],
+    "keywords": [
+      "Leadership",
+      "Vision",
+      "Decisiveness",
+      "Command",
+      "Mature passion"
+    ],
+    "symbolism": "A king sits on a throne carved with lions and salamanders, holding a staff in bud, a live salamander at his feet. The salamander with its tail in its mouth stands for a completed cycle — fire energy that has reached full maturity. His forward-leaning posture means a decisiveness ready to act at any moment, and the flame-shaped crown a mature authority that governs its own passion.",
     "upright": {
       "core": "Means visionary leadership that governs passion with full maturity. The command and decisiveness that set out the big picture and move people — will tempered by experience, settled into authority and influence.",
       "general": "This is the leader's season: handling passion maturely and steering the big picture. The power to set a vision and move people is flowing. Your decision may well change the whole board.",
