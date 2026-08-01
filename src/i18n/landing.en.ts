@@ -296,4 +296,7 @@ export const LANDING_EN: Record<string, string> = {
   '화면 흐름 (방문자가 무엇을 하면 무엇이 보이나요):': 'Screen flow (visitor does what, sees what):',
   '비슷하다고 생각한 서비스나 사례:': 'Similar services or examples you have in mind:',
   '이미 준비된 자료 (이미지·문구·명단 등):': 'Material you already have (images, text, lists):',
+  '주문 제작': 'Custom build',
+  '행사기간 / 주인공 이름': 'event dates / celebrant name',
+  '8/12~8/14 / 리안': '8/12-8/14 / Rian',
 }

@@ -103,9 +103,14 @@ export function InquiryModal({
 
         <ol className={styles.steps}>
           <li>
+            {/*
+              * 자리 표시자에 **원문을 그대로 넣으면 안 된다** — 문장은 옮겨지는데
+              * 그 안의 값만 한국어로 남아 "[행사기간 / 주인공 이름] (e.g. 8/12~8/14 / 리안)"
+              * 처럼 반쪽이 된다. 값도 사전을 통과시킨다.
+              */}
             {t('오픈채팅방 닉네임을 [{rule}] 형식으로 설정해 주세요. (예: {example})', {
-              rule: NICKNAME_RULE,
-              example: NICKNAME_EXAMPLE,
+              rule: t(NICKNAME_RULE),
+              example: t(NICKNAME_EXAMPLE),
             })}
           </li>
           <li>{t('원하시는 서비스(또는 주문 제작)를 선택하신 후, 하단의 양식을 복사해 주세요.')}</li>
@@ -143,7 +148,8 @@ export function InquiryModal({
               aria-pressed={picked.includes(id)}
             >
               {picked.includes(id) && <Check size={14} strokeWidth={2.4} aria-hidden="true" />}
-              {SERVICE_FORM[id].name}
+              {/* 서비스 이름도 우리가 쓴 문구다 — 양식 본문과 같은 사전을 쓴다 */}
+              {t(SERVICE_FORM[id].name)}
             </button>
           ))}
           {/* 목록에 없는 것 — 서비스가 아니라 '만들어 주세요' 라 칸을 따로 둔다 */}
@@ -156,7 +162,7 @@ export function InquiryModal({
             aria-pressed={custom}
           >
             {custom && <Check size={14} strokeWidth={2.4} aria-hidden="true" />}
-            {CUSTOM_FORM.name}
+            {t(CUSTOM_FORM.name)}
           </button>
         </div>
 
