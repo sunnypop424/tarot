@@ -25,7 +25,9 @@ export function Guide() {
       <header className="ad-head">
         <div className="ad-head__row">
           <h1 className="ad-head__title">{t('포토존')}</h1>
-          <span className="ad-head__count tnum">프레임 {display.frames.length}종</span>
+          <span className="ad-head__count tnum">
+            {t('프레임 {n}종', { n: display.frames.length })}
+          </span>
         </div>
         <p className="ad-head__desc">{t('따로 설정할 것이 없는 서비스예요.')}</p>
       </header>
@@ -33,7 +35,7 @@ export function Guide() {
       <div style={{ maxWidth: 680 }}>
         <div className="ad-card" style={{ padding: 26 }}>
           <div className="ad-card__title ad-card__title--lg">
-            프레임 {display.frames.length}종이 올라가 있어요
+            {t('프레임 {n}종이 올라가 있어요', { n: display.frames.length })}
           </div>
           <p className="ad-card__desc">
             {t('따로 설정할 것이 없는 서비스예요. 방문자는 프레임을 골라 사진을 찍고 저장하면 끝이에요.')}

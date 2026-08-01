@@ -66,8 +66,14 @@ export function Login() {
             <div className={styles.logo}>
               <Sparkles size={22} aria-hidden="true" />
             </div>
-            <h1 className="t-title-l">{slot.name}</h1>
-            <p className="t-text-xs t-muted">/{slot.slug} 관리자</p>
+            {/* 주최자가 지은 행사 이름 — 사전이 옮길 말이 아니다 */}
+            <h1 className="t-title-l" data-user-text>
+              {slot.name}
+            </h1>
+            {/* 슬러그는 주소라 번역 대상이 아니다 — 뒤에 붙는 낱말만 옮긴다 */}
+            <p className="t-text-xs t-muted">
+              /{slot.slug} {t('관리자')}
+            </p>
           </div>
 
           {/* 인증이 없는 채로 띄웠으면 그 사실을 말한다 — 보안된 것처럼 보이면 안 된다 */}
@@ -75,15 +81,14 @@ export function Login() {
             <p className={styles.notice}>
               <TriangleAlert size={16} strokeWidth={2} aria-hidden="true" />
               <span className="t-text-xs">
-                이 브라우저에만 저장되는 임시 모드예요 (Supabase 미설정). 아무 값이나 들어가고,
-                고친 답변이 방문자에게 가지 않아요.
+                {t('이 브라우저에만 저장되는 임시 모드예요 (Supabase 미설정). 아무 값이나 들어가고, 고친 답변이 방문자에게 가지 않아요.')}
               </span>
             </p>
           )}
 
           <div className="field">
             <label className="field__label" htmlFor="admin-email">
-              이메일
+              {t('이메일')}
             </label>
             <input
               id="admin-email"
@@ -98,7 +103,7 @@ export function Login() {
 
           <div className="field">
             <label className="field__label" htmlFor="admin-password">
-              비밀번호
+              {t('비밀번호')}
             </label>
             <input
               id="admin-password"
@@ -118,7 +123,7 @@ export function Login() {
             className="btn btn--md btn--primary btn--block"
             disabled={busy}
           >
-            로그인
+            {t('로그인')}
           </button>
         </form>
       </div>

@@ -57,7 +57,7 @@ export function Moderation() {
 
   async function remove(m: RollingMessage) {
     const ok = await confirmAction({
-      title: `이 ${c.unit}를 지울까요?`,
+      title: t('이 {unit}를 지울까요?', { unit: t(c.unit) }),
       desc: t('숨기기만 해도 방문자에겐 보이지 않아요.'),
       okLabel: t('지우기'),
       danger: true,
@@ -83,7 +83,7 @@ export function Moderation() {
         <div className="ad-head__row">
           <h1 className="ad-head__title">{t(c.title)}</h1>
           <span className="ad-head__count tnum">
-            {list.length}개 · 숨김 {hiddenCount}개
+            {t('{a}개 · 숨김 {b}개', { a: list.length, b: hiddenCount })}
           </span>
         </div>
         <p className="ad-head__desc">
@@ -93,7 +93,10 @@ export function Moderation() {
 
       <div className="ad-stack">
         <div className="ad-banner ad-banner--info">
-          남긴 즉시 {c.place}에 보여요. 부적절한 것만 숨기거나 지워 주세요.
+          {/* 자리 이름(벽·나무·상영 화면)이 문장에 낀다 — 조각내지 않고 값으로 넘긴다 */}
+          {t('남긴 즉시 {place}에 보여요. 부적절한 것만 숨기거나 지워 주세요.', {
+            place: t(c.place),
+          })}
         </div>
 
         <BannedWords slug={slug} unit={c.unit} />

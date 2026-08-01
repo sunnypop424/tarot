@@ -183,11 +183,11 @@ export function Cards() {
                 onClick={() => void save({ ...settings, rarityCurve: c.id })}
                 data-curve={c.id}
               >
-                {c.label}
+                {t(c.label)}
               </button>
             ))}
             <span className="ad-fine">
-              {RARITY_CURVES.find((c) => c.id === settings.rarityCurve)?.desc}
+              {t(RARITY_CURVES.find((c) => c.id === settings.rarityCurve)?.desc ?? '')}
             </span>
           </div>
 

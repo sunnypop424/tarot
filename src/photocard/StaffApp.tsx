@@ -318,7 +318,8 @@ function Staff({ slot }: { slot: Slot }) {
                 <div className={styles.banner} data-demo>
                   <Info size={17} strokeWidth={2} aria-hidden="true" />
                   <span>
-                    <b>{t('체험용 화면이에요.')}</b> 실제로는 스태프가 로그인한 기기에서만 열려요.
+                    <b>{t('체험용 화면이에요.')}</b>{' '}
+                    {t('실제로는 스태프가 로그인한 기기에서만 열려요.')}
                   </span>
                 </div>
               )}

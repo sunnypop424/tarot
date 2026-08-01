@@ -252,4 +252,11 @@ export const ADMIN_EN: Record<string, string> = {
   '열림': 'Open',
   '종료됨': 'Ended',
   '테스트': 'Test',
+  '프레임 {n}종': '{n} frames',
+  '프레임 {n}종이 올라가 있어요': '{n} frames are uploaded',
+  '이메일': 'Email',
+  '비밀번호': 'Password',
+  '로그인': 'Sign in',
+  '이 브라우저에만 저장되는 임시 모드예요 (Supabase 미설정). 아무 값이나 들어가고, 고친 답변이 방문자에게 가지 않아요.':
+    'This is a temporary mode stored only in this browser (Supabase not configured). Any value is accepted, and edits do not reach visitors.',
 }
