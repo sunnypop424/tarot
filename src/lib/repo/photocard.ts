@@ -85,7 +85,8 @@ export const supabasePhotocard: PhotocardRepo = {
   async listCards(slug) {
     const { data, error } = await (await db())
       .from('photocards')
-      .select('id, name, rarity, image, remaining, batch_cap_ratio, lucky, "order"')
+      // `name_i18n` 을 빠뜨리면 주최자가 적어 둔 이름이 화면에 한 번도 안 나온다
+      .select('id, name, name_i18n, rarity, image, remaining, batch_cap_ratio, lucky, "order"')
       .eq('slug', slug)
       .order('order')
     if (error) throw new Error(error.message)
@@ -163,7 +164,11 @@ export const supabasePhotocard: PhotocardRepo = {
   async report(slug) {
     const db_ = await db()
     const [{ data: cards, error: e1 }, { data: draws, error: e2 }] = await Promise.all([
-      db_.from('photocards').select('id, name, image, rarity, lucky, remaining, "order"').eq('slug', slug).order('order'),
+      db_
+        .from('photocards')
+        .select('id, name, name_i18n, image, rarity, lucky, remaining, "order"')
+        .eq('slug', slug)
+        .order('order'),
       // 리허설 분은 빼고 센다 — 그게 리허설의 뜻이다 (재고도 안 깎였다)
       db_.from('photocard_draws').select('card_id').eq('slug', slug).eq('rehearsal', false),
     ])

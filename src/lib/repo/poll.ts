@@ -51,7 +51,13 @@ const toPoll = (r: PollRow): Poll => ({
     })),
 })
 
-const SELECT = 'id, title, kind, max_pick, closed, hidden, order:"order", poll_options(id, order:"order", label, image, votes)'
+/**
+ * **`_i18n` 컬럼을 빠뜨리지 않는다.** 타입에도 있고 저장도 하는데 여기서만 빠져서,
+ * 주최자가 언어별로 적어 둔 제목·선택지가 화면에 한 번도 안 나왔다 (`pick` 은 늘
+ * `undefined` 를 받아 원문으로 떨어졌다 — 고장처럼 안 보여서 오래 못 봤다).
+ */
+const SELECT =
+  'id, title, title_i18n, kind, max_pick, closed, hidden, order:"order", poll_options(id, order:"order", label, label_i18n, image, votes)'
 
 async function read(slug: string, includeHidden: boolean): Promise<Poll[]> {
   let q = (await db()).from('poll_polls').select(SELECT).eq('slug', slug)
