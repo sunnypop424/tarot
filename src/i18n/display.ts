@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { useT } from './index'
+import { useT, useLang, type Lang } from './index'
 
 /**
  * **서비스 표시 설정(`display`)을 지금 언어로 옮긴다.**
@@ -24,9 +24,24 @@ import { useT } from './index'
  */
 export function useLocalizedDisplay<T extends object>(display: T): T {
   const t = useT()
+  const { lang } = useLang()
   return useMemo(() => {
     const out = { ...display } as Record<string, unknown>
+    /**
+     * **주최자가 언어별로 적어 둔 값이 먼저다** (`display.i18n` — 편집기에서 적는다).
+     *
+     * 여기서 한 번 갈아 끼우면 **화면 코드는 하나도 안 고쳐도 된다** — 아홉 서비스가
+     * 이미 이 훅을 통과시키고 있기 때문이다. 값마다 `pick()` 을 흩뿌리는 대신
+     * 통로 하나에서 끝낸다.
+     */
+    const alt = (out.i18n ?? null) as Record<string, Partial<Record<Lang, string>>> | null
     for (const [k, v] of Object.entries(out)) {
+      if (k === 'i18n') continue
+      const written = alt?.[k]?.[lang]
+      if (typeof v === 'string' && written && written.trim()) {
+        out[k] = written
+        continue
+      }
       if (typeof v === 'string' && v !== '' && !isOpaque(v)) out[k] = t(v)
       // 선택지 목록처럼 문자열 배열인 자리도 같이 (예: 칭호·안내 줄)
       else if (Array.isArray(v) && v.every((x) => typeof x === 'string')) {
@@ -34,7 +49,7 @@ export function useLocalizedDisplay<T extends object>(display: T): T {
       }
     }
     return out as T
-  }, [display, t])
+  }, [display, t, lang])
 }
 
 /**

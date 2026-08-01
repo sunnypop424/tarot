@@ -8,6 +8,7 @@ import type { Slot } from '@/types/slot'
 import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { uploadAsset, deleteAsset, extOf, nameFromUrl } from '../upload'
+import { I18nRow } from './I18nRow'
 
 /** 칸 줄에만 쓰는 작은 아이콘 버튼 — 편집기 공용 CSS 에 없어 여기 둔다 */
 const ICON: React.CSSProperties = {
@@ -114,6 +115,8 @@ export function StampCard({
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
           <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />
+          {/* 방문자 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="title" patch={patch} slot={slot} />
         </div>
         <div style={CSS.fieldCol}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
@@ -121,9 +124,13 @@ export function StampCard({
             <ShowToggle checked={d.showSubtitle} onChange={(v) => patch({ showSubtitle: v })} />
           </div>
           <input value={d.subtitle} onChange={(e) => patch({ subtitle: e.target.value })} style={CSS.input} />
+          {/* 부제 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="subtitle" patch={patch} slot={slot} />
         </div>
         <Field label="암호 입력 버튼 문구">
           <input value={d.codeLabel} onChange={(e) => patch({ codeLabel: e.target.value })} style={CSS.input} />
+          {/* 암호 입력 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="codeLabel" patch={patch} slot={slot} />
         </Field>
         <Field label="기본 글꼴">
           <select value={d.font} onChange={(e) => patch({ font: e.target.value as FontId })} style={CSS.select}>
@@ -260,6 +267,8 @@ export function StampCard({
       <Divided>
         <Field label="암호 입력 안내">
           <input value={d.codeHint} onChange={(e) => patch({ codeHint: e.target.value })} style={CSS.input} />
+          {/* 암호 입력창 안내 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="codeHint" patch={patch} slot={slot} />
         </Field>
       </Divided>
 

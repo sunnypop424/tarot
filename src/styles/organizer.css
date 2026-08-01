@@ -10,7 +10,16 @@
  */
 
 .admin,
-.admin-portal {
+/**
+ * **편집기(`.owner`)도 같은 토큰을 받는다.**
+ *
+ * `ad-*` 는 원래 주최자 도구(`.admin-portal`) 전용이었다. 그런데 편집기에 언어별 입력
+ * 칸(`.ad-i18n`)을 얹으면서 그 규칙이 `--ad-line`·`--ad-surface` 를 찾는데, `.owner`
+ * 서브트리엔 값이 없어 **테두리도 배경도 통째로 무효**가 됐다 — 흰 바탕에 글씨만 뜬 채로.
+ * 두 도구 다 고정 라이트 한 벌을 쓰므로(`admin.css` 머리말) 값을 나눌 이유가 없다.
+ */
+.admin-portal,
+.owner {
   color-scheme: light;
 
   --ad-canvas: #f7f7f7;

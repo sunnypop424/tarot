@@ -1,6 +1,7 @@
 import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
+import type { DisplayI18n } from './multilingual'
 
 /**
  * 롤링페이퍼 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다 (주최자는 못 건드린다).
@@ -16,6 +17,12 @@ import type { FontId } from './fonts'
  * 흰 글자가 연한 한지색 쪽지 위로 올라가 **한 글자도 안 읽힌다.** 종이와 잉크는 짝이라 같이 간다.
  */
 export interface RollingDisplay {
+  /**
+   * 주최자가 언어별로 적어 둔 값 — 키는 이 설정의 필드 이름이다.
+   * `useLocalizedDisplay` 가 화면을 그리기 전에 갈아 끼운다 (`src/i18n/display.ts`).
+   */
+  i18n?: DisplayI18n
+
   /** 벽 제목 — 방문자 화면 맨 위 (편집 가능, 고정 아님) */
   wallTitle: string
   /** 제목을 벽에 보일지 (로고만 쓰거나 제목을 숨기고 싶을 때 끈다) */
@@ -108,6 +115,8 @@ export function rollingDisplay(slot: Slot): RollingDisplay {
   const saved = (slot.rolling ?? {}) as Partial<RollingDisplay>
   const base = serviceTheme(slot)
   return {
+    /** 주최자가 언어별로 적어 둔 값 — 기본값이 없다 (안 적으면 없는 게 맞다) */
+    i18n: saved.i18n,
     wallTitle: saved.wallTitle || DEFAULT_ROLLING.wallTitle,
     showTitle: saved.showTitle ?? DEFAULT_ROLLING.showTitle,
     wallSubtitle: saved.wallSubtitle ?? DEFAULT_ROLLING.wallSubtitle,

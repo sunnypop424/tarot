@@ -13,6 +13,7 @@ import { uploadAsset, deleteAsset, extOf, nameFromUrl } from '../upload'
 import { BoxFields } from './BoxFields'
 import { BackgroundField } from './BackgroundField'
 import { PickerFields } from './PickerFields'
+import { I18nRow } from './I18nRow'
 
 const ICON: React.CSSProperties = {
   width: 24,
@@ -131,9 +132,13 @@ export function PhotocardCard({
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
           <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />
+          {/* 방문자 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="title" patch={patch} slot={slot} />
         </div>
         <Field label="덱 안내 문구">
           <input value={d.deckGuide} onChange={(e) => patch({ deckGuide: e.target.value })} style={CSS.input} />
+          {/* 덱 위 안내 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="deckGuide" patch={patch} slot={slot} />
         </Field>
         <Field label="덱에 깔 뒷면 장수" hint="연출용이에요 — 실제 카드 종류와 상관없어요 (3~21장).">
           <input
@@ -227,9 +232,13 @@ export function PhotocardCard({
       <Divided>
         <Field label="뽑기권 화면 제목" hint="'1장 증정' 방식에서만 보여요.">
           <input value={d.ticketHeadline} onChange={(e) => patch({ ticketHeadline: e.target.value })} style={CSS.input} />
+          {/* 뽑기권 화면 머리말 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="ticketHeadline" patch={patch} slot={slot} />
         </Field>
         <Field label="뽑기권 안내">
           <input value={d.ticketGuide} onChange={(e) => patch({ ticketGuide: e.target.value })} style={CSS.input} />
+          {/* 뽑기권 안내문 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="ticketGuide" patch={patch} slot={slot} rows={3} />
         </Field>
         <Field label="안내 화면 제목" hint="'판매' 방식에서 방문자 폰에 뜨는 한 장이에요.">
           <input value={d.counterTitle} onChange={(e) => patch({ counterTitle: e.target.value })} style={CSS.input} />
@@ -297,9 +306,13 @@ export function PhotocardCard({
         />
         <Field label="보관함 이름">
           <input value={d.lockerLabel} onChange={(e) => patch({ lockerLabel: e.target.value })} style={CSS.input} />
+          {/* 보관함 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="lockerLabel" patch={patch} slot={slot} />
         </Field>
         <Field label="마감 문구" hint="마감했을 때 스태프 화면에 떠요.">
           <input value={d.closedText} onChange={(e) => patch({ closedText: e.target.value })} style={CSS.input} />
+          {/* 마감 안내 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="closedText" patch={patch} slot={slot} />
         </Field>
         <Field label="화면 아래 표기" hint="비우면 안 그려요 (제작사 표기 자리).">
           <input
@@ -308,6 +321,8 @@ export function PhotocardCard({
             placeholder="made by ○○"
             style={CSS.input}
           />
+          {/* 화면 아래 안내 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="footerNote" patch={patch} slot={slot} />
         </Field>
       </Divided>
 

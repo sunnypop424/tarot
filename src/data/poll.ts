@@ -1,12 +1,19 @@
 import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
+import type { DisplayI18n } from './multilingual'
 
 /**
  * 실시간 투표 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다.
  * 설문·선택지 같은 **운영 데이터는 주최자**가 `/{slug}/admin` 에서 만든다 (럭드 상품표와 같은 경계).
  */
 export interface PollDisplay {
+  /**
+   * 주최자가 언어별로 적어 둔 값 — 키는 이 설정의 필드 이름이다.
+   * `useLocalizedDisplay` 가 화면을 그리기 전에 갈아 끼운다 (`src/i18n/display.ts`).
+   */
+  i18n?: DisplayI18n
+
   title: string
   showTitle: boolean
   subtitle: string
@@ -64,6 +71,8 @@ export function pollDisplay(slot: Slot): PollDisplay {
   const saved = (slot.poll ?? {}) as Partial<PollDisplay>
   const base = serviceTheme(slot)
   return {
+    /** 주최자가 언어별로 적어 둔 값 — 기본값이 없다 (안 적으면 없는 게 맞다) */
+    i18n: saved.i18n,
     title: saved.title || DEFAULT_POLL.title,
     showTitle: saved.showTitle ?? DEFAULT_POLL.showTitle,
     subtitle: saved.subtitle ?? DEFAULT_POLL.subtitle,

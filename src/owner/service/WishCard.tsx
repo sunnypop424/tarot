@@ -6,6 +6,7 @@ import { ImageField } from '../ImageField'
 import { BackgroundField } from './BackgroundField'
 import { StickerField } from '../StickerField'
 import { PaletteField } from './PaletteField'
+import { I18nRow } from './I18nRow'
 
 /**
  * 소원나무 설정 카드 — 포토존에 이어 **두 번째로 `SlotEditor` 밖에 있는 서비스 카드**.
@@ -38,6 +39,8 @@ export function WishCard({
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
           <input value={d.treeTitle} onChange={(e) => patch({ treeTitle: e.target.value })} style={CSS.input} />
+          {/* 나무 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="treeTitle" patch={patch} slot={slot} />
         </div>
         <div style={CSS.fieldCol}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
@@ -45,12 +48,18 @@ export function WishCard({
             <ShowToggle checked={d.showSubtitle} onChange={(v) => patch({ showSubtitle: v })} />
           </div>
           <input value={d.treeSubtitle} onChange={(e) => patch({ treeSubtitle: e.target.value })} style={CSS.input} />
+          {/* 나무 화면 부제 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="treeSubtitle" patch={patch} slot={slot} />
         </div>
         <Field label="입력 안내" hint="작성 화면 소원칸에 흐리게 뜨는 문구예요.">
           <input value={d.wishPrompt} onChange={(e) => patch({ wishPrompt: e.target.value })} style={CSS.input} />
+          {/* 작성 화면 입력칸 안내 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="wishPrompt" patch={patch} slot={slot} />
         </Field>
         <Field label="소원 걸기 버튼">
           <input value={d.hangLabel} onChange={(e) => patch({ hangLabel: e.target.value })} style={CSS.input} />
+          {/* 소원 거는 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="hangLabel" patch={patch} slot={slot} />
         </Field>
       </div>
 

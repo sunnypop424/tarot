@@ -1,6 +1,7 @@
 import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
+import type { DisplayI18n } from './multilingual'
 
 /**
  * 소원 나무 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다 (주최자는 못 건드린다).
@@ -28,6 +29,12 @@ import type { FontId } from './fonts'
  *   `sticker` → 매다는 장식 (롤페의 스티커 자리)
  */
 export interface WishDisplay {
+  /**
+   * 주최자가 언어별로 적어 둔 값 — 키는 이 설정의 필드 이름이다.
+   * `useLocalizedDisplay` 가 화면을 그리기 전에 갈아 끼운다 (`src/i18n/display.ts`).
+   */
+  i18n?: DisplayI18n
+
   /** 나무 화면 제목 (편집 가능, 고정 아님) */
   treeTitle: string
   showTitle: boolean
@@ -153,6 +160,8 @@ export function wishDisplay(slot: Slot): WishDisplay {
   const saved = (slot.wish ?? {}) as Partial<WishDisplay>
   const base = serviceTheme(slot)
   return {
+    /** 주최자가 언어별로 적어 둔 값 — 기본값이 없다 (안 적으면 없는 게 맞다) */
+    i18n: saved.i18n,
     treeTitle: saved.treeTitle || DEFAULT_WISH.treeTitle,
     showTitle: saved.showTitle ?? DEFAULT_WISH.showTitle,
     treeSubtitle: saved.treeSubtitle ?? DEFAULT_WISH.treeSubtitle,

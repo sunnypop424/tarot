@@ -68,3 +68,25 @@ export function clean(alt: I18nText): Partial<Record<Lang, string>> | null {
   }
   return Object.keys(out).length ? out : null
 }
+
+/**
+ * **서비스 표시 설정 안의 다국어 묶음** — `display.i18n`.
+ *
+ * 편집기에서 적는 값은 대부분 `slots.theme` jsonb 안의 서비스별 `display` 에 산다
+ * (제목·부제·안내·버튼 라벨…). 값마다 `titleI18n`·`subtitleI18n` 처럼 필드를 하나씩
+ * 더하면 **서비스 아홉 개 × 값 다섯 개 = 45개 필드**가 되고, 그때마다 타입·저장·렌더
+ * 세 곳을 고쳐야 한다.
+ *
+ * 그래서 **키 → 언어별 값** 한 묶음으로 든다:
+ *
+ *     display.i18n = { title: { en: 'Wish tree' }, subtitle: { ja: '…' } }
+ *
+ * 이러면 타입은 서비스당 한 줄이고, **렌더는 아예 안 고쳐도 된다** —
+ * `useLocalizedDisplay`(`src/i18n/display.ts`)가 이 묶음을 먼저 보기 때문이다.
+ */
+export type DisplayI18n = Record<string, I18nText>
+
+/** `display.i18n` 을 가진 설정 — `useLocalizedDisplay` 가 이 모양을 본다 */
+export interface HasI18n {
+  i18n?: DisplayI18n
+}

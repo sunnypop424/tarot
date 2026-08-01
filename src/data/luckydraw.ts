@@ -14,6 +14,12 @@ import type { CountPickerStyle } from './countPicker'
  */
 export interface LuckydrawDisplay {
   /**
+   * 주최자가 언어별로 적어 둔 값 — 키는 이 설정의 필드 이름이다.
+   * `useLocalizedDisplay` 가 화면을 그리기 전에 갈아 끼운다 (`src/i18n/display.ts`).
+   */
+  i18n?: DisplayI18n
+
+  /**
    * 스크래치로 가려 놓고 **직접 긁게** 할 등수.
    *
    * 비싼 상품만 긁는 재미를 준다 — 전부 긁게 하면 10개 뽑을 때 10번 긁어야 해서
@@ -147,6 +153,7 @@ export interface LuckydrawDisplay {
  */
 // 웹폰트는 fonts.ts 로 모았다 (럭드·롤페가 함께 쓴다). 기존 import 경로를 위해 여기서 재수출한다.
 import { WEBFONTS, type FontId } from './fonts'
+import type { DisplayI18n } from './multilingual'
 export { WEBFONTS, loadWebfont, fontStack, type FontId } from './fonts'
 
 /**
@@ -325,6 +332,8 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
 export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
   const saved = slot.luckydraw ?? {}
   return {
+    /** 주최자가 언어별로 적어 둔 값 — 기본값이 없다 (안 적으면 없는 게 맞다) */
+    i18n: saved.i18n,
     highlightRanks: saved.highlightRanks ?? DEFAULT_DISPLAY.highlightRanks,
     coverMark: saved.coverMark || DEFAULT_DISPLAY.coverMark,
     // null 은 "안 띄운다" 는 뜻이라 살려야 한다 — ?? 로 기본값을 덮으면 그 의도가 사라진다

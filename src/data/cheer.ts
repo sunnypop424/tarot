@@ -1,6 +1,7 @@
 import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
+import type { DisplayI18n } from './multilingual'
 
 /**
  * 영상회 라이브 응원 **겉모습** — 최고관리자가 편집기에서 정한다.
@@ -18,6 +19,12 @@ import type { FontId } from './fonts'
  *    말풍선(`bubble*`)은 예능 자막바 문법이고 크레딧은 검은 바탕이 기본이다
  */
 export interface CheerDisplay {
+  /**
+   * 주최자가 언어별로 적어 둔 값 — 키는 이 설정의 필드 이름이다.
+   * `useLocalizedDisplay` 가 화면을 그리기 전에 갈아 끼운다 (`src/i18n/display.ts`).
+   */
+  i18n?: DisplayI18n
+
   /** 입력 화면 제목 */
   title: string
   showTitle: boolean
@@ -103,6 +110,8 @@ export function cheerDisplay(slot: Slot): CheerDisplay {
   const saved = (slot.cheer ?? {}) as Partial<CheerDisplay>
   const base = serviceTheme(slot)
   return {
+    /** 주최자가 언어별로 적어 둔 값 — 기본값이 없다 (안 적으면 없는 게 맞다) */
+    i18n: saved.i18n,
     /*
      * **문구는 지울 수 있어야 한다.** `||` 로 두면 빈 문자열이 "값 없음" 으로 읽혀 기본 문구가
      * 되살아난다 — 편집기에서 지웠는데 다시 생기는 걸로 보였다(실제 신고). 비움이 뜻을 갖는

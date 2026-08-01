@@ -50,6 +50,7 @@ import { quizDisplay, type QuizDisplay } from '@/data/quiz'
 import { photocardDisplay, type PhotocardDisplay } from '@/data/photocard'
 import { cheerDisplay, type CheerDisplay } from '@/data/cheer'
 import { exportSlots } from './slotsFile'
+import { I18nRow } from './service/I18nRow'
 
 /** 색을 역할별로 묶어 보여준다 — 17개를 한 줄로 늘어놓으면 뭘 고치는지 모른다 */
 const COLOR_GROUPS: {
@@ -1227,6 +1228,8 @@ export function SlotEditor() {
                       </label>
                     </div>
                     <input value={rd.wallTitle} onChange={(e) => patchRolling({ wallTitle: e.target.value })} style={CSS.input} />
+                    {/* 벽 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
+                    <I18nRow d={rd} k="wallTitle" patch={patchRolling} slot={draft} />
                   </div>
                   <div style={CSS.fieldCol}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
@@ -1237,12 +1240,18 @@ export function SlotEditor() {
                       </label>
                     </div>
                     <input value={rd.wallSubtitle} onChange={(e) => patchRolling({ wallSubtitle: e.target.value })} style={CSS.input} />
+                    {/* 벽 화면 부제 — 방문자가 읽는 글자라 언어별로 받는다 */}
+                    <I18nRow d={rd} k="wallSubtitle" patch={patchRolling} slot={draft} />
                   </div>
                   <Field label="입력 안내" hint="작성 화면 메시지칸에 흐리게 뜨는 문구예요.">
                     <input value={rd.prompt} onChange={(e) => patchRolling({ prompt: e.target.value })} style={CSS.input} />
+                    {/* 작성 화면 입력칸 안내 — 방문자가 읽는 글자라 언어별로 받는다 */}
+                    <I18nRow d={rd} k="prompt" patch={patchRolling} slot={draft} />
                   </Field>
                   <Field label="남기기 버튼">
                     <input value={rd.postLabel} onChange={(e) => patchRolling({ postLabel: e.target.value })} style={CSS.input} />
+                    {/* 남기기 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+                    <I18nRow d={rd} k="postLabel" patch={patchRolling} slot={draft} />
                   </Field>
                 </div>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eeeeee', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 16 }}>

@@ -5,6 +5,7 @@ import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { BackgroundField } from './BackgroundField'
 import { FrameField } from './FrameField'
+import { I18nRow } from './I18nRow'
 
 /**
  * 포토존 설정 카드 — **서비스 설정을 `SlotEditor` 밖으로 뺀 첫 사례.**
@@ -39,6 +40,8 @@ export function PhotozoneCard({
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
           <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />
+          {/* 방문자 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="title" patch={patch} slot={slot} />
         </div>
         <div style={CSS.fieldCol}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
@@ -46,9 +49,13 @@ export function PhotozoneCard({
             <ShowToggle checked={d.showSubtitle} onChange={(v) => patch({ showSubtitle: v })} />
           </div>
           <input value={d.subtitle} onChange={(e) => patch({ subtitle: e.target.value })} style={CSS.input} />
+          {/* 부제 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="subtitle" patch={patch} slot={slot} />
         </div>
         <Field label="촬영 안내" hint="카메라 화면 아래 뜨는 한 줄이에요.">
           <input value={d.guide} onChange={(e) => patch({ guide: e.target.value })} style={CSS.input} />
+          {/* 촬영 안내문 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="guide" patch={patch} slot={slot} rows={3} />
         </Field>
         <Field label="기본 글꼴">
           <select value={d.font} onChange={(e) => patch({ font: e.target.value as FontId })} style={CSS.select}>
@@ -91,15 +98,23 @@ export function PhotozoneCard({
         </Field>
         <Field label="촬영 버튼 문구">
           <input value={d.shootLabel} onChange={(e) => patch({ shootLabel: e.target.value })} style={CSS.input} />
+          {/* 촬영 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="shootLabel" patch={patch} slot={slot} />
         </Field>
         <Field label="올리기 버튼 문구">
           <input value={d.uploadLabel} onChange={(e) => patch({ uploadLabel: e.target.value })} style={CSS.input} />
+          {/* 사진 올리기 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="uploadLabel" patch={patch} slot={slot} />
         </Field>
         <Field label="저장 버튼 문구">
           <input value={d.saveLabel} onChange={(e) => patch({ saveLabel: e.target.value })} style={CSS.input} />
+          {/* 저장 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="saveLabel" patch={patch} slot={slot} />
         </Field>
         <Field label="다시 찍기 문구">
           <input value={d.retakeLabel} onChange={(e) => patch({ retakeLabel: e.target.value })} style={CSS.input} />
+          {/* 다시 찍기 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="retakeLabel" patch={patch} slot={slot} />
         </Field>
       </Divided>
 

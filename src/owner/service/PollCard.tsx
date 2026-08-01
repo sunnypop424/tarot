@@ -3,6 +3,7 @@ import { WEBFONTS, type FontId } from '@/data/luckydraw'
 import type { Slot } from '@/types/slot'
 import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
+import { I18nRow } from './I18nRow'
 
 /**
  * 실시간 투표 설정 카드 — **겉모습만 여기 있다.**
@@ -31,6 +32,8 @@ export function PollCard({
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
           <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />
+          {/* 방문자 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="title" patch={patch} slot={slot} />
         </div>
         <div style={CSS.fieldCol}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
@@ -38,9 +41,13 @@ export function PollCard({
             <ShowToggle checked={d.showSubtitle} onChange={(v) => patch({ showSubtitle: v })} />
           </div>
           <input value={d.subtitle} onChange={(e) => patch({ subtitle: e.target.value })} style={CSS.input} />
+          {/* 부제 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="subtitle" patch={patch} slot={slot} />
         </div>
         <Field label="투표 버튼 문구">
           <input value={d.voteLabel} onChange={(e) => patch({ voteLabel: e.target.value })} style={CSS.input} />
+          {/* 투표 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="voteLabel" patch={patch} slot={slot} />
         </Field>
         <Field label="기본 글꼴">
           <select value={d.font} onChange={(e) => patch({ font: e.target.value as FontId })} style={CSS.select}>
@@ -89,6 +96,8 @@ export function PollCard({
         </Field>
         <Field label="참여 감사 문구">
           <input value={d.thanksText} onChange={(e) => patch({ thanksText: e.target.value })} style={CSS.input} />
+          {/* 투표 뒤 인사 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="thanksText" patch={patch} slot={slot} />
         </Field>
       </Divided>
 

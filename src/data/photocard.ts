@@ -2,6 +2,7 @@ import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
 import type { CountPickerStyle } from './countPicker'
+import type { DisplayI18n } from './multilingual'
 
 /**
  * 포토카드 뽑기 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다.
@@ -14,6 +15,12 @@ import type { CountPickerStyle } from './countPicker'
  * 넣으면 뽑는 순간의 연출이 통째로 사라진다.
  */
 export interface PhotocardDisplay {
+  /**
+   * 주최자가 언어별로 적어 둔 값 — 키는 이 설정의 필드 이름이다.
+   * `useLocalizedDisplay` 가 화면을 그리기 전에 갈아 끼운다 (`src/i18n/display.ts`).
+   */
+  i18n?: DisplayI18n
+
   title: string
   showTitle: boolean
 
@@ -145,6 +152,8 @@ export function photocardDisplay(slot: Slot): PhotocardDisplay {
   const saved = (slot.photocard ?? {}) as Partial<PhotocardDisplay>
   const base = serviceTheme(slot)
   return {
+    /** 주최자가 언어별로 적어 둔 값 — 기본값이 없다 (안 적으면 없는 게 맞다) */
+    i18n: saved.i18n,
     title: saved.title || DEFAULT_PHOTOCARD.title,
     showTitle: saved.showTitle ?? DEFAULT_PHOTOCARD.showTitle,
     spreadCount: saved.spreadCount ?? DEFAULT_PHOTOCARD.spreadCount,

@@ -1,6 +1,7 @@
 import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
+import type { DisplayI18n } from './multilingual'
 
 /**
  * 방문 스탬프 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다.
@@ -8,6 +9,12 @@ import type { FontId } from './fonts'
  * (`stamp_settings` 테이블) — 럭드에서 상품표가 주최자 것인 것과 같은 경계다.
  */
 export interface StampDisplay {
+  /**
+   * 주최자가 언어별로 적어 둔 값 — 키는 이 설정의 필드 이름이다.
+   * `useLocalizedDisplay` 가 화면을 그리기 전에 갈아 끼운다 (`src/i18n/display.ts`).
+   */
+  i18n?: DisplayI18n
+
   title: string
   showTitle: boolean
   subtitle: string
@@ -71,6 +78,8 @@ export function stampDisplay(slot: Slot): StampDisplay {
   const saved = (slot.stamp ?? {}) as Partial<StampDisplay>
   const base = serviceTheme(slot)
   return {
+    /** 주최자가 언어별로 적어 둔 값 — 기본값이 없다 (안 적으면 없는 게 맞다) */
+    i18n: saved.i18n,
     title: saved.title || DEFAULT_STAMP.title,
     showTitle: saved.showTitle ?? DEFAULT_STAMP.showTitle,
     subtitle: saved.subtitle ?? DEFAULT_STAMP.subtitle,

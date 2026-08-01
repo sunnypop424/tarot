@@ -5,6 +5,7 @@ import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { BackgroundField } from './BackgroundField'
 import { PaletteField } from './PaletteField'
+import { I18nRow } from './I18nRow'
 
 /**
  * 영상회 응원 설정 카드 — **겉모습만.**
@@ -36,21 +37,33 @@ export function CheerCard({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,240px),1fr))', gap: 14 }}>
         <Field label="입력 화면 제목">
           <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />
+          {/* 방문자 작성 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="title" patch={patch} slot={slot} />
         </Field>
         <Field label="부제">
           <input value={d.subtitle} onChange={(e) => patch({ subtitle: e.target.value })} style={CSS.input} />
+          {/* 그 아래 부제 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="subtitle" patch={patch} slot={slot} />
         </Field>
         <Field label="입력칸 안내">
           <input value={d.prompt} onChange={(e) => patch({ prompt: e.target.value })} style={CSS.input} />
+          {/* 한마디 입력칸 안내 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="prompt" patch={patch} slot={slot} />
         </Field>
         <Field label="이름칸 안내">
           <input value={d.namePrompt} onChange={(e) => patch({ namePrompt: e.target.value })} style={CSS.input} />
+          {/* 이름 입력칸 안내 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="namePrompt" patch={patch} slot={slot} />
         </Field>
         <Field label="보내기 버튼">
           <input value={d.postLabel} onChange={(e) => patch({ postLabel: e.target.value })} style={CSS.input} />
+          {/* 보내기 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="postLabel" patch={patch} slot={slot} />
         </Field>
         <Field label="보낸 뒤 문구">
           <input value={d.thanks} onChange={(e) => patch({ thanks: e.target.value })} style={CSS.input} />
+          {/* 보낸 뒤 인사 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="thanks" patch={patch} slot={slot} />
         </Field>
         <Field label="기본 글꼴">
           <select value={d.font} onChange={(e) => patch({ font: e.target.value as FontId })} style={CSS.select}>
@@ -63,6 +76,8 @@ export function CheerCard({
         </Field>
         <Field label="엔딩크레딧 제목">
           <input value={d.creditsTitle} onChange={(e) => patch({ creditsTitle: e.target.value })} style={CSS.input} />
+          {/* 엔딩크레딧 제목 — 상영 화면에 뜬다 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="creditsTitle" patch={patch} slot={slot} />
         </Field>
       </div>
 

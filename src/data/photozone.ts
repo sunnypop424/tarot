@@ -1,6 +1,7 @@
 import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
+import type { DisplayI18n } from './multilingual'
 
 /**
  * 포토존 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다 (주최자는 못 건드린다).
@@ -12,6 +13,12 @@ import type { FontId } from './fonts'
  * 어떤 어댑터에서도 100% 동작한다.
  */
 export interface PhotozoneDisplay {
+  /**
+   * 주최자가 언어별로 적어 둔 값 — 키는 이 설정의 필드 이름이다.
+   * `useLocalizedDisplay` 가 화면을 그리기 전에 갈아 끼운다 (`src/i18n/display.ts`).
+   */
+  i18n?: DisplayI18n
+
   /** 화면 제목 (편집 가능, 고정 아님) */
   title: string
   showTitle: boolean
@@ -115,6 +122,8 @@ export function photozoneDisplay(slot: Slot): PhotozoneDisplay {
   const saved = (slot.photozone ?? {}) as Partial<PhotozoneDisplay>
   const base = serviceTheme(slot)
   return {
+    /** 주최자가 언어별로 적어 둔 값 — 기본값이 없다 (안 적으면 없는 게 맞다) */
+    i18n: saved.i18n,
     title: saved.title || DEFAULT_PHOTOZONE.title,
     showTitle: saved.showTitle ?? DEFAULT_PHOTOZONE.showTitle,
     subtitle: saved.subtitle ?? DEFAULT_PHOTOZONE.subtitle,

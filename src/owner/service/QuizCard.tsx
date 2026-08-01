@@ -8,6 +8,7 @@ import type { Slot } from '@/types/slot'
 import { CSS, Card, Divided, Field, SwatchColor } from '../editorUi'
 import { ImageField } from '../ImageField'
 import { uploadAsset, deleteAsset, extOf, nameFromUrl } from '../upload'
+import { I18nRow } from './I18nRow'
 
 const ICON: React.CSSProperties = {
   width: 24,
@@ -87,6 +88,8 @@ export function QuizCard({
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
           <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />
+          {/* 시작 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="title" patch={patch} slot={slot} />
         </div>
         <div style={CSS.fieldCol}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
@@ -94,9 +97,13 @@ export function QuizCard({
             <ShowToggle checked={d.showSubtitle} onChange={(v) => patch({ showSubtitle: v })} />
           </div>
           <input value={d.subtitle} onChange={(e) => patch({ subtitle: e.target.value })} style={CSS.input} />
+          {/* 부제 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="subtitle" patch={patch} slot={slot} />
         </div>
         <Field label="시작 버튼 문구">
           <input value={d.startLabel} onChange={(e) => patch({ startLabel: e.target.value })} style={CSS.input} />
+          {/* 시작 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="startLabel" patch={patch} slot={slot} />
         </Field>
         <Field label="기본 글꼴">
           <select value={d.font} onChange={(e) => patch({ font: e.target.value as FontId })} style={CSS.select}>
@@ -229,6 +236,8 @@ export function QuizCard({
       <Divided>
         <Field label="칭호 카드 위 작은 글씨" hint="시안 기본값은 MY TITLE 이에요.">
           <input value={d.resultKicker} onChange={(e) => patch({ resultKicker: e.target.value })} style={CSS.input} />
+          {/* 결과 화면 머리말 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="resultKicker" patch={patch} slot={slot} />
         </Field>
         <Field label="칭호 카드 아래 한 줄" hint="보통 이벤트 주소를 적어요 — 저장된 이미지가 퍼질 때 출처가 돼요.">
           <input
@@ -237,6 +246,8 @@ export function QuizCard({
             placeholder={`tarot.example.com/${slot.slug}`}
             style={CSS.input}
           />
+          {/* 칭호 카드 아래 글 — 저장 이미지에 들어간다 */}
+          <I18nRow d={d} k="cardFooter" patch={patch} slot={slot} />
         </Field>
         <Field label="문항 순서" hint="섞으면 앞사람 답을 어깨너머로 보기 어려워져요.">
           <select
@@ -250,6 +261,8 @@ export function QuizCard({
         </Field>
         <Field label="다음 버튼 문구">
           <input value={d.nextLabel} onChange={(e) => patch({ nextLabel: e.target.value })} style={CSS.input} />
+          {/* 다음 문항 버튼 — 방문자가 읽는 글자라 언어별로 받는다 */}
+          <I18nRow d={d} k="nextLabel" patch={patch} slot={slot} />
         </Field>
       </Divided>
 
