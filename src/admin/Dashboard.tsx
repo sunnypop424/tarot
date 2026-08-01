@@ -26,13 +26,25 @@ import { useT, useLocale } from '@/i18n'
  * 못 읽는 항목은 **조용히 빼지 않고** "지금은 못 봐요" 로 남긴다(0 과 모름은 다르다).
  */
 
+/**
+ * 수를 낀 문구 — **조립하지 않고 키와 값을 따로 든다.**
+ *
+ * 여기는 모듈 함수(`COLLECT`)라 훅이 없어 문구를 한국어로 두고 렌더가 `t()` 한다.
+ * 그런데 `` `상품 ${n}종` `` 처럼 미리 조립해 버리면 그 문자열이 사전에 있을 리 없어
+ * **한국어로 남는다** (대시보드 여섯 자리가 실제로 그랬다). 조립은 렌더의 `t()` 가 한다.
+ */
+type Phrase = string | { key: string; vars: Record<string, string | number> }
+
+/** 리터럴 추론이 `vars` 를 좁히지 않게 감싸 준다 — 이 함수 없이 쓰면 유니온이 안 맞는다 */
+const ph = (key: string, vars: Record<string, string | number>): Phrase => ({ key, vars })
+
 interface Stat {
-  label: string
+  label: Phrase
   value: string
   /** 숫자 뒤에 붙는 단위 (개·명·장…) */
   unit?: string
   /** 숫자 아래 한 줄 — 뭘 센 건지 */
-  note?: string
+  note?: Phrase
   /** 눈에 띄어야 하는 값 (재고 소진 임박 등) */
   warn?: boolean
 }
@@ -52,6 +64,13 @@ interface Shortcut {
  * 부담이 안 될 만큼 길다. 실시간(`watch`)을 안 쓰는 이유는 서비스마다 붙는 테이블이 다르고
  * 대시보드가 그걸 전부 알아야 하기 때문이다 — 그러면 서비스가 늘 때마다 여기가 같이 자란다.
  */
+/** 화면에 낼 글자 — 키만 있으면 그대로, 값이 있으면 대입해서 */
+const say = (p: Phrase, t: (ko: string, vars?: Record<string, string | number>) => string) =>
+  typeof p === 'string' ? t(p) : t(p.key, p.vars)
+
+/** React key 로 쓸 안정된 문자열 — 번역되면 바뀌는 글자를 key 로 쓸 수는 없다 */
+const phKey = (p: Phrase) => (typeof p === 'string' ? p : p.key)
+
 const REFRESH_MS = 30_000
 
 export function Dashboard() {
@@ -198,13 +217,13 @@ export function Dashboard() {
             data-stats
           >
             {stats.map((s) => (
-              <div key={s.label} className="ad-stat" data-hot={s.warn || undefined}>
-                <div className="ad-stat__label">{t(s.label)}</div>
+              <div key={phKey(s.label)} className="ad-stat" data-hot={s.warn || undefined}>
+                <div className="ad-stat__label">{say(s.label, t)}</div>
                 <div className="ad-stat__row">
                   <span className="ad-stat__value tnum">{s.value}</span>
                   {s.unit && <span className="ad-stat__unit">{t(s.unit)}</span>}
                 </div>
-                {s.note && <div className="ad-stat__sub">{t(s.note)}</div>}
+                {s.note && <div className="ad-stat__sub">{say(s.note, t)}</div>}
               </div>
             ))}
           </div>
@@ -450,7 +469,7 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
         label: '남은 재고',
         value: n(left),
         unit: '개',
-        note: `상품 ${rows.length}종`,
+        note: ph('상품 {n}종', { n: rows.length }),
         warn: left > 0 && left <= 10,
       },
     ]
@@ -473,7 +492,7 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
     const votes = polls.reduce((a, p) => a + p.options.reduce((b, o) => b + o.votes, 0), 0)
     const open = polls.filter((p) => !p.closed && !p.hidden).length
     return [
-      { label: '진행 중 설문', value: n(open), unit: '개', note: `전체 ${polls.length}개` },
+      { label: '진행 중 설문', value: n(open), unit: '개', note: ph('전체 {n}개', { n: polls.length }) },
       { label: '받은 표', value: n(votes), unit: '표' },
     ]
   },
@@ -486,7 +505,7 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
     const stamped = report.reduce((a, r) => a + r.count, 0)
     const unredeemed = issued.filter((r) => r.kind === 'guaranteed' && !r.redeemedAt).length
     return [
-      { label: '찍힌 도장', value: n(stamped), unit: '개', note: `칸 ${report.length}개 합계` },
+      { label: '찍힌 도장', value: n(stamped), unit: '개', note: ph('칸 {n}개 합계', { n: report.length }) },
       { label: '판을 채운 사람', value: n(issued.length), unit: '명', note: '교환권이 나간 수' },
       {
         label: '아직 안 받아간 선물',
@@ -534,15 +553,17 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
     const soldOut = limited.filter((r) => (r.remaining ?? 0) === 0).length
     const open = tickets.filter((t) => t.status === 'open').length
     return [
-      { label: '나간 카드', value: n(drawn), unit: '장', note: `카드 ${rows.length}종` },
+      { label: '나간 카드', value: n(drawn), unit: '장', note: ph('카드 {n}종', { n: rows.length }) },
       {
         label: '남은 한정 재고',
         value: limited.length ? n(left) : '무제한',
         unit: limited.length ? '장' : '',
-        note: limited.length ? `한정 ${limited.length}종 · 소진 ${soldOut}종` : '재고를 정한 카드가 없어요',
+        note: limited.length
+          ? ph('한정 {a}종 · 소진 {b}종', { a: limited.length, b: soldOut })
+          : '재고를 정한 카드가 없어요',
         warn: limited.length > 0 && left <= 10,
       },
-      { label: '아직 안 쓴 뽑기권', value: n(open), unit: '장', note: `발급 ${tickets.length}장` },
+      { label: '아직 안 쓴 뽑기권', value: n(open), unit: '장', note: ph('발급 {n}장', { n: tickets.length }) },
     ]
   },
 }
@@ -550,7 +571,12 @@ const COLLECT: Record<ServiceId, (slug: string) => Promise<Stat[]>> = {
 function messageStats(all: { hidden?: boolean; createdAt: string }[], unit: string): Stat[] {
   const today = new Date().toISOString().slice(0, 10)
   return [
-    { label: `남긴 ${unit}`, value: n(all.filter((m) => !m.hidden).length), unit: '개', note: '숨김 제외' },
+    {
+      label: ph('남긴 {what}', { what: unit }),
+      value: n(all.filter((m) => !m.hidden).length),
+      unit: '개',
+      note: '숨김 제외',
+    },
     { label: '오늘', value: n(all.filter((m) => m.createdAt.slice(0, 10) === today).length), unit: '개' },
     { label: '숨김', value: n(all.filter((m) => m.hidden).length), unit: '개' },
   ]

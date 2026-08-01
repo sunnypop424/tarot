@@ -392,7 +392,7 @@ export function Polls() {
                           })
                         }
                       >
-                        + 선택지 추가
+                        {t('+ 선택지 추가')}
                       </button>
                     </div>
                     <span className="ad-card__num tnum">

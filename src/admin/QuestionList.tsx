@@ -85,7 +85,7 @@ export function QuestionList() {
           )}
         </div>
         <p className="ad-head__desc">
-          방문자가 고를 질문과, 카드가 나왔을 때 보여줄 답변을 관리해요.
+          {t('방문자가 고를 질문과, 카드가 나왔을 때 보여줄 답변을 관리해요.')}
         </p>
       </header>
 
@@ -98,7 +98,7 @@ export function QuestionList() {
             </span>
           </div>
           <button type="button" className="ad-btn ad-btn--soft ad-btn--sm" onClick={() => void handleAdd()}>
-            + 질문 추가
+            {t('+ 질문 추가')}
           </button>
         </div>
 

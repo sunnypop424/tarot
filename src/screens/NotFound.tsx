@@ -13,7 +13,7 @@ export function NotFound() {
         <div className="screen">
           <h1 className="t-title-l screen__title">{t('페이지를 찾을 수 없어요')}</h1>
           <p className="t-body t-muted screen__lead">
-            주소를 다시 확인해 주세요. 카페에 비치된 QR로 들어오시면 돼요.
+            {t('주소를 다시 확인해 주세요. 카페에 비치된 QR로 들어오시면 돼요.')}
           </p>
         </div>
       </main>

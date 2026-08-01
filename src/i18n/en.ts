@@ -463,4 +463,8 @@ export const EN: Record<string, string> = {
   '취소': 'Cancel',
   '{n}등 · {name}': 'Rank {n} · {name}',
   '목적: 경품 배송 · 이벤트가 끝나면 즉시 폐기돼요.': 'Purpose: shipping your prize · Deleted as soon as the event ends.',
+
+  // ── 도감 · 없는 페이지 ──────────────────────────
+  '도감으로': 'Back to the index',
+  '주소를 다시 확인해 주세요. 카페에 비치된 QR로 들어오시면 돼요.': 'Please check the address again. Scanning the QR code at the cafe will get you there.',
 }

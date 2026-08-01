@@ -263,7 +263,12 @@ function MessageNote({ message, papers }: { message: RollingMessage; papers: str
             aria-hidden="true"
           />
         )}
-        <p className={styles.noteBody} style={fontStyle(message.font, 'var(--text-s)')}>
+        {/* 방문자가 쓴 글 — 번역 대상이 아니다 (`scripts/verify-i18n-leak.mjs`) */}
+        <p
+          className={styles.noteBody}
+          style={fontStyle(message.font, 'var(--text-s)')}
+          data-user-text
+        >
           {message.body}
         </p>
         {message.nickname && (

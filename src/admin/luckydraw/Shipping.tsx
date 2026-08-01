@@ -94,7 +94,7 @@ export function Shipping() {
           <span className="ad-head__count tnum">{t('배송 {n}건', { n: list.length })}</span>
         </div>
         <p className="ad-head__desc">
-          당첨자가 직접 남긴 배송지예요. 방문자 개인정보가 나오는 유일한 화면이에요.
+          {t('당첨자가 직접 남긴 배송지예요. 방문자 개인정보가 나오는 유일한 화면이에요.')}
         </p>
       </header>
 
@@ -127,7 +127,7 @@ export function Shipping() {
                 disabled={!list.length}
                 onClick={download}
               >
-                CSV 내려받기
+                {t('CSV 내려받기')}
               </button>
             </div>
           </div>
@@ -136,7 +136,7 @@ export function Shipping() {
             <div className="ad-empty">
               <div className="ad-empty__title">{t('아직 배송 정보를 낸 사람이 없어요')}</div>
               <div className="ad-empty__sub">
-                배송이 필요한 상품에 당첨된 방문자가 주소를 넣으면 여기에 쌓여요.
+                {t('배송이 필요한 상품에 당첨된 방문자가 주소를 넣으면 여기에 쌓여요.')}
               </div>
             </div>
           ) : shown.length === 0 ? (

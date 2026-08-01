@@ -193,7 +193,7 @@ export function Redeem() {
             </button>
           </div>
           <p className="ad-fine" style={{ marginTop: 10 }}>
-            한 번 처리한 코드는 다시 쓸 수 없어요.
+            {t('한 번 처리한 코드는 다시 쓸 수 없어요.')}
           </p>
 
           {result && (
@@ -245,7 +245,7 @@ export function Redeem() {
                 disabled={!guaranteed.length}
                 onClick={download}
               >
-                CSV 내려받기
+                {t('CSV 내려받기')}
               </button>
             </div>
           </div>
@@ -264,7 +264,7 @@ export function Redeem() {
             <div className="ad-empty">
               <div className="ad-empty__title">{t('아직 발급된 교환권이 없어요')}</div>
               <div className="ad-empty__sub">
-                방문자가 조건을 채우면 교환코드가 발급되고 여기 한 줄씩 쌓여요.
+                {t('방문자가 조건을 채우면 교환코드가 발급되고 여기 한 줄씩 쌓여요.')}
               </div>
             </div>
           ) : shown.length === 0 ? (

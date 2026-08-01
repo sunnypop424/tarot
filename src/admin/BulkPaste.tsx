@@ -77,7 +77,7 @@ export function BulkPaste<T>({
         disabled={disabled}
         data-bulk-open
       >
-        여러 개 붙여넣기
+        {t('여러 개 붙여넣기')}
       </button>
     )
   }

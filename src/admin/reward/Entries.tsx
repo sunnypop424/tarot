@@ -187,7 +187,7 @@ export function Entries() {
                 disabled={!list.length}
                 onClick={download}
               >
-                CSV 내려받기
+                {t('CSV 내려받기')}
               </button>
             </div>
           </div>

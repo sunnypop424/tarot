@@ -254,7 +254,8 @@ function AdminShell() {
             </button>
             <div style={{ minWidth: 0 }}>
               <div className="ad-top__name">
-                <span>{slot.name}</span>
+                {/* 주최자가 지은 행사 이름 — 사전이 옮길 말이 아니다 */}
+                <span data-user-text>{slot.name}</span>
                 <span className="ad-svc">{t(serviceLabel(service))}</span>
               </div>
               <div className="ad-top__slug">

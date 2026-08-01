@@ -66,7 +66,7 @@ export function CardDetail() {
         onClick={() => go('cards')}
       >
         <ChevronLeft size={20} strokeWidth={2} aria-hidden="true" />
-        도감으로
+        {t('도감으로')}
       </button>
 
       <p className="t-text-xxs disclaimer">{t('타로는 재미와 성찰을 위한 것이에요.')}</p>

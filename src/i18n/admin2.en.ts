@@ -477,4 +477,14 @@ export const ADMIN2_EN: Record<string, string> = {
   '공개하면 방문자 화면에 바로 나오고 표는 실시간으로 쌓여요. 여러 줄을 고치는 동안 방문자가 중간 상태를 보지 않도록, 이 화면은 저장을 눌러야 반영돼요.': 'Once public, it appears on the visitor screen right away and votes come in live. So visitors do not see a half-edited state, this screen only applies when you press Save.',
   '새 설문은 준비 중으로 시작해요. 선택지를 채운 뒤 공개해 주세요.': 'New polls start as drafts. Fill in the options, then make it public.',
   '한 줄에 하나씩 적어 주세요. 한 줄 안에 쉼표·세로줄로 여러 개를 적어도 나눠서 들어가요.': 'One per line. If you put several on one line separated by commas or bars, they get split too.',
+
+  // ── 목록 · 안내 ─────────────────────────────────
+  '+ 질문 추가': '+ Add a question',
+  '+ 선택지 추가': '+ Add an option',
+  '여러 개 붙여넣기': 'Paste several at once',
+  '방문자가 고를 질문과, 카드가 나왔을 때 보여줄 답변을 관리해요.': 'Manage the questions visitors pick from and the answers shown for each card.',
+  '당첨자가 직접 남긴 배송지예요. 방문자 개인정보가 나오는 유일한 화면이에요.': 'These are the addresses winners entered themselves. This is the only screen that shows visitors’ personal data.',
+  '배송이 필요한 상품에 당첨된 방문자가 주소를 넣으면 여기에 쌓여요.': 'When a winner of a prize that needs shipping enters an address, it appears here.',
+  '방문자가 조건을 채우면 교환코드가 발급되고 여기 한 줄씩 쌓여요.': 'When a visitor meets the conditions, a code is issued and appears here as a row.',
+  '한 번 처리한 코드는 다시 쓸 수 없어요.': 'A code that has been processed cannot be used again.',
 }

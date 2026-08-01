@@ -240,4 +240,12 @@ export const ADMIN_EN: Record<string, string> = {
     'When the event ends, the visitor screen switches to a closing notice, and your data is destroyed once the retention period is over. The admin screens stay open for the whole retention period.',
   'CSV 여러 개로 떨어져요 · 개인정보가 든 파일이 섞여 있어요 · 종료 +14일이 지나면 꺼낼 수 없어요':
     'Comes as several CSV files · Some contain personal data · Unavailable 14 days after the event ends',
+
+  // ── 대시보드 통계 (수를 낀 문구) ─────────────────
+  '전체 {n}개': '{n} total',
+  '칸 {n}개 합계': '{n} slots in total',
+  '카드 {n}종': '{n} cards',
+  '한정 {a}종 · 소진 {b}종': '{a} limited · {b} gone',
+  '발급 {n}장': '{n} issued',
+  '남긴 {what}': '{what} left',
 }
