@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { I18nField } from './I18nField'
+import type { I18nText } from '@/data/multilingual'
+import type { Lang } from '@/i18n'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { getDeck, type DeckRange } from '@/data/cards'
@@ -109,6 +112,30 @@ export function QuestionEditor() {
   )
 
   /**
+   * 같은 답변의 **언어별 판**. 원문(`answers`)과 나란히 사는 다른 묶음이라
+   * 저장 규칙(적는 즉시 저장)도 같다 — 저장을 잊어 날리는 게 더 나쁘다 (CLAUDE.md).
+   */
+  const setAnswerAlt = useCallback(
+    (cardId: string, orientation: Orientation, next: Partial<Record<Lang, string>> | null) => {
+      setDraft((prev) => {
+        if (!prev) return prev
+        const forCard = { ...(prev.answersI18n?.[cardId] ?? {}) }
+        if (next) forCard[orientation] = next
+        else delete forCard[orientation]
+        const all = { ...(prev.answersI18n ?? {}) }
+        // 빈 껍데기는 안 남긴다 — 저장된 JSON 이 카드 수만큼 지저분해진다
+        if (Object.keys(forCard).length) all[cardId] = forCard
+        else delete all[cardId]
+        const q: Question = { ...prev, answersI18n: Object.keys(all).length ? all : undefined }
+        setSaving(true)
+        void repo.questions.save(slug, q).finally(() => setSaving(false))
+        return q
+      })
+    },
+    [slug]
+  )
+
+  /**
    * 답변칸이 채워야 할 카드 = **슬롯의 카드 범위**.
    * 질문마다 범위를 고를 수 없다 — 최고관리자가 슬롯에 정해둔 값만 따른다.
    */
@@ -212,6 +239,12 @@ export function QuestionEditor() {
             value={draft.question}
             placeholder={t('방문자에게 보일 문구')}
             onChange={(e) => patch({ question: e.target.value })}
+          />
+          {/* 주최자가 지은 질문이라 사전이 못 옮긴다 — 언어를 켠 슬롯이면 여기서 직접 적는다 */}
+          <I18nField
+            base={draft.question}
+            value={draft.questionI18n}
+            onChange={(next) => patch({ questionI18n: next ?? undefined })}
           />
           <button
             type="button"
@@ -370,6 +403,7 @@ export function QuestionEditor() {
                 question={draft}
                 pending={pending?.[card.id]}
                 onChange={setAnswer}
+                onChangeAlt={setAnswerAlt}
                 onChangePending={(orientation, text) =>
                   setPending((prev) =>
                     prev
@@ -391,6 +425,7 @@ function AnswerRow({
   question,
   pending,
   onChange,
+  onChangeAlt,
   onChangePending,
 }: {
   card: Card
@@ -398,6 +433,7 @@ function AnswerRow({
   /** AI 가 만들었지만 아직 저장 안 된 답변 — 있으면 이걸 보여준다 */
   pending?: Partial<Record<Orientation, string>>
   onChange: (cardId: string, orientation: Orientation, text: string) => void
+  onChangeAlt: (cardId: string, orientation: Orientation, next: Partial<Record<Lang, string>> | null) => void
   onChangePending: (orientation: Orientation, text: string) => void
 }) {
   const t = useT()
@@ -412,6 +448,9 @@ function AnswerRow({
   // 검수 중엔 그 자리에서 바로 고칠 수 있다 — 고친 것도 저장을 눌러야 들어간다
   const edit = (orientation: Orientation, text: string) =>
     pending ? onChangePending(orientation, text) : onChange(card.id, orientation, text)
+  /* 검수 중(AI 초안)에는 언어별 칸을 안 건다 — 저장 전 초안이라 저장할 자리가 없다 */
+  const editAlt = (orientation: Orientation, next: Partial<Record<Lang, string>> | null) =>
+    onChangeAlt(card.id, orientation, next)
 
   return (
     // `data-pending` 은 검수 중인 줄 표시다 (verify-ai 가 이걸로 줄을 짚는다)
@@ -436,6 +475,8 @@ function AnswerRow({
             meaning={card.upright[question.fallbackAspect]}
             value={upright}
             onChange={(t) => edit('upright', t)}
+            alt={question.answersI18n?.[card.id]?.upright}
+            onChangeAlt={(next) => editAlt('upright', next)}
           />
           {question.allowReversed && (
             <AnswerField
@@ -443,6 +484,8 @@ function AnswerRow({
               meaning={card.reversed[question.fallbackAspect]}
               value={reversed}
               onChange={(t) => edit('reversed', t)}
+              alt={question.answersI18n?.[card.id]?.reversed}
+              onChangeAlt={(next) => editAlt('reversed', next)}
             />
           )}
         </div>
@@ -468,12 +511,17 @@ function AnswerField({
   meaning,
   value,
   onChange,
+  alt,
+  onChangeAlt,
 }: {
   label: string
   /** 안 채웠을 때 대신 나갈 카드 의미 — 뭘 쓸지 참고가 된다 */
   meaning: string
   value: string
   onChange: (text: string) => void
+  /** 언어별로 적어 둔 같은 답변 */
+  alt?: I18nText
+  onChangeAlt: (next: Partial<Record<Lang, string>> | null) => void
 }) {
   return (
     <div>
@@ -489,6 +537,11 @@ function AnswerField({
       <div className="ad-fine" style={{ marginTop: 5 }}>
         비우면: {meaning}
       </div>
+      {/*
+        * 답변은 78장 × 2방향이라 다 채우기 벅차다. **안 적어도 된다** — 그 언어를 비우면
+        * 한국어 원문이, 원문도 비면 카드 기본 의미가 나간다 (`src/lib/answer.ts`).
+        */}
+      <I18nField base={value} value={alt} rows={3} onChange={onChangeAlt} />
     </div>
   )
 }

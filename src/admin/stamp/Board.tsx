@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { I18nField } from '../I18nField'
 
 import { repo } from '@/lib/repo'
 import type { StampSettings } from '@/lib/repo/types'
@@ -223,6 +224,18 @@ export function Board() {
                   disabled={busy}
                   onChange={(e) => setSettings({ ...settings, rewardLabel: e.target.value })}
                   onBlur={() => void save(settings)}
+                />
+                {/* 주최자가 지은 선물 이름이라 사전이 못 옮긴다 — 여기서 직접 적는다.
+                    적으면 그 자리에서 저장한다 (원문 칸과 달리 blur 를 기다리지 않는다) */}
+                <I18nField
+                  base={settings.rewardLabel}
+                  value={settings.rewardLabelI18n}
+                  disabled={busy}
+                  onChange={(next) => {
+                    const s2 = { ...settings, rewardLabelI18n: next ?? undefined }
+                    setSettings(s2)
+                    void save(s2)
+                  }}
                 />
                 <p className="ad-field__hint">
                   {t('확정이면 방문자 폰에 교환코드가 뜨고, 스태프가 ‘수령 확인’ 에서 처리해요.')}

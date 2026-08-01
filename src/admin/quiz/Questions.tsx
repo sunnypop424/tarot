@@ -5,7 +5,9 @@ import type { QuizQuestionFull, QuizSettings } from '@/lib/repo/types'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
 import { BulkPaste, splitCells, toLines, type BulkResult } from '../BulkPaste'
-import { useT } from '@/i18n'
+import { useT, type Lang } from '@/i18n'
+import { I18nField } from '../I18nField'
+import type { I18nText } from '@/data/multilingual'
 
 /**
  * 붙여넣기 한 줄 → 문항 하나.
@@ -79,6 +81,39 @@ function parseQuestions(text: string, startOrder: number): BulkResult<QuizQuesti
  * **새 문항은 비공개로 시작한다.** 정답을 채우기 전에 방문자에게 보이면 그 문항은 아무도 못
  * 맞히고, 이미 푼 사람들의 점수가 통째로 어긋난다. 정답이 빈 문항은 목록에서 눈에 띄게 그린다.
  */
+/**
+ * 보기 다국어를 **한 칸씩** 다루는 두 함수.
+ *
+ * 저장은 `{en: ['a','b'], ja: […]}` 처럼 **언어당 배열 하나**다 — 순서가 곧 정답 인덱스라
+ * 줄이 어긋나면 채점이 어긋나기 때문이다 (`src/data/multilingual.ts` 의 `pickList`).
+ * 그런데 화면은 보기 하나마다 칸을 띄우므로, 그 사이를 여기서 옮긴다.
+ */
+function choiceAlt(alt: Partial<Record<Lang, string[]>> | undefined, i: number): I18nText {
+  if (!alt) return undefined
+  const out: Partial<Record<Lang, string>> = {}
+  for (const [k, row] of Object.entries(alt)) {
+    if (Array.isArray(row) && row[i]?.trim()) out[k as Lang] = row[i]
+  }
+  return Object.keys(out).length ? out : undefined
+}
+
+function setChoiceAlt(
+  alt: Partial<Record<Lang, string[]>> | undefined,
+  i: number,
+  next: Partial<Record<Lang, string>> | null
+): Partial<Record<Lang, string[]>> | undefined {
+  const langs = new Set([...Object.keys(alt ?? {}), ...Object.keys(next ?? {})]) as Set<Lang>
+  const out: Partial<Record<Lang, string[]>> = {}
+  for (const l of langs) {
+    const row = [...(alt?.[l] ?? [])]
+    // 그 자리까지 빈칸으로 늘려 둔다 — 줄이 밀리면 정답 인덱스가 딴 보기를 가리킨다
+    while (row.length <= i) row.push('')
+    row[i] = next?.[l] ?? ''
+    if (row.some((x) => x.trim())) out[l] = row
+  }
+  return Object.keys(out).length ? out : undefined
+}
+
 export function Questions() {
   const t = useT()
   const slot = useSlot()
@@ -447,6 +482,18 @@ export function Questions() {
                   onChange={(e) => setSettings({ ...settings, rewardLabel: e.target.value })}
                   onBlur={() => void saveSettings(settings)}
                 />
+                {/* 주최자가 지은 선물 이름이라 사전이 못 옮긴다 — 여기서 직접 적는다.
+                    적으면 그 자리에서 저장한다 (원문 칸과 달리 blur 를 기다리지 않는다) */}
+                <I18nField
+                  base={settings.rewardLabel}
+                  value={settings.rewardLabelI18n}
+                  disabled={busy}
+                  onChange={(next) => {
+                    const s2 = { ...settings, rewardLabelI18n: next ?? undefined }
+                    setSettings(s2)
+                    void saveSettings(s2)
+                  }}
+                />
               </div>
             )}
 
@@ -605,6 +652,8 @@ function Editor({
             onChange={(e) => set({ body: e.target.value })}
             data-q-body
           />
+          {/* 주최자가 쓴 문항이라 사전이 못 옮긴다 — 언어를 켠 슬롯이면 여기서 직접 적는다 */}
+          <I18nField base={q.body} value={q.bodyI18n} onChange={(next) => set({ bodyI18n: next ?? undefined })} />
 
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginTop: 18 }}>
             <div>
@@ -658,7 +707,10 @@ function Editor({
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {/* 보기 입력칸은 문제·사진 칸과 **같은 폭**이다 — 정답 표시와 지우기는 칸 안쪽에 얹는다 */}
                 {q.choices.map((c, i) => (
-                  <div key={i} className="ad-choicerow">
+                  /* 줄(정답 고르기·입력·삭제)과 언어 칸을 한 덩어리로 — `ad-choicerow` 는
+                     가로 flex 라 언어 칸을 그 안에 넣으면 옆으로 붙는다 */
+                  <div key={i}>
+                  <div className="ad-choicerow">
                     <button
                       type="button"
                       className="ad-pick"
@@ -690,6 +742,16 @@ function Editor({
                     >
                       ×
                     </button>
+                    {/*
+                      * 보기의 언어별 값. **순서가 곧 정답 인덱스**라(`answers` 가 '0'·'2')
+                      * 배열째 같은 줄에 맞춰 넣는다 (`cleanList` 가 길이를 맞춘다).
+                      */}
+                  </div>
+                    <I18nField
+                      base={c}
+                      value={choiceAlt(q.choicesI18n, i)}
+                      onChange={(next) => set({ choicesI18n: setChoiceAlt(q.choicesI18n, i, next) })}
+                    />
                   </div>
                 ))}
               </div>
@@ -751,6 +813,21 @@ function Editor({
                   {t('추가')}
                 </button>
               </div>
+              {/*
+                * **보여줄 모범답안**의 번역 — 인정할 답이 아니다.
+                *
+                * 채점은 위의 '인정할 답' 하나만 본다. 언어로 가르면 같은 답이 언어에 따라
+                * 맞았다 틀렸다 한다 (`0047_quiz_i18n.sql`). 다른 언어 표현도 맞다고 보려면
+                * 위 칸에 그 말을 더하면 된다 — 그게 이미 있는 길이다.
+                */}
+              <p className="ad-fine" style={{ margin: '12px 0 0' }}>
+                다시보기에 보여줄 답이에요. 채점은 위의 인정할 답만 봐요.
+              </p>
+              <I18nField
+                base={q.answers[0] ?? ''}
+                value={q.answersI18n}
+                onChange={(next) => set({ answersI18n: next ?? undefined })}
+              />
             </div>
           )}
 

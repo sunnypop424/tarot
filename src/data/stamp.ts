@@ -1,7 +1,7 @@
 import { serviceTheme } from './serviceTheme'
 import type { Slot } from '@/types/slot'
 import type { FontId } from './fonts'
-import type { DisplayI18n } from './multilingual'
+import type { DisplayI18n, I18nText } from './multilingual'
 
 /**
  * 방문 스탬프 **겉모습** — 최고관리자가 슬롯 편집기에서 정한다.
@@ -45,6 +45,14 @@ export interface StampCell {
   id: string
   /** 칸 이름 — "1번 카페", "포토존 참여" */
   name: string
+  /**
+   * 언어별 칸 이름 — 없으면 `name`.
+   *
+   * **`display.i18n` 묶음에 못 넣는다.** 그 묶음은 `useLocalizedDisplay` 가 훑는
+   * *평평한 문자열 필드*를 위한 것이고(`src/i18n/display.ts`), 칸은 배열 안의 객체다.
+   * 그래서 칸마다 자기 사전을 든다.
+   */
+  nameI18n?: I18nText
   /**
    * 찍힌 도장 그림 (투명 PNG). 없으면 내장 아이콘(도장·별·하트)이 돌아가며 들어간다.
    *

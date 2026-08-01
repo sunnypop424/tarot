@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CircleCheck, CircleX, Clock, Info, Lock, WifiOff } from 'lucide-react'
+import { CircleCheck, CircleX, Clock, Lock, WifiOff } from 'lucide-react'
 
 import { repo } from '@/lib/repo'
 import { getSlotService, serviceLabel } from '@/data/services'
@@ -213,25 +213,12 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
                 </p>
               )}
 
-              {/* 직전 결과 — 전달 착오가 나면 되짚어야 한다 (누른 뒤 화면이 비면 확인할 길이 없다) */}
-              {log.last && (
-                <div className={styles.banner} data-last>
-                  <Info size={16} aria-hidden="true" />
-                  <span>
-                    직전: <b>{log.last.code}</b> · {log.last.label}
-                    {log.at ? ` (${when(log.at)})` : ''}
-                  </span>
-                </div>
-              )}
             </form>
           )}
         </div>
 
         {/* 박스 아래는 스태프만 보는 줄이다 — 포토카드 스태프 화면과 같은 자리 */}
         <div className={styles.footRow}>
-          <span className={styles.tally} data-tally>
-            {t('오늘 이 기기 {n}건', { n: log.count })}
-          </span>
           <a className={styles.adminLink} href={`/${slug}/admin/redeem`}>
             {t('관리자 페이지로 이동')}
           </a>

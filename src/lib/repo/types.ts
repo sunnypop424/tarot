@@ -1,5 +1,6 @@
 import type { Aspect, Orientation } from '@/types/card'
 import type { I18nText } from '@/data/multilingual'
+import type { Lang } from '@/i18n'
 import type { Question } from '@/types/question'
 import type { Slot } from '@/types/slot'
 
@@ -533,6 +534,15 @@ export interface PollRepo {
 export interface MyReward {
   code: string
   label: string
+  /**
+   * 언어별 선물 이름 — 없으면 `label`.
+   *
+   * **`rewards` 행에는 안 산다.** 거기 있는 `label` 은 응모하던 순간에 박제된 값이고,
+   * 번역을 같이 박으려면 `reward_claim` 을 고쳐야 하는데 그 함수는 스탬프·모의고사·
+   * 포토카드가 같이 쓴다. 그래서 리포가 **설정 행**에서 읽어 붙인다 — 다만 주최자가
+   * 그새 이름을 바꿨으면(원문이 다르면) 안 붙인다. 딴 선물의 번역이 붙는 게 더 나쁘다.
+   */
+  labelI18n?: I18nText
   kind: 'guaranteed' | 'raffle'
   /** 스태프가 수령 처리한 시각 — null 이면 아직 */
   redeemedAt: string | null
@@ -549,6 +559,8 @@ export interface StampSettings {
   /** 응모 폼에서 받을 필드 — 안 켠 건 폼에도 DB 에도 안 들어간다 */
   entryFields: { handle: boolean; contact: boolean; address: boolean }
   rewardLabel: string
+  /** 언어별 보상 이름 — 없으면 `rewardLabel` */
+  rewardLabelI18n?: I18nText
 }
 
 /**
@@ -618,9 +630,19 @@ export interface QuizQuestion {
   order: number
   kind: QuizKind
   body: string
+  /** 주최자가 언어별로 적은 문항 — 없으면 `body` (`src/data/multilingual.ts` 의 `pick`) */
+  bodyI18n?: I18nText
   image?: string
   /** 객관식 보기. 주관식이면 빈 배열 */
   choices: string[]
+  /**
+   * 언어 → 그 언어 보기 **배열**. `choices` 와 같은 순서다.
+   *
+   * 보기마다 사전을 두지 않고 배열째 두는 이유: 보기는 순서가 곧 정답 인덱스라
+   * (`quiz_answers.answers` 가 '0'·'2' 로 가리킨다) **줄이 어긋나면 채점이 어긋난다.**
+   * 한 덩어리로 두면 순서가 갈릴 자리가 없다. 짧거나 빈 자리는 원문으로 떨어진다.
+   */
+  choicesI18n?: Partial<Record<Lang, string[]>>
   points: number
   hidden: boolean
 }
@@ -629,6 +651,14 @@ export interface QuizQuestion {
 export interface QuizQuestionFull extends QuizQuestion {
   /** 객관식은 보기 인덱스 문자열('0'), 주관식은 허용 정답들 */
   answers: string[]
+  /**
+   * 언어 → 그 언어로 **보여줄** 주관식 모범답안.
+   *
+   * **인정할 답이 아니다.** 채점은 `answers` 하나만 본다 — 언어로 가르면 같은 답이
+   * 언어에 따라 맞았다 틀렸다 한다 (`0047_quiz_i18n.sql`). 다른 언어 답도 인정하려면
+   * 주최자가 `answers` 에 그 말을 더한다.
+   */
+  answersI18n?: I18nText
 }
 
 export interface QuizSettings {
@@ -636,6 +666,8 @@ export interface QuizSettings {
   /** `threshold` 에서 이 점수 이상이면 확정 */
   rewardMinScore: number
   rewardLabel: string
+  /** 언어별 보상 이름 — 없으면 `rewardLabel` */
+  rewardLabelI18n?: I18nText
   entryFields: { handle: boolean; contact: boolean; address: boolean }
   /** 0 = 무제한 */
   timeLimitSec: number
@@ -689,7 +721,16 @@ export interface QuizRepo {
   settings(slug: string): Promise<QuizSettings>
   saveSettings(slug: string, s: QuizSettings): Promise<void>
   /** 채점은 서버가 한다 — 정답이 브라우저에 한 번도 안 내려간다 */
-  submit(slug: string, subject: string, answers: { id: string; value: string }[]): Promise<QuizResult>
+  /**
+   * `lang` 은 **결과에 담길 글자**를 고르는 데만 쓴다 — 채점은 언어를 안 탄다
+   * (`0047_quiz_i18n.sql`). 주관식 모범답안이 숨긴 표에 있어서 서버가 골라야 한다.
+   */
+  submit(
+    slug: string,
+    subject: string,
+    answers: { id: string; value: string }[],
+    lang: Lang
+  ): Promise<QuizResult>
   /** 이미 냈나 (재응시 금지 이벤트에서 시작 화면이 물어본다) */
   mine(slug: string, subject: string): Promise<{ attempts: number }>
   stats(slug: string): Promise<{ attempts: number; avg: number; questions: QuizStat[] }>

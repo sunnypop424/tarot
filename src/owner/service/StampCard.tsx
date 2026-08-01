@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { I18nField } from '@/admin/I18nField'
 import { GripVertical, Image as ImageIcon, Plus, Upload, X } from 'lucide-react'
 
 import { stampDisplay, type StampCell, type StampDisplay } from '@/data/stamp'
@@ -258,6 +259,16 @@ export function StampCard({
                 <button type="button" onClick={() => removeCell(i)} aria-label="칸 삭제" style={ICON}>
                   <X size={14} />
                 </button>
+                {/* 칸 이름은 방문자가 읽는 글자다 — 언어를 켠 슬롯이면 언어별로 받는다.
+                    줄이 가로 flex 라 폭을 다 쓰게 `flexBasis: '100%'` 로 다음 줄에 앉힌다 */}
+                <div style={{ flexBasis: '100%' }}>
+                  <I18nField
+                    base={c.name}
+                    value={c.nameI18n}
+                    slot={slot}
+                    onChange={(next) => setCell(i, { nameI18n: next ?? undefined })}
+                  />
+                </div>
               </div>
             ))}
           </div>

@@ -90,3 +90,34 @@ export type DisplayI18n = Record<string, I18nText>
 export interface HasI18n {
   i18n?: DisplayI18n
 }
+
+/**
+ * **줄 맞춘 목록의 다국어** — 보기처럼 *순서가 뜻을 가진* 배열.
+ *
+ * 모의고사 보기는 순서가 곧 정답 인덱스다 (`quiz_answers.answers` 가 '0'·'2' 로 가리킨다).
+ * 그래서 항목마다 사전을 두면 **줄이 어긋나는 순간 채점이 어긋난다** — 배열째 두고
+ * 원문과 같은 길이로 맞춰 둔다.
+ */
+export function pickList(base: string[], alt: Partial<Record<Lang, string[]>> | undefined, lang: Lang): string[] {
+  if (lang === 'ko' || !alt) return base
+  const row = alt[lang]
+  if (!row) return base
+  // 짧거나 빈 자리는 원문으로 — 한 줄만 적어 둬도 나머지가 안 사라진다
+  return base.map((v, i) => (row[i]?.trim() ? row[i] : v))
+}
+
+/** 비어 있는 언어를 털어낸 목록 묶음 — 다 빈 배열이면 통째로 안 넣는다 */
+export function cleanList(
+  alt: Partial<Record<Lang, string[]>> | undefined,
+  len: number
+): Partial<Record<Lang, string[]>> | null {
+  if (!alt) return null
+  const out: Partial<Record<Lang, string[]>> = {}
+  for (const [k, v] of Object.entries(alt)) {
+    if (!Array.isArray(v)) continue
+    // 원문과 길이를 맞춰 둔다 — 짧으면 화면이 원문으로 떨어지므로 손해가 없다
+    const row = Array.from({ length: len }, (_, i) => (typeof v[i] === 'string' ? v[i].trim() : ''))
+    if (row.some((x) => x)) out[k as Lang] = row
+  }
+  return Object.keys(out).length ? out : null
+}

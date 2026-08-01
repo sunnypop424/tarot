@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { pick } from '@/data/multilingual'
 import {
   ChevronLeft,
   CircleCheck,
@@ -25,7 +26,7 @@ import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Stamp.module.css'
-import { useT } from '@/i18n'
+import { useT, useLang } from '@/i18n'
 import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
@@ -291,6 +292,7 @@ function StampBoard({
   mine: string[]
   fresh: string | null
 }) {
+  const { lang } = useLang()
   // 4칸은 2열, 나머지는 3열 — 시안의 모양 (칸이 적을 때 휑하지 않게)
   const cols = cells.length <= 4 ? 2 : 3
   const big = cells.length <= 4
@@ -341,7 +343,7 @@ function StampBoard({
             )}
             {/* 칸 이름은 주최자가 정한다 (「방명록 작성」·「굿즈 구매」…) */}
             <span className={styles.cellName} data-user-text>
-              {c.name}
+              {pick(c.name, c.nameI18n, lang)}
             </span>
           </li>
         )
@@ -500,6 +502,7 @@ function Complete({
 
 function Ticket({ reward, onBack }: { reward: MyReward; onBack: () => void }) {
   const t = useT()
+  const { lang } = useLang()
   const redeemed = !!reward.redeemedAt
   return (
     <>
@@ -510,7 +513,10 @@ function Ticket({ reward, onBack }: { reward: MyReward; onBack: () => void }) {
       </div>
       <div style={{ padding: '16px 22px 0', textAlign: 'center' }}>
         <div className={styles.doneKicker}>{t('판을 다 채웠어요')}</div>
-        <div style={{ marginTop: 6, fontSize: 20, fontWeight: 800 }}>{reward.label} 교환권</div>
+        <div style={{ marginTop: 6, fontSize: 20, fontWeight: 800 }} data-user-text>
+          {/* 이름 + 꼬리표를 **한 문장**으로 옮긴다 — 붙이는 자리가 언어마다 다르다 */}
+          {t('{name} 교환권', { name: pick(reward.label, reward.labelI18n, lang) })}
+        </div>
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 22px' }}>
         <div className={styles.ticket} data-ticket>
@@ -527,7 +533,7 @@ function Ticket({ reward, onBack }: { reward: MyReward; onBack: () => void }) {
               <div className={styles.prize}>
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.6 }}>{t('받는 선물')}</div>
-                  <div className={styles.prizeName}>{reward.label}</div>
+                  <div className={styles.prizeName}>{pick(reward.label, reward.labelI18n, lang)}</div>
                 </div>
               </div>
             </>
@@ -571,6 +577,7 @@ function EntryForm({
   onDone: () => void | Promise<void>
 }) {
   const t = useT()
+  const { lang } = useLang()
   const f = settings?.entryFields ?? { handle: true, contact: false, address: false }
   const [nickname, setNickname] = useState('')
   const [handle, setHandle] = useState('')
@@ -613,8 +620,8 @@ function EntryForm({
       </div>
       <div style={{ padding: '16px 22px 0' }}>
         <div className={styles.doneKicker}>{t('판을 다 채웠어요')}</div>
-        <h2 style={{ margin: '8px 0 0', fontSize: 24, fontWeight: 800, lineHeight: 1.35 }}>
-          {reward.label} 응모하기
+        <h2 style={{ margin: '8px 0 0', fontSize: 24, fontWeight: 800, lineHeight: 1.35 }} data-user-text>
+          {t('{name} 응모하기', { name: pick(reward.label, reward.labelI18n, lang) })}
         </h2>
         <p className={styles.doneText} style={{ marginTop: 10 }}>
           {t('당첨자는 이벤트가 끝난 뒤 주최자가 따로 발표해요.')}

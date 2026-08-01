@@ -1,4 +1,5 @@
 import { db } from './client'
+import { clean, type I18nText } from '@/data/multilingual'
 import type { MyReward, StampCheckinResult, StampRepo, StampSettings } from './types'
 
 /**
@@ -14,12 +15,14 @@ const toSettings = (r: {
   closed: boolean
   entry_fields: StampSettings['entryFields']
   reward_label: string
+  reward_label_i18n: I18nText
 }): StampSettings => ({
   rewardMode: r.reward_mode,
   dailyReset: r.daily_reset,
   closed: r.closed,
   entryFields: r.entry_fields,
   rewardLabel: r.reward_label,
+  rewardLabelI18n: r.reward_label_i18n ?? undefined,
 })
 
 const DEFAULTS: StampSettings = {
@@ -36,7 +39,7 @@ export const supabaseStamp: StampRepo = {
   async settings(slug) {
     const { data, error } = await (await db())
       .from('stamp_settings')
-      .select('reward_mode, daily_reset, closed, entry_fields, reward_label')
+      .select('reward_mode, daily_reset, closed, entry_fields, reward_label, reward_label_i18n')
       .eq('slug', slug)
       .maybeSingle()
     if (error) throw new Error(error.message)
@@ -51,6 +54,7 @@ export const supabaseStamp: StampRepo = {
       closed: s.closed,
       entry_fields: s.entryFields,
       reward_label: s.rewardLabel,
+      reward_label_i18n: clean(s.rewardLabelI18n),
       updated_at: new Date().toISOString(),
     })
     if (error) throw new Error(error.message)
@@ -118,9 +122,21 @@ export const supabaseStamp: StampRepo = {
     }[]
     if (!rows.length) return null
     const r = rows[0]
+    /*
+     * 선물 이름의 번역은 **설정 행**에 있다 (`MyReward.labelI18n` 주석 — 보상 행에
+     * 박으면 세 서비스가 같이 쓰는 `reward_claim` 을 고쳐야 한다). 원문이 그새 바뀌었으면
+     * 안 붙인다 — 딴 선물의 번역이 붙는 게 안 붙는 것보다 나쁘다.
+     */
+    const { data: cfg } = await (await db())
+      .from('stamp_settings')
+      .select('reward_label, reward_label_i18n')
+      .eq('slug', slug)
+      .maybeSingle()
+    const c = cfg as { reward_label: string; reward_label_i18n: I18nText } | null
     return {
       code: r.code,
       label: r.label,
+      labelI18n: c && c.reward_label === r.label ? (c.reward_label_i18n ?? undefined) : undefined,
       kind: r.kind,
       redeemedAt: r.redeemed_at,
       entered: r.entered,

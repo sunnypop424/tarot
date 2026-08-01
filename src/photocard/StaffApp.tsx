@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { History, Image as ImageIcon, Info, Layers, Lock, Sparkles, Star, WifiOff, X } from 'lucide-react'
+import { Image as ImageIcon, Info, Layers, Lock, Sparkles, Star, WifiOff, X } from 'lucide-react'
 
 import { useSlotState } from '@/slot/SlotProvider'
 import { photocardDisplay, photocardRules, RARITY_LABEL } from '@/data/photocard'
@@ -394,37 +394,12 @@ function Staff({ slot }: { slot: Slot }) {
                   {error}
                 </p>
               )}
-
-              {/*
-                * 직전 결과 다시 보기 — **전달 착오가 나면 되짚어야 한다.**
-                * '전달 완료' 를 누르면 화면이 비어서, 방금 뭘 건넸는지 확인할 길이 없었다.
-                */}
-              {log.last && log.last.length > 0 && (
-                <button
-                  type="button"
-                  className={styles.lastBtn}
-                  onClick={() => {
-                    setResult(log.last)
-                    setSummary(log.last!.length > 1)
-                  }}
-                  data-last
-                >
-                  <History size={14} strokeWidth={2} aria-hidden="true" />
-                  직전 결과 다시 보기 ({log.last.length}장)
-                </button>
-              )}
             </div>
           )}
         </div>
 
-        {/*
-          * 박스 아래는 **스태프만 보는 줄**이다 (관리자 링크가 원래 거기 있다).
-          * 오늘 처리 수를 밴드에 넣었더니 문구·미리보기 버튼과 셋이 밀려 밴드가 네 줄이 됐다.
-          */}
+        {/* 박스 아래는 **스태프만 보는 줄**이다 (관리자 링크가 원래 거기 있다) */}
         <div className={styles.footRow}>
-          <span className={styles.tally} data-tally>
-            {t('오늘 이 기기 {n}회', { n: log.count })}
-          </span>
           {stock !== null && (
             <span className={styles.tally} data-stock>
               남은 재고 {stock}장

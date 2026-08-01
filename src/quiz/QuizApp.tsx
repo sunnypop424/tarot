@@ -24,7 +24,8 @@ import type { Slot } from '@/types/slot'
 import { drawTitleCard } from './titleCard'
 import { AdminEntry } from '@/components/AdminEntry'
 import styles from './Quiz.module.css'
-import { useT } from '@/i18n'
+import { useT, useLang } from '@/i18n'
+import { pick, pickList } from '@/data/multilingual'
 import { LangBar } from '@/components/LangBar'
 import { useLocalizedDisplay } from '@/i18n/display'
 
@@ -82,6 +83,7 @@ const SAMPLE_REWARD: MyReward = {
 
 function Quiz({ slot }: { slot: Slot }) {
   const t = useT()
+  const { lang } = useLang()
   const { slug } = slot
   const rawDisplay = useMemo(() => quizDisplay(slot), [slot])
   /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
@@ -138,7 +140,8 @@ function Quiz({ slot }: { slot: Slot }) {
     setError(null)
     try {
       const payload = ordered.map((q) => ({ id: q.id, value: picks[q.id] ?? '' }))
-      const r = await repo.quiz.submit(slug, subject, payload)
+      // 결과에 담길 글자를 서버가 이 언어로 골라 준다 (채점은 언어를 안 탄다)
+      const r = await repo.quiz.submit(slug, subject, payload, lang)
       setResult(r)
       if (r.rewardCode) setReward(await repo.quiz.myReward(slug, subject).catch(() => null))
       setView('result')
@@ -146,7 +149,7 @@ function Quiz({ slot }: { slot: Slot }) {
       setError(e instanceof Error ? t(e.message) : t('제출하지 못했어요'))
       setView('start')
     }
-  }, [ordered, picks, slug, subject, t])
+  }, [ordered, picks, slug, subject, t, lang])
 
   /**
    * 제한시간 — **시간이 다 되면 그 자리에서 제출한다.** 남은 답을 버리고 시작 화면으로
@@ -397,6 +400,7 @@ function Run({
   onNext: () => void
 }) {
   const t = useT()
+  const { lang } = useLang()
   const last = step + 1 >= total
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -430,7 +434,10 @@ function Run({
       </div>
 
       <div className={styles.qHead}>
-        <h2 className={styles.qBody}>{q.body}</h2>
+        {/* 주최자가 쓴 문항이라 사전이 못 옮긴다 — 언어별로 적어 둔 게 있으면 그걸 쓴다 */}
+        <h2 className={styles.qBody} data-user-text>
+          {pick(q.body, q.bodyI18n, lang)}
+        </h2>
       </div>
 
       <div
@@ -448,7 +455,8 @@ function Run({
         )}
 
         {q.kind === 'choice' ? (
-          q.choices.map((label, i) => (
+          /* 보기도 주최자의 말이다. 순서는 정답 인덱스라 배열째 갈아 끼운다 (`pickList`) */
+          pickList(q.choices, q.choicesI18n, lang).map((label, i) => (
             <button
               key={i}
               type="button"
@@ -460,7 +468,9 @@ function Run({
               <span className={styles.choiceNum} aria-hidden="true">
                 {i + 1}
               </span>
-              <span className={styles.choiceLabel}>{label}</span>
+              <span className={styles.choiceLabel} data-user-text>
+                {label}
+              </span>
             </button>
           ))
         ) : (
@@ -809,13 +819,17 @@ function Ticket({
   onBack: () => void
 }) {
   const t = useT()
+  const { lang } = useLang()
   const redeemed = !!reward.redeemedAt
   return (
     <>
       <Top onBack={onBack} />
       <div style={{ padding: '14px 22px 0', textAlign: 'center' }}>
         {!redeemed && <div className={styles.formKicker}>{t('기준 점수를 넘었어요')}</div>}
-        <div style={{ marginTop: 6, fontSize: 20, fontWeight: 800 }}>{reward.label} 교환권</div>
+        <div style={{ marginTop: 6, fontSize: 20, fontWeight: 800 }} data-user-text>
+          {/* 이름 + 꼬리표를 **한 문장**으로 옮긴다 — 붙이는 자리가 언어마다 다르다 */}
+          {t('{name} 교환권', { name: pick(reward.label, reward.labelI18n, lang) })}
+        </div>
       </div>
       <div className={styles.ticketWrap}>
         <div className={styles.ticket} data-ticket>
@@ -872,6 +886,7 @@ function EntryForm({
   onDone: () => void
 }) {
   const t = useT()
+  const { lang } = useLang()
   const f = settings.entryFields
   const [nickname, setNickname] = useState('')
   const [handle, setHandle] = useState('')
@@ -910,7 +925,9 @@ function EntryForm({
       <Top onBack={onBack} />
       <div className={styles.formHead}>
         <div className={styles.formKicker}>{t('기준 점수를 넘었어요')}</div>
-        <h2 className={styles.formTitle}>{reward.label} 응모하기</h2>
+        <h2 className={styles.formTitle} data-user-text>
+          {t('{name} 응모하기', { name: pick(reward.label, reward.labelI18n, lang) })}
+        </h2>
         <p className={styles.formIntro}>{t('당첨자는 이벤트가 끝난 뒤 주최자가 따로 발표해요.')}</p>
       </div>
 

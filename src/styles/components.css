@@ -395,3 +395,13 @@ header:has(> .svc-lang) {
   --svc-lang-gutter: calc(var(--svc-lang-right, 20px) + 62px + var(--space-md));
   padding-right: var(--svc-lang-gutter);
 }
+/**
+ * **가운데 정렬이면 왼쪽에도 같은 자리를 비운다.**
+ *
+ * 오른쪽만 비우면 헤더의 안쪽 폭이 그만큼 짧아져서, 최고관리자가 로고를 '가운데' 로 둬도
+ * **고르개 폭만큼 왼쪽으로 밀린 가운데**가 된다 — 화면 정가운데가 아니다. 좌우를 같이
+ * 비워야 가운데가 진짜 가운데다. 왼쪽 여백은 눈에 안 띈다(거기엔 아무것도 없다).
+ */
+header:has(> .svc-lang)[data-align='center'] {
+  padding-left: var(--svc-lang-gutter);
+}

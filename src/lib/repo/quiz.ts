@@ -1,4 +1,6 @@
 import { db } from './client'
+import { clean, cleanList, type I18nText } from '@/data/multilingual'
+import type { Lang } from '@/i18n'
 import type {
   MyReward,
   QuizQuestion,
@@ -25,8 +27,10 @@ interface QRow {
   order: number
   kind: 'choice' | 'short'
   body: string
+  body_i18n: I18nText
   image: string | null
   choices: string[]
+  choices_i18n: Partial<Record<Lang, string[]>> | null
   points: number
   hidden: boolean
 }
@@ -36,8 +40,10 @@ const toQuestion = (r: QRow): QuizQuestion => ({
   order: r.order,
   kind: r.kind,
   body: r.body,
+  bodyI18n: r.body_i18n ?? undefined,
   image: r.image ?? undefined,
   choices: r.choices ?? [],
+  choicesI18n: r.choices_i18n ?? undefined,
   points: r.points,
   hidden: r.hidden,
 })
@@ -53,7 +59,8 @@ const DEFAULTS: QuizSettings = {
   closed: false,
 }
 
-const COLS = 'id, "order", kind, body, image, choices, points, hidden'
+const COLS =
+  'id, "order", kind, body, body_i18n, image, choices, choices_i18n, points, hidden'
 
 export const supabaseQuiz: QuizRepo = {
   ready: () => true,
@@ -72,13 +79,15 @@ export const supabaseQuiz: QuizRepo = {
   async listAll(slug) {
     const { data, error } = await (await db())
       .from('quiz_questions')
-      .select(`${COLS}, quiz_answers(answers)`)
+      .select(`${COLS}, quiz_answers(answers, answers_i18n)`)
       .eq('slug', slug)
       .order('order')
     if (error) throw new Error(error.message)
-    return (data as unknown as (QRow & { quiz_answers: { answers: string[] } | null })[]).map((r) => ({
+    type Ans = { answers: string[]; answers_i18n: I18nText }
+    return (data as unknown as (QRow & { quiz_answers: Ans | null })[]).map((r) => ({
       ...toQuestion(r),
       answers: r.quiz_answers?.answers ?? [],
+      answersI18n: r.quiz_answers?.answers_i18n ?? undefined,
     })) satisfies QuizQuestionFull[]
   },
 
@@ -90,8 +99,11 @@ export const supabaseQuiz: QuizRepo = {
       order: q.order,
       kind: q.kind,
       body: q.body,
+      body_i18n: clean(q.bodyI18n),
       image: q.image ?? null,
       choices: q.choices,
+      // 빈 배열만 든 묶음은 안 넣는다 — 저장된 JSON 이 지저분해질 뿐 화면은 원문으로 떨어진다
+      choices_i18n: cleanList(q.choicesI18n, q.choices.length),
       points: q.points,
       hidden: q.hidden,
     })
@@ -101,6 +113,7 @@ export const supabaseQuiz: QuizRepo = {
       question_id: q.id,
       slug,
       answers: q.answers,
+      answers_i18n: clean(q.answersI18n),
       updated_at: new Date().toISOString(),
     })
     if (e2) throw new Error(e2.message)
@@ -115,7 +128,7 @@ export const supabaseQuiz: QuizRepo = {
     const { data, error } = await (await db())
       .from('quiz_settings')
       .select(
-        'reward_mode, reward_min_score, reward_label, entry_fields, time_limit_sec, allow_retry, show_answers, closed'
+        'reward_mode, reward_min_score, reward_label, reward_label_i18n, entry_fields, time_limit_sec, allow_retry, show_answers, closed'
       )
       .eq('slug', slug)
       .maybeSingle()
@@ -125,6 +138,7 @@ export const supabaseQuiz: QuizRepo = {
       reward_mode: QuizSettings['rewardMode']
       reward_min_score: number
       reward_label: string
+      reward_label_i18n: I18nText
       entry_fields: QuizSettings['entryFields']
       time_limit_sec: number
       allow_retry: boolean
@@ -135,6 +149,7 @@ export const supabaseQuiz: QuizRepo = {
       rewardMode: r.reward_mode,
       rewardMinScore: r.reward_min_score,
       rewardLabel: r.reward_label,
+      rewardLabelI18n: r.reward_label_i18n ?? undefined,
       entryFields: r.entry_fields,
       timeLimitSec: r.time_limit_sec,
       allowRetry: r.allow_retry,
@@ -149,6 +164,7 @@ export const supabaseQuiz: QuizRepo = {
       reward_mode: s.rewardMode,
       reward_min_score: s.rewardMinScore,
       reward_label: s.rewardLabel,
+      reward_label_i18n: clean(s.rewardLabelI18n),
       entry_fields: s.entryFields,
       time_limit_sec: s.timeLimitSec,
       allow_retry: s.allowRetry,
@@ -159,11 +175,19 @@ export const supabaseQuiz: QuizRepo = {
     if (error) throw new Error(error.message)
   },
 
-  async submit(slug, subject, answers) {
+  async submit(slug, subject, answers, lang) {
     const { data, error } = await (await db()).rpc('quiz_submit', {
       target: slug,
       subj: subject,
       payload: answers,
+      /**
+       * **결과에 담길 글자를 서버가 그 언어로 골라 준다** (`0047_quiz_i18n.sql`).
+       *
+       * 문항·보기는 화면이 직접 옮길 수도 있지만(공개된 값이다), **주관식 모범답안은
+       * 숨긴 표에 있어서** 화면이 손댈 수가 없다 — 서버만 고를 수 있다.
+       * 채점 자체는 언어를 안 탄다 (같은 답이 언어에 따라 갈리면 안 된다).
+       */
+      lang,
     })
     if (error) throw new Error(error.message)
     return data as QuizResult
@@ -242,9 +266,21 @@ export const supabaseQuiz: QuizRepo = {
     }[]
     if (!rows.length) return null
     const r = rows[0]
+    /*
+     * 선물 이름의 번역은 **설정 행**에 있다 (`MyReward.labelI18n` 주석 — 보상 행에
+     * 박으면 세 서비스가 같이 쓰는 `reward_claim` 을 고쳐야 한다). 원문이 그새 바뀌었으면
+     * 안 붙인다 — 딴 선물의 번역이 붙는 게 안 붙는 것보다 나쁘다.
+     */
+    const { data: cfg } = await (await db())
+      .from('quiz_settings')
+      .select('reward_label, reward_label_i18n')
+      .eq('slug', slug)
+      .maybeSingle()
+    const c = cfg as { reward_label: string; reward_label_i18n: I18nText } | null
     return {
       code: r.code,
       label: r.label,
+      labelI18n: c && c.reward_label === r.label ? (c.reward_label_i18n ?? undefined) : undefined,
       kind: r.kind,
       redeemedAt: r.redeemed_at,
       entered: r.entered,

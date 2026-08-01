@@ -13,7 +13,8 @@ import type { DrawnCard } from '@/types/card'
 import { QUESTION_CARD_COUNT, type Question as QuestionType } from '@/types/question'
 import { NotReady } from './NotReady'
 import styles from './Question.module.css'
-import { useT } from '@/i18n'
+import { useT, useLang } from '@/i18n'
+import { pick } from '@/data/multilingual'
 import { useCardText } from '@/i18n/cardText'
 
 /** 질문 타로 — 주최자가 등록한 질문에 카드를 뽑아 답을 본다 (PLANNING.md §2) */
@@ -31,6 +32,7 @@ export function Question() {
 
 function QuestionFlow({ question }: { question: QuestionType }) {
   const t = useT()
+  const { lang } = useLang()
   const { go } = useSlotPath()
   const slot = useSlot()
   const [revealed, setRevealed] = useState<DrawnCard[] | null>(null)
@@ -39,7 +41,7 @@ function QuestionFlow({ question }: { question: QuestionType }) {
     return (
       <CardDraw
         title={t('질문 타로')}
-        lead={question.question}
+        lead={pick(question.question, question.questionI18n, lang)}
         cardCount={QUESTION_CARD_COUNT}
         positions={POSITIONS.map((p) => t(p))}
         /**
@@ -61,7 +63,9 @@ function QuestionFlow({ question }: { question: QuestionType }) {
     <div className={`screen ${styles.resultScreen}`}>
       {/* 리드는 다른 화면과 같은 모양·같은 자리 — 뽑기 화면에서 넘어와도 어긋나지 않게 */}
       <h1 className="t-title-l screen__title">{t('질문 타로')}</h1>
-      <p className="t-text-m screen__lead">{question.question}</p>
+      <p className="t-text-m screen__lead" data-user-text>
+        {pick(question.question, question.questionI18n, lang)}
+      </p>
 
       <div className={styles.results}>
         {revealed.map((drawn) => (
@@ -97,11 +101,15 @@ const POSITIONS = ['답']
 /** 스크롤로 화면에 들어올 때 뒤집힌다 */
 function AnswerCard({ question, drawn }: { question: QuestionType; drawn: DrawnCard }) {
   const t = useT()
+  const { lang } = useLang()
   const lc = useCardText()
   const [ref, inView] = useInView<HTMLElement>()
   const card = lc(drawn.card)
-  // 주최자가 쓴 답변은 그분의 글이라 못 번역한다 — 폴백(카드 해석)만 번역이 입혀진다
-  const answer = answerFor(question, { ...drawn, card })
+  /*
+   * 주최자가 쓴 답변은 그분의 글이라 사전이 못 옮긴다 — 대신 **주최자가 언어별로 적어 둔**
+   * 판이 있으면 그걸 쓴다(`answerFor` 가 고른다). 안 적었으면 원문, 원문도 없으면 카드 해석.
+   */
+  const answer = answerFor(question, { ...drawn, card }, lang)
 
   return (
     <section ref={ref} className={styles.result}>

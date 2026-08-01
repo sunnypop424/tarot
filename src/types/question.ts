@@ -1,4 +1,5 @@
 import type { Aspect, Orientation } from './card'
+import type { I18nText } from '@/data/multilingual'
 import type { DeckRange } from '@/data/cards'
 
 /**
@@ -14,6 +15,14 @@ export const QUESTION_CARD_COUNT = 1
 
 /** 카드별 관리자 입력 답변 — 미입력 시 카드 기본 의미로 폴백 */
 export type QuestionAnswers = Record<string, Partial<Record<Orientation, string>>>
+
+/**
+ * 같은 답변의 **언어별 판** — `{카드id: {정/역: {en: '…', ja: '…'}}}`.
+ *
+ * 원문(`answers`)은 그대로 둔다. 안 적은 언어는 원문으로 떨어지고, 원문도 없으면 지금처럼
+ * 카드 기본 의미로 간다 (`src/lib/answer.ts`) — 폴백이 두 겹이라 빈칸이 고장이 아니다.
+ */
+export type QuestionAnswersI18n = Record<string, Partial<Record<Orientation, I18nText>>>
 
 /**
  * 관리자가 등록하는 커스텀 질문 (PLANNING.md §4-1).
@@ -47,4 +56,8 @@ export interface Question {
   fallbackAspect: Aspect
   /** `{cardId}` → 방향별 답변 */
   answers: QuestionAnswers
+  /** 주최자가 언어별로 적은 질문 — 없으면 `question` */
+  questionI18n?: I18nText
+  /** 주최자가 언어별로 적은 답변 — 없으면 `answers` */
+  answersI18n?: QuestionAnswersI18n
 }
