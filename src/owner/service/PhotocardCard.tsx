@@ -137,8 +137,8 @@ export function PhotocardCard({
           <I18nRow d={d} k="title" patch={patch} slot={slot} />
         </div>
         <Field label="부제">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
-            <span style={{ fontSize: 11, color: '#8a8a8a' }}>{'보이기'}</span>
+          {/* 토글 자신이 '화면에 보이기' 라고 적혀 있다 — 앞에 라벨을 또 두면 두 번 읽힌다 */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 19 }}>
             <ShowToggle checked={d.showSubtitle} onChange={(v) => patch({ showSubtitle: v })} />
           </div>
           <input value={d.subtitle} onChange={(e) => patch({ subtitle: e.target.value })} style={CSS.input} />

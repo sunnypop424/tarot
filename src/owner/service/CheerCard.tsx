@@ -42,8 +42,8 @@ export function CheerCard({
             * 여기만 없어서, 로고를 올려도 그 아래 제목 글자가 계속 따라 나왔다
             * (`CheerApp` 이 `showTitle` 을 읽고 있는데도 켠 값에서 못 바꿨다).
             */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
-            <span style={{ fontSize: 11, color: '#8a8a8a' }}>{'보이기'}</span>
+          {/* 토글 자신이 '화면에 보이기' 라고 적혀 있다 — 앞에 라벨을 또 두면 두 번 읽힌다 */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 19 }}>
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
           <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />
@@ -51,8 +51,8 @@ export function CheerCard({
           <I18nRow d={d} k="title" patch={patch} slot={slot} />
         </Field>
         <Field label="부제">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
-            <span style={{ fontSize: 11, color: '#8a8a8a' }}>{'보이기'}</span>
+          {/* 토글 자신이 '화면에 보이기' 라고 적혀 있다 — 앞에 라벨을 또 두면 두 번 읽힌다 */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 19 }}>
             <ShowToggle checked={d.showSubtitle} onChange={(v) => patch({ showSubtitle: v })} />
           </div>
           <input value={d.subtitle} onChange={(e) => patch({ subtitle: e.target.value })} style={CSS.input} />
