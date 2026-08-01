@@ -327,8 +327,8 @@ function Start({
             aria-label={display.title}
           />
         )}
-        {display.showTitle && <h1 className={styles.startTitle}>{display.title}</h1>}
-        {display.showSubtitle && display.subtitle && <p className={styles.startIntro}>{display.subtitle}</p>}
+        {display.showTitle && <h1 className={styles.title}>{display.title}</h1>}
+        {display.showSubtitle && display.subtitle && <p className={styles.subtitle}>{display.subtitle}</p>}
 
         {count > 0 && (
           <div className={styles.facts}>

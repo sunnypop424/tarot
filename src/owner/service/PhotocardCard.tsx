@@ -136,10 +136,14 @@ export function PhotocardCard({
           {/* 방문자 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
           <I18nRow d={d} k="title" patch={patch} slot={slot} />
         </div>
-        <Field label="덱 안내 문구">
-          <input value={d.deckGuide} onChange={(e) => patch({ deckGuide: e.target.value })} style={CSS.input} />
+        <Field label="부제">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
+            <span style={{ fontSize: 11, color: '#8a8a8a' }}>{'보이기'}</span>
+            <ShowToggle checked={d.showSubtitle} onChange={(v) => patch({ showSubtitle: v })} />
+          </div>
+          <input value={d.subtitle} onChange={(e) => patch({ subtitle: e.target.value })} style={CSS.input} />
           {/* 덱 위 안내 — 방문자가 읽는 글자라 언어별로 받는다 */}
-          <I18nRow d={d} k="deckGuide" patch={patch} slot={slot} />
+          <I18nRow d={d} k="subtitle" patch={patch} slot={slot} />
         </Field>
         <Field label="덱에 깔 뒷면 장수" hint="연출용이에요 — 실제 카드 종류와 상관없어요 (3~21장).">
           <input

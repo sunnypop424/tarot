@@ -442,15 +442,21 @@ function Deck({
         title={display.title}
         showTitle={display.showTitle}
         align={display.logoAlign}
-        classes={{ head: styles.head, logo: styles.logo, title: styles.title }}
+        classes={{ head: styles.head, logo: styles.logo, title: styles.title, text: styles.headText }}
+        /* 부제는 **헤더 안**이어야 제목과 같이 정렬된다 — 밖에 두면 혼자 왼쪽에 남는다 */
+        below={
+          display.showSubtitle && display.subtitle ? (
+            <p className={styles.subtitle}>{display.subtitle}</p>
+          ) : null
+        }
       />
-      {display.deckGuide && <p className={styles.deckGuide}>{display.deckGuide}</p>}
 
       <div className={styles.fanWrap} ref={wrapRef}>
         <div
           className={styles.fan}
           style={{ ['--fanScale' as string]: scale }}
           data-fan
+          data-stage
           data-shuffle={shuffling ? '' : undefined}
           key={shuffle}
         >

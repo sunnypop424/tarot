@@ -306,6 +306,7 @@ function StampBoard({
     <ul
       className={styles.board}
       data-stamp-board
+      data-stage
       style={{
         ['--cols' as string]: String(cols),
         ['--gap' as string]: `${small ? 8 : big ? 12 : 10}px`,

@@ -1228,9 +1228,9 @@ export function SlotEditor() {
                         벽에 보이기
                       </label>
                     </div>
-                    <input value={rd.wallTitle} onChange={(e) => patchRolling({ wallTitle: e.target.value })} style={CSS.input} />
+                    <input value={rd.title} onChange={(e) => patchRolling({ title: e.target.value })} style={CSS.input} />
                     {/* 벽 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
-                    <I18nRow d={rd} k="wallTitle" patch={patchRolling} slot={draft} />
+                    <I18nRow d={rd} k="title" patch={patchRolling} slot={draft} />
                   </div>
                   <div style={CSS.fieldCol}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
@@ -1240,9 +1240,9 @@ export function SlotEditor() {
                         벽에 보이기
                       </label>
                     </div>
-                    <input value={rd.wallSubtitle} onChange={(e) => patchRolling({ wallSubtitle: e.target.value })} style={CSS.input} />
+                    <input value={rd.subtitle} onChange={(e) => patchRolling({ subtitle: e.target.value })} style={CSS.input} />
                     {/* 벽 화면 부제 — 방문자가 읽는 글자라 언어별로 받는다 */}
-                    <I18nRow d={rd} k="wallSubtitle" patch={patchRolling} slot={draft} />
+                    <I18nRow d={rd} k="subtitle" patch={patchRolling} slot={draft} />
                   </div>
                   <Field label="입력 안내" hint="작성 화면 메시지칸에 흐리게 뜨는 문구예요.">
                     <input value={rd.prompt} onChange={(e) => patchRolling({ prompt: e.target.value })} style={CSS.input} />

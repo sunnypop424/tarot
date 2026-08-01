@@ -140,7 +140,7 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
       <ServiceHeader
         variant="mark"
         logo={display.logo}
-        title={t(display.wallTitle)}
+        title={t(display.title)}
         showTitle={display.showTitle}
         align={display.logoAlign}
         marginTop={display.logoMarginTop}
@@ -148,8 +148,8 @@ function Wall({ slot, display }: { slot: Slot; display: RollingDisplay }) {
         titleWithLogo={false}
         classes={{ head: styles.head, logo: styles.logo, title: styles.title, text: styles.headText }}
         below={
-          display.showSubtitle && display.wallSubtitle ? (
-            <p className={styles.subtitle}>{display.wallSubtitle}</p>
+          display.showSubtitle && display.subtitle ? (
+            <p className={styles.subtitle}>{display.subtitle}</p>
           ) : null
         }
       >
@@ -359,7 +359,7 @@ function Compose({ slot, display }: { slot: Slot; display: RollingDisplay }) {
       <div className={`app__scroll ${styles.composeWrap}`}>
         <form className={styles.formCard} onSubmit={submit} data-rolling-composer>
           <div className={styles.formHead}>
-            <div className={styles.formHeadTitle}>{display.wallSubtitle || t('한마디를 남겨 주세요')}</div>
+            <div className={styles.formHeadTitle}>{display.subtitle || t('한마디를 남겨 주세요')}</div>
             <div className={styles.formHeadSub}>{t('남기면 바로 벽에 붙어요.')}</div>
           </div>
 

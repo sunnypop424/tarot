@@ -183,7 +183,7 @@
 }
 .again {
   height: 42px;
-  padding: 0 18px;
+  padding: 0 var(--layout-pad);
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--ch-sub) 45%, transparent);
   background: none;

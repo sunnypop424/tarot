@@ -61,6 +61,31 @@ for (const [name, route] of PAGES) {
       titleWeight: t ? getComputedStyle(t).fontWeight : null,
       subSize: sub ? px(getComputedStyle(sub).fontSize) : null,
       gap: t && sub ? Math.round(sub.getBoundingClientRect().top - t.getBoundingClientRect().bottom) : null,
+      /**
+       * **페이지 바깥 여백** — 헤더만 맞춰 놓고 본문이 어긋나면 화면이 통째로 삐뚤어 보인다.
+       *
+       * "헤더 다음 덩어리의 왼쪽 끝" 으로 재면 안 된다. 소원나무의 나무·포토존의 카메라·
+       * 포토카드의 부채는 **전면 배치 무대**라 여백이라는 게 없고, 그걸 여백으로 세면
+       * 175·0·25 같은 값이 나와 진짜 어긋남이 그 소음에 묻힌다.
+       *
+       * 그래서 **글자를 담은 블록**만 보되, `[data-stage]` 안은 건너뛴다 — 등불·도장 칸·
+       * 부채처럼 좌표로 흩뿌리는 자리의 글자는 여백과 아무 상관이 없다.
+       * 가장 흔한 값이 그 서비스의 기준이다.
+       */
+      bodyPad: (() => {
+        const lefts = []
+        for (const el of document.querySelectorAll('p, h2, h3, li, label')) {
+          if (h.contains(el) || el.closest('[data-stage]')) continue
+          const r = el.getBoundingClientRect()
+          if (r.width < 40 || r.top < 0) continue
+          if (!el.textContent?.trim()) continue
+          lefts.push(Math.round(r.left))
+        }
+        if (!lefts.length) return null
+        const tally = new Map()
+        for (const v of lefts) tally.set(v, (tally.get(v) ?? 0) + 1)
+        return [...tally].sort((a, b) => b[1] - a[1])[0][0]
+      })(),
     }
   })
   if (!got) {
@@ -69,13 +94,13 @@ for (const [name, route] of PAGES) {
   }
   rows.push([name, got])
   console.log(
-    `· ${name} — 제목 ${got.titleSize}px/${got.titleWeight} · 부제 ${got.subSize}px · 위 ${got.padTop} · 옆 ${got.padSide} · 사이 ${got.gap}`
+    `· ${name} — 제목 ${got.titleSize}px/${got.titleWeight} · 부제 ${got.subSize}px · 위 ${got.padTop} · 옆 ${got.padSide} · 사이 ${got.gap} · 본문옆 ${got.bodyPad}`
   )
 }
 
 /** 값이 갈리는 항목을 찾는다 — **다수를 기준으로 삼는다** (뭐가 옳은지는 안 정한다) */
 let failed = 0
-for (const key of ['titleSize', 'titleWeight', 'subSize', 'padTop', 'padSide', 'gap']) {
+for (const key of ['titleSize', 'titleWeight', 'subSize', 'padTop', 'padSide', 'gap', 'bodyPad']) {
   const seen = rows.map(([n, g]) => [n, g[key]]).filter(([, v]) => v !== null)
   const kinds = new Map()
   for (const [n, v] of seen) kinds.set(String(v), [...(kinds.get(String(v)) ?? []), n])

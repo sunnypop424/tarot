@@ -395,7 +395,7 @@
 /* ── 하단 CTA ── */
 .bottom {
   position: relative;
-  padding: 0 18px 26px;
+  padding: 0 var(--layout-pad) 26px;
 }
 .cta {
   width: 100%;
@@ -480,7 +480,7 @@
     display: none;
   }
   .bottom {
-    padding: 0 26px 18px;
+    padding: 0 var(--layout-pad) 18px;
   }
   .adminRow {
     text-align: left;
@@ -556,7 +556,7 @@
   position: relative;
   flex: 1;
   overflow-y: auto;
-  padding: 18px 20px 16px;
+  padding: 18px var(--layout-pad) 16px;
 }
 /* 데스크톱은 가운데 카드 2단 (시안 ⑤) */
 .composeCard {
@@ -741,7 +741,7 @@
 @media (min-width: 900px) {
   .submitBar {
     background: none;
-    padding: 0 0 34px;
+    padding: 0 var(--layout-pad) 34px;
     display: flex;
     justify-content: center;
   }

@@ -58,6 +58,9 @@
 .logoLight {
   background-color: color-mix(in srgb, currentColor 9%, transparent);
 }
+.headText {
+  min-width: 0;
+}
 .title {
   margin: 0;
   font-size: 18px;
@@ -70,14 +73,8 @@
  * 안내 문구는 **제목과 같은 줄에서 시작한다.** 제목은 왼쪽(로고 옆)인데 문구만 가운데면
  * 둘이 따로 노는 것처럼 보인다 — 여백을 헤더와 같은 20px 로 맞춘다.
  */
-.deckGuide {
-  position: relative;
-  margin: 10px 20px 0;
-  font-size: 13px;
+.subtitle {
   color: #93959f;
-  line-height: 1.6;
-  text-align: left;
-  word-break: keep-all;
 }
 
 /* ── 덱 (부채꼴) ── */
@@ -162,7 +159,7 @@
 .deckFoot {
   position: relative;
   flex: none;
-  padding: 0 20px 24px;
+  padding: 0 var(--layout-pad) 24px;
   text-align: center;
 }
 /* 덱 아래 보조 버튼 줄 — 섞기 · 보관함 */
@@ -282,7 +279,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 44px 24px 0;
+  padding: 44px var(--layout-pad) 0;
   min-height: 0;
 }
 .kicker {
@@ -339,7 +336,7 @@
 .resultFoot {
   position: relative;
   flex: none;
-  padding: 22px 20px 30px;
+  padding: 22px var(--layout-pad) 30px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -405,7 +402,7 @@
 /* ── 보관함 ── */
 .lockerTop {
   flex: none;
-  padding: 38px 18px 0;
+  padding: 38px var(--layout-pad) 0;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -574,7 +571,7 @@
 }
 .bottom {
   flex: none;
-  padding: 0 20px 24px;
+  padding: 0 var(--layout-pad) 24px;
 }
 .cta {
   width: 100%;

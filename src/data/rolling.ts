@@ -24,11 +24,11 @@ export interface RollingDisplay {
   i18n?: DisplayI18n
 
   /** 벽 제목 — 방문자 화면 맨 위 (편집 가능, 고정 아님) */
-  wallTitle: string
+  title: string
   /** 제목을 벽에 보일지 (로고만 쓰거나 제목을 숨기고 싶을 때 끈다) */
   showTitle: boolean
   /** 벽 부제 — 제목 아래 한 줄 안내 */
-  wallSubtitle: string
+  subtitle: string
   /** 부제를 벽에 보일지 */
   showSubtitle: boolean
   /** 입력 안내 — 작성 화면 메시지칸에 흐리게 */
@@ -81,10 +81,20 @@ export interface RollingDisplay {
 /** 기본 종이색 팔레트 — 중립 파스텔 (편집기에서 갈아끼운다) */
 const DEFAULT_PAPERS = ['#f4efe2', '#eef1e6', '#eceff4', '#f4ecec', '#f1ecf4', '#e9f0ef']
 
+
+/**
+ * 옛 이름으로 저장된 값 — 읽기만 한다.
+ *
+ * 부제·제목을 서비스마다 다른 이름으로 두던 시절의 값이 슬롯 jsonb 에 남아 있다.
+ * 새 이름만 읽으면 **이미 도는 행사의 제목이 기본값으로 돌아간다** — 마이그레이션 없이
+ * 둘 다 보고, 저장은 새 이름으로만 한다(옛 키는 저절로 안 쓰이게 된다).
+ */
+type LegacyRollingDisplay = { wallTitle?: string; wallSubtitle?: string }
+
 export const DEFAULT_ROLLING: RollingDisplay = {
-  wallTitle: '롤링페이퍼',
+  title: '롤링페이퍼',
   showTitle: true,
-  wallSubtitle: '따뜻한 한마디를 남겨 주세요',
+  subtitle: '따뜻한 한마디를 남겨 주세요',
   showSubtitle: true,
   prompt: '축하하는 마음을 자유롭게 적어 주세요',
   postLabel: '남기기',
@@ -112,14 +122,14 @@ export const DEFAULT_ROLLING: RollingDisplay = {
  * `slot.rolling ?? DEFAULT` 로 뭉뚱그리면 한 값만 저장한 슬롯에서 나머지가 빈다.
  */
 export function rollingDisplay(slot: Slot): RollingDisplay {
-  const saved = (slot.rolling ?? {}) as Partial<RollingDisplay>
+  const saved = (slot.rolling ?? {}) as Partial<RollingDisplay> & LegacyRollingDisplay
   const base = serviceTheme(slot)
   return {
     /** 주최자가 언어별로 적어 둔 값 — 기본값이 없다 (안 적으면 없는 게 맞다) */
     i18n: saved.i18n,
-    wallTitle: saved.wallTitle || DEFAULT_ROLLING.wallTitle,
+    title: (saved.title ?? saved.wallTitle) || DEFAULT_ROLLING.title,
     showTitle: saved.showTitle ?? DEFAULT_ROLLING.showTitle,
-    wallSubtitle: saved.wallSubtitle ?? DEFAULT_ROLLING.wallSubtitle,
+    subtitle: saved.subtitle ?? saved.wallSubtitle ?? DEFAULT_ROLLING.subtitle,
     showSubtitle: saved.showSubtitle ?? DEFAULT_ROLLING.showSubtitle,
     prompt: saved.prompt || DEFAULT_ROLLING.prompt,
     postLabel: saved.postLabel || DEFAULT_ROLLING.postLabel,

@@ -39,18 +39,18 @@ export function WishCard({
             <span style={CSS.label}>{'제목'}</span>
             <ShowToggle checked={d.showTitle} onChange={(v) => patch({ showTitle: v })} />
           </div>
-          <input value={d.treeTitle} onChange={(e) => patch({ treeTitle: e.target.value })} style={CSS.input} />
+          <input value={d.title} onChange={(e) => patch({ title: e.target.value })} style={CSS.input} />
           {/* 나무 화면 제목 — 방문자가 읽는 글자라 언어별로 받는다 */}
-          <I18nRow d={d} k="treeTitle" patch={patch} slot={slot} />
+          <I18nRow d={d} k="title" patch={patch} slot={slot} />
         </div>
         <div style={CSS.fieldCol}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 19 }}>
             <span style={CSS.label}>부제</span>
             <ShowToggle checked={d.showSubtitle} onChange={(v) => patch({ showSubtitle: v })} />
           </div>
-          <input value={d.treeSubtitle} onChange={(e) => patch({ treeSubtitle: e.target.value })} style={CSS.input} />
+          <input value={d.subtitle} onChange={(e) => patch({ subtitle: e.target.value })} style={CSS.input} />
           {/* 나무 화면 부제 — 방문자가 읽는 글자라 언어별로 받는다 */}
-          <I18nRow d={d} k="treeSubtitle" patch={patch} slot={slot} />
+          <I18nRow d={d} k="subtitle" patch={patch} slot={slot} />
         </div>
         <Field label="입력 안내" hint="작성 화면 소원칸에 흐리게 뜨는 문구예요.">
           <input value={d.wishPrompt} onChange={(e) => patch({ wishPrompt: e.target.value })} style={CSS.input} />

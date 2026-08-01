@@ -473,7 +473,7 @@ function Ready({
             <div className={styles.pickTitle}>{t('프레임 고르기')}</div>
             {display.frames.length > 1 && <div className={styles.pickHint}>{t('좌우로 넘겨 보세요')}</div>}
           </div>
-          <ul className={styles.frames} data-frames>
+          <ul className={styles.frames} data-frames data-stage>
             {display.frames.map((f, i) => {
               const size = fit(f.ratio || 3 / 4)
               const on = i === frameIdx

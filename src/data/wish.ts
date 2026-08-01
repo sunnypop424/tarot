@@ -36,9 +36,9 @@ export interface WishDisplay {
   i18n?: DisplayI18n
 
   /** 나무 화면 제목 (편집 가능, 고정 아님) */
-  treeTitle: string
+  title: string
   showTitle: boolean
-  treeSubtitle: string
+  subtitle: string
   showSubtitle: boolean
   /** 입력 안내 — 작성 화면 소원칸에 흐리게 */
   wishPrompt: string
@@ -121,10 +121,20 @@ export interface WishDisplay {
  */
 const DEFAULT_LANTERNS = ['#efe8cd', '#e9d3c4', '#d8dfd0', '#dcd4e6', '#e4dcc2', '#dfe3ea']
 
+
+/**
+ * 옛 이름으로 저장된 값 — 읽기만 한다.
+ *
+ * 부제·제목을 서비스마다 다른 이름으로 두던 시절의 값이 슬롯 jsonb 에 남아 있다.
+ * 새 이름만 읽으면 **이미 도는 행사의 제목이 기본값으로 돌아간다** — 마이그레이션 없이
+ * 둘 다 보고, 저장은 새 이름으로만 한다(옛 키는 저절로 안 쓰이게 된다).
+ */
+type LegacyWishDisplay = { treeTitle?: string; treeSubtitle?: string }
+
 export const DEFAULT_WISH: WishDisplay = {
-  treeTitle: '소원 나무',
+  title: '소원 나무',
   showTitle: true,
-  treeSubtitle: '소원을 적어 나무에 걸어 주세요',
+  subtitle: '소원을 적어 나무에 걸어 주세요',
   showSubtitle: true,
   wishPrompt: '이루고 싶은 소원을 적어 주세요',
   hangLabel: '소원 걸기',
@@ -157,14 +167,14 @@ export const DEFAULT_WISH: WishDisplay = {
  * `slot.wish ?? DEFAULT` 로 뭉뚱그리면 한 값만 저장한 슬롯에서 나머지가 빈다.
  */
 export function wishDisplay(slot: Slot): WishDisplay {
-  const saved = (slot.wish ?? {}) as Partial<WishDisplay>
+  const saved = (slot.wish ?? {}) as Partial<WishDisplay> & LegacyWishDisplay
   const base = serviceTheme(slot)
   return {
     /** 주최자가 언어별로 적어 둔 값 — 기본값이 없다 (안 적으면 없는 게 맞다) */
     i18n: saved.i18n,
-    treeTitle: saved.treeTitle || DEFAULT_WISH.treeTitle,
+    title: (saved.title ?? saved.treeTitle) || DEFAULT_WISH.title,
     showTitle: saved.showTitle ?? DEFAULT_WISH.showTitle,
-    treeSubtitle: saved.treeSubtitle ?? DEFAULT_WISH.treeSubtitle,
+    subtitle: saved.subtitle ?? saved.treeSubtitle ?? DEFAULT_WISH.subtitle,
     showSubtitle: saved.showSubtitle ?? DEFAULT_WISH.showSubtitle,
     wishPrompt: saved.wishPrompt || DEFAULT_WISH.wishPrompt,
     hangLabel: saved.hangLabel || DEFAULT_WISH.hangLabel,

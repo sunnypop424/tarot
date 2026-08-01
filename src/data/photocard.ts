@@ -23,10 +23,11 @@ export interface PhotocardDisplay {
 
   title: string
   showTitle: boolean
+  showSubtitle: boolean
 
   /** 덱에 깔 뒷면 장수 — 실제 카드 종류와 무관한 **연출값**이다 */
   spreadCount: number
-  deckGuide: string
+  subtitle: string
   drawLabel: string
   saveLabel: string
   lockerLabel: string
@@ -110,11 +111,22 @@ export interface PhotocardDisplay {
   modalNoBorder: boolean
 }
 
+
+/**
+ * 옛 이름으로 저장된 값 — 읽기만 한다.
+ *
+ * 부제·제목을 서비스마다 다른 이름으로 두던 시절의 값이 슬롯 jsonb 에 남아 있다.
+ * 새 이름만 읽으면 **이미 도는 행사의 제목이 기본값으로 돌아간다** — 마이그레이션 없이
+ * 둘 다 보고, 저장은 새 이름으로만 한다(옛 키는 저절로 안 쓰이게 된다).
+ */
+type LegacyPhotocardDisplay = { deckGuide?: string }
+
 export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
   title: '포토카드 뽑기',
   showTitle: true,
+  showSubtitle: true,
   spreadCount: 13,
-  deckGuide: '마음이 가는 카드를 한 장 골라 주세요',
+  subtitle: '마음이 가는 카드를 한 장 골라 주세요',
   drawLabel: '뽑기권 받기',
   saveLabel: '저장',
   lockerLabel: '보관함',
@@ -157,15 +169,16 @@ export const DEFAULT_PHOTOCARD: PhotocardDisplay = {
 
 /** 슬롯 설정 + 기본값 — **키 단위로 채운다** */
 export function photocardDisplay(slot: Slot): PhotocardDisplay {
-  const saved = (slot.photocard ?? {}) as Partial<PhotocardDisplay>
+  const saved = (slot.photocard ?? {}) as Partial<PhotocardDisplay> & LegacyPhotocardDisplay
   const base = serviceTheme(slot)
   return {
     /** 주최자가 언어별로 적어 둔 값 — 기본값이 없다 (안 적으면 없는 게 맞다) */
     i18n: saved.i18n,
     title: saved.title || DEFAULT_PHOTOCARD.title,
     showTitle: saved.showTitle ?? DEFAULT_PHOTOCARD.showTitle,
+    showSubtitle: saved.showSubtitle ?? DEFAULT_PHOTOCARD.showSubtitle,
     spreadCount: saved.spreadCount ?? DEFAULT_PHOTOCARD.spreadCount,
-    deckGuide: saved.deckGuide ?? DEFAULT_PHOTOCARD.deckGuide,
+    subtitle: saved.subtitle ?? saved.deckGuide ?? DEFAULT_PHOTOCARD.subtitle,
     drawLabel: saved.drawLabel || DEFAULT_PHOTOCARD.drawLabel,
     saveLabel: saved.saveLabel || DEFAULT_PHOTOCARD.saveLabel,
     lockerLabel: saved.lockerLabel || DEFAULT_PHOTOCARD.lockerLabel,

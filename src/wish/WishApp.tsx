@@ -444,7 +444,7 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
       <ServiceHeader
         variant="mark"
         logo={display.logo}
-        title={display.treeTitle}
+        title={display.title}
         showTitle={display.showTitle}
         align={display.logoAlign}
         marginTop={display.logoMarginTop}
@@ -452,8 +452,8 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
         titleWithLogo={false}
         classes={{ head: styles.head, logo: styles.logo, title: styles.title, text: styles.headText }}
         below={
-          display.showSubtitle && display.treeSubtitle ? (
-            <p className={styles.subtitle}>{display.treeSubtitle}</p>
+          display.showSubtitle && display.subtitle ? (
+            <p className={styles.subtitle}>{display.subtitle}</p>
           ) : null
         }
       >
@@ -494,6 +494,7 @@ function Tree({ slot, display }: { slot: Slot; display: WishDisplay }) {
         <div
           ref={canopyRef}
           className={styles.canopy}
+          data-stage
           data-wish-tree
         >
           {placed.map((p) => (
