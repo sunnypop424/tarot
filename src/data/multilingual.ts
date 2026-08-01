@@ -1,0 +1,70 @@
+import type { Lang } from '@/i18n'
+import type { Slot } from '@/types/slot'
+
+/**
+ * **주최자가 적는 값의 다국어.**
+ *
+ * 화면 문구는 우리가 쓰고 사전이 옮긴다 (`src/i18n/`). 그런데 방문자가 보는 글자의 절반은
+ * 우리가 안 쓴 것이다 — 경품 이름("1등 사인 폴라로이드"), 스탬프 칸("방명록 작성"),
+ * 설문 선택지("청량"), 질문 타로의 질문과 답변. **이건 사전으로 못 푼다.** 행사마다 다르고,
+ * 주최자가 오늘 적은 말을 우리가 미리 번역해 둘 방법이 없다.
+ *
+ * 그래서 **주최자가 직접 언어별로 적는다.** 이 파일은 그 값이 사는 모양과 고르는 규칙이다.
+ *
+ * ── 모양: 원문 옆에 사전 하나 ──────────────────────
+ *
+ * 기존 컬럼(`prizes.name`)은 **그대로 둔다.** 언어별 값은 `name_i18n jsonb` 에 따로 든다:
+ *
+ *     name      = '1등 사인 폴라로이드'          ← 한국어, 늘 있다
+ *     name_i18n = { en: 'Signed Polaroid', ja: 'サイン入りチェキ' }
+ *
+ * 원문을 그대로 두는 이유가 셋이다:
+ *
+ *  1. **이미 도는 행사가 안 깨진다.** `name_i18n` 이 없으면 지금과 똑같이 돈다.
+ *  2. **서버 함수가 안 깨진다.** `draw_prizes` 가 `name` 을 읽어 결과에 담는데, 값을 객체로
+ *     바꾸면 그 함수와 저장된 뽑기 기록이 같이 깨진다.
+ *  3. **한국어가 특별하지 않아진다.** 원문은 늘 있고, `_i18n` 은 있으면 좋은 덤이다 —
+ *     주최자가 영어만 적어 두고 일본어를 비워 둬도 화면이 멀쩡하다.
+ *
+ * ── 고르는 규칙: 있으면 쓰고 없으면 원문 ───────────
+ *
+ * `t()` 의 폴백과 **같은 결**이다. 빠진 자리가 고장이 아니라 한국어여야, 주최자가 78장 답변을
+ * 세 언어로 다 채우지 않아도 행사를 열 수 있다.
+ */
+
+/** 언어 코드 → 그 언어로 적은 값. 빈 문자열은 "안 적었다" 와 같게 본다 */
+export type I18nText = Partial<Record<Lang, string>> | null | undefined
+
+/**
+ * 지금 언어의 값 — 없으면 원문.
+ *
+ * `lang === 'ko'` 면 물어볼 것도 없이 원문이다 (원문이 곧 한국어다).
+ */
+export function pick(base: string, alt: I18nText, lang: Lang): string {
+  if (lang === 'ko') return base
+  const v = alt?.[lang]
+  return v && v.trim() ? v : base
+}
+
+/**
+ * **주최자에게 물어볼 언어** — 슬롯이 켠 것만.
+ *
+ * 안 켠 언어의 칸을 띄우면 주최자는 쓰지도 않을 번역을 78번 적게 된다. 나중에 언어를 켜면
+ * 그때 칸이 생기고, 그전까지 적어둔 값은 `_i18n` 에 그대로 남아 있다가 살아난다
+ * (칸을 안 보여줄 뿐 값을 지우지는 않는다).
+ *
+ * 한국어는 안 낀다 — 그건 원문 칸이고, 이미 화면에 있다.
+ */
+export function askLangs(slot: Slot): Lang[] {
+  return (slot.langs ?? []).filter((l): l is Lang => l === 'en' || l === 'zh' || l === 'ja')
+}
+
+/** 비어 있는 언어를 털어낸 값 — 빈 문자열만 든 객체를 DB 에 넣지 않는다 */
+export function clean(alt: I18nText): Partial<Record<Lang, string>> | null {
+  if (!alt) return null
+  const out: Partial<Record<Lang, string>> = {}
+  for (const [k, v] of Object.entries(alt)) {
+    if (typeof v === 'string' && v.trim()) out[k as Lang] = v.trim()
+  }
+  return Object.keys(out).length ? out : null
+}

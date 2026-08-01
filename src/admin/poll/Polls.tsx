@@ -6,6 +6,7 @@ import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
 import { BulkPaste, splitCells, toLines, type BulkResult } from '../BulkPaste'
 import { useT, useLocale } from '@/i18n'
+import { I18nField } from '../I18nField'
 
 /**
  * 붙여넣기 → 선택지들.
@@ -159,23 +160,25 @@ export function Polls() {
       <header className="ad-head">
         <div className="ad-head__row">
           <h1 className="ad-head__title">{t('설문')}</h1>
-          <span className="ad-head__count tnum">설문 {drafts.length}개</span>
+          <span className="ad-head__count tnum">{t('설문 {n}개', { n: drafts.length })}</span>
         </div>
         <p className="ad-head__desc">
-          공개하면 방문자 화면에 바로 나오고 표는 실시간으로 쌓이에요.
+          {/* 예전엔 "쌓이에요" 라고 적혀 있었다 — 아래 배너와 같은 문장이라 표현도 맞춘다 */}
+          {t('공개하면 방문자 화면에 바로 나오고 표는 실시간으로 쌓여요.')}
         </p>
       </header>
 
       <div className="ad-stack">
         <div className="ad-banner ad-banner--info">
-          공개하면 방문자 화면에 바로 나오고 표는 실시간으로 쌓여요. 여러 줄을 고치는 동안 방문자가 중간
-          상태를 보지 않도록, 이 화면은 저장을 눌러야 반영돼요.
+          {t(
+            '공개하면 방문자 화면에 바로 나오고 표는 실시간으로 쌓여요. 여러 줄을 고치는 동안 방문자가 중간 상태를 보지 않도록, 이 화면은 저장을 눌러야 반영돼요.'
+          )}
         </div>
 
         <div className="ad-card__head" style={{ marginBottom: 0 }}>
-          <span className="ad-card__title">설문 {drafts.length}개</span>
+          <span className="ad-card__title">{t('설문 {n}개', { n: drafts.length })}</span>
           <button type="button" className="ad-btn ad-btn--soft ad-btn--sm" onClick={addPoll} data-add-poll>
-            + 설문 추가
+            {t('+ 설문 추가')}
           </button>
         </div>
 
@@ -184,7 +187,7 @@ export function Polls() {
             <div className="ad-empty" style={{ border: 'none', padding: '24px 20px' }}>
               <div className="ad-empty__title">{t('아직 설문이 없어요')}</div>
               <div className="ad-empty__sub">
-                새 설문은 준비 중으로 시작해요. 선택지를 채운 뒤 공개해 주세요.
+                {t('새 설문은 준비 중으로 시작해요. 선택지를 채운 뒤 공개해 주세요.')}
               </div>
             </div>
           </div>
@@ -229,9 +232,17 @@ export function Polls() {
                     </button>
                   </div>
 
+                  {/* 제목도 주최자가 쓴 말 — 한 줄 안에 넣으면 폭이 깨져서 아래에 붙인다 */}
+                  <I18nField
+                    base={p.title}
+                    value={p.titleI18n}
+                    placeholder={t('설문 제목')}
+                    onChange={(next) => patch(p.id, { titleI18n: next })}
+                  />
+
                   <div className="ad-inline" style={{ marginTop: 16 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ad-ink-2)' }}>
-                      고르는 방식
+                      {t('고르는 방식')}
                     </span>
                     <div className="ad-seg">
                       {(
@@ -278,7 +289,8 @@ export function Polls() {
 
                   <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {p.options.map((o, i) => (
-                      <div key={o.id} className="ad-inline" style={{ flexWrap: 'nowrap' }}>
+                      <div key={o.id}>
+                      <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>
                         <input
                           className="ad-input ad-input--sm"
                           value={o.label}
@@ -316,6 +328,19 @@ export function Polls() {
                           ×
                         </button>
                       </div>
+                      {/* 선택지는 주최자가 쓴 말이라 사전이 못 옮긴다 — 언어를 켠 슬롯만 뜬다 */}
+                      <I18nField
+                        base={o.label}
+                        value={o.labelI18n}
+                        onChange={(next) =>
+                          patch(p.id, {
+                            options: p.options.map((x) =>
+                              x.id === o.id ? { ...x, labelI18n: next } : x
+                            ),
+                          })
+                        }
+                      />
+                      </div>
                     ))}
                   </div>
 
@@ -336,8 +361,7 @@ export function Polls() {
                         placeholder={'청량\n청순\n걸크러시'}
                         hint={
                           <>
-                            한 줄에 하나씩 적어 주세요. 한 줄 안에 쉼표·세로줄로 여러 개를 적어도
-                            나눠서 들어가요.
+                            {t('한 줄에 하나씩 적어 주세요. 한 줄 안에 쉼표·세로줄로 여러 개를 적어도 나눠서 들어가요.')}
                           </>
                         }
                         parse={parseOptions}

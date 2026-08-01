@@ -18,12 +18,22 @@ interface PollRow {
   closed: boolean
   hidden: boolean
   order: number
-  poll_options: { id: string; order: number; label: string; image: string | null; votes: number }[]
+  title_i18n: Record<string, string> | null
+  poll_options: {
+    id: string
+    order: number
+    label: string
+    label_i18n: Record<string, string> | null
+    image: string | null
+    votes: number
+  }[]
 }
 
 const toPoll = (r: PollRow): Poll => ({
   id: r.id,
   title: r.title,
+  /** 주최자가 언어별로 적은 제목 — 없으면 title (`0046_content_i18n.sql`) */
+  titleI18n: r.title_i18n ?? null,
   kind: r.kind,
   maxPick: r.max_pick,
   closed: r.closed,
@@ -35,6 +45,7 @@ const toPoll = (r: PollRow): Poll => ({
       id: o.id,
       order: o.order,
       label: o.label,
+      labelI18n: o.label_i18n ?? null,
       image: o.image ?? undefined,
       votes: o.votes,
     })),
@@ -63,6 +74,7 @@ export const supabasePoll: PollRepo = {
       id: poll.id,
       slug,
       title: poll.title,
+      title_i18n: poll.titleI18n ?? null,
       kind: poll.kind,
       max_pick: poll.maxPick,
       closed: poll.closed,
@@ -82,6 +94,7 @@ export const supabasePoll: PollRepo = {
         poll_id: poll.id,
         order: o.order,
         label: o.label,
+        label_i18n: o.labelI18n ?? null,
         image: o.image ?? null,
       }))
     )

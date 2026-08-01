@@ -463,4 +463,18 @@ export const ADMIN2_EN: Record<string, string> = {
   '칸 {n}개': '{n} slots',
   '발급 {time}': 'Issued at {time}',
   '오늘 이 기기 {n}건': '{n} on this device today',
+
+  // ── 주최자 다국어 입력 · 설문 ────────────────────
+  '다른 언어': 'Other languages',
+  '{a}/{b}': '{a}/{b}',
+  '비워 두면 한국어가 그대로 보여요.': 'Leave it blank and the Korean text is shown as is.',
+  '{n}등': 'Rank {n}',
+  '{n}개': '{n}',
+  '설문 {n}개': '{n} polls',
+  '+ 설문 추가': '+ Add a poll',
+  '고르는 방식': 'How to choose',
+  '공개하면 방문자 화면에 바로 나오고 표는 실시간으로 쌓여요.': 'Once public, it appears on the visitor screen right away and votes come in live.',
+  '공개하면 방문자 화면에 바로 나오고 표는 실시간으로 쌓여요. 여러 줄을 고치는 동안 방문자가 중간 상태를 보지 않도록, 이 화면은 저장을 눌러야 반영돼요.': 'Once public, it appears on the visitor screen right away and votes come in live. So visitors do not see a half-edited state, this screen only applies when you press Save.',
+  '새 설문은 준비 중으로 시작해요. 선택지를 채운 뒤 공개해 주세요.': 'New polls start as drafts. Fill in the options, then make it public.',
+  '한 줄에 하나씩 적어 주세요. 한 줄 안에 쉼표·세로줄로 여러 개를 적어도 나눠서 들어가요.': 'One per line. If you put several on one line separated by commas or bars, they get split too.',
 }

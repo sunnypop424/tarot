@@ -35,6 +35,7 @@ const DEFAULTS: PhotocardSettings = {
 interface CardRow {
   id: string
   name: string
+  name_i18n: Record<string, string> | null
   rarity: number
   image: string
   remaining: number | null
@@ -46,6 +47,8 @@ interface CardRow {
 const toCard = (r: CardRow): Photocard => ({
   id: r.id,
   name: r.name,
+  /** 주최자가 언어별로 적은 카드 이름 — 없으면 name */
+  nameI18n: r.name_i18n ?? null,
   rarity: r.rarity,
   image: r.image,
   remaining: r.remaining,
@@ -94,6 +97,7 @@ export const supabasePhotocard: PhotocardRepo = {
       id: card.id,
       slug,
       name: card.name,
+      name_i18n: card.nameI18n ?? null,
       rarity: card.rarity,
       image: card.image,
       remaining: card.remaining,

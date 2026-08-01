@@ -14,7 +14,8 @@ import { countPicker, pickerVars } from '@/data/countPicker'
 import { ResultReveal } from './ResultReveal'
 import { PrizePreview } from './PrizePreview'
 import styles from './Luckydraw.module.css'
-import { useT } from '@/i18n'
+import { useT, useLang } from '@/i18n'
+import { pick } from '@/data/multilingual'
 import { LangBar } from '@/components/LangBar'
 import { useLocalizedDisplay } from '@/i18n/display'
 
@@ -63,6 +64,7 @@ function sampleResult(display: LuckydrawDisplay): DrawResult {
 
 export default function LuckydrawApp() {
   const t = useT()
+  const { lang } = useLang()
   const slot = useSlot()
   const rawDisplay = luckydrawDisplay(slot)
   /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
@@ -71,6 +73,15 @@ export default function LuckydrawApp() {
   const preview = useLivePreview()
 
   const [prizes, setPrizes] = useState<Prize[] | null>(null)
+  /**
+   * **경품 id → 주최자가 언어별로 적은 이름** (`0046_content_i18n.sql`).
+   *
+   * `draw_prizes` 는 결과 JSON 을 서버에서 만들어 주는데 거기엔 원문 이름만 실려 있다 —
+   * 그 함수는 재고 차감과 묶음 상한을 한 트랜잭션에서 하는 자리라 번역을 붙이자고 열지 않았다.
+   * 대신 **경품 표를 읽을 때 이 맵을 떠 둔다.** 뽑고 나면 서버가 준 최신 재고로 `prizes` 가
+   * 덮이지만(번역이 없는 값이다), 이 맵은 그대로 남아 결과 화면이 계속 쓸 수 있다.
+   */
+  const [nameI18n, setNameI18n] = useState<Record<string, Prize['nameI18n']>>({})
   const [settings, setSettings] = useState<LuckydrawSettings | null>(null)
   const [count, setCount] = useState(1)
   const [drawing, setDrawing] = useState(false)
@@ -158,6 +169,8 @@ export default function LuckydrawApp() {
         repo.luckydraw.getSettings(slot.slug),
       ])
       setPrizes(p)
+      // 번역 맵은 **경품 표를 읽을 때만** 뜬다 — 뽑기 결과엔 원문만 실려 온다
+      setNameI18n(Object.fromEntries(p.map((x) => [x.id, x.nameI18n])))
       setSettings(s)
     } catch {
       // 못 읽은 것과 상품이 없는 것은 다르다 — 빈 배열로 두면 "마감" 처럼 보인다
@@ -186,13 +199,29 @@ export default function LuckydrawApp() {
   const soldOut = prizes !== null && realRemaining === 0
   const closed = settings?.closed === true
 
+  /**
+   * 결과에 실린 경품 이름을 **방문자의 언어로 갈아 끼운다.**
+   *
+   * 아래 화면들(당첨 연출·요약·배송 폼)이 전부 `name` 하나만 본다. 여기서 한 번 바꿔 두면
+   * 그 셋을 안 건드려도 되고, 나중에 화면이 늘어도 자동으로 따라온다.
+   * 한국어면 바꿀 게 없어 그대로 돌려준다 (`pick` 이 원문을 준다).
+   */
+  const localizeResult = useCallback(
+    (r: DrawResult): DrawResult => ({
+      ...r,
+      results: r.results.map((x) => ({ ...x, name: pick(x.name, nameI18n[x.prizeId], lang) })),
+      prizes: r.prizes.map((x) => ({ ...x, name: pick(x.name, nameI18n[x.id], lang) })),
+    }),
+    [nameI18n, lang]
+  )
+
   async function draw() {
     if (drawing) return
     setDrawing(true)
     setError(null)
     try {
       const next = await repo.luckydraw.draw(slot.slug, count)
-      setResult(next)
+      setResult(localizeResult(next))
       // 서버가 최신 재고를 같이 준다 — 다시 읽을 필요가 없다
       setPrizes(next.prizes)
     } catch (e) {

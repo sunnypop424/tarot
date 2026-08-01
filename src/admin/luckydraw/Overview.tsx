@@ -6,6 +6,7 @@ import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
 import { BulkPaste, splitCells, toLines, type BulkResult } from '../BulkPaste'
 import { useT } from '@/i18n'
+import { I18nField } from '../I18nField'
 
 const MAX_PRIZES = 100
 
@@ -382,16 +383,28 @@ export function Overview() {
 
               {rows.map((r, i) => (
                 <div key={r.id} className="ad-table__row ad-table__row--tight" data-dim={locked || undefined}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
-                    <span className="ad-rank" data-first={i === 0 || undefined}>
-                      {r.rank}등
-                    </span>
-                    <input
-                      className="ad-input ad-input--sm"
-                      value={r.name}
-                      placeholder={t('상품 이름')}
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
+                      <span className="ad-rank" data-first={i === 0 || undefined}>
+                        {t('{n}등', { n: r.rank })}
+                      </span>
+                      <input
+                        className="ad-input ad-input--sm"
+                        value={r.name}
+                        placeholder={t('상품 이름')}
+                        disabled={locked}
+                        onChange={(e) => patchRow(i, { name: e.target.value })}
+                      />
+                    </div>
+                    {/*
+                      * 상품명은 **주최자가 쓴 말**이라 사전이 못 옮긴다 — 언어를 켠 슬롯이면
+                      * 여기서 직접 적는다. 안 켰으면 이 칸 자체가 안 뜬다.
+                      */}
+                    <I18nField
+                      base={r.name}
+                      value={r.nameI18n}
                       disabled={locked}
-                      onChange={(e) => patchRow(i, { name: e.target.value })}
+                      onChange={(next) => patchRow(i, { nameI18n: next })}
                     />
                   </div>
                   <input

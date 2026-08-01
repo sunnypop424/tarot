@@ -2,11 +2,14 @@ import { createPortal } from 'react-dom'
 import { Gift } from 'lucide-react'
 
 import styles from './Luckydraw.module.css'
-import { useT } from '@/i18n'
+import { useT, useLang } from '@/i18n'
+import { pick, type I18nText } from '@/data/multilingual'
 
 interface PreviewPrize {
   rank: number
   name: string
+  /** 주최자가 언어별로 적은 이름 — 없으면 `name` (`src/data/multilingual.ts`) */
+  nameI18n?: I18nText
   remaining: number
   requiresShipping: boolean
 }
@@ -28,6 +31,7 @@ interface Props {
  */
 export function PrizePreview({ prizes, showCount, highlightRanks, onClose }: Props) {
   const t = useT()
+  const { lang } = useLang()
   return createPortal(
     <div
       className={styles.overlay}
@@ -55,10 +59,11 @@ export function PrizePreview({ prizes, showCount, highlightRanks, onClose }: Pro
               data-high={highlightRanks.includes(p.rank) || undefined}
             >
               <span className={styles.prizeBadge} data-high={highlightRanks.includes(p.rank) || undefined}>
-                {p.rank}등
+                {t('{n}등', { n: p.rank })}
               </span>
-              <span className={styles.prizeName}>{p.name}</span>
-              {showCount && <span className={styles.prizeCount}>{p.remaining}개</span>}
+              {/* 경품 이름은 주최자가 쓴 말 — 언어별로 적었으면 그걸, 아니면 원문 */}
+              <span className={styles.prizeName}>{pick(p.name, p.nameI18n, lang)}</span>
+              {showCount && <span className={styles.prizeCount}>{t('{n}개', { n: p.remaining })}</span>}
             </li>
           ))}
         </ul>

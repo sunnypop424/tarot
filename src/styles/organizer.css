@@ -2250,3 +2250,77 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
   max-width: calc(100vw - 40px);
 }
+
+/* ══ 다국어 입력 (I18nField) ═══════════════════════
+ *
+ * 주최자가 한 값을 언어별로 적는 칸. **접혀 있는 게 기본**이라 한국어로만 여는 행사의
+ * 화면이 지금과 같아 보인다 (`src/admin/I18nField.tsx` 머리말).
+ */
+.ad-i18n {
+  margin-top: 8px;
+}
+.ad-i18n__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--ad-line);
+  border-radius: 4px;
+  background: var(--ad-surface);
+  color: var(--ad-ink-2);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.ad-i18n__toggle:hover:not(:disabled),
+.ad-i18n__toggle[data-on] {
+  border-color: var(--ad-key);
+  color: var(--ad-key);
+}
+.ad-i18n__toggle:disabled {
+  color: var(--ad-ink-3);
+  cursor: default;
+}
+/* 접혀 있어도 채운 게 있는지 보인다 */
+.ad-i18n__count {
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--ad-canvas);
+  font-size: 11px;
+}
+.ad-i18n__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid var(--ad-line);
+  border-radius: 4px;
+  background: var(--ad-canvas);
+}
+.ad-i18n__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* 여러 줄 칸은 언어 이름이 위로 붙는다 */
+.ad-i18n__row:has(.ad-textarea) {
+  align-items: flex-start;
+}
+.ad-i18n__lang {
+  flex: 0 0 64px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ad-ink-2);
+}
+.ad-i18n__row:has(.ad-textarea) .ad-i18n__lang {
+  padding-top: 10px;
+}
+.ad-i18n__note {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--ad-ink-3);
+}

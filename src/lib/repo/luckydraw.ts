@@ -23,6 +23,8 @@ function toPrize(row: Record<string, unknown>): Prize {
     id: row.id as string,
     rank: row.rank as number,
     name: (row.name as string) ?? '',
+    /** 주최자가 언어별로 적은 이름 — 없으면 name 이 그대로 쓰인다 (`0046_content_i18n.sql`) */
+    nameI18n: (row.name_i18n as Prize['nameI18n']) ?? null,
     remaining: (row.remaining as number) ?? 0,
     requiresShipping: row.requires_shipping === true,
     batchCapRatio: row.batch_cap_ratio == null ? null : Number(row.batch_cap_ratio),
@@ -73,6 +75,7 @@ export const supabaseLuckydraw: LuckydrawRepo = {
       slug,
       rank: i + 1,
       name: p.name,
+      name_i18n: p.nameI18n ?? null,
       remaining: Math.max(0, Math.floor(p.remaining) || 0),
       requires_shipping: p.requiresShipping,
       batch_cap_ratio: p.batchCapRatio ?? null,

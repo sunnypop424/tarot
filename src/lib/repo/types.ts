@@ -1,4 +1,5 @@
 import type { Aspect, Orientation } from '@/types/card'
+import type { I18nText } from '@/data/multilingual'
 import type { Question } from '@/types/question'
 import type { Slot } from '@/types/slot'
 
@@ -280,6 +281,13 @@ export interface Prize {
   rank: number
   name: string
   /**
+   * **주최자가 언어별로 적은 이름** — 없으면 `name` 이 그대로 나간다.
+   *
+   * "1등 사인 폴라로이드" 는 우리가 미리 번역해 둘 수 없어서 사전으로 못 푼다
+   * (`src/data/multilingual.ts` 머리말). 고르는 건 `pick(name, nameI18n, lang)`.
+   */
+  nameI18n?: I18nText
+  /**
    * **지금 뽑을 수 있는 수량 — 이게 단일 진실이다.**
    *
    * 원본(Firebase)엔 '전체 수량'과 '남은 수량'이 따로 있었지만, 전체를 고치면 남은 수량이
@@ -465,6 +473,8 @@ export interface PollOption {
   id: string
   order: number
   label: string
+  /** 주최자가 언어별로 적은 선택지 — 없으면 `label` (`src/data/multilingual.ts`) */
+  labelI18n?: I18nText
   /** 이미지형 설문일 때 (업로드 URL) */
   image?: string
   /** 지금까지 받은 표 — **컬럼으로 든다** (0020 주석: 럭드와 반대인 이유) */
@@ -474,6 +484,8 @@ export interface PollOption {
 export interface Poll {
   id: string
   title: string
+  /** 주최자가 언어별로 적은 제목 — 없으면 `title` */
+  titleI18n?: I18nText
   /** single = 하나만 · multi = 여러 개 */
   kind: 'single' | 'multi'
   maxPick: number
@@ -697,6 +709,8 @@ export interface QuizRepo {
 export interface Photocard {
   id: string
   name: string
+  /** 주최자가 언어별로 적은 카드 이름 — 없으면 `name` (`src/data/multilingual.ts`) */
+  nameI18n?: I18nText
   /** 1~5. **이게 곧 가중치다** — 재고가 아니다 (0026 주석) */
   rarity: number
   image: string

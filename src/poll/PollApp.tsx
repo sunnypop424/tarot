@@ -14,7 +14,8 @@ import type { Slot } from '@/types/slot'
 import { AdminEntry } from '@/components/AdminEntry'
 import { ServiceHeader } from '@/components/ServiceHeader'
 import styles from './Poll.module.css'
-import { useT, useLocale } from '@/i18n'
+import { useT, useLocale, useLang } from '@/i18n'
+import { pick } from '@/data/multilingual'
 import { useLocalizedDisplay } from '@/i18n/display'
 
 /**
@@ -52,6 +53,7 @@ const SAMPLE_POLL: Poll = {
 
 function PollHome({ slot }: { slot: Slot }) {
   const t = useT()
+  const { lang } = useLang()
   const { slug } = slot
   const rawDisplay = useMemo(() => pollDisplay(slot), [slot])
   /** 기본 문구는 사전에서 번역되고, 주최자가 쓴 문구는 원문 그대로 (src/i18n/display.ts) */
@@ -183,7 +185,7 @@ function PollHome({ slot }: { slot: Slot }) {
                             {p.kind === 'multi' ? t('최대 {n}개', { n: p.maxPick }) : t('하나만 고르기')}
                           </span>
                         </div>
-                        <div className={styles.cardQ}>{p.title}</div>
+                        <div className={styles.cardQ}>{pick(p.title, p.titleI18n, lang)}</div>
                         <div className={styles.cardFoot}>
                           <span className={`${styles.cardCount} ${styles.tnum}`}>
                             {display.showCount ? t('{n}표', { n: total.toLocaleString() }) : ''}
@@ -237,6 +239,7 @@ function PollView({
   notice: string | null
 }) {
   const t = useT()
+  const { lang } = useLang()
   const loc = useLocale()
   const [picked, setPicked] = useState<string[]>([])
   const voted = !!mine
@@ -290,7 +293,8 @@ function PollView({
       )}
 
       <div className={styles.qWrap}>
-        <h2 className={styles.q}>{poll.title}</h2>
+        {/* 설문 제목·선택지는 주최자가 쓴 말 — 언어별로 적었으면 그걸, 아니면 원문 */}
+        <h2 className={styles.q}>{pick(poll.title, poll.titleI18n, lang)}</h2>
         {!result && (
           <div className={styles.qHint}>
             <span>
@@ -324,7 +328,7 @@ function PollView({
               >
                 <div className={styles.resRow} data-mine={isMine || undefined} data-top={o.id === topId || undefined}>
                   {o.id === topId && <Crown size={17} strokeWidth={1.7} aria-hidden="true" />}
-                  <span className={styles.resLabel}>{o.label}</span>
+                  <span className={styles.resLabel}>{pick(o.label, o.labelI18n, lang)}</span>
                   {isMine && <span className={styles.mineTag}>{t('내 선택')}</span>}
                   <span className={`${styles.pct} ${styles.tnum}`}>{pct}%</span>
                 </div>
@@ -372,7 +376,7 @@ function PollView({
                       </span>
                     )}
                   </span>
-                  <span className={styles.imgLabel}>{o.label}</span>
+                  <span className={styles.imgLabel}>{pick(o.label, o.labelI18n, lang)}</span>
                 </button>
               </li>
             )
@@ -394,7 +398,7 @@ function PollView({
                   <span className={styles.optDot} aria-hidden="true">
                     {on && <Check size={14} strokeWidth={2.4} />}
                   </span>
-                  <span className={styles.optLabel}>{o.label}</span>
+                  <span className={styles.optLabel}>{pick(o.label, o.labelI18n, lang)}</span>
                 </button>
               </li>
             )
