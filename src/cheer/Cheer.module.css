@@ -32,6 +32,12 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  /**
+   * 이 헤더는 좌우 여백을 **부모가 준다**(자기 패딩이 0 이다). 그래서 언어 고르개의 기본
+   * 안쪽 여백 20px 을 쓰면 혼자 더 들어와 제목 오른쪽 끝과 안 맞는다 — 여기선 0 이 맞다
+   * (`src/styles/components.css` 의 `.svc-lang`).
+   */
+  --svc-lang-right: 0;
 }
 .logo {
   width: 44px;

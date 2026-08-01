@@ -208,6 +208,12 @@ function Quiz({ slot }: { slot: Slot }) {
 
   return (
     <div className={rootClass} style={vars}>
+      {/*
+        * 이 서비스는 자기 무대를 그린다 — `ServiceHeader` 가 없어서 고르개를 여기서 얹는다.
+        * 예전엔 "쓸 수 없어요" 분기에만 있어서 **정상 화면엔 고르개가 아예 없었다**
+        * (`verify-langbar.mjs` 가 잡았다 — 글자가 아니라 자리의 문제라 번역 검사로는 안 보인다).
+        */}
+      <LangBar className={styles.langBar} />
       <div className={styles.phone}>
         {at === 'start' && (
           <Start

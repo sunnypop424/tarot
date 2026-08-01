@@ -75,7 +75,22 @@ export function ServiceHeader({
    * 이 헤더가 그려진다 — 거기선 고르개가 없는 게 맞다.
    */
   const slot = useSlotOrNull()
-  const langPicker = slot?.langs?.length ? <LangPicker only={slot.langs} /> : null
+  /**
+   * **자리를 여기서 못박는다** — 헤더 오른쪽 위 한 곳.
+   *
+   * 예전엔 고르개를 헤더의 마지막 자식으로 그냥 흘려 두었다. 그런데 `classes.head` 가
+   * 서비스마다 달라서(가로 flex · 세로 stack · 가운데 정렬) **흐르는 자리도 제각각**이 됐다:
+   * 투표는 제목 바로 옆에 딱 붙고, 응원은 부제 아래 왼쪽에 혼자 떴다.
+   *
+   * 그래서 배치를 부모에게 맡기지 않고 `.svc-lang` 이 절대 좌표로 잡는다 —
+   * 일곱 서비스가 같은 자리에 갖는다는 이 부품의 약속이 그제야 실제로 지켜진다.
+   * 겹침은 `scripts/verify-langbar.mjs` 가 화면에서 재서 잡는다.
+   */
+  const langPicker = slot?.langs?.length ? (
+    <span className="svc-lang">
+      <LangPicker only={slot.langs} />
+    </span>
+  ) : null
 
   /**
    * **여기가 이 부품의 전부다.** 로고가 없으면 로고 자리를 아예 안 그린다 —
