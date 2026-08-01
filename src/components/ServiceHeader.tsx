@@ -40,6 +40,7 @@ export function ServiceHeader({
   align,
   marginTop,
   titleWithLogo = true,
+  stage = false,
   classes,
   below,
   children,
@@ -54,6 +55,8 @@ export function ServiceHeader({
   marginTop?: number
   /** false 면 **로고가 제목을 대신한다** — 로고가 있으면 제목 글자를 안 그린다 */
   titleWithLogo?: boolean
+  /** 화면 위 헤더가 아니라 전면 무대인가 — 공통 헤더 규칙에서 빠진다 */
+  stage?: boolean
   /**
    * `text` 는 **있는 서비스만 준다.** 롤페·소원나무는 제목 덩어리를 감싸는 칸이 따로 있어야
    * 그 옆에 CTA 가 붙고(flex row), 포카·응원은 헤더 자체가 세로 흐름이라 래퍼가 없다.
@@ -134,7 +137,7 @@ export function ServiceHeader({
 
   if (variant === 'tile') {
     return (
-      <header className={classes.head} data-align={align}>
+      <header className={classes.head} data-align={align} data-stage={stage || undefined}>
         {mark}
         {/*
           * **부제도 제목과 같이 움직인다.** `textAlign` 을 안 걸어 두면 제목 상자만
@@ -160,7 +163,14 @@ export function ServiceHeader({
     </>
   )
   return (
-    <header className={classes.head} data-align={align}>
+    /**
+     * `data-stage` — **화면 위쪽 헤더가 아니라 전면 무대**라는 표식.
+     *
+     * 공통 규칙(`components.css` 의 `header:has(> .svc-lang)`)은 제목 19px·좌우 20px 처럼
+     * *헤더* 를 전제로 한 값이다. 포토카드 판매의 카운터 안내처럼 화면을 통째로 쓰는 자리에
+     * 그걸 씌우면 큰 제목이 19px 로 쪼그라들고 가운데도 어긋난다. 여기선 빠진다.
+     */
+    <header className={classes.head} data-align={align} data-stage={stage || undefined}>
       {classes.text ? (
         <div
           className={classes.text}

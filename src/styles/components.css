@@ -383,7 +383,7 @@
  *
  * `header` 를 그냥 두면 특이도가 0,1,1 이라 `.head`(0,1,0)를 이긴다.
  */
-header:has(> .svc-lang) {
+header:has(> .svc-lang):not([data-stage]) {
   position: relative;
   /**
    * 비울 폭 = **고르개가 화면 끝에서 떨어진 만큼 + 고르개 폭(62) + 사이 여백.**
@@ -416,13 +416,13 @@ header:has(> .svc-lang) {
  * `:where()` 로 감싸면 0 이 되어 도로 갈린다 (`--svc-lang-gutter` 주석과 같은 사고다).
  * 실측은 `scripts/verify-header-uniform.mjs` 가 한다.
  */
-header:has(> .svc-lang) h1 {
+header:has(> .svc-lang):not([data-stage]) h1 {
   margin: 0;
   font-size: 19px;
   font-weight: var(--weight-heavy);
   line-height: 1.3;
 }
-header:has(> .svc-lang) p {
+header:has(> .svc-lang):not([data-stage]) p {
   margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.6;
@@ -434,10 +434,10 @@ header:has(> .svc-lang) p {
  * `text-align: right` 는 글자를 자기 상자 안에서 오른쪽으로 둘 뿐이라, 상자가 왼쪽에
  * 붙어 있으면 화면으로는 여전히 왼쪽이다 — 포토존에서 '오른쪽' 을 골라도 왼쪽에 붙어 있었다.
  */
-header:has(> .svc-lang)[data-align='right'] {
+header:has(> .svc-lang):not([data-stage])[data-align='right'] {
   justify-content: flex-end;
 }
-header:has(> .svc-lang)[data-align='center'] {
+header:has(> .svc-lang):not([data-stage])[data-align='center'] {
   padding-left: var(--svc-lang-gutter);
   /**
    * **덩어리째 가운데로 민다.**

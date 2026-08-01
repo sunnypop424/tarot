@@ -157,7 +157,12 @@ for (const width of WIDTHS) {
        */
       // 서비스 헤더(`.svc-lang`)와 타로 셸(`.langbar--mobile`) 둘 다 제목과 나란해야 한다.
       // 관리 셸만 예외 — 고르개가 화면 맨 위 바에 있고 제목은 본문 안이라 구조상 못 맞춘다.
-      const inHeader = !!b.closest('.svc-lang, .langbar--mobile')
+      /**
+       * `[data-stage]` 는 화면을 통째로 쓰는 안내 무대다 (포토카드 판매의 카운터 안내).
+       * 큰 제목이 화면 가운데에 있고 고르개는 오른쪽 위라, 애초에 나란히 둘 수 없다.
+       */
+      const inHeader =
+        !!b.closest('.svc-lang, .langbar--mobile') && !b.closest('header[data-stage]')
       const h1 = document.querySelector('h1')
       const hr = h1?.getBoundingClientRect()
       const gap =

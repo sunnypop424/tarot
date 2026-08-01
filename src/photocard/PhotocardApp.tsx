@@ -932,6 +932,8 @@ function Counter({ display, slug }: { display: PhotocardDisplay; slug: string })
           title={display.title}
           showTitle={display.showTitle}
           classes={{ head: styles.counterHead, logo: styles.bigLogo, title: styles.counterHeadline }}
+          /* 화면을 통째로 쓰는 안내 무대다 — 헤더용 공통 규칙(19px·좌우 20)에서 뺀다 */
+          stage
         />
 
         <div className={styles.counterBox}>
