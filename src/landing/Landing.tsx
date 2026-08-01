@@ -362,7 +362,7 @@ export default function Landing() {
           */}
           {service.tip && (
             <p className={styles.stageTip} data-tip>
-              {service.tip}
+              {t(service.tip)}
             </p>
           )}
           <p className={styles.stageNote}>
@@ -427,7 +427,7 @@ export default function Landing() {
             <b>{t(ROLE_YOURS.label)}:</b> {t(ROLE_YOURS.body)}
           </p>
           <div className={styles.note}>
-            <p className={styles.noteText}>{ROLE_NOTE}</p>
+            <p className={styles.noteText}>{t(ROLE_NOTE)}</p>
           </div>
         </div>
 

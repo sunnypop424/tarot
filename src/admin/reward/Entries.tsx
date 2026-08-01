@@ -41,7 +41,9 @@ export function Entries() {
     <header className="ad-head">
       <div className="ad-head__row">
         <h1 className="ad-head__title">{t('응모자 명단')}</h1>
-        {list && <span className="ad-head__count tnum">응모 {list.length}명</span>}
+        {list && (
+          <span className="ad-head__count tnum">{t('응모 {n}명', { n: list.length })}</span>
+        )}
       </div>
       <p className="ad-head__desc">{t('보상을 받을 자격을 얻고 응모까지 마친 방문자 명단이에요.')}</p>
     </header>
@@ -124,8 +126,9 @@ export function Entries() {
                 {cols.contact || cols.address
                   ? '연락처·주소가 들어 있어요. 선물을 다 보내고 나면 지워 주세요 — '
                   : ''}
-                이벤트가 끝나고 14일이 지나면 이 화면이 잠기고, 슬롯을 지우면 함께 삭제돼요. 화면을
-                켜 둔 채 자리를 비우지 말아 주세요.
+                {t(
+                  '이벤트가 끝나고 14일이 지나면 이 화면이 잠기고, 슬롯을 지우면 함께 삭제돼요. 화면을 켜 둔 채 자리를 비우지 말아 주세요.'
+                )}
               </div>
             </div>
           </div>
@@ -163,7 +166,9 @@ export function Entries() {
         {raffle.length > list.length && (
           <div className="ad-banner ad-banner--warn ad-banner--pad">
             <div className="ad-banner__title">
-              자격은 얻었는데 아직 응모 폼을 안 내신 분이 {raffle.length - list.length}명 있어요
+              {t('자격은 얻었는데 아직 응모 폼을 안 내신 분이 {n}명 있어요', {
+                n: raffle.length - list.length,
+              })}
             </div>
             <div className="ad-banner__body">
               그분들은 연락할 방법이 없어서 추첨 후보에도 들어가지 않아요.
@@ -176,7 +181,7 @@ export function Entries() {
             <div className="ad-card__titleRow">
               <span className="ad-card__title">{t('응모자')}</span>
               <span className="ad-card__num tnum">
-                {shown.length} / {list.length}명
+                {t('{a} / {b}명', { a: shown.length, b: list.length })}
               </span>
             </div>
             <div className="ad-inline" style={{ flexWrap: 'nowrap' }}>

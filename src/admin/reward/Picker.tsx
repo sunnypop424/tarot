@@ -108,7 +108,7 @@ export function Picker() {
 
   async function undo(round: number, names: string[]) {
     const ok = await confirmAction({
-      title: `${round}회차를 되돌릴까요?`,
+      title: t('{n}회차를 되돌릴까요?', { n: round }),
       desc: `이 회차에서 뽑힌 ${names.length}명이 다시 후보로 돌아가요. 이미 안내를 보냈다면 혼선이 생길 수 있어요.`,
       okLabel: t('되돌리기'),
       danger: true,
@@ -176,8 +176,9 @@ export function Picker() {
         <div className="ad-card ad-card--form" data-picker>
           <div className="ad-card__title ad-card__title--lg">{t('추첨하기')}</div>
           <p className="ad-card__desc">
-            뽑은 결과는 되돌릴 수 있지만, 회차 단위로만 되돌려요. 후보가 남아 있지 않으면 추첨할 수
-            없어요.
+            {t(
+              '뽑은 결과는 되돌릴 수 있지만, 회차 단위로만 되돌려요. 후보가 남아 있지 않으면 추첨할 수 없어요.'
+            )}
           </p>
 
           <div className="ad-drawform">
@@ -265,7 +266,7 @@ export function Picker() {
                 <span className="ad-card__title">방금 뽑힌 {picked.length}명</span>
                 {picked[0]?.pickedRound !== null && (
                   <span className="ad-tag ad-tag--sm" data-tone="on">
-                    {picked[0]?.pickedRound}회차
+                    {t('{n}회차', { n: picked[0]?.pickedRound ?? 0 })}
                   </span>
                 )}
               </div>
@@ -303,7 +304,7 @@ export function Picker() {
           <div className="ad-card__head">
             <div className="ad-card__titleRow">
               <span className="ad-card__title">{t('지난 회차')}</span>
-              <span className="ad-card__num tnum">{rounds.length}회</span>
+              <span className="ad-card__num tnum">{t('{n}회', { n: rounds.length })}</span>
             </div>
           </div>
 

@@ -254,7 +254,7 @@ function BannedWords({ slug, unit }: { slug: string; unit: string }) {
       <div className="ad-card__head">
         <div className="ad-card__titleRow">
           <span className="ad-card__title">{t('금칙어')}</span>
-          <span className="ad-card__num tnum">{count}개</span>
+          <span className="ad-card__num tnum">{t('{n}개', { n: count })}</span>
         </div>
         <button
           type="button"

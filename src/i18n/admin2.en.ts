@@ -598,4 +598,17 @@ export const ADMIN2_EN: Record<string, string> = {
     '{n} per screen · {sec}s',
   '보기 {a}개 · 정답 {b}개':
     '{a} options · {b} answers',
+  '누적 {n}개': '{n} in total',
+  '{name} · {n}개': '{name} · {n}',
+  '응모 {n}명': '{n} entrants',
+  '자격은 얻었는데 아직 응모 폼을 안 내신 분이 {n}명 있어요':
+    '{n} people qualified but have not submitted the entry form yet',
+  '{a} / {b}명':
+    '{a} / {b}',
+  '{n}회차를 되돌릴까요?':
+    'Undo round {n}?',
+  '{n}회차':
+    'Round {n}',
+  '{n}회':
+    '{n} rounds',
 }

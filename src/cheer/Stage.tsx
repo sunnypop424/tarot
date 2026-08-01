@@ -273,7 +273,9 @@ function Bubble({
   if (shape === 'chipBar')
     return (
       <div className={styles.chipBar} style={style}>
-        <span className={styles.chip}>{name || t('한마디')}</span>
+        <span className={styles.chip} data-user-text>
+          {name || t('한마디')}
+        </span>
         <span className={styles.chipBody} data-user-text>
           <span data-user-text>{message.body}</span>
         </span>
@@ -282,8 +284,12 @@ function Bubble({
   if (shape === 'solidBar')
     return (
       <div className={styles.solidBar} style={style}>
-        {name && <span className={styles.solidName}>{name}</span>}
-        {message.body}
+        {name && (
+          <span className={styles.solidName} data-user-text>
+            {name}
+          </span>
+        )}
+        <span data-user-text>{message.body}</span>
       </div>
     )
   if (shape === 'banner')
@@ -294,7 +300,7 @@ function Bubble({
        */
       <div className={styles.banner} style={style}>
         <span className={styles.bannerBody} data-user-text>
-          {message.body}
+          <span data-user-text>{message.body}</span>
         </span>
       </div>
     )
@@ -302,20 +308,33 @@ function Bubble({
     return (
       // 별도 리본과 같은 두 겹 — 바깥이 테두리 색, 안이 별 색 (clip-path 는 border 를 잘라낸다)
       <div className={styles.burst} style={style}>
-        <span className={styles.burstBody}>{message.body}</span>
+        <span className={styles.burstBody} data-user-text>
+          {message.body}
+        </span>
       </div>
     )
   if (shape === 'plaque')
     return (
       <div className={styles.plaque} style={style}>
-        {name && <span className={styles.plaqueName}>{name}</span>}
-        <span className={styles.plaqueBody}>{message.body}</span>
+        {name && (
+          <span className={styles.plaqueName} data-user-text>
+            {name}
+          </span>
+        )}
+        <span className={styles.plaqueBody} data-user-text>
+          {message.body}
+        </span>
       </div>
     )
   return (
     <div className={styles.bubble} style={style}>
-      {name && <span className={styles.bubbleName}>{name}</span>}
-      {message.body}
+      {/* 방문자가 남긴 이름 — 번역 대상이 아니다 */}
+      {name && (
+        <span className={styles.bubbleName} data-user-text>
+          {name}
+        </span>
+      )}
+      <span data-user-text>{message.body}</span>
     </div>
   )
 }
@@ -346,8 +365,12 @@ function Credits({
         <h1 className={styles.creditsTitle}>{t(display.creditsTitle)}</h1>
         {messages.map((m) => (
           <p key={m.id} className={styles.creditsLine}>
-            {showName && m.nickname.trim() && <span className={styles.creditsName}>{m.nickname}</span>}
-            {m.body}
+            {showName && m.nickname.trim() && (
+              <span className={styles.creditsName} data-user-text>
+                {m.nickname}
+              </span>
+            )}
+            <span data-user-text>{m.body}</span>
           </p>
         ))}
         {messages.length === 0 && <p className={styles.creditsLine}>{t('아직 한마디가 없어요')}</p>}

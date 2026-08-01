@@ -106,7 +106,7 @@ export function CardDraw({
           onClick={() => onComplete(selected.map((i) => deck[i]))}
           disabled={!done || phase !== 'idle'}
         >
-          결과 보기
+          {t('결과 보기')}
         </button>
       </div>
     </div>

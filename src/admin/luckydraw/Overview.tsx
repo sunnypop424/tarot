@@ -5,7 +5,7 @@ import type { LuckydrawSettings, PrizeReport } from '@/lib/repo'
 import { useSlot } from '@/slot/SlotProvider'
 import { confirmAction, toast } from '../AdminFeedback'
 import { BulkPaste, splitCells, toLines, type BulkResult } from '../BulkPaste'
-import { useT } from '@/i18n'
+import { useT, useLocale } from '@/i18n'
 import { I18nField } from '../I18nField'
 
 const MAX_PRIZES = 100
@@ -83,6 +83,7 @@ function blankPrize(rank: number): PrizeReport {
  */
 export function Overview() {
   const t = useT()
+  const loc = useLocale()
   const slot = useSlot()
   const slug = slot.slug
 
@@ -298,7 +299,7 @@ export function Overview() {
               <span className="ad-stat__value tnum">{totalToday.toLocaleString()}</span>
               <span className="ad-stat__unit">{t('개')}</span>
             </div>
-            <div className="ad-stat__sub">누적 {totalAll.toLocaleString()}개</div>
+            <div className="ad-stat__sub">{t('누적 {n}개', { n: totalAll.toLocaleString(loc) })}</div>
           </div>
           <div className="ad-stat">
             <div className="ad-stat__label">{t('지금 운영 상태')}</div>
@@ -338,7 +339,10 @@ export function Overview() {
                   </>
                 }
                 parse={parsePrizes}
-                preview={(p) => `${p.name} · ${p.remaining}개${p.requiresShipping ? ' · 배송' : ''}`}
+                preview={(p) =>
+                  t('{name} · {n}개', { name: p.name, n: p.remaining }) +
+                  (p.requiresShipping ? ` · ${t('배송')}` : '')
+                }
                 onApply={(items) => {
                   setRows((prev) => {
                     if (!prev) return prev
@@ -365,8 +369,9 @@ export function Overview() {
             </div>
           </div>
           <p className="ad-sub" style={{ marginBottom: 16 }}>
-            등수는 줄 순서예요 · 남은 수량에 적은 만큼만 뽑을 수 있어요 · 다음 날 물량을 더할 땐 지금
-            남은 수량에 더해서 적어 주세요 · 오늘 나감과 누적은 뽑힌 기록에서 센 값이라 고칠 수 없어요.
+            {t(
+              '등수는 줄 순서예요 · 남은 수량에 적은 만큼만 뽑을 수 있어요 · 다음 날 물량을 더할 땐 지금 남은 수량에 더해서 적어 주세요 · 오늘 나감과 누적은 뽑힌 기록에서 센 값이라 고칠 수 없어요.'
+            )}
           </p>
 
           <div className="ad-table" style={tableVars}>
@@ -551,7 +556,8 @@ export function Overview() {
                 data-on={settings.displayMode === value || undefined}
                 onClick={() => patchSettings({ displayMode: value })}
               >
-                {label}
+                {/* 라벨은 위 배열의 한국어 상수 — 번역은 여기 렌더에서 */}
+                {t(label)}
               </button>
             ))}
           </div>

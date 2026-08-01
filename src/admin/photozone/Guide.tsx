@@ -44,14 +44,16 @@ export function Guide() {
           <div className="ad-banner ad-banner--info ad-banner--pad" style={{ marginTop: 20 }}>
             <div className="ad-banner__title">{t('방문자 사진은 서버에 저장되지 않아요')}</div>
             <div className="ad-banner__body">
-              합성은 방문자 폰 안에서 끝나고, 결과 이미지도 그 기기에만 남아요. 그래서 주최자가 볼
-              사진도, 지울 사진도 없어요. 방문자가 물어보면 이대로 답해 주시면 돼요.
+              {t(
+                '합성은 방문자 폰 안에서 끝나고, 결과 이미지도 그 기기에만 남아요. 그래서 주최자가 볼 사진도, 지울 사진도 없어요. 방문자가 물어보면 이대로 답해 주시면 돼요.'
+              )}
             </div>
           </div>
 
           <p className="ad-sub" style={{ marginTop: 16 }}>
-            프레임을 바꾸고 싶으면 담당자에게 말씀해 주세요. 원본 이미지를 보내 주시면 교체해
-            드려요.
+            {t(
+              '프레임을 바꾸고 싶으면 담당자에게 말씀해 주세요. 원본 이미지를 보내 주시면 교체해 드려요.'
+            )}
           </p>
 
           <a

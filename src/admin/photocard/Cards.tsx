@@ -158,8 +158,9 @@ export function Cards() {
             </div>
           </div>
           <p className="ad-sub" style={{ marginBottom: 16 }}>
-            줄 안에서 바로 고칠 수 있어요. 고르면 바로 저장돼요. 카드 이름과 이미지는 담당자가
-            올려 드려요.
+            {t(
+              '줄 안에서 바로 고칠 수 있어요. 고르면 바로 저장돼요. 카드 이름과 이미지는 담당자가 올려 드려요.'
+            )}
           </p>
 
           {/**
@@ -353,7 +354,8 @@ export function Cards() {
                 }}
                 data-mode
               >
-                {label}
+                {/* 라벨은 위 배열의 한국어 상수 — 번역은 여기 렌더에서 */}
+                {t(label)}
               </button>
             ))}
           </div>
@@ -469,8 +471,9 @@ export function Cards() {
                 <div className="ad-switchrow__text">
                   <div className="ad-switchrow__name">{t('묶음 상한')}</div>
                   <div className="ad-switchrow__hint">
-                    켜면 한 묶음에 같은 카드가 몰리는 걸 막아요 — “10연차에 스페셜 5장” 같은 사고를
-                    막아요.
+                    {t(
+                      '켜면 한 묶음에 같은 카드가 몰리는 걸 막아요 — “10연차에 스페셜 5장” 같은 사고를 막아요.'
+                    )}
                   </div>
                 </div>
                 <button

@@ -204,8 +204,9 @@ export function Settings() {
         <div className="ad-card ad-card--form">
           <div className="ad-card__title">{t('상영 화면 열기')}</div>
           <p className="ad-card__desc">
-            오버레이는 배경이 투명해요. OBS·프리즘의 브라우저 소스로 얹거나, 전체화면으로 영상 위에
-            겹쳐 주세요.
+            {t(
+              '오버레이는 배경이 투명해요. OBS·프리즘의 브라우저 소스로 얹거나, 전체화면으로 영상 위에 겹쳐 주세요.'
+            )}
           </p>
           <div className="ad-btnrow" style={{ marginTop: 16 }}>
             <a
