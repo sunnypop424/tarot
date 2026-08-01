@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { GroupApply } from './GroupApply'
 import { AlignField } from './service/AlignField'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { AlertCircle, ArrowLeft, Check, Download, ExternalLink, Eye, Sparkles } from 'lucide-react'
@@ -987,6 +988,11 @@ export function SlotEditor() {
                   })}
                 </div>
               </div>
+              {/*
+                * **묶음에 같이 적용** — 한 행사가 슬롯 여럿을 얹으면 색·글꼴·로고가 셋이
+                * 같아야 하는데 지금까지는 같은 값을 세 번 넣었다. 같은 묶음이 없으면 안 뜬다.
+                */}
+              <GroupApply draft={draft} slots={slots ?? []} />
             </Card>
           )}
 
