@@ -42,6 +42,9 @@
   display: flex;
   align-items: center;
   gap: 11px;
+  /* 이 헤더는 위 여백이 44px — 언어 고르개도 그만큼 내려와야 제목과 같은 선상이다
+     (`src/styles/components.css` 의 `.svc-lang`) */
+  --svc-lang-top: 44px;
 }
 .logo {
   width: 40px;

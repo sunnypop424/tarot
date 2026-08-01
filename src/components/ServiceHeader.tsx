@@ -88,8 +88,13 @@ export function ServiceHeader({
    *     제목 옆에 혼자 오른쪽 끝으로 붕 떴다. `right` 는 변수로 맞췄지만 `top` 은
    *     서비스마다 값이 달라 그 방법으로는 끝이 없었다.
    *
-   * 결국 **흐름 안에 자기 줄**을 주는 게 맞다. 헤더 앞에 오른쪽 정렬 한 줄을 두면
-   * 헤더가 어떤 모양이든(가로든 세로든 가운데든) 고르개는 늘 같은 자리다.
+   * 지금은 **다시 절대 좌표**인데, 이번엔 `top` 을 0 이 아니라 **헤더의 위 여백과 같은 값**
+   * 으로 받는다 — 그래야 제목 첫 줄과 같은 선상에 앉는다. 그 여백이 서비스마다 다르므로
+   * (24px 이 다섯, 포토카드 44px, 응원 0) CSS 변수로 열어 두고 예외만 자기 파일에서 준다.
+   *
+   * 자기 줄로 뺐던 때(직전 시도)는 자리가 일정해지는 대신 **제목보다 위**에 앉아,
+   * 제목과 고르개가 두 층으로 갈라져 보였다.
+   *
    * 자리는 `scripts/verify-langbar.mjs` 가 화면에서 재서 지킨다.
    */
   const langRow = slot?.langs?.length ? (
@@ -119,17 +124,15 @@ export function ServiceHeader({
 
   if (variant === 'tile') {
     return (
-      <>
+      <header className={classes.head} data-align={align}>
+        {mark}
+        <div className={classes.text} style={{ minWidth: 0 }}>
+          {heading}
+          {below}
+        </div>
+        {children}
         {langRow}
-        <header className={classes.head} data-align={align}>
-          {mark}
-          <div className={classes.text} style={{ minWidth: 0 }}>
-            {heading}
-            {below}
-          </div>
-          {children}
-        </header>
-      </>
+      </header>
     )
   }
 
@@ -142,22 +145,20 @@ export function ServiceHeader({
     </>
   )
   return (
-    <>
+    <header className={classes.head} data-align={align}>
+      {classes.text ? (
+        <div
+          className={classes.text}
+          data-align={align}
+          style={{ textAlign: align, marginTop: marginTop || undefined }}
+        >
+          {body}
+        </div>
+      ) : (
+        body
+      )}
+      {children}
       {langRow}
-      <header className={classes.head} data-align={align}>
-        {classes.text ? (
-          <div
-            className={classes.text}
-            data-align={align}
-            style={{ textAlign: align, marginTop: marginTop || undefined }}
-          >
-            {body}
-          </div>
-        ) : (
-          body
-        )}
-        {children}
-      </header>
-    </>
+    </header>
   )
 }

@@ -83,9 +83,20 @@
 /**
  * 타로 셸의 언어 고르개 — **상단 네비와 정확히 반대로** 보인다.
  * 네비는 폰에서 숨고(아래) 고르개는 폰에서만 뜬다. 둘 다 보이면 한 화면에 고르개가 둘이다.
+ *
+ * **흐름에서 뺀다.** 예전엔 스크롤 맨 위에 한 줄로 앉아 화면을 44px 밀어냈고, 그만큼
+ * 제목이 아래로 내려가 고르개와 두 층으로 갈라져 보였다. 절대 배치로 띄우고 `top` 을
+ * `.screen` 의 위 여백(24px)과 같게 두면 **제목 첫 줄과 같은 선상**에 온다 —
+ * 다른 일곱 서비스의 `.svc-lang` 과 같은 규칙이다 (`src/styles/components.css`).
+ *
+ * 기준은 `.app__scroll`(이미 `position: relative` 다). 스크롤과 함께 올라가는 것이 맞다.
  */
 .langbar--mobile {
   display: flex;
+  position: absolute;
+  top: 24px;
+  right: 20px;
+  z-index: 5;
 }
 
 .topnav {

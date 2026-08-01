@@ -94,6 +94,25 @@ for (const [label, path] of PAGES) {
       const cs = getComputedStyle(b)
       // 겹침 — 단추 한가운데를 짚었을 때 나오는 게 자기 자신(또는 자식)인가
       const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)
+      /**
+       * **제목과 같은 선상인가.**
+       *
+       * 고르개는 절대 좌표로 앉는데, `top` 이 헤더의 위 여백과 어긋나면 제목보다 한 층
+       * 위(또는 아래)로 밀린다 — 잘린 것도 겹친 것도 아니라 다른 검사는 전부 통과한다.
+       * 실제로 포토카드가 제목보다 위에 떠 있었다. 세로 중심 차이로 잰다.
+       *
+       * **서비스 헤더 안의 고르개만 본다**(`.svc-lang`). 타로 셸과 관리 셸은 고르개를
+       * 화면 맨 위 바에 두고 제목은 본문 안에 있어서, 애초에 나란히 둘 수 없는 구조다.
+       */
+      // 서비스 헤더(`.svc-lang`)와 타로 셸(`.langbar--mobile`) 둘 다 제목과 나란해야 한다.
+      // 관리 셸만 예외 — 고르개가 화면 맨 위 바에 있고 제목은 본문 안이라 구조상 못 맞춘다.
+      const inHeader = !!b.closest('.svc-lang, .langbar--mobile')
+      const h1 = document.querySelector('h1')
+      const hr = h1?.getBoundingClientRect()
+      const gap =
+        inHeader && hr && hr.height > 0
+          ? Math.round(r.top + r.height / 2 - (hr.top + hr.height / 2))
+          : null
       return {
         x: Math.round(r.left),
         right: Math.round(r.right),
@@ -101,6 +120,7 @@ for (const [label, path] of PAGES) {
         w: Math.round(r.width),
         h: Math.round(r.height),
         vw,
+        titleGap: gap,
         overlapped: !(hit && (hit === b || b.contains(hit))),
         color: cs.color,
         bg: cs.backgroundColor,
@@ -135,6 +155,14 @@ for (const [label, path] of PAGES) {
    * 겹친 것도 아니라 위의 검사들은 전부 통과한다. 실제로 다섯 서비스가 그 상태였다.
    */
   if (g.vw - g.right < 8) notes.push(`오른쪽 여백 ${g.vw - g.right}px — 화면 끝에 붙었어요`)
+  /**
+   * 제목과 같은 선상인가 — 세로 중심이 12px 넘게 벌어지면 두 층으로 갈라져 보인다.
+   * 고르개(36px)가 제목 글자(24~36px)보다 큰 만큼 몇 px 은 늘 남으므로 0 을 요구하지 않는다.
+   * **제목이 세로 가운데인 화면**(모의고사)은 애초에 나란히 둘 수 없어 건너뛴다.
+   */
+  if (g.titleGap !== null && Math.abs(g.titleGap) > 12 && Math.abs(g.titleGap) < 100) {
+    notes.push(`제목 중심과 ${g.titleGap}px 어긋났어요 — 같은 선상이 아니에요`)
+  }
 
   if (notes.length) bad(label, notes.join(' · '))
   else console.log(`✓ ${label} — (${g.x},${g.y}) ${g.w}×${g.h}`)
