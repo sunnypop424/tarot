@@ -272,7 +272,11 @@ function MessageNote({ message, papers }: { message: RollingMessage; papers: str
           {message.body}
         </p>
         {message.nickname && (
-          <div className={styles.noteName} style={fontStyle(message.font, 'var(--text-xs)')}>
+          <div
+            className={styles.noteName}
+            style={fontStyle(message.font, 'var(--text-xs)')}
+            data-user-text
+          >
             — {message.nickname}
           </div>
         )}

@@ -93,7 +93,7 @@ export function AdminFeedbackHost() {
                 onClick={() => close(false)}
                 data-confirm-cancel
               >
-                취소
+                {t('취소')}
               </button>
               <button
                 type="button"

@@ -296,10 +296,11 @@ function Lantern({
       }}
     >
       <p className={styles.body} style={fontStyle(wish.font, '12px')}>
-        {wish.body}
+        {/* 방문자가 쓴 글 — 번역 대상이 아니다 */}
+        <span data-user-text>{wish.body}</span>
       </p>
       {wish.nickname && (
-        <div className={styles.name} style={fontStyle(wish.font, '10px')}>
+        <div className={styles.name} style={fontStyle(wish.font, '10px')} data-user-text>
           — {wish.nickname}
         </div>
       )}
@@ -666,7 +667,7 @@ function Compose({ slot, display }: { slot: Slot; display: WishDisplay }) {
 
             <div>
               <label className={styles.label} htmlFor="wish-body">
-                소원
+                {t('소원')}
               </label>
               <textarea
                 id="wish-body"

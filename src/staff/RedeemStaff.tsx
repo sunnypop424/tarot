@@ -74,7 +74,7 @@ export function RedeemStaff({ slot }: { slot: Slot }) {
           {t('행사 계정으로 한 번만 로그인해 두시면 이 기기에서 계속 쓸 수 있어요.')}
         </p>
         <Link className={styles.linkBtn} to={`/${slug}/admin/login`}>
-          로그인하러 가기
+          {t('로그인하러 가기')}
         </Link>
       </div>
     )

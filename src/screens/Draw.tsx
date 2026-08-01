@@ -295,6 +295,8 @@ function useResultImage(
     void drawResultCard({
       eventTitle: slot.name,
       kicker: t(category.label),
+      // 캔버스 안 글자는 화면의 t() 가 못 닿는다 — 여기서 넘긴다
+      reversedLabel: t('역방향'),
       cards: drawn.map((d, i) => ({
         name: lc(d.card).name,
         nameEn: d.card.nameEn,

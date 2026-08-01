@@ -40,6 +40,13 @@ export interface ResultCardInput {
   body: string
   /** 'YYYY.MM.DD' */
   date: string
+  /**
+   * 저장 이미지 안에 그려 넣는 글자 — **캔버스라 화면의 `t()` 가 닿지 않는다.**
+   *
+   * 지금은 '역방향' 한 낱말뿐이지만, 이미지는 방문자가 저장해서 가져가는 결과물이라
+   * 화면만 번역되고 저장물이 한국어면 그게 더 눈에 띈다. 부르는 쪽이 넘긴다.
+   */
+  reversedLabel: string
   logo?: string
   colors: {
     bg: string
@@ -249,7 +256,7 @@ export async function drawResultCard(input: ResultCardInput): Promise<ResultImag
     if (card.reversed) {
       ctx.fillStyle = c.sub
       ctx.font = `400 ${Math.round(nameSize * 0.62)}px ${ff}`
-      ctx.fillText('역방향', x + cardW / 2, ny + nameSize * 0.95)
+      ctx.fillText(input.reversedLabel, x + cardW / 2, ny + nameSize * 0.95)
     }
   })
 

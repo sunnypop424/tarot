@@ -298,7 +298,7 @@ function Staff({ slot }: { slot: Slot }) {
                     onClick={() => setResult(null)}
                     data-done
                   >
-                    처음으로
+                    {t('처음으로')}
                   </button>
                 ) : (
                   <button
@@ -307,7 +307,7 @@ function Staff({ slot }: { slot: Slot }) {
                     onClick={() => setSummary(true)}
                     data-summary-btn
                   >
-                    전체 결과 보기
+                    {t('전체 결과 보기')}
                   </button>
                 )}
               </div>

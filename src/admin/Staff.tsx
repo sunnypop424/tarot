@@ -208,7 +208,7 @@ export function Staff() {
                     )
                   }}
                 >
-                  복사
+                  {t('복사')}
                 </button>
                 <button
                   type="button"

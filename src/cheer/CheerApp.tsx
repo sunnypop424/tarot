@@ -167,6 +167,7 @@ function ShowShell({
   vars: React.CSSProperties
   children?: React.ReactNode
 }) {
+  const t = useT()
   const [countdown, setCountdown] = useState<number | null>(null)
   const [cancelled, setCancelled] = useState(false)
 
@@ -226,7 +227,7 @@ function ShowShell({
               setCancelled(true)
             }}
           >
-            취소
+            {t('취소')}
           </button>
         </div>
       )}

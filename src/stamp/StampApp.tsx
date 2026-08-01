@@ -206,7 +206,7 @@ function Board({ slot }: { slot: Slot }) {
 
             {cells.length === 0 ? (
               <div className={styles.empty}>
-                아직 스탬프 칸이 준비되지 않았어요.
+                {t('아직 스탬프 칸이 준비되지 않았어요.')}
                 <br />
                 조금 뒤에 다시 와 주세요.
               </div>
@@ -339,7 +339,10 @@ function StampBoard({
                 {i + 1}
               </span>
             )}
-            <span className={styles.cellName}>{c.name}</span>
+            {/* 칸 이름은 주최자가 정한다 (「방명록 작성」·「굿즈 구매」…) */}
+            <span className={styles.cellName} data-user-text>
+              {c.name}
+            </span>
           </li>
         )
       })}
@@ -485,7 +488,12 @@ function Complete({
         </p>
       </div>
       <div style={{ height: 30 }} />
-      {display.showTitle && <span className="sr-only">{display.title}</span>}
+      {/* 행사 제목은 주최자가 정한다 — 기본 문구면 사전이 옮기고, 고쳤으면 그 말 그대로 */}
+      {display.showTitle && (
+        <span className="sr-only" data-user-text>
+          {display.title}
+        </span>
+      )}
     </>
   )
 }

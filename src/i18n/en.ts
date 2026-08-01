@@ -473,4 +473,5 @@ export const EN: Record<string, string> = {
   '실시간 갱신 중': 'Updating live',
   '관리자': 'Admin',
   '남은 기회 {n}회': '{n} draws left',
+  '아직 스탬프 칸이 준비되지 않았어요.': 'No stamp slots have been set up yet.',
 }

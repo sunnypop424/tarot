@@ -120,7 +120,17 @@ export function ServiceHeader({
   ) : null
 
   /** 로고가 제목을 대신하는 서비스에서는, 로고가 있으면 제목 글자를 안 그린다 */
-  const heading = showTitle && (titleWithLogo || !logo) ? <h1 className={classes.title}>{title}</h1> : null
+  /**
+   * 제목은 **주최자가 정하는 값**이다 — 기본 문구면 사전이 옮기고(`useLocalizedDisplay`),
+   * 고쳤으면 그 사람이 쓴 말이 그대로 나온다. `data-user-text` 로 그 사실을 표시해 두면
+   * 번역 검사(`verify-i18n-leak`)가 이 자리를 "안 옮긴 우리 문구" 로 세지 않는다.
+   */
+  const heading =
+    showTitle && (titleWithLogo || !logo) ? (
+      <h1 className={classes.title} data-user-text>
+        {title}
+      </h1>
+    ) : null
 
   if (variant === 'tile') {
     return (

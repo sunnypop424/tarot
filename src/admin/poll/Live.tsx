@@ -66,7 +66,10 @@ export function Live() {
       <header className={styles.head}>
         <div className={styles.headText}>
           <div className={styles.eventName}>{display.title}</div>
-          <h2 className={styles.q}>{poll.title}</h2>
+          {/* 설문 제목·선택지는 주최자가 쓴 말 — 부스 화면이라 그대로 크게 띄운다 */}
+          <h2 className={styles.q} data-user-text>
+            {poll.title}
+          </h2>
         </div>
         <div className={styles.headRight}>
           <span className={styles.livePill}>
@@ -84,7 +87,9 @@ export function Live() {
             <div key={o.id} className={styles.row} data-first={i === 0 || undefined}>
               <div className={styles.rowTop}>
                 <span className={styles.rank}>{i + 1}</span>
-                <span className={styles.label}>{o.label}</span>
+                <span className={styles.label} data-user-text>
+                  {o.label}
+                </span>
                 <span className={styles.pct}>{pct}%</span>
               </div>
               <div className={styles.track}>

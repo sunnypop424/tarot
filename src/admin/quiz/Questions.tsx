@@ -785,7 +785,7 @@ function Editor({
               {t('저장하기')}
             </button>
             <button type="button" className="ad-btn ad-btn--line ad-btn--2xl" onClick={onCancel}>
-              취소
+              {t('취소')}
             </button>
           </div>
         </div>

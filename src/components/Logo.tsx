@@ -14,7 +14,12 @@ export function Logo({ className }: { className?: string }) {
 
   if (!logo || status === 'failed') {
     return (
-      <span className={`t-text-l ${className ?? ''}`} style={{ lineHeight: 1 }}>
+      // 주최자가 지은 행사 이름 — 사전이 옮길 말이 아니다
+      <span
+        className={`t-text-l ${className ?? ''}`}
+        style={{ lineHeight: 1 }}
+        data-user-text
+      >
         {logoAlt}
       </span>
     )

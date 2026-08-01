@@ -74,8 +74,20 @@ for (const root of roots) {
       let bare = 0
       let decl = 0
       for (const m of src.matchAll(standalone)) {
-        const before = src.slice(Math.max(0, m.index - 8), m.index)
-        if (/t\($/.test(before)) continue // 감쌌다
+        const before = src.slice(Math.max(0, m.index - 40), m.index)
+        /**
+         * 이미 감싼 것 — **세 모양을 다 본다.**
+         *
+         *   t('…')          ← 흔한 자리
+         *   t(⏎  '…'        ← 문장이 길어 줄을 바꾼 자리 (포매터가 그렇게 접는다)
+         *   ph('…', { n })  ← 수를 낀 문구를 키와 값으로 든 자리 (`Dashboard` 의 `Phrase`)
+         *
+         * 앞 8글자만 보던 때는 뒤의 둘을 "안 감쌌다" 로 세어, **진짜 빠진 자리 여덟 개가
+         * 오탐 열 개 사이에 묻혀 있었다.** 검사는 0 이 될 수 있어야 다음 하나가 보인다.
+         *
+         * 앞 글자를 `t`·`ph` 로 한정한다 — `\b` 가 없으면 `setCount(` 같은 것도 통과한다.
+         */
+        if (/(?:^|[^\w$])(?:t|ph)\(\s*$/.test(before)) continue
         // `new Error('…')` 도 상수 취급 — 모듈 파일이라 훅을 못 쓰고, **보여주는 쪽**이
         // `t(e.message)` 로 번역한다 (QuizApp 의 catch 가 그 예)
         if (/[:=,[?]\s*$|Error\($/.test(before)) decl++

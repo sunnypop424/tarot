@@ -185,7 +185,13 @@ function PollHome({ slot }: { slot: Slot }) {
                             {p.kind === 'multi' ? t('최대 {n}개', { n: p.maxPick }) : t('하나만 고르기')}
                           </span>
                         </div>
-                        <div className={styles.cardQ}>{pick(p.title, p.titleI18n, lang)}</div>
+                        {/*
+                          * 사전이 아니라 **주최자가** 정하는 값이다 — 언어별로 적었으면
+                          * `pick` 이 그걸 고르고, 안 적었으면 원문이 나온다 (0046).
+                          */}
+                        <div className={styles.cardQ} data-user-text>
+                          {pick(p.title, p.titleI18n, lang)}
+                        </div>
                         <div className={styles.cardFoot}>
                           <span className={`${styles.cardCount} ${styles.tnum}`}>
                             {display.showCount ? t('{n}표', { n: total.toLocaleString() }) : ''}

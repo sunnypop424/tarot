@@ -333,7 +333,7 @@ export function Picker() {
                           className="ad-btn ad-btn--line ad-btn--xs"
                           onClick={() => void copy(rows, '복사했어요')}
                         >
-                          복사
+                          {t('복사')}
                         </button>
                         <button
                           type="button"

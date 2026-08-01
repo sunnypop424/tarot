@@ -79,7 +79,7 @@ export function ShowStaff({ slot }: { slot: Slot }) {
         <div className={styles.centerTitle}>{t('상영 제어는 주최자만 써요')}</div>
         <p className={styles.centerBody}>{t('행사 계정으로 한 번만 로그인해 두시면 이 기기에서 계속 쓸 수 있어요.')}</p>
         <Link className={styles.linkBtn} to={`/${slug}/admin/login`}>
-          로그인하러 가기
+          {t('로그인하러 가기')}
         </Link>
       </div>
     )
@@ -220,7 +220,7 @@ export function ShowStaff({ slot }: { slot: Slot }) {
 
         <div className={styles.footRow}>
           <a className={styles.tally} href={`/${slug}/show`} target="_blank" rel="noreferrer">
-            상영 화면 열기
+            {t('상영 화면 열기')}
             <ExternalLink size={11} strokeWidth={2} aria-hidden="true" />
           </a>
           <a className={styles.adminLink} href={`/${slug}/admin/cheer`}>

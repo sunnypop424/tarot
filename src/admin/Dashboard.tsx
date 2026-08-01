@@ -245,7 +245,10 @@ export function Dashboard() {
                     return (
                       <div key={b.name} className="ad-bar" data-tone={tone}>
                         <div className="ad-bar__top">
-                          <span className="ad-bar__name">{b.name}</span>
+                          {/* 경품 이름 — 주최자가 쓴 말이라 사전을 안 거친다 */}
+                          <span className="ad-bar__name" data-user-text>
+                            {b.name}
+                          </span>
                           <span className="ad-bar__num tnum">
                             {b.left} / {b.total}
                           </span>
