@@ -272,7 +272,10 @@ export function Dashboard() {
             <div className="ad-card">
               <div className="ad-card__title">{t('바로 가기')}</div>
               <div className="ad-shortcuts">
-                {SHORTCUTS[service].concat(COMMON_SHORTCUTS).map((s) =>
+                {/* QR 은 럭키드로우에서 빠진다 — 이유는 `COMMON_SHORTCUTS` 주석 */}
+                {SHORTCUTS[service]
+                  .concat(COMMON_SHORTCUTS.filter((s) => !(service === 'luckydraw' && s.to === 'qr')))
+                  .map((s) =>
                   s.external ? (
                     <a
                       key={s.to}
@@ -443,7 +446,14 @@ const SHORTCUTS: Record<ServiceId, Shortcut[]> = {
   ],
 }
 
-/** 서비스와 무관하게 늘 붙는 두 장 */
+/**
+ * 서비스와 무관하게 늘 붙는 두 장 — **QR 만 럭키드로우에서 빠진다.**
+ *
+ * QR 은 방문자가 찍고 들어오는 주소를 인쇄물로 만드는 도구인데, 럭키드로우의 그 주소는
+ * **부스 태블릿에서 스태프가 여는 화면**이다. 붙여 두면 방문자가 찍고 들어와 아무것도
+ * 못 하는 화면을 본다(로그인이 없으면 뽑기 버튼이 안 눌린다). 메뉴 쪽 판정은
+ * `AdminLayout` 의 `useNav` 에 같은 이유로 적혀 있다.
+ */
 const COMMON_SHORTCUTS: Shortcut[] = [
   { to: 'qr', label: 'QR 만들기', desc: '붙일 QR을 내려받아요' },
   { to: '', label: '내 페이지 보기', desc: '방문자에게 보이는 화면을 확인해요', external: true },

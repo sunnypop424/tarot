@@ -63,7 +63,8 @@ const SERVICES = {
     ],
     admin: ['', '/questions', '/qr', '/account', '/login'],
   },
-  luckydraw: { visitor: [''], admin: ['', '/overview', '/shipping', '/qr'] },
+  // QR 은 이 서비스의 메뉴에 없다 (부스 기기에서 스태프가 여는 화면이라 붙일 QR 이 없다)
+  luckydraw: { visitor: [''], admin: ['', '/overview', '/shipping'] },
   rolling: { visitor: ['', '/write'], admin: ['', '/messages', '/qr'] },
   wish: { visitor: ['', '/write'], admin: ['', '/messages', '/qr'] },
   photozone: { visitor: [''], admin: ['', '/photozone', '/qr'] },
