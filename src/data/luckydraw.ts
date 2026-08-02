@@ -121,6 +121,15 @@ export interface LuckydrawDisplay {
   noBorder: boolean
 
   /**
+   * **당첨(긁는 등수) 타일만 따로 테두리 없음.**
+   *
+   * 위 `noBorder` 는 상품 타일·요약 줄·경품 줄을 한꺼번에 다룬다. 당첨 타일은 사정이 다르다 —
+   * 밑면이 '열린 뒤 배경'(대개 흰색)이라 **테두리가 커버 둘레에 얇은 링으로 새어 보인다.**
+   * 링을 없애자고 위 토글을 켜면 안 덮인 타일의 테두리까지 같이 사라진다. 그래서 칸을 나눈다.
+   */
+  highNoBorder: boolean
+
+  /**
    * 수량 카운터(알약) 전용 색 — 비우면 테마 색으로 폴백한다.
    *
    * 카운터는 화면 한가운데 큰 알약이라 따로 꾸미고 싶을 때가 있다. `counterBg` 는 알약 배경,
@@ -129,6 +138,17 @@ export interface LuckydrawDisplay {
   counterBg: string
   counterBorder: string
   counterShadow: string
+
+  /**
+   * **보조 버튼('처음으로') 색** — 비우면 지금까지처럼 테마에서 파생한다.
+   *
+   * 파생 규칙은 "칩 바탕(`--color-wash`) 위에서 읽히는 글자색"(`--color-primary-soft`)이라
+   * 대비는 늘 맞지만 **색을 고를 수는 없었다.** 실제로 커버 배경을 진한 빨강으로 둔 슬롯에서
+   * 이 버튼이 빨간 바탕에 검은 글자로 나왔다(파생이 그 배경에서 읽히는 색을 고른 결과다).
+   * 바탕 쪽은 이제 옅게 파생되지만, 그래도 **직접 고르고 싶은 자리**라 칸을 연다.
+   */
+  subBtnBg: string
+  subBtnFg: string
 
   /**
    * 등수 배지 스타일 (전체 결과·경품 목록의 "1등" 알약).
@@ -186,9 +206,9 @@ export const LUCKYDRAW_GROUPS: {
   colors?: LuckydrawColorField[]
   /** 이 카드에 같이 오는 형태·여백·문구 칸 (편집기가 이름으로 알아본다) */
   extras?: (
-    | 'boxRadius' | 'boxPadding' | 'boxTopMargin' | 'buttonRadius'
+    | 'boxRadius' | 'boxPadding' | 'boxTopMargin' | 'buttonRadius' | 'subBtn'
     | 'font' | 'background' | 'texts' | 'cover' | 'badge' | 'footer' | 'shadow' | 'modal'
-    | 'noBorder' | 'counter' | 'badgeStyle' | 'boxBorder'
+    | 'noBorder' | 'highNoBorder' | 'counter' | 'badgeStyle' | 'boxBorder'
   )[]
 }[] = [
   // ── 박스 (사진 위에 뜨는 상자) — 배경·테두리·둥글기·여백·그림자 한자리에 ──
@@ -203,11 +223,12 @@ export const LUCKYDRAW_GROUPS: {
   // ── 버튼 ──
   {
     title: '버튼',
+    hint: '주요 버튼(뽑기·전체 결과 보기)과 보조 버튼(처음으로)이에요.',
     colors: [
       { key: 'primary', label: '배경색', part: 'button' },
       { key: 'onPrimary', label: '글자색', part: 'button' },
     ],
-    extras: ['buttonRadius', 'texts'],
+    extras: ['buttonRadius', 'subBtn', 'texts'],
   },
   // ── 수량 카운터 (가운데 큰 알약) — 배경·테두리·그림자색 ──
   {
@@ -231,12 +252,18 @@ export const LUCKYDRAW_GROUPS: {
     title: '당첨 (긁는 등수)',
     hint: '비싼 등수만 덮어두고 직접 긁게 해요.',
     colors: [
-      { key: 'wash', label: '커버 배경', part: 'cover' },
+      {
+        key: 'wash',
+        label: '커버 배경',
+        part: 'cover',
+        // 진한 색을 골라도 화면 곳곳이 그 색으로 물들지 않는다 — 칩·배너 바탕은 옅게 파생된다
+        hint: '진해도 괜찮아요',
+      },
       { key: 'accent', label: '커버 문자색', part: 'cover' },
       { key: 'high', label: '열린 뒤 배경', part: 'high' },
       { key: 'onHigh', label: '열린 뒤 글자', part: 'high' },
     ],
-    extras: ['cover'],
+    extras: ['cover', 'highNoBorder'],
   },
   // ── 글자 · 폰트 ──
   {
@@ -314,10 +341,14 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   modalBorder: '',
   modalNoBorder: false,
   noBorder: false,
+  highNoBorder: false,
   // 비우면 테마 색 / 시안 기본 그림자색으로 폴백
   counterBg: '',
   counterBorder: '',
   counterShadow: '',
+  // 비우면 지금까지처럼 파생색 (칩 바탕 + 그 위에서 읽히는 글자)
+  subBtnBg: '',
+  subBtnFg: '',
   // 시안 기본 — 옅은 배경 + 글자색
   badgeStyle: 'soft',
   picker: {},
@@ -366,9 +397,12 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
     // false 가 기본이라 ?? 로 살린다 (있는 그대로)
     modalNoBorder: saved.modalNoBorder ?? DEFAULT_DISPLAY.modalNoBorder,
     noBorder: saved.noBorder ?? DEFAULT_DISPLAY.noBorder,
+    highNoBorder: saved.highNoBorder ?? DEFAULT_DISPLAY.highNoBorder,
     counterBg: saved.counterBg ?? DEFAULT_DISPLAY.counterBg,
     counterBorder: saved.counterBorder ?? DEFAULT_DISPLAY.counterBorder,
     counterShadow: saved.counterShadow ?? DEFAULT_DISPLAY.counterShadow,
+    subBtnBg: saved.subBtnBg ?? DEFAULT_DISPLAY.subBtnBg,
+    subBtnFg: saved.subBtnFg ?? DEFAULT_DISPLAY.subBtnFg,
     // 'solid' 만 유효값으로 받고 나머지는 기본 soft
     badgeStyle: saved.badgeStyle === 'solid' ? 'solid' : 'soft',
     /*

@@ -151,7 +151,13 @@
   padding: 7px 14px;
   border: 1px solid var(--ds-tile-border, var(--color-border));
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-wash) 55%, var(--color-surface));
+  /**
+   * 채움은 **끌 수 있다** (`--ds-row-bg: transparent`). 럭키드로우가 그렇게 쓴다 —
+   * 이 줄의 바탕은 `wash` 에서 오는데 그 칸이 럭드 편집기에선 '커버 배경' 이라
+   * 진한 색이 들어오고, 옅게 파생해도 **테두리와 채움이 둘 다 있으면 목록이 답답하다**.
+   * 포토카드는 기본값(옅은 채움) 그대로다.
+   */
+  background: var(--ds-row-bg, color-mix(in srgb, var(--color-wash) 55%, var(--color-surface)));
 }
 .summaryName {
   flex: 1;
@@ -249,7 +255,8 @@
   padding: 11px 13px;
   border-radius: var(--radius-md);
   border: 1px solid var(--ds-tile-border, var(--color-border-hover));
-  background: var(--color-wash);
+  /* 채움은 끌 수 있다 — `.summaryRow` 의 `--ds-row-bg` 와 같은 이유 (럭드는 테두리만 남긴다) */
+  background: var(--ds-note-bg, var(--color-wash));
   font-size: var(--text-xs);
   line-height: 1.55;
   color: var(--color-fg-2);

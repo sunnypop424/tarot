@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Flag, Gift, Info, Lock } from 'lucide-react'
 
 import { luckydrawDisplay, loadWebfont, fontStack, type LuckydrawDisplay } from '@/data/luckydraw'
-import { luminance } from '@/lib/color'
+import { luminance, softTint } from '@/lib/color'
 import { repo } from '@/lib/repo'
 import type { DrawResult, LuckydrawSettings, Prize } from '@/lib/repo'
 import { useAdminAuth } from '@/admin/useAdminAuth'
@@ -118,15 +118,33 @@ export default function LuckydrawApp() {
     set('--ld-modal-border', display.modalNoBorder ? 'transparent' : display.modalBorder)
     // 타일 테두리 없애기 — 결과 타일·요약 줄·경품 모달 줄까지 (포털이라 :root 에 실어야 닿는다)
     set('--ds-tile-border', display.noBorder ? 'transparent' : '')
+    /*
+     * 당첨(긁는 등수) 타일만 따로 테두리 없음 — 위 토글과 나눈 이유는 `data/luckydraw.ts`.
+     * **색이 아니라 표식이다**: 투명 테두리는 자리를 차지해 커버 둘레에 흰 링이 남는다
+     * (`Luckydraw.module.css` 의 `[data-ld-high-noborder]`). 그래서 테두리를 통째로 없앤다.
+     */
+    if (display.highNoBorder) root.setAttribute('data-ld-high-noborder', '')
+    else root.removeAttribute('data-ld-high-noborder')
     // 수량 카운터 전용 색 (비우면 CSS 가 테마 색·시안 그림자로 폴백)
     set('--ld-counter-shadow', display.counterShadow)
+    /*
+     * 보조 버튼('처음으로') 색 — 비우면 CSS 가 파생색으로 폴백한다 (지금과 똑같다).
+     * :root 에 싣는 이유는 다른 --ld-* 와 같다: 모달이 body 로 포털돼 무대 밖이다.
+     */
+    set('--ld-sub-bg', display.subBtnBg)
+    set('--ld-sub-fg', display.subBtnFg)
     /*
      * 수량 고르기는 공용 컴포넌트라 `--cp-*` 로 넘긴다. 안 고른 색은 **슬롯 테마와 옛
      * counter* 값에서** 물려받는다 — 이미 도는 럭드 슬롯의 화면이 달라지면 안 된다.
      */
     const cp = pickerVars(
       countPicker(display.picker, {
-        bg: display.counterBg || c0.wash,
+        /**
+         * 안 고르면 **옅게 파생한 wash** 를 쓴다 (저장값 그대로가 아니라).
+         * 저장값은 럭드 편집기에서 '커버 배경' 이라 진한 색이 올 수 있는데, 카운터는
+         * 화면 한가운데 큰 알약이라 그 색으로 꽉 차면 무대가 통째로 그 색이 된다.
+         */
+        bg: display.counterBg || softTint(c0.wash, c0.canvas),
         borderColor: display.counterBorder || c0.border,
         fg: c0.fg1,
         stepBg: c0.surfaceRaised,
@@ -154,9 +172,12 @@ export default function LuckydrawApp() {
     display.modalBorder,
     display.modalNoBorder,
     display.noBorder,
+    display.highNoBorder,
     display.counterBg,
     display.counterBorder,
     display.counterShadow,
+    display.subBtnBg,
+    display.subBtnFg,
     display.picker,
     display.badgeStyle,
     c0,

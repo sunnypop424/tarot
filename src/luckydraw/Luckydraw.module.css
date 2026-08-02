@@ -13,6 +13,17 @@
 .stage {
   /* 무대·박스·밴드·관리자 링크·전체결과는 **포토카드 스태프 화면과 같은 CSS** 다 */
   composes: stage from '../components/DrawStage.module.css';
+  /**
+   * **안내 배너와 전체 결과 줄은 테두리만 남긴다** (채움 없음).
+   *
+   * 그 채움은 `wash` 에서 왔는데, 럭드 편집기에서 그 칸의 이름은 '커버 배경' 이다 —
+   * 긁는 커버로 고른 진한 색이 배너와 목록 바탕까지 칠했다. 옅게 파생해 살릴 수도 있지만
+   * (`lib/theme.ts`), 이 두 자리는 **테두리만 있는 편이 박스 안에서 깔끔하다** —
+   * 흰 박스 위에 옅은 색 판이 겹겹이 놓이면 무엇이 강조인지 흐려진다.
+   * 포토카드 스태프 화면은 기본값 그대로다 (여기서만 끈다).
+   */
+  --ds-note-bg: transparent;
+  --ds-row-bg: transparent;
 }
 
 .panel {
@@ -148,6 +159,24 @@
   background: color-mix(in srgb, var(--color-primary) 88%, #000);
 }
 
+/**
+ * 보조 버튼('처음으로') — **색을 직접 고를 수 있다** (편집기 '보조 버튼 배경색·글자색').
+ *
+ * 원래는 전부 파생이었다: 바탕은 `--color-wash`, 글자는 그 위에서 읽히게 맞춘
+ * `--color-primary-soft`. 대비는 늘 맞지만 **색을 고를 수가 없었고**, 커버 배경을 진한
+ * 빨강으로 둔 슬롯에서 이 버튼이 빨간 바탕에 검은 글자로 나왔다 — 파생은 그 배경에서
+ * 가장 읽히는 색을 고른 것뿐이라 "틀린" 게 아닌데도 원하는 그림이 아니었다.
+ * 비워 두면 지금까지와 똑같이 파생값을 쓴다.
+ */
+.reveal :global(.btn--slight) {
+  background: var(--ld-sub-bg, var(--color-wash));
+  color: var(--ld-sub-fg, var(--color-primary-soft));
+}
+.reveal :global(.btn--slight):hover:not(:disabled) {
+  background: var(--ld-sub-bg, color-mix(in srgb, var(--color-wash) 80%, var(--color-primary)));
+  filter: brightness(0.96);
+}
+
 /* 비활성 주요 버튼 — 회색으로 비우지 말고 **흐려진 주요 버튼**으로 (빈 느낌 제거) */
 .controls :global(.btn--primary):disabled,
 .reveal :global(.btn--primary):disabled,
@@ -279,6 +308,33 @@
   border-color: var(--ds-tile-border, var(--color-high));
   background: var(--color-high);
 }
+/**
+ * **'당첨 타일 테두리 없음' — 색이 아니라 테두리 자체를 없앤다.**
+ *
+ * 처음엔 `border-color: transparent` 로 껐는데 링이 그대로 보였다: 투명한 테두리도
+ * **자리는 차지하고**, 커버(캔버스)는 `inset: 0` 이라 그 안쪽에 그려진다. 그 1px 띠에는
+ * 타일 자기 배경('열린 뒤 배경', 대개 흰색)이 비쳐 여전히 흰 링으로 남는다 —
+ * 색을 어떻게 골라도 안 지워지는 링이다.
+ *
+ * `!important` 인 이유: 이 타일의 테두리를 정하는 자리가 셋이다(기본 `.resultItem`,
+ * `[data-high]`, 덮여 있는 동안의 `:not([data-open])`). 토글은 **그 전부를 이겨야** 하고,
+ * 하나라도 놓치면 "껐는데 남아 있다" 가 된다. 표식은 `:root` 에 있다 — 결과 타일이
+ * 모달로 포털되는 경우까지 한 번에 닿게.
+ */
+:global([data-ld-high-noborder]) .resultItem[data-high] {
+  border: 0 !important;
+}
+/**
+ * **아직 덮여 있는 동안은 테두리도 커버 색이다.**
+ *
+ * 커버(캔버스·버튼)는 `inset: 0` 이라 **테두리 안쪽**에 그려진다. 그래서 밑면인 '열린 뒤
+ * 배경'(`--color-high`, 흰색인 슬롯이 많다)이 커버 둘레에 1px 링으로 새어 나왔다 —
+ * 긁지도 않았는데 결과 배경색이 테두리로 먼저 보이는 셈이라 지저분하고, 무엇보다
+ * **덮여 있다는 인상이 깨진다.** 긁기 시작하면(`data-open`) 원래 테두리로 돌아온다.
+ */
+.resultItem[data-high]:not([data-open]) {
+  border-color: var(--color-wash-raw, var(--color-wash));
+}
 
 /* 낮은 등수만 순서대로 등장 — 덮인 칸은 바로 보여 긁게 한다 */
 .resultItem[data-anim] {
@@ -315,7 +371,12 @@
   justify-content: center;
   border: 0;
   border-radius: inherit;
-  background: var(--color-wash);
+  /**
+   * **커버만 저장값 그대로 쓴다** (`--color-wash-raw`). 편집기에서 이 칸의 이름이
+   * '커버 배경' 이라 진한 색이 오는데, 같은 값이 칩·배너 바탕(`--color-wash`)이기도 해서
+   * 화면 곳곳이 그 색으로 칠해졌다. 지금은 바탕만 옅게 파생된다 (`lib/theme.ts`).
+   */
+  background: var(--color-wash-raw, var(--color-wash));
   color: var(--color-accent);
   font-size: var(--text-s);
   font-weight: var(--weight-bold);

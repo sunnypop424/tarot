@@ -1,4 +1,5 @@
 import { contrastRatio, readableShade } from '@/lib/color'
+import { DERIVED_COLORS } from '@/lib/theme'
 import type { ThemeColors } from '@/types/theme'
 
 /**
@@ -55,8 +56,8 @@ export function repairContrast(colors: GeneratedTheme): {
      * 파생색이라 저장값은 안 쓰인다 (applyTheme 이 덮어쓴다).
      * 그래도 타입을 채워야 하니 같은 규칙으로 넣어둔다 — 값이 어긋나 보이면 다음 사람이 헷갈린다.
      */
-    primarySoft: readableShade(colors.primary, colors.wash),
-    accentSoft: readableShade(colors.accent, colors.surface),
+    primarySoft: DERIVED_COLORS.primarySoft(colors),
+    accentSoft: DERIVED_COLORS.accentSoft(colors),
   }
 
   return { colors: out, fixed }

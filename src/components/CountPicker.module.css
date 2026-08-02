@@ -39,7 +39,8 @@
    */
   border-radius: var(--cp-btn-radius, var(--radius-md));
   background: var(--cp-step-bg);
-  color: var(--cp-fg);
+  /* ± 글자색 — 안 고르면 숫자색을 따라간다 (`countPicker()` 가 그렇게 채운다) */
+  color: var(--cp-step-fg, var(--cp-fg));
   font-family: inherit;
   cursor: pointer;
   display: grid;

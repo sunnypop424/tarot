@@ -77,6 +77,43 @@ export function mix(hex: string, toward: 'white' | 'black', t: number): string {
   return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`
 }
 
+/** 두 색을 t(0~1)만큼 섞은 hex — t=0 이면 a, t=1 이면 b. 못 읽는 색은 a 를 그대로 */
+export function blend(a: string, b: string, t: number): string {
+  const ra = toRgb(a)
+  const rb = toRgb(b)
+  if (!ra || !rb) return a
+  const out = ra.map((v, i) => Math.round(v + (rb[i] - v) * t))
+  return `#${out.map((v) => v.toString(16).padStart(2, '0')).join('')}`
+}
+
+/**
+ * **옅은 바탕(칩·보조 버튼·안내 배너)으로 쓸 수 있는 색인가** — 아니면 캔버스 쪽으로 끌어온다.
+ *
+ * 이 함수가 생긴 이유가 실제 사고다. `wash` 는 역할이 '보조 버튼 · 칩 배경' 인데,
+ * **럭키드로우 편집기에서는 같은 칸이 '커버 배경'** 이라고 적혀 있다 (`data/luckydraw.ts`).
+ * 그래서 최고관리자가 긁는 커버를 진한 빨강(#dc4651)으로 고르자, 그 색이 커버뿐 아니라
+ * 리허설 배너·전체 결과 줄·'처음으로' 버튼 바탕까지 통째로 칠했다 — 한 토큰이 두 가지
+ * 일을 하고 있었고, 한쪽에서 고른 값이 다른 쪽을 망가뜨렸다.
+ *
+ * 커버는 진해야 맞고 칩 바탕은 옅어야 맞다. **둘 다 지키려면 하나는 파생돼야 한다** —
+ * 원본은 `--color-wash-raw`(커버)로 남기고, 바탕용은 여기서 만든다.
+ *
+ * 판정은 **캔버스와의 대비**로 한다 (`isLight` 처럼 배경 밝기에서 파생하는 규칙과 같은 결).
+ * 이미 옅은 색(기본 프리셋의 `#F0EDFF` / 다크의 `#241F45`)은 대비가 1.5 를 안 넘어
+ * **그대로 통과한다** — 지금 잘 나오는 슬롯의 색은 하나도 안 바뀐다는 뜻이다.
+ */
+export function softTint(color: string, canvas: string, limit = 1.5): string {
+  const ratio = contrastRatio(color, canvas)
+  // 못 읽는 색(rgba·CSS 변수 등)은 건드리지 않는다 — 판단할 근거가 없으면 그대로 두는 게 맞다
+  if (ratio === null || ratio <= limit) return color
+  for (let t = 0.1; t < 1; t += 0.05) {
+    const tint = blend(color, canvas, t)
+    const r = contrastRatio(tint, canvas)
+    if (r !== null && r <= limit) return tint
+  }
+  return canvas
+}
+
 /**
  * bg 위에서 target 대비를 넘는 base 의 명암 조정본.
  * 저장값 하나로는 못 맞추는 토큰(칩·배지 글자, 포인트 아이콘)을 런타임에 계산한다.

@@ -43,7 +43,14 @@
   --color-canvas: #0f1020;
   --color-surface: #1a1b2e;
   --color-surface-raised: #242537;
+  /**
+   * `--color-wash` 는 **칩·보조 버튼·안내 배너의 옅은 바탕**이다.
+   * `--color-wash-raw` 는 최고관리자가 고른 **그 값 그대로** — 럭키드로우 긁는 커버만 쓴다
+   * (편집기에서 그 칸의 이름이 '커버 배경' 이라 진한 색이 들어온다).
+   * 둘을 나눈 전말은 `src/lib/color.ts` 의 `softTint` 머리말에 있다.
+   */
   --color-wash: #241f45;
+  --color-wash-raw: #241f45;
   --color-fg-1: #f2f0fa;
   --color-fg-2: #c6c3d8;
   --color-fg-3: #9a97b0;
@@ -155,6 +162,7 @@
   --color-surface: #ffffff;
   --color-surface-raised: #ffffff;
   --color-wash: #f0edff;
+  --color-wash-raw: #f0edff;
   --color-fg-1: #1a1b2e;
   --color-fg-2: #4a4860;
   --color-fg-3: #7a7791;

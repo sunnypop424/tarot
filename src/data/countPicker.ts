@@ -21,6 +21,14 @@ export interface CountPickerStyle {
   fg: string
   /** ± 버튼 배경 */
   stepBg: string
+  /**
+   * ± 글자색 — **안 고르면 숫자색(`fg`)을 따라간다.**
+   *
+   * 원래 ± 는 숫자와 같은 색으로 못박혀 있었는데, ± 버튼만 배경을 따로 줄 수 있어서
+   * (`stepBg`) 그 배경이 진해지면 ± 가 안 보였다. 짝이 되는 칸이 없으면 배경만 고를 수 있고
+   * 글자는 못 고치는 상태가 된다 — 색 짝은 늘 같이 열어 둔다.
+   */
+  stepFg: string
   /** 고른 프리셋 */
   onBg: string
   onFg: string
@@ -36,6 +44,7 @@ export const DEFAULT_COUNT_PICKER: CountPickerStyle = {
   bg: '#f3f4f6',
   fg: '#1f1f1f',
   stepBg: '#ffffff',
+  stepFg: '#1f1f1f',
   onBg: '#26262a',
   onFg: '#ffffff',
   goBg: '#26262a',
@@ -63,6 +72,11 @@ export function countPicker(
     bg: pick('bg'),
     fg: pick('fg'),
     stepBg: pick('stepBg'),
+    /**
+     * ± 글자색은 **숫자색으로 폴백한다** — 지금까지 ± 는 `--cp-fg` 로 그려졌으니,
+     * 안 고른 슬롯의 화면이 이 칸이 생겼다고 달라지면 안 된다.
+     */
+    stepFg: s.stepFg ?? base.stepFg ?? pick('fg'),
     onBg: pick('onBg'),
     onFg: pick('onFg'),
     goBg: pick('goBg'),
@@ -78,6 +92,7 @@ export function pickerVars(s: CountPickerStyle): Record<string, string> {
     '--cp-bg': s.bg,
     '--cp-fg': s.fg,
     '--cp-step-bg': s.stepBg,
+    '--cp-step-fg': s.stepFg,
     '--cp-on-bg': s.onBg,
     '--cp-on-fg': s.onFg,
     '--cp-go-bg': s.goBg,

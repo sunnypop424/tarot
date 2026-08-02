@@ -25,8 +25,12 @@ export function checkThemeContrast(colors: ThemeColors): ContrastCheck[] {
     ['보조 텍스트 / 표면', colors.fg2, colors.surface],
     ['흐린 텍스트 / 표면', colors.fg3, colors.surface],
     ['버튼 글자 / 버튼', colors.onPrimary, colors.primary],
-    // 아래 둘은 저장값이 아니라 **런타임 파생색**을 검사한다 (실제로 화면에 나가는 색)
-    ['칩 글자 / 칩 배경', DERIVED_COLORS.primarySoft(colors), colors.wash],
+    /**
+     * 아래 둘은 저장값이 아니라 **런타임 파생색**을 검사한다 (실제로 화면에 나가는 색).
+     * 칩 배경도 파생이다 — 저장된 `wash` 는 럭키드로우에선 '커버 배경' 이라 진할 수 있고,
+     * 화면에 실제로 깔리는 건 캔버스 쪽으로 끌어온 옅은 값이다 (`DERIVED_COLORS.wash`).
+     */
+    ['칩 글자 / 칩 배경', DERIVED_COLORS.primarySoft(colors), DERIVED_COLORS.wash(colors)],
     ['포인트 아이콘 / 표면', DERIVED_COLORS.accentSoft(colors), colors.surface],
   ]
 

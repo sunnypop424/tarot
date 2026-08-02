@@ -56,7 +56,15 @@ export function ScratchCover({ mark, onReveal }: Props) {
     }
 
     const cs = getComputedStyle(cv)
-    const wash = cs.getPropertyValue('--color-wash').trim() || '#f0edff'
+    /**
+     * **저장값 그대로**(`--color-wash-raw`)를 쓴다 — 이 칸의 편집기 이름이 '커버 배경' 이다.
+     * `--color-wash` 는 칩·배너용으로 옅게 파생된 값이라, 그걸 쓰면 커버가 거의 안 보인다
+     * (`lib/theme.ts` 의 wash 두 벌 설명).
+     */
+    const wash =
+      cs.getPropertyValue('--color-wash-raw').trim() ||
+      cs.getPropertyValue('--color-wash').trim() ||
+      '#f0edff'
     const accent = cs.getPropertyValue('--color-accent').trim() || '#c99700'
     ctx.fillStyle = wash
     ctx.fillRect(0, 0, w, h)

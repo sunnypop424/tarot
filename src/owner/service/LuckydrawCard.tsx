@@ -272,6 +272,49 @@ export function LuckydrawExtra({
           </span>
         </label>
       )
+    /**
+     * 당첨(긁는 등수) 타일만 따로 테두리를 뺀다.
+     *
+     * 상품 타일 카드의 '테두리 없음' 과 나눈 이유: 당첨 타일은 밑면이 '열린 뒤 배경'
+     * (대개 흰색)이라, **덮여 있는 동안 테두리가 커버 둘레에 얇은 링으로 새어 보인다.**
+     * 그 링만 없애려고 위 토글을 켜면 안 덮인 상품 타일 테두리까지 같이 사라진다.
+     */
+    case 'highNoBorder':
+      return (
+        <label
+          className="field"
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+        >
+          <input
+            type="checkbox"
+            checked={d.highNoBorder}
+            onChange={(e) => patchLd({ highNoBorder: e.target.checked })}
+          />
+          <span className="field__label" style={{ margin: 0 }}>
+            당첨 타일 테두리 없음
+          </span>
+        </label>
+      )
+    /**
+     * 보조 버튼('처음으로') 색 — **비우면 파생값**이라 지금까지의 화면과 같다.
+     * 칸을 연 이유는 `data/luckydraw.ts` 의 `subBtnBg` 머리말에 적어 뒀다.
+     */
+    case 'subBtn':
+      return (
+        <>
+          <AlphaColor
+            label="보조 버튼 배경색"
+            value={d.subBtnBg || draft.theme.colors.wash}
+            onChange={(v) => patchLd({ subBtnBg: v })}
+            hint="'처음으로' 버튼이에요"
+          />
+          <AlphaColor
+            label="보조 버튼 글자색"
+            value={d.subBtnFg || draft.theme.colors.fg1}
+            onChange={(v) => patchLd({ subBtnFg: v })}
+          />
+        </>
+      )
     case 'counter': {
       /**
        * 수량 고르기 — **포토카드와 같은 컴포넌트**를 쓴다 (`components/CountPicker.tsx`).
@@ -341,6 +384,12 @@ export function LuckydrawExtra({
             value={p.stepBg || draft.theme.colors.surfaceRaised}
             hint="비우면 테마 표면색"
             onChange={(v) => setColor('stepBg', v)}
+          />
+          <AlphaColor
+            label="± 버튼 글자"
+            value={p.stepFg || p.fg || draft.theme.colors.fg1}
+            hint="비우면 위 '숫자·프리셋 글자색' 을 따라가요"
+            onChange={(v) => setColor('stepFg', v)}
           />
           <AlphaColor
             label="고른 프리셋 배경"

@@ -1,7 +1,7 @@
 import defaultThemeJson from '@/data/slot-default.json'
 import { WEBFONTS, fontStack, loadWebfont } from '@/data/fonts'
 import { cardRadius } from './card'
-import { isLight, readableShade, withAlpha } from './color'
+import { isLight, readableShade, softTint, withAlpha } from './color'
 import type { Theme, ThemeColors, ThemeShape } from '@/types/theme'
 
 /**
@@ -13,7 +13,7 @@ const COLOR_VARS: Partial<Record<keyof ThemeColors, string>> = {
   canvas: '--color-canvas',
   surface: '--color-surface',
   surfaceRaised: '--color-surface-raised',
-  wash: '--color-wash',
+  // wash 는 저장값을 그대로 쓰지 않는다 — 캔버스 기준으로 옅게 파생한다 (아래 applyTheme)
   primary: '--color-primary',
   primaryHover: '--color-primary-hover',
   // primarySoft·accentSoft 는 저장값을 쓰지 않고 배경 밝기로 파생한다 (아래 applyTheme 참고)
@@ -42,8 +42,24 @@ const COLOR_VARS: Partial<Record<keyof ThemeColors, string>> = {
  * 규칙이 갈라지면 검사는 통과라는데 화면은 안 읽히는 색이 나간다.
  */
 export const DERIVED_COLORS = {
-  /** 칩·배지·보조버튼 글자 — wash 위에 얹힌다 */
-  primarySoft: (c: Pick<ThemeColors, 'primary' | 'wash'>) => readableShade(c.primary, c.wash),
+  /**
+   * 칩·보조 버튼·안내 배너의 **옅은 바탕** — 저장된 `wash` 를 캔버스 쪽으로 끌어온다.
+   *
+   * `wash` 칸이 럭키드로우 편집기에서는 '커버 배경' 이라 **진한 색이 들어올 수 있다.**
+   * 실제로 진한 빨강이 들어와 리허설 배너·전체 결과 줄·'처음으로' 버튼까지 빨갛게 칠했다.
+   * 커버는 진해야 맞으므로 원본은 `--color-wash-raw` 로 남기고, 바탕만 여기서 옅게 만든다
+   * (`softTint` 머리말에 전말이 있다). 이미 옅은 색은 그대로 통과한다.
+   */
+  wash: (c: Pick<ThemeColors, 'wash' | 'canvas'>) => softTint(c.wash, c.canvas),
+  /**
+   * 칩·배지·보조버튼 글자 — wash 위에 얹힌다.
+   *
+   * **파생된 바탕을 기준으로 잰다.** 저장된 원본(커버색)을 기준으로 재면, 진한 빨강 위에서
+   * 읽히라고 고른 **검정 글자가 옅은 분홍 바탕에 얹혀** 엉뚱해진다 — 실제로 '처음으로'
+   * 버튼이 그 꼴이었다. 재는 배경과 실제로 깔리는 배경이 같아야 한다.
+   */
+  primarySoft: (c: Pick<ThemeColors, 'primary' | 'wash' | 'canvas'>) =>
+    readableShade(c.primary, DERIVED_COLORS.wash(c)),
   /** 포인트 글자·아이콘 — 표면 위에 얹힌다 (raw accent 는 어두운 카드 위 장식용) */
   accentSoft: (c: Pick<ThemeColors, 'accent' | 'surface'>) => readableShade(c.accent, c.surface),
 } as const
@@ -163,6 +179,15 @@ export function applyTheme(raw: Theme): void {
   )
 
   // 배경 밝기 종속 색 — 규칙은 DERIVED_COLORS 한 곳에 있다 (대비 검사도 같은 걸 쓴다)
+  /**
+   * **wash 는 두 벌로 나간다.**
+   *  · `--color-wash`     — 옅은 바탕 (칩·보조 버튼·안내 배너). 늘 캔버스에 가깝다.
+   *  · `--color-wash-raw` — 최고관리자가 고른 값 그대로. **럭키드로우 긁는 커버만** 쓴다
+   *                          (편집기에서 그 칸의 이름이 '커버 배경' 이라 진한 색이 온다).
+   * 나누기 전에는 커버로 고른 진한 빨강이 화면의 옅은 바탕을 전부 칠했다.
+   */
+  root.style.setProperty('--color-wash', DERIVED_COLORS.wash(theme.colors))
+  root.style.setProperty('--color-wash-raw', theme.colors.wash)
   root.style.setProperty('--color-primary-soft', DERIVED_COLORS.primarySoft(theme.colors))
   root.style.setProperty('--color-accent-soft', DERIVED_COLORS.accentSoft(theme.colors))
 
