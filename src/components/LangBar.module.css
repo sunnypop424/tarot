@@ -7,7 +7,14 @@
 .bar {
   display: flex;
   justify-content: flex-end;
-  /* 화면 가장자리 여백은 앱 공통값을 따른다 — 화면마다 다른 값을 쓰면 줄이 삐뚤어 보인다 */
-  padding: var(--space-sm) var(--layout-pad) 0;
+  /**
+   * 화면 가장자리 여백은 앱 공통값을 따른다 — 화면마다 다른 값을 쓰면 줄이 삐뚤어 보인다.
+   *
+   * **변수로 여는 이유:** 타로 셸은 이 줄을 흐름에서 빼서 절대 좌표로 띄운다
+   * (`.langbar--mobile`, `layout.css`). 클래스 둘이 **한 요소**에 붙는 구조라 이 padding 이
+   * 그 좌표에 그대로 더해져, 타로만 단추가 위 32 · 옆 40 에 앉아 있었다. 값으로 덮으려면
+   * 모듈 CSS 와 전역 CSS 의 주입 순서에 기대야 해서, 순서를 안 타는 변수로 연다.
+   */
+  padding: var(--langbar-pad, var(--space-sm) var(--layout-pad) 0);
   flex: none;
 }

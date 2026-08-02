@@ -124,8 +124,20 @@
 }
 
 /* ── 등불이 걸리는 자리 ── */
+/**
+ * **등불의 z-index 를 이 안에 가둔다 (`isolation`).**
+ *
+ * 등불은 줄 길이(`--drop`, 최대 500 가까이)를 그대로 `z-index` 로 쓴다 — 아래 걸린 등불이
+ * 위로 오게 하려고(아래 `.hang` 주석). 그런데 이 자리가 쌓임 맥락이 아니면 그 숫자가
+ * **페이지 전체와 겨룬다**: 언어 고르개(`.svc-lang`)의 펼침 목록이 z-index 30 인데 등불이
+ * 300 이면 목록 위에 소원이 얹힌다 — 실제로 그렇게 보였다. 아래 고정 CTA 도 같은 이유로
+ * 등불에 덮일 수 있다(`position: fixed` 라도 z-index 가 auto 면 진다).
+ *
+ * 등불끼리의 순서는 이 안의 문제라 밖으로 새어 나갈 이유가 없다. 여기서 끊는다.
+ */
 .canopy {
   position: relative;
+  isolation: isolate;
   flex: 1;
   margin-top: 6px;
   min-height: 300px;

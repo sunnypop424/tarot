@@ -15,6 +15,7 @@
  *  · 다른 요소와 겹침 (제목·버튼 위에 올라앉음)
  *  · 손가락에 안 잡히는 크기 (44px 규칙 — 높이는 36 이어도 폭이 44 는 돼야 한다)
  *  · **글자가 안 읽힘** (배경과 대비가 낮음 — 어두운 슬롯에서 실제로 안 보였다)
+ *  · **펼친 목록이 본문에 덮임** (접힌 단추만 보면 멀쩡한데 펼치면 소원·카드가 위에 얹힌다)
  */
 import puppeteer from 'puppeteer-core'
 import { existsSync } from 'node:fs'
@@ -220,6 +221,59 @@ for (const width of WIDTHS) {
    */
   if (g.titleGap !== null && Math.abs(g.titleGap) > 12 && Math.abs(g.titleGap) < 100) {
     notes.push(`제목 중심과 ${g.titleGap}px 어긋났어요 — 같은 선상이 아니에요`)
+  }
+
+  /**
+   * ③ **펼친 목록이 본문에 덮이나.**
+   *
+   * 여기까지는 **접힌 단추**만 봤다. 그런데 실제로 언어를 바꾸는 건 펼친 뒤라, 목록이
+   * 본문 아래로 들어가면 고르개는 있으나 마나다 — 소원나무에서 등불이 목록 위에 얹혀
+   * "한국어" 가 소원에 가려 있었다.
+   *
+   * **왜 `elementFromPoint` 만으로는 못 잡았나.** 그 등불은 `pointer-events: none` 이라
+   * 클릭 판정에서 통째로 빠진다 — 눈에는 위에 있는데 검사는 목록을 짚었다. 그래서
+   * 재기 직전에 **모든 요소의 `pointer-events` 를 켠다**: 클릭 판정은 그리는 순서를 따르므로,
+   * 그렇게 하면 `elementFromPoint` 가 곧 "무엇이 위에 그려졌나" 가 된다.
+   */
+  const buried = await page.evaluate(() => {
+    const btn = [...document.querySelectorAll('[data-lang-open]')].find(
+      (b) => b.getBoundingClientRect().width > 0
+    )
+    if (!btn) return null
+    btn.click()
+    return true
+  })
+  if (buried) {
+    await new Promise((r) => setTimeout(r, 250))
+    const cover = await page.evaluate(() => {
+      const menu = document.querySelector('[data-lang-menu]')
+      if (!menu) return ['목록이 안 펼쳐졌어요']
+      const style = document.createElement('style')
+      style.textContent = '*{pointer-events:auto !important}'
+      document.head.append(style)
+      const r = menu.getBoundingClientRect()
+      // 네 귀퉁이 안쪽 + 가운데 — 한 점만 보면 좁은 것이 비켜 앉았을 때 놓친다
+      const pts = [
+        [0.2, 0.1],
+        [0.8, 0.1],
+        [0.5, 0.5],
+        [0.2, 0.9],
+        [0.8, 0.9],
+      ]
+      const names = new Set()
+      for (const [fx, fy] of pts) {
+        const el = document.elementFromPoint(r.left + r.width * fx, r.top + r.height * fy)
+        if (el && !menu.contains(el)) {
+          names.add(
+            (el.textContent ?? '').trim().slice(0, 12) || el.className.toString().slice(0, 24) || el.tagName
+          )
+        }
+      }
+      style.remove()
+      return [...names]
+    })
+    if (cover.length) notes.push(`펼친 목록을 본문이 덮어요 — ${cover.join(' · ')}`)
+    await page.keyboard.press('Escape')
   }
 
   if (notes.length) bad(label, notes.join(' · '))
