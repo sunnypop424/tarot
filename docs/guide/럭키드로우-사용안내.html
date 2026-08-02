@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>럭키드로우 사용 안내</title>
+<style>
+  /*
+   * 인쇄용 한 장짜리 문서 — 외부 폰트·CDN 을 쓰지 않는다.
+   * 오프라인에서 열어도 똑같이 보여야 해서 글꼴은 시스템 한글 폰트로만 지정하고,
+   * 캡처는 같은 폴더의 상대 경로(luckydraw/*.png)로 넣는다.
+   */
+  @page { size: A4 portrait; margin: 18mm 17mm 16mm; }
+
+  :root {
+    --ink:   #17161c;
+    --ink-2: #45424f;
+    --ink-3: #736f80;
+    --line:  #e3e0ea;
+    --key:   #6c4ee3;
+    --key-bg:#f3f0ff;
+    --warn:  #b8541f;
+    --warn-bg:#fff5eb;
+    --danger:#b32b4a;
+    --danger-bg:#fff0f3;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    margin: 0;
+    font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', 'Noto Sans KR',
+                 'Nanum Gothic', sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.75;
+    color: var(--ink);
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* ── 페이지 ───────────────────────────────────────────── */
+  .page { break-after: page; }
+  .page:last-child { break-after: auto; }
+
+  h1, h2, h3 { line-height: 1.4; margin: 0; }
+
+  .chap {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .chap__no {
+    font-size: 10pt; font-weight: 700; color: #fff; background: var(--ink);
+    border-radius: 999px; padding: 1px 10px; letter-spacing: .02em;
+  }
+  .chap__t { font-size: 16pt; font-weight: 800; letter-spacing: -.02em; }
+
+  h3 {
+    font-size: 11.5pt; font-weight: 800; margin: 20px 0 6px;
+    letter-spacing: -.01em;
+    /* 제목만 쪽 끝에 홀로 남지 않게 — 뒤따르는 글·캡처와 함께 넘어간다 */
+    break-after: avoid;
+  }
+  h3:first-of-type { margin-top: 4px; }
+  /* 장 안의 큰 구분 — 새 쪽으로 밀지 않고 글 흐름 안에서 나눈다 */
+  h3.sub {
+    font-size: 13pt; margin: 26px 0 10px; padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  p { margin: 0 0 9px; }
+  .lead { color: var(--ink-2); margin-bottom: 16px; }
+  .mute { color: var(--ink-3); font-size: 9.5pt; }
+
+  ul, ol { margin: 0 0 10px; padding-left: 20px; }
+  li { margin-bottom: 4px; }
+  li::marker { color: var(--ink-3); }
+
+  b, strong { font-weight: 800; }
+  .q { font-weight: 700; color: var(--key); white-space: nowrap; }
+
+  /* ── 강조 상자 ────────────────────────────────────────── */
+  .box {
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 13px 15px; margin: 12px 0 14px;
+    break-inside: avoid;
+  }
+  .box--key    { border-color: #cfc4ff; background: var(--key-bg); }
+  .box--warn   { border-color: #f0cfa8; background: var(--warn-bg); }
+  .box--danger { border-color: #f2c2ce; background: var(--danger-bg); }
+  .box__t { font-weight: 800; margin-bottom: 4px; }
+  .box--key .box__t    { color: var(--key); }
+  .box--warn .box__t   { color: var(--warn); }
+  .box--danger .box__t { color: var(--danger); }
+  .box p:last-child, .box ul:last-child, .box ol:last-child { margin-bottom: 0; }
+
+  /* ── 캡처 ─────────────────────────────────────────────── */
+  figure { margin: 0 0 16px; break-inside: avoid; }
+  .shot {
+    position: relative; display: block;
+    border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+    background: #fff;
+  }
+  .shot img { display: block; width: 100%; height: auto; }
+  /*
+   * 부스 화면 캡처는 아이패드 가로(1180×820)라 본문 폭을 꽉 채우면 한 장이 페이지의 절반을
+   * 먹는다 — 한 쪽에 한 장밖에 안 들어가 빈 곳이 크게 남는다. 조금 줄여 두 장이 앉게 한다.
+   */
+  .shot--pad { width: 62%; margin-inline: auto; }
+  .two .shot--pad { width: 100%; }
+  /* 관리 화면 전체 캡처(세로로 긴 것) — 조금만 줄여 뒤따르는 글이 같은 쪽에 붙게 */
+  .shot--tall { width: 90%; margin-inline: auto; }
+  figcaption {
+    margin-top: 6px; font-size: 9pt; color: var(--ink-3); line-height: 1.6;
+  }
+  .two { display: flex; gap: 10px; break-inside: avoid; }
+  .two figure { flex: 1; min-width: 0; }
+
+  /* 캡처 위 번호 뱃지 — 본문에서 같은 번호로 부른다 */
+  .pin {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 20px; height: 20px; border-radius: 999px;
+    background: var(--key); color: #fff;
+    font-size: 8.5pt; font-weight: 800; line-height: 20px; text-align: center;
+    box-shadow: 0 0 0 2.5px #fff;
+  }
+  .num {
+    display: inline-block; min-width: 16px; height: 16px; line-height: 16px;
+    border-radius: 999px; background: var(--key); color: #fff;
+    font-size: 8pt; font-weight: 800; text-align: center; margin-right: 5px;
+    vertical-align: 1px;
+  }
+
+  /* ── 표 ───────────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 14px; break-inside: avoid; }
+  th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: #f6f5f9; font-weight: 800; font-size: 9.5pt; }
+  td { font-size: 10pt; }
+
+  /* ── 체크리스트 ───────────────────────────────────────── */
+  .check { list-style: none; padding-left: 0; }
+  .check li { position: relative; padding-left: 26px; margin-bottom: 7px; }
+  .check li::before {
+    content: ''; position: absolute; left: 0; top: 4px;
+    width: 14px; height: 14px; border: 1.5px solid #b9b3c8; border-radius: 3px;
+  }
+
+  /* ── 표지 ─────────────────────────────────────────────── */
+  .cover { height: 245mm; display: flex; flex-direction: column; }
+  .cover__top { flex: 1; }
+  .cover__kicker {
+    font-size: 10pt; font-weight: 800; color: var(--key); letter-spacing: .12em;
+    margin-bottom: 14px;
+  }
+  .cover__title { font-size: 34pt; font-weight: 800; letter-spacing: -.035em; line-height: 1.2; }
+  .cover__sub { font-size: 13pt; color: var(--ink-2); margin-top: 14px; line-height: 1.6; }
+  .cover__rule { height: 4px; background: var(--key); width: 56px; margin: 26px 0; border-radius: 2px; }
+  .cover__meta { font-size: 10pt; color: var(--ink-3); }
+  .cover__meta b { color: var(--ink-2); }
+
+  /* ── 목차 ─────────────────────────────────────────────── */
+  .toc { list-style: none; padding-left: 0; }
+  .toc li {
+    display: flex; gap: 12px; align-items: baseline;
+    padding: 8px 0; border-bottom: 1px solid var(--line); margin: 0;
+  }
+  .toc__no { font-weight: 800; color: var(--key); min-width: 20px; }
+  .toc__t { font-weight: 700; }
+  .toc__d { color: var(--ink-3); font-size: 9.5pt; margin-left: auto; text-align: right; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ 표지 ══════════════════ -->
+<section class="page cover">
+  <div class="cover__top">
+    <div class="cover__kicker">주최자용 안내서</div>
+    <h1 class="cover__title">럭키드로우<br />사용 안내</h1>
+    <div class="cover__rule"></div>
+    <p class="cover__sub">
+      부스에서 어떻게 뽑히는지, 관리 화면에서 무엇을 누르시면 되는지<br />
+      화면 그대로 담았습니다. 처음부터 끝까지 한 번만 읽어 주세요.
+    </p>
+  </div>
+
+  <div class="box box--key">
+    <div class="box__t">가장 자주 나는 사고 세 가지</div>
+    <ol style="margin-bottom:0">
+      <li><b>‘실제 운영’ 을 안 켠 채 행사를 시작</b> — 하루 종일 재고가 줄지 않습니다.</li>
+      <li><b>바꾸고 ‘저장’ 을 안 누름</b> — 상품·운영 화면은 저장을 눌러야 반영됩니다.</li>
+      <li><b>배송 정보를 안 내려받고 지움</b> — 사본이 없어 되돌릴 수 없습니다.</li>
+    </ol>
+  </div>
+
+  <p class="cover__meta">
+    <b>화면 캡처는 체험용 이벤트에서 찍었습니다.</b> 상품 이름·수량·색은 실제 이벤트와 다릅니다.<br />
+    색·이미지·글씨체는 저희가 미리 맞춰 두었습니다 — 주최자님이 만지실 항목이 아닙니다.
+  </p>
+</section>
+
+<!-- ══════════════════ 목차 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__t">목차</span></div>
+
+  <ul class="toc">
+    <li><span class="toc__no">1</span><span class="toc__t">이 이벤트는 이렇게 굴러갑니다</span><span class="toc__d">누가 뽑는가</span></li>
+    <li><span class="toc__no">2</span><span class="toc__t">행사 전날 준비</span><span class="toc__d">기기·로그인·체크리스트</span></li>
+    <li><span class="toc__no">3</span><span class="toc__t">부스에서 보이는 화면</span><span class="toc__d">뽑기부터 배송지 입력까지</span></li>
+    <li><span class="toc__no">4</span><span class="toc__t">관리 화면 둘러보기</span><span class="toc__d">대시보드와 메뉴</span></li>
+    <li><span class="toc__no">5</span><span class="toc__t">상품과 수량</span><span class="toc__d">적은 숫자가 곧 뽑을 수 있는 수량</span></li>
+    <li><span class="toc__no">6</span><span class="toc__t">운영 스위치와 저장</span><span class="toc__d">실제 운영 · 마감 · 잠금</span></li>
+    <li><span class="toc__no">7</span><span class="toc__t">방문자에게 어떻게 보일지</span><span class="toc__d">결과 표시 · 경품 미리보기</span></li>
+    <li><span class="toc__no">8</span><span class="toc__t">다국어</span><span class="toc__d">상품 이름은 직접 적으셔야 합니다</span></li>
+    <li><span class="toc__no">9</span><span class="toc__t">묶음 뽑기 제한</span><span class="toc__d">켜면 치르는 대가</span></li>
+    <li><span class="toc__no">10</span><span class="toc__t">배송 정보</span><span class="toc__d">개인정보 · 보관 기간</span></li>
+    <li><span class="toc__no">11</span><span class="toc__t">행사 당일 순서</span><span class="toc__d">아침에 이 순서로</span></li>
+    <li><span class="toc__no">12</span><span class="toc__t">저희에게 말씀해 주세요</span><span class="toc__d">주최자님이 못 바꾸는 것</span></li>
+  </ul>
+
+  <h3>이 문서를 읽는 법</h3>
+  <p>
+    <b>3장</b>은 방문자와 스태프가 부스에서 보게 될 화면입니다. 미리 한 번 보셔야
+    현장에서 “이게 맞나요?” 하는 질문에 답하실 수 있습니다.
+  </p>
+  <p>
+    <b>5장부터 10장</b>이 주최자님이 실제로 손대시는 부분입니다. 시간이 없으시면
+    <b>5장(수량)</b>, <b>6장(저장)</b>, <b>10장(배송 정보)</b> 세 곳만 읽어 주세요.
+  </p>
+
+  <div class="box box--warn">
+    <div class="box__t">이 문서에서 사람은 세 부류입니다</div>
+    <ul style="margin-bottom:0">
+      <li><b>방문자</b> — 카페에 온 손님입니다.</li>
+      <li><b>스태프</b> — 부스에서 기기를 누르는 분입니다. 뽑기는 스태프가 합니다.</li>
+      <li><b>주최자</b> — 이 문서를 읽고 계신 분입니다. 상품·수량·운영을 정하십니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════════════ 1장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">1장</span><span class="chap__t">이 이벤트는 이렇게 굴러갑니다</span></div>
+
+  <p class="lead">
+    럭키드로우는 <b>방문자가 자기 휴대폰으로 뽑는 방식이 아닙니다.</b>
+    부스에 세워 둔 태블릿에서 <b>스태프가 방문자 앞에서 눌러 뽑습니다.</b>
+  </p>
+
+  <h3>왜 스태프가 뽑나요</h3>
+  <p>
+    주소가 밖으로 알려져도 남이 재고를 태울 수 없어야 하기 때문입니다.
+    그래서 <b>로그인이 되어 있지 않은 기기에서는 뽑기 버튼이 아예 눌리지 않습니다.</b>
+    버튼 아래에 <span class="q">“스태프가 로그인해야 뽑을 수 있어요”</span> 라고 떠 있으면
+    그 기기는 로그인이 안 된 상태입니다.
+  </p>
+
+  <h3>화면은 두 개뿐입니다</h3>
+  <table>
+    <tr>
+      <th style="width:26%">추첨 화면</th>
+      <td>
+        부스 기기에서 여는 화면입니다. 여기서 뽑습니다.<br />
+        <span class="mute">이벤트 주소를 그대로 열면 나옵니다.</span>
+      </td>
+    </tr>
+    <tr>
+      <th>관리 화면</th>
+      <td>
+        주최자님이 상품·수량·운영을 정하는 화면입니다.<br />
+        <span class="mute">이벤트 주소 뒤에 <b>/admin</b> 을 붙이면 나옵니다.
+        추첨 화면 맨 아래 흐릿한 글씨로도 들어가실 수 있습니다.</span>
+      </td>
+    </tr>
+  </table>
+
+  <div class="box box--key">
+    <div class="box__t">‘스태프 화면’ 은 이 이벤트에 없습니다</div>
+    <p>
+      다른 이벤트(포토카드·스탬프)에는 스태프 전용 화면이 따로 있지만,
+      럭키드로우는 <b>추첨 화면 자체가 곧 스태프 화면</b>입니다.
+      부스 기기에는 추첨 화면 하나만 띄워 두시면 됩니다.
+    </p>
+  </div>
+
+  <h3>한 번에 여러 개도 뽑힙니다</h3>
+  <p>
+    개수를 정하고 한 번 누르면 그만큼 한꺼번에 뽑힙니다.
+    구매 금액에 따라 3개·5개·10개를 드리는 운영이라면 그대로 쓰시면 됩니다.
+    한 번에 최대 100개까지 됩니다.
+  </p>
+
+  <h3>재고는 모든 기기가 함께 씁니다</h3>
+  <p>
+    태블릿을 두 대 쓰시든 세 대 쓰시든 재고는 하나입니다.
+    한 기기에서 뽑으면 다른 기기의 남은 수량도 <b>가만히 두어도 따라서 줄어듭니다.</b>
+    관리 화면에서 마감을 켜시면 부스 기기들도 바로 마감 화면으로 바뀝니다.
+  </p>
+</section>
+
+<!-- ══════════════════ 2장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">2장</span><span class="chap__t">행사 전날 준비</span></div>
+
+  <p class="lead">
+    당일 아침에 처음 만지시면 반드시 무언가 빠집니다. 전날 밤에 아래까지만 해 두시면
+    당일에는 스위치 두 개만 만지시면 됩니다.
+  </p>
+
+  <h3>기기</h3>
+  <ul>
+    <li><b>아이패드는 가로로 두고 쓰시길 권합니다.</b> 화면이 그 비율에 맞춰져 있습니다.</li>
+    <li>브라우저는 아이패드면 사파리, 갤럭시탭이면 크롬을 쓰시는 편이 안전합니다.</li>
+    <li>
+      추첨 화면을 열고 <b>‘홈 화면에 추가’</b> 를 해 두세요. 주소창 없이 앱처럼 열려서
+      현장에서 주소를 찾을 일이 없습니다.
+    </li>
+    <li>
+      추가된 앱을 열어 <b>로그인까지 해 두세요.</b> 로그인은 추첨 화면 맨 아래
+      흐릿한 <span class="q">‘관리자로 로그인’</span> 입니다. 한 번 하면 유지됩니다.
+    </li>
+    <li>기기·브라우저마다 표시가 조금씩 다릅니다. 전날 반드시 한 번 테스트해 주세요.</li>
+  </ul>
+
+  <div class="box box--warn">
+    <div class="box__t">스태프가 여럿이면 계정을 나눠 주세요</div>
+    <p>
+      관리 화면 왼쪽 <span class="q">‘스태프 계정’</span> 에서 계정을 따로 만드실 수 있습니다.
+      한 계정을 돌려 쓰시면 누가 뽑았는지 기록이 섞입니다.
+    </p>
+  </div>
+
+  <h3>전날 체크리스트</h3>
+  <ul class="check">
+    <li>부스에서 쓸 기기마다 추첨 화면을 열고 <b>홈 화면에 추가 → 로그인</b>까지 해 둡니다.</li>
+    <li>관리 화면 <span class="q">‘상품 · 운영’</span> 에서 상품과 수량을 넣고 <b>저장</b>합니다. (5장)</li>
+    <li>리허설 상태로 몇 번 뽑아 보며 화면을 확인합니다. <b>재고는 줄지 않습니다.</b></li>
+    <li>배송이 필요한 상품이 있으면 <span class="q">‘배송’</span> 칸을 <b>‘필요’</b> 로 켜 둡니다.</li>
+    <li><span class="q">‘설정 잠금’</span> 과 <span class="q">‘행사 마감’</span> 을 켜고 <b>저장</b>합니다.</li>
+  </ul>
+
+  <p>
+    마지막 줄까지 해 두시면, 당일 아침 전까지 스태프가 실수로 수량을 건드리거나
+    미리 뽑아 버릴 일이 없습니다.
+  </p>
+
+  <div class="box box--danger">
+    <div class="box__t">비밀번호는 꼭 바꿔 주세요</div>
+    <p>
+      처음 받으신 비밀번호는 저희도 아는 값입니다.
+      관리 화면 왼쪽 <span class="q">‘내 계정’</span> 에서 주최자님만 아는 값으로 바꿔 주세요.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════ 3장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">3장</span><span class="chap__t">부스에서 보이는 화면</span></div>
+
+  <p class="lead">
+    아래는 부스 기기(아이패드 가로)에서 보이는 화면 그대로입니다.
+    방문자가 옆에서 같이 보는 화면이라 미리 알고 계시는 편이 좋습니다.
+  </p>
+
+  <figure>
+    <span class="shot shot--pad">
+      <img src="luckydraw/01-draw.png" alt="뽑기 화면" />
+      <span class="pin" style="left:52%; top:38.6%">1</span>
+      <span class="pin" style="left:33%; top:47.5%">2</span>
+      <span class="pin" style="left:31%; top:69.5%">3</span>
+      <span class="pin" style="left:31%; top:76.6%">4</span>
+    </span>
+    <figcaption>뽑기 화면 — 스태프가 개수를 정하고 누릅니다.</figcaption>
+  </figure>
+
+  <ul>
+    <li>
+      <span class="num">1</span><b>경품 미리보기</b> — 어떤 상품이 준비돼 있는지 방문자에게 보여 줍니다.
+      보여 줄지 말지는 주최자님이 정하십니다(7장).
+    </li>
+    <li>
+      <span class="num">2</span><b>리허설 안내</b> — 이 줄이 보이면 <b>연습 중</b>이라 아무리 뽑아도
+      재고가 줄지 않습니다. 행사 중에 이 줄이 보이면 잘못된 것입니다.
+    </li>
+    <li>
+      <span class="num">3</span><b>개수 고르기</b> — 1개·5개·10개 버튼이나 ＋−로 정합니다.
+    </li>
+    <li>
+      <span class="num">4</span><b>뽑기 버튼</b> — 누르면 그 자리에서 결과가 나옵니다.
+      로그인이 안 된 기기에서는 이 버튼이 눌리지 않습니다.
+    </li>
+  </ul>
+
+  <p class="mute">
+    남은 수량이 적어지면 이 자리에 <span class="q">“남은 경품 N개, 서둘러요!”</span> 가 대신 뜹니다.
+  </p>
+
+  <h3 class="sub">당첨 연출 — 긁어서 확인합니다</h3>
+
+  <figure>
+    <span class="shot shot--pad"><img src="luckydraw/02-prize-preview.png" alt="경품 미리보기" /></span>
+    <figcaption>
+      뽑기 화면의 <span class="num">1</span><span class="q">‘경품 미리보기’</span> 를 누르면 나오는 목록입니다.
+      남은 수량까지 보여 줄지도 고르실 수 있습니다.
+    </figcaption>
+  </figure>
+
+  <div class="two">
+    <figure>
+      <span class="shot shot--pad"><img src="luckydraw/03-result-covered.png" alt="당첨 결과 — 덮인 상태" /></span>
+      <figcaption>뽑은 직후 — 비싼 등수만 덮여 있습니다.</figcaption>
+    </figure>
+    <figure>
+      <span class="shot shot--pad"><img src="luckydraw/04-result-open.png" alt="당첨 결과 — 긁은 뒤" /></span>
+      <figcaption>긁은 뒤 — 상품이 드러나고 색종이가 쏟아집니다.</figcaption>
+    </figure>
+  </div>
+
+  <p>
+    낮은 등수는 순서대로 스르륵 나타나고, <b>비싼 등수만 덮여 있어 방문자가 직접 긁습니다.</b>
+    어느 등수를 덮을지는 저희가 미리 정해 두었습니다.
+    10개를 한 번에 뽑아도 <b>긁는 칸은 비싼 등수뿐</b>이라 줄이 밀리지 않습니다.
+  </p>
+
+  <h3 class="sub">정산과 배송</h3>
+
+  <figure>
+    <span class="shot shot--pad"><img src="luckydraw/05-summary.png" alt="전체 결과" /></span>
+    <figcaption>
+      <span class="q">‘전체 결과 보기’</span> 를 누르면 나오는 화면입니다.
+      같은 상품끼리 묶여 개수로 나오니 <b>스태프가 무엇을 몇 개 드려야 하는지 여기서 확인</b>하시면 됩니다.
+    </figcaption>
+  </figure>
+
+  <div class="box box--key">
+    <div class="box__t">전체 결과에는 상품명이 항상 나옵니다</div>
+    <p>
+      방문자 화면을 ‘등수만’ 으로 해 두셔도 이 화면에는 상품명이 나옵니다.
+      연출이 아니라 <b>스태프가 물건을 건네기 위한 목록</b>이기 때문입니다.
+    </p>
+  </div>
+
+  <figure>
+    <span class="shot shot--pad"><img src="luckydraw/06-shipping.png" alt="배송 정보 입력" /></span>
+    <figcaption>
+      <b>배송이 필요한 상품이 나왔을 때만</b> <span class="q">‘배송지 입력’</span> 버튼이 생깁니다.
+      방문자가 직접 이름·연락처·주소를 넣습니다. (위 내용은 예시로 넣은 값입니다.)
+    </figcaption>
+  </figure>
+
+  <p>
+    한 번 낸 내용은 <b>방문자 본인도 다시 볼 수 없습니다.</b> 잘못 적으셨다는 분이 계시면
+    스태프에게 말씀해 달라고 안내해 주세요 — 주최자님이 관리 화면에서 확인하실 수 있습니다.
+  </p>
+
+  <h3 class="sub">마감 화면</h3>
+
+  <figure>
+    <span class="shot shot--pad"><img src="luckydraw/40-closed.png" alt="마감 화면" /></span>
+    <figcaption>
+      관리 화면에서 <span class="q">‘행사 마감’</span> 을 켜고 저장하면 부스 기기가 이 화면으로 바뀝니다.
+      <b>상품이 다 소진되어도</b> 같은 화면이 나옵니다.
+    </figcaption>
+  </figure>
+
+  <h3>마감은 언제든 되돌릴 수 있습니다</h3>
+  <p>
+    다시 열면 방문자가 이어서 뽑을 수 있습니다. 지워지는 것은 없습니다.
+    그래서 <b>전날 밤에는 마감을 켜 두시고, 당일 아침에 끄시는</b> 운영을 권합니다 —
+    준비 중에 누가 눌러 재고가 나가는 일이 없습니다.
+  </p>
+
+  <div class="box box--warn">
+    <div class="box__t">마감을 켜도 관리 화면은 그대로 열립니다</div>
+    <p>
+      마감은 방문자 쪽만 닫습니다. 주최자님은 계속 들어와 수량을 고치고
+      배송 정보를 확인하실 수 있습니다.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════ 4장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">4장</span><span class="chap__t">관리 화면 둘러보기</span></div>
+
+  <p class="lead">
+    이벤트 주소 뒤에 <b>/admin</b> 을 붙여 로그인하시면 아래 화면이 나옵니다.
+    처음 열리는 곳은 <b>대시보드</b>입니다 — 보는 화면이지 고치는 화면이 아닙니다.
+  </p>
+
+  <figure>
+    <span class="shot shot--tall"><img src="luckydraw/20-admin-dashboard.png" alt="관리 화면 대시보드" /></span>
+    <figcaption>대시보드 — 오늘 얼마나 나갔는지, 무엇이 남았는지 한눈에 봅니다. 30초마다 저절로 갱신됩니다.</figcaption>
+  </figure>
+
+  <h3>왼쪽 메뉴</h3>
+  <table>
+    <tr><th style="width:30%">대시보드</th><td>오늘·전체 나간 경품, 남은 재고, 품목별 남은 비율.</td></tr>
+    <tr><th>상품 · 운영</th><td><b>주최자님이 제일 자주 여실 화면입니다.</b> 상품·수량과 운영 설정이 함께 있습니다. (5~9장)</td></tr>
+    <tr><th>배송 정보</th><td>배송 상품에 당첨된 방문자가 남긴 주소입니다. (10장)</td></tr>
+    <tr><th>내 계정</th><td>비밀번호를 바꾸는 곳입니다.</td></tr>
+    <tr><th>스태프 계정</th><td>부스 기기에서 쓸 스태프 계정을 만듭니다.</td></tr>
+  </table>
+
+  <p class="mute">
+    위 캡처는 로그인 없이 열리는 체험용 화면이라 <b>‘내 계정’ · ‘스태프 계정’ 이 보이지 않습니다.</b>
+    실제 이벤트 화면에서는 왼쪽 아래 ‘계정’ 묶음에 함께 나옵니다.
+  </p>
+
+  <div class="box box--danger">
+    <div class="box__t">맨 위에 빨간 줄이 떠 있으면 읽어 주세요</div>
+    <p>
+      <span class="q">“리허설이 켜져 있어요 — 뽑아도 재고가 줄지 않고 기록에도 안 남아요.”</span><br />
+      행사 중에 이 줄이 보이면 <b>지금 판매분이 하나도 집계되지 않고 있습니다.</b>
+      오른쪽 <span class="q">‘고치러 가기 →’</span> 를 누르시면 바로 그 자리로 갑니다.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════ 5장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">5장</span><span class="chap__t">상품과 수량</span></div>
+
+  <p class="lead">왼쪽 메뉴 <span class="q">‘상품 · 운영’</span> 을 여시면 맨 위에 오늘 현황이 나옵니다.</p>
+
+  <figure>
+    <span class="shot"><img src="luckydraw/27-admin-stats.png" alt="상품·운영 상단 지표" /></span>
+    <figcaption>
+      <b>지금 운영 상태</b>가 <span class="q">‘리허설’</span> 이면 연습 중,
+      <span class="q">‘실제 운영’</span> 이면 뽑을 때마다 재고가 줄어드는 상태입니다.
+    </figcaption>
+  </figure>
+
+  <figure>
+    <span class="shot">
+      <img src="luckydraw/26-admin-prizes.png" alt="상품 표" />
+      <span class="pin" style="left:51%; top:34.6%">1</span>
+      <span class="pin" style="left:59.5%; top:23.8%">2</span>
+      <span class="pin" style="left:80.5%; top:34.6%">3</span>
+      <span class="pin" style="left:70.5%; top:8.8%">4</span>
+    </span>
+    <figcaption>상품 표 — 줄 순서가 곧 등수입니다. 맨 위가 1등입니다.</figcaption>
+  </figure>
+
+  <ul>
+    <li>
+      <span class="num">1</span><b>남은 수량</b> — 여기 적으신 숫자가 <b>곧 지금 뽑을 수 있는 개수</b>입니다.
+      고치실 수 있는 칸은 이것 하나뿐입니다.
+    </li>
+    <li>
+      <span class="num">2</span><b>오늘 나감 · 누적</b> — 실제로 뽑힌 기록에서 자동으로 센 값이라
+      <b>고치실 수 없습니다.</b> 행사가 끝나고 이 숫자를 보시면 오늘 얼마나 나갔는지 바로 아십니다.
+    </li>
+    <li>
+      <span class="num">3</span><b>배송</b> — <span class="q">‘필요’</span> 로 켜 두시면 그 상품이 당첨됐을 때
+      방문자 화면에 배송지 입력창이 뜹니다.
+    </li>
+    <li>
+      <span class="num">4</span><b>여러 개 붙여넣기</b> — 상품이 많으실 때 한 번에 넣습니다.
+      한 줄에 <b>이름, 수량</b> 순으로 적으시고, 수량 뒤에 <b>배송</b> 이라고 적으시면 배송 상품이 됩니다.
+    </li>
+  </ul>
+
+  <h3 class="sub">이튿날 운영</h3>
+
+  <div class="box box--key">
+    <div class="box__t">다음 날 물량은 ‘더해서’ 적어 주세요</div>
+    <p>
+      이 칸은 <b>더하는 칸이 아니라 지금 값을 그대로 정하는 칸</b>입니다.
+      그래서 이튿날에는 <b>어제 남은 수량 + 오늘 가져오신 개수</b>를 주최자님이 계산해 적으셔야 합니다.
+    </p>
+    <p style="margin-bottom:0">
+      예를 들어 화면에 남은 수량이 <b>12</b> 로 보이고 오늘 <b>30개</b>를 더 가져오셨다면,
+      그 칸에 <b>42</b> 라고 적으시면 됩니다.
+    </p>
+  </div>
+
+  <div class="box box--danger">
+    <div class="box__t">수량을 고치실 땐 뽑기를 멈춰 주세요</div>
+    <p>
+      주최자님이 <b>42</b> 를 적는 사이에 부스에서 누가 뽑으면, 그 나간 개수가
+      주최자님이 적은 숫자에 <b>덮여 사라집니다.</b>
+    </p>
+    <p style="margin-bottom:0">
+      수량 편집은 <b>‘행사 마감’ 이나 ‘설정 잠금’ 을 켜서 뽑기가 멈춘 상태</b>에서 하시고,
+      다 끝난 뒤 다시 여세요. 어차피 전날 밤에 하시는 작업입니다.
+    </p>
+  </div>
+
+  <h3>상품을 지우면</h3>
+  <p>
+    아래 등수가 하나씩 당겨지며 다시 매겨집니다. <b>이미 뽑힌 기록은 그대로 남습니다</b> —
+    오늘 나간 개수가 사라지지는 않습니다.
+  </p>
+
+  <h3>수량을 0으로 두면</h3>
+  <p>
+    그 상품은 나오지 않습니다. 목록에서 지우지 않고 잠시 빼 두고 싶으실 때 쓰시면 됩니다.
+    모든 상품의 수량이 0이 되면 부스 화면은 마감 화면으로 바뀝니다.
+  </p>
+
+  <h3>상품은 100종까지</h3>
+  <p>그보다 많이 필요하시면 말씀해 주세요.</p>
+</section>
+
+<!-- ══════════════════ 6장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">6장</span><span class="chap__t">운영 스위치와 저장</span></div>
+
+  <figure>
+    <span class="shot"><img src="luckydraw/22-admin-ops.png" alt="운영 스위치" /></span>
+    <figcaption>같은 화면을 아래로 내리시면 나오는 ‘운영’ 스위치 세 개입니다.</figcaption>
+  </figure>
+
+  <table>
+    <tr>
+      <th style="width:26%">실제 운영</th>
+      <td>
+        <b>처음에는 꺼져 있습니다(리허설).</b> 꺼져 있는 동안에는 아무리 뽑아도 재고가 줄지 않고
+        기록에도 남지 않습니다. <b>행사 시작 전에 반드시 켜고 저장해 주세요.</b><br />
+        <span class="mute">전날 시연하다 한정 상품을 태워 버리는 사고가 더 비싸서 이렇게 해 두었습니다.</span>
+      </td>
+    </tr>
+    <tr>
+      <th>행사 마감</th>
+      <td>켜면 방문자가 더 못 뽑습니다. 언제든 다시 열 수 있습니다.</td>
+    </tr>
+    <tr>
+      <th>설정 잠금</th>
+      <td>
+        <b>상품과 수량만</b> 못 고치게 잠급니다. <b>뽑기는 그대로 됩니다.</b>
+        스태프가 실수로 수량을 건드리는 것을 막고 싶으실 때 쓰세요.
+      </td>
+    </tr>
+  </table>
+
+  <figure>
+    <span class="shot"><img src="luckydraw/25-admin-savebar.png" alt="저장 바" /></span>
+    <figcaption>화면 맨 아래에 늘 붙어 있는 저장 바입니다.</figcaption>
+  </figure>
+
+  <div class="box box--danger">
+    <div class="box__t">이 화면은 ‘저장’ 을 눌러야 반영됩니다</div>
+    <p>
+      상품 표든 운영 스위치든, 바꾸신 뒤 화면 맨 아래 <span class="q">‘저장’</span> 을
+      누르셔야 실제로 적용됩니다. 안 누르시면 그 줄에
+      <span class="q">“아직 저장하지 않은 변경이 있어요”</span> 라고 떠 있습니다.
+    </p>
+    <p style="margin-bottom:0">
+      수량 여러 칸을 고치는 도중에 값이 하나씩 나가지 않도록 그렇게 만들었습니다.
+      <b>‘실제 운영’ 을 켜고 저장을 안 하면 하루 종일 리허설로 돕니다.</b>
+      잘못 만지셨으면 <span class="q">‘되돌리기’</span> 로 저장 전 상태로 돌아갑니다.
+    </p>
+  </div>
+
+  <p class="mute">
+    <b>‘실제 운영’ 과 ‘행사 마감’ 은 누르는 그 자리에서 한 번 더 물어봅니다.</b>
+    되돌리기 어려운 전환이라 확인 창을 띄웁니다 — 확인을 누르신 뒤에도 <b>저장</b>은 따로 눌러 주세요.
+  </p>
+</section>
+
+<!-- ══════════════════ 7장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">7장</span><span class="chap__t">방문자에게 어떻게 보일지</span></div>
+
+  <figure>
+    <span class="shot"><img src="luckydraw/23-admin-display.png" alt="당첨 결과 표시" /></span>
+    <figcaption>뽑은 방문자 화면에 무엇으로 보일지 고릅니다.</figcaption>
+  </figure>
+
+  <ul>
+    <li><b>등수와 상품명</b> — 기본값입니다. 대부분 이대로 쓰시면 됩니다.</li>
+    <li><b>등수만</b> — 상품명을 감추고 싶으실 때. 스태프가 무엇을 드릴지는 전체 결과 화면에서 봅니다.</li>
+    <li><b>상품명만</b> — 등수를 매기지 않고 상품만 보여 주고 싶으실 때.</li>
+  </ul>
+
+  <figure>
+    <span class="shot"><img src="luckydraw/28-admin-preview.png" alt="경품 미리보기 설정" /></span>
+    <figcaption>뽑기 전에 경품 목록을 보여 줄지 정합니다.</figcaption>
+  </figure>
+
+  <ul>
+    <li>
+      <b>뽑기 전에 경품 목록 보여주기</b> — 켜면 뽑기 화면에
+      <span class="q">‘경품 미리보기’</span> 버튼이 생깁니다.
+      상품명이 스포일러가 되는 행사면 꺼 주세요.
+    </li>
+    <li>
+      <b>남은 수량까지 보여주기</b> — 위를 켜셨을 때만 고르실 수 있습니다.
+      막바지에 “1등 1개 남음” 이 보이면 줄이 길어집니다. 원하지 않으시면 꺼 두세요.
+    </li>
+  </ul>
+
+  <div class="box box--key">
+    <div class="box__t">고르신 뒤 ‘저장’ 을 눌러 주세요</div>
+    <p>이 설정도 같은 화면이라 저장을 눌러야 방문자 화면에 반영됩니다.</p>
+  </div>
+</section>
+
+<!-- ══════════════════ 8장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">8장</span><span class="chap__t">다국어</span></div>
+
+  <p class="lead">
+    외국에서 오시는 방문자를 받는 이벤트라면 <b>화면 오른쪽 위 지구본</b>으로 언어를 바꿀 수 있습니다.
+    한국어 · English · 中文 · 日本語 중에서, <b>이 이벤트에 켜 둔 언어만</b> 목록에 나옵니다.
+  </p>
+
+  <figure>
+    <span class="shot shot--pad"><img src="luckydraw/50-lang-picker.png" alt="언어 고르개" /></span>
+    <figcaption>
+      부스 화면 오른쪽 위 지구본을 누르면 나옵니다. 방문자가 직접 바꿉니다.
+      <b>한국어는 언제나 목록에 있습니다</b> — 다른 언어를 골랐다가 되돌아올 길이 있어야 하기 때문입니다.
+    </figcaption>
+  </figure>
+
+  <div class="box box--key">
+    <div class="box__t">어떤 언어를 켤지는 저희가 맞춰 드립니다</div>
+    <p style="margin-bottom:0">
+      관리 화면에는 언어를 켜고 끄는 곳이 없습니다.
+      필요하신 언어를 말씀해 주시면 켜 드리고, 그때부터 지구본이 나타납니다.
+      <b>아무 언어도 켜지 않은 이벤트에는 지구본 자체가 없습니다.</b>
+    </p>
+  </div>
+
+  <figure>
+    <span class="shot shot--pad"><img src="luckydraw/51-visitor-en.png" alt="영어로 본 뽑기 화면" /></span>
+    <figcaption>English 를 고른 뽑기 화면입니다. 버튼과 안내가 통째로 바뀝니다.</figcaption>
+  </figure>
+
+  <h3>화면 문구는 저희가, 상품 이름은 주최자님이</h3>
+  <p>
+    <span class="q">‘몇 개를 뽑을까요?’</span>, <span class="q">‘전체 결과’</span>,
+    <span class="q">‘배송 정보 입력’</span> 처럼 <b>화면에 원래 있는 문구는 저희가 번역해 두었습니다.</b>
+    언어를 바꾸면 그대로 따라 바뀝니다.
+  </p>
+  <p>
+    하지만 <b>주최자님이 적으신 상품 이름은 저절로 번역되지 않습니다.</b>
+    저희가 무슨 상품인지 알 수 없기 때문입니다. 아래처럼 직접 적어 주셔야 합니다.
+  </p>
+
+  <h3 class="sub">상품 이름 적기</h3>
+
+  <figure>
+    <span class="shot"><img src="luckydraw/29-admin-i18n.png" alt="상품 이름 다른 언어 입력" /></span>
+    <figcaption>
+      <span class="q">‘상품 · 운영’</span> 의 상품 표에서 상품 이름 아래
+      <span class="q">‘다른 언어’</span> 를 누르면 켜 둔 언어만큼 칸이 열립니다.
+    </figcaption>
+  </figure>
+
+  <ul>
+    <li>평소에는 <b>접혀 있습니다.</b> 상품이 열 줄이면 칸이 서른 개가 되기 때문입니다.</li>
+    <li>이미 적어 두신 게 있으면 <span class="q">‘다른 언어’</span> 옆에 <b>1/3</b> 처럼 개수가 뜹니다. 열어 보지 않으셔도 채웠는지 아실 수 있습니다.</li>
+    <li>칸 안의 흐린 글씨는 <b>한국어 원문</b>입니다. 무엇을 옮기는 칸인지 보시라고 띄워 둔 것이지 저장된 값이 아닙니다.</li>
+    <li><b>비워 두셔도 됩니다.</b> 비워 두신 언어에는 한국어가 그대로 보입니다.</li>
+  </ul>
+
+  <figure>
+    <span class="shot shot--pad"><img src="luckydraw/52-prize-preview-en.png" alt="영어로 본 경품 목록" /></span>
+    <figcaption>
+      영어로 바꾼 화면입니다. <b>제목과 버튼은 영어로 바뀌었지만 상품 이름은 한국어 그대로</b>입니다 —
+      위 칸을 안 채웠기 때문입니다. 고장이 아닙니다.
+    </figcaption>
+  </figure>
+
+  <div class="box box--warn">
+    <div class="box__t">적으신 뒤 ‘저장’ 을 눌러 주세요</div>
+    <p style="margin-bottom:0">
+      상품 표와 같은 화면이라 저장을 눌러야 반영됩니다.
+      한 번 적어 두시면 <b>경품 목록·당첨 결과·전체 결과·배송지 입력</b> 화면에 모두 같은 이름으로 나옵니다.
+    </p>
+  </div>
+
+  <p class="mute">
+    화면 문구 중에 번역이 안 되고 한국어로 남아 있는 곳을 보시면 알려 주세요 — 채워 넣겠습니다.
+    <b>방문자가 넣는 배송 주소는 번역 대상이 아닙니다</b>(적으신 그대로 저장됩니다).
+  </p>
+</section>
+
+<!-- ══════════════════ 9장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">9장</span><span class="chap__t">묶음 뽑기 제한</span></div>
+
+  <p class="lead">
+    <b>기본은 꺼져 있습니다. 켜지 않으셔도 아무 문제 없습니다.</b>
+    10개를 한 번에 뽑을 때 흔한 상품이 우르르 쏟아지는 것이 신경 쓰이실 때만 쓰시는 기능입니다.
+  </p>
+
+  <figure>
+    <span class="shot"><img src="luckydraw/24-admin-batchcap.png" alt="묶음 뽑기 제한" /></span>
+    <figcaption>‘상품 · 운영’ 맨 아래에 있습니다.</figcaption>
+  </figure>
+
+  <h3>켜면 어떻게 되나요</h3>
+  <p>
+    상품 표에 <span class="q">‘5개당 최대’</span> 열이 하나 생깁니다. 거기에 숫자를 적으시면
+    <b>한 묶음 안에서 그 상품이 그 개수를 넘지 않습니다.</b>
+    비워 두신 상품은 제한이 없습니다.
+  </p>
+
+  <table>
+    <tr><th style="width:34%">5개당 최대에 <b>3</b></th><td>5개 뽑기 → 최대 3개 · 10개 뽑기 → 최대 5개</td></tr>
+    <tr><th>비워 둠</th><td>제한 없음 (지금과 똑같이 나옵니다)</td></tr>
+  </table>
+
+  <div class="box box--warn">
+    <div class="box__t">켜시면 치르는 대가가 있습니다</div>
+    <p>
+      흔한 상품이 덜 나오는 만큼 <b>비싼 상품이 이론보다 빨리 소진됩니다.</b>
+      방문자 체감은 좋아지지만 행사 막바지에 낮은 등수만 남는 현상이 심해집니다.
+      고장이 아니라 이 기능의 본질적인 대가입니다.
+    </p>
+    <p style="margin-bottom:0">
+      또한 제한은 <b>한 번에 누른 묶음 안에서만</b> 작동합니다.
+      10개를 5개씩 두 번에 나눠 누르면 우회됩니다 — 누르는 사람이 스태프라 현장에서 지키시면 됩니다.
+    </p>
+  </div>
+
+  <p class="mute">
+    행사 막바지에 남은 상품이 부족해지면 제한을 잠시 풀고 채웁니다.
+    <b>“10개 뽑기를 눌렀는데 오류”</b> 가 나는 것보다 낫기 때문입니다.
+  </p>
+</section>
+
+<!-- ══════════════════ 9장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">10장</span><span class="chap__t">배송 정보</span></div>
+
+  <p class="lead">
+    <b>방문자의 이름·연락처·주소가 그대로 들어 있는 유일한 화면입니다.</b>
+    다른 어떤 화면보다 조심해서 다뤄 주세요.
+  </p>
+
+  <figure>
+    <span class="shot shot--tall"><img src="luckydraw/30-admin-shipping.png" alt="배송 정보 화면" /></span>
+    <figcaption>
+      왼쪽 메뉴 <span class="q">‘배송 정보’</span>.
+      배송이 필요한 상품에 당첨된 방문자가 주소를 넣으면 여기에 한 줄씩 쌓입니다.
+      <span class="mute">위 캡처는 체험용 화면이라 목록이 비어 있습니다 — 체험 이벤트에는 개인정보를 넣을 수 없게 막아 두었습니다.</span>
+    </figcaption>
+  </figure>
+
+  <h3>여기서 하시는 일</h3>
+  <ul>
+    <li><b>찾기</b> — 이름·연락처·주소·상품으로 검색됩니다. 배송을 준비하며 한 명을 짚으실 때 쓰세요.</li>
+    <li><b>CSV 내려받기</b> — 엑셀에서 바로 열립니다. 한글도 깨지지 않습니다.</li>
+    <li><b>전체 지우기</b> — 배송이 끝나면 눌러 주세요.</li>
+  </ul>
+
+  <div class="box box--danger">
+    <div class="box__t">지우기 전에 반드시 CSV 부터 내려받으세요</div>
+    <p>
+      <b>이 목록에는 다른 곳에 사본이 없습니다.</b> 방문자 본인도 자기가 넣은 내용을 다시 볼 수 없습니다.
+      지우시면 되돌릴 방법이 없습니다.
+    </p>
+    <p style="margin-bottom:0">
+      순서는 언제나 <b>① CSV 내려받기 → ② 배송 완료 → ③ 전체 지우기</b> 입니다.
+    </p>
+  </div>
+
+  <h3>이 목록은 누가 볼 수 있나요</h3>
+  <p>
+    <b>주최자님 계정과 저희(플랫폼 운영자)</b>만 볼 수 있습니다.
+    방문자는 자기가 넣은 내용조차 다시 못 봅니다 — 읽기를 열어 두면 그 이벤트 당첨자 전원의
+    개인정보가 새기 때문입니다.
+  </p>
+
+  <div class="box box--warn">
+    <div class="box__t">보관 기간이 있습니다</div>
+    <p>
+      <b>행사 기간이 끝난 뒤 14일까지</b>는 관리 화면에 들어와 배송 정보를 꺼내실 수 있습니다.
+      추첨은 이때 되지 않습니다.
+    </p>
+    <p style="margin-bottom:0">
+      <b>15일째가 되면 이 이벤트의 자료가 자동으로 모두 삭제됩니다.</b>
+      배송 정보도 함께 사라지니 그 전에 꼭 내려받아 주세요.
+      정확한 날짜는 전달드린 안내 메시지에 적혀 있습니다.
+    </p>
+  </div>
+
+  <p class="mute">
+    대시보드 오른쪽 아래 <span class="q">‘행사 자료 내보내기’</span> 를 쓰시면 배송 정보를 포함한
+    행사 자료를 CSV 여러 개로 한 번에 받으실 수 있습니다. 개인정보가 든 파일이 섞여 있으니
+    받으신 뒤 보관에 유의해 주세요.
+  </p>
+</section>
+
+<!-- ══════════════════ 10장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">11장</span><span class="chap__t">행사 당일 순서</span></div>
+
+  <p class="lead">전날 준비(2장)를 마치셨다면 당일 아침에 하실 일은 네 가지뿐입니다.</p>
+
+  <ul class="check">
+    <li>관리 화면 <span class="q">‘상품 · 운영’</span> 을 엽니다.</li>
+    <li><span class="q">‘행사 마감’</span> 을 <b>끕니다.</b> (수량을 고치실 게 있으면 <span class="q">‘설정 잠금’</span> 도 함께)</li>
+    <li><span class="q">‘실제 운영’</span> 을 <b>켭니다.</b> — 이걸 잊으면 재고가 줄지 않습니다.</li>
+    <li>맨 아래 <span class="q">‘저장’</span> 을 <b>누릅니다.</b> 위 두 가지는 저장해야 반영됩니다.</li>
+  </ul>
+
+  <div class="box box--key">
+    <div class="box__t">제대로 됐는지 확인하는 법</div>
+    <p style="margin-bottom:0">
+      부스 기기에서 추첨 화면을 새로고침해 보세요.
+      <b>리허설 안내 줄이 안 보이면 정상</b>입니다. 관리 화면 위쪽 빨간 줄도 사라져 있어야 합니다.
+    </p>
+  </div>
+
+  <h3>행사 중에 보시면 좋은 것</h3>
+  <ul>
+    <li><b>대시보드</b> — 오늘 몇 개가 나갔는지, 무엇이 얼마 남았는지 봅니다.</li>
+    <li>재고가 얼마 안 남았을 때 부스 화면에 <span class="q">“남은 경품 N개, 서둘러요!”</span> 가 뜹니다.</li>
+    <li>마감하실 때는 <span class="q">‘행사 마감’</span> 을 켜고 <b>저장</b>하시면 모든 기기가 바로 닫힙니다.</li>
+  </ul>
+
+  <h3>이럴 땐 이렇게</h3>
+  <table>
+    <tr><th style="width:40%">뽑기 버튼이 눌리지 않아요</th><td>그 기기가 로그인이 안 된 상태입니다. 화면 맨 아래 <span class="q">‘관리자로 로그인’</span> 으로 로그인해 주세요.</td></tr>
+    <tr><th>뽑았는데 재고가 안 줄어요</th><td><span class="q">‘실제 운영’</span> 이 꺼져 있습니다. 켜고 <b>저장</b>해 주세요.</td></tr>
+    <tr><th>수량을 고쳤는데 그대로예요</th><td>맨 아래 <span class="q">‘저장’</span> 을 안 누르셨습니다.</td></tr>
+    <tr><th>수량을 못 고치겠어요</th><td><span class="q">‘설정 잠금’</span> 이 켜져 있습니다. 끄고 저장한 뒤 고쳐 주세요.</td></tr>
+    <tr><th>방문자 화면이 마감으로 떠요</th><td><span class="q">‘행사 마감’</span> 이 켜져 있거나 모든 상품의 남은 수량이 0입니다.</td></tr>
+  </table>
+</section>
+
+<!-- ══════════════════ 11장 ══════════════════ -->
+<section class="page">
+  <div class="chap"><span class="chap__no">12장</span><span class="chap__t">저희에게 말씀해 주세요</span></div>
+
+  <p class="lead">
+    아래는 관리 화면에 없는 항목입니다. <b>주최자님이 잘못 만지실까 걱정하실 필요가 없도록</b>
+    처음부터 저희가 맡아 두었습니다. 바꾸고 싶으신 게 있으면 편하게 연락 주세요.
+  </p>
+
+  <table>
+    <tr><th style="width:36%">색 · 배경 · 로고 · 글씨체</th><td>이벤트 분위기에 맞춰 저희가 미리 맞춰 두었습니다.</td></tr>
+    <tr><th>덮여 있다가 긁는 등수</th><td>몇 등까지 긁게 할지, 덮개에 어떤 문양을 넣을지 정해 드립니다.</td></tr>
+    <tr><th>뽑기 버튼 문구 · 마감 문구</th><td>“DRAW!” 대신 원하시는 문구로 바꿔 드립니다.</td></tr>
+    <tr><th>상품이 100종을 넘을 때</th><td>말씀해 주시면 조정해 드립니다.</td></tr>
+    <tr><th>행사 기간 연장</th><td><b>기간이 지나면 주소가 닫힙니다.</b> 연장이 필요하시면 미리 말씀해 주세요.</td></tr>
+  </table>
+
+  <h3>행사가 끝난 뒤</h3>
+  <ul>
+    <li><b>배송 정보를 CSV 로 내려받아 주세요.</b> 이게 가장 중요합니다.</li>
+    <li>배송이 끝나면 <span class="q">‘전체 지우기’</span> 로 개인정보를 지워 주세요.</li>
+    <li>행사 기간이 끝난 뒤 <b>14일까지</b> 관리 화면에 들어오실 수 있고, <b>15일째에 자료가 모두 삭제</b>됩니다.</li>
+  </ul>
+
+  <div class="box box--key">
+    <div class="box__t">마지막으로 한 번만 더</div>
+    <ol style="margin-bottom:0">
+      <li>행사 시작 전 <b>‘실제 운영’ 켜고 저장</b></li>
+      <li>바꾸셨으면 <b>‘저장’</b></li>
+      <li>지우기 전에 <b>‘CSV 내려받기’</b></li>
+    </ol>
+  </div>
+
+  <p style="margin-top:22px" class="mute">
+    이 세 가지만 지키시면 나머지는 크게 어긋날 일이 없습니다.
+    궁금한 점은 언제든 편하게 연락 주세요.
+  </p>
+</section>
+
+</body>
+</html>
