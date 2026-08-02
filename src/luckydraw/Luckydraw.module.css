@@ -24,6 +24,19 @@
    */
   --ds-note-bg: transparent;
   --ds-row-bg: transparent;
+  /**
+   * 위쪽 밴드('어떤 경품이 있는지 확인해보세요!')도 같은 정리다 — **선을 안 긋는다.**
+   *
+   * 밴드는 이미 자기 배경으로 구분되는데 아래 경계선까지 그으면 박스 안에 가로줄이
+   * 하나 더 생긴다. 그 안의 '경품 미리보기' 버튼도 테두리를 뺀다 — 밴드 위에 얹힌
+   * 작은 버튼이라 테두리가 있으면 선이 겹쳐 보인다.
+   *
+   * hover 는 **제자리 색**으로 둔다: 원래 값(`--color-wash`)이 밴드 바탕과 같은 데서
+   * 나와서, 올려도 안 바뀐 것처럼 보이거나 얼룩으로만 읽혔다.
+   */
+  --ds-band-line: none;
+  --ds-pv-border: none;
+  --ds-pv-hover: var(--color-surface);
 }
 
 .panel {
@@ -123,8 +136,14 @@
 .previewBtn {
   composes: previewBtn from '../components/DrawStage.module.css';
 }
+/**
+ * hover 는 **안 바꾼다** (`--ds-pv-hover`, 위 `.stage`).
+ *
+ * 이 줄은 원래 공용 규칙과 똑같은 값을 한 번 더 적고 있었다. 그러면 공용 쪽을 변수로 열어도
+ * **여기가 덮어써서 안 먹는다** — 실제로 그래서 hover 가 안 꺼졌다. 같은 변수를 보게 둔다.
+ */
 .previewBtn:hover {
-  background: var(--color-wash);
+  background: var(--ds-pv-hover, var(--color-wash));
 }
 
 /* 리허설 안내 — 아이콘 배너 (시안) */
@@ -220,7 +239,15 @@
   justify-content: center;
   border-radius: var(--radius-full);
   background: var(--color-wash);
-  color: var(--color-primary);
+  /**
+   * **바탕 위에서 읽히게 파생된 색**을 쓴다 (`--color-primary-soft`).
+   *
+   * 원래는 `--color-primary` 였는데, 그 색과 이 바탕(`--color-wash`)이 서로 가까우면
+   * 아이콘이 사라진다 — 옅은 분홍 바탕에 옅은 분홍 아이콘이 실제로 그랬다(대비 1.1:1).
+   * `primary-soft` 는 "이 바탕 위에서 읽히는 primary" 로 런타임에 계산된 값이라
+   * (`lib/theme.ts` 의 DERIVED_COLORS) 어떤 슬롯 색이 와도 보인다.
+   */
+  color: var(--color-primary-soft);
   margin-bottom: 8px;
 }
 .closedTitle {
@@ -336,7 +363,7 @@
   border-color: var(--color-wash-raw, var(--color-wash));
 }
 
-/* 낮은 등수만 순서대로 등장 — 덮인 칸은 바로 보여 긁게 한다 */
+/* 뽑힌 순서대로 하나씩 등장 — 덮인(긁는) 칸도 같이 (`ResultReveal` 의 data-anim 주석) */
 .resultItem[data-anim] {
   opacity: 0;
   animation: rise 0.5s ease-out forwards;
@@ -701,7 +728,15 @@
   justify-content: center;
   border-radius: var(--radius-md);
   background: var(--color-wash);
-  color: var(--color-primary);
+  /**
+   * **바탕 위에서 읽히게 파생된 색**을 쓴다 (`--color-primary-soft`).
+   *
+   * 원래는 `--color-primary` 였는데, 그 색과 이 바탕(`--color-wash`)이 서로 가까우면
+   * 아이콘이 사라진다 — 옅은 분홍 바탕에 옅은 분홍 아이콘이 실제로 그랬다(대비 1.1:1).
+   * `primary-soft` 는 "이 바탕 위에서 읽히는 primary" 로 런타임에 계산된 값이라
+   * (`lib/theme.ts` 의 DERIVED_COLORS) 어떤 슬롯 색이 와도 보인다.
+   */
+  color: var(--color-primary-soft);
 }
 .previewTitle {
   margin: 0;

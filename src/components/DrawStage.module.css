@@ -88,7 +88,8 @@
   margin: calc(var(--ds-box-padding, 32px) * -1) calc(var(--ds-box-padding, 32px) * -1) 22px;
   padding: 14px;
   background: color-mix(in srgb, var(--color-wash) 55%, var(--color-surface));
-  border-bottom: 1px solid var(--ds-tile-border, var(--color-border));
+  /* 아래 경계선도 끌 수 있다 — `--ds-note-bg`·`--ds-row-bg` 와 같은 이유 (럭드는 끈다) */
+  border-bottom: var(--ds-band-line, 1px solid var(--ds-tile-border, var(--color-border)));
   text-align: center;
 }
 .bandMsg {
@@ -102,7 +103,8 @@
   align-items: center;
   gap: 5px;
   padding: 5px 12px;
-  border: 1px solid var(--color-border-hover);
+  /* 테두리도 끌 수 있다 (`--ds-pv-border: none`) — 밴드와 함께 쓰는 값이라 짝으로 연다 */
+  border: var(--ds-pv-border, 1px solid var(--color-border-hover));
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-primary);
@@ -111,8 +113,15 @@
   cursor: pointer;
   transition: background var(--dur-micro, 0.12s) ease;
 }
+/**
+ * hover 배경도 끌 수 있다 (`--ds-pv-hover: var(--color-surface)` — 제자리 색).
+ *
+ * 이 버튼은 **밴드 위에 얹혀 있는데** 밴드 바탕도 `wash` 에서 온다. 그래서 hover 색이
+ * 밴드와 거의 같아져 "눌러지는 것" 처럼 안 보이고 그냥 얼룩으로 읽힌다 — 그럴 바엔
+ * 안 바뀌는 편이 낫다. 포토카드 스태프 화면은 기본값 그대로다.
+ */
 .previewBtn:hover {
-  background: var(--color-wash);
+  background: var(--ds-pv-hover, var(--color-wash));
 }
 
 .adminLink {

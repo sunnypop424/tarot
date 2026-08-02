@@ -87,7 +87,8 @@
   background: var(--cp-bg);
   color: var(--cp-fg);
   font-family: inherit;
-  font-size: 14px;
+  /* 프리셋(1개·5개·10개)은 숫자가 짧아 14px 이면 버튼 크기에 비해 작아 보인다 */
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
 }
