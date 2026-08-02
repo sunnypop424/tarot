@@ -160,7 +160,28 @@ create policy "owner manages slots" on slots for all
 - GitHub 레포 연결. Framework: **Vite**. 빌드 `npm run build`, 출력 `dist`.
 - 환경변수 3개: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_AI_BASE`. **`ANTHROPIC_API_KEY` 는 여기 넣지 않는다** — Supabase secret 으로만 산다.
 - **배포 도메인을 `AI_ALLOWED_ORIGINS` 에 넣어야 한다.** 안 넣으면 함수가 CORS 로 막아 AI 가 통째로 죽는다(앱은 안 멈추고 종합만 빠진다 — 그래서 조용히 지나칠 수 있다):
-  `npx supabase secrets set AI_ALLOWED_ORIGINS="https://내도메인,http://localhost:5174"`
+  `npx supabase secrets set AI_ALLOWED_ORIGINS="https://내도메인,http://localhost:5174" --project-ref <ref>`
+
+  **커스텀 도메인을 붙일 때 실제로 여기서 터졌다.** `olucky.me` 를 연결하고 secret 은 그대로 둬서
+  `www.olucky.me` 에서 함수 호출이 전부 막혔다 — `ai` 뿐 아니라 **같은 secret 을 쓰는 `admin`(주최자
+  계정·비밀번호)까지** 같이 죽는다. 지금 값은 이렇다:
+
+  ```
+  https://www.olucky.me,https://olucky.me,https://tarot-btjp.vercel.app,http://localhost:5174
+  ```
+
+  - **맨 앞이 실서비스 도메인이어야 한다.** 모르는 출처엔 함수가 `ALLOWED[0]` 을 돌려주므로
+    (`corsHeaders`), 그 자리가 옛 주소면 브라우저 오류 메시지가 엉뚱한 도메인을 가리킨다.
+  - apex(`olucky.me`)도 같이 넣는다 — 지금은 `www` 로 308 이지만 apex 로 직접 서빙하면 같은 사고다.
+  - 기존 `*.vercel.app` 과 `localhost:5174` 를 **빼지 않는다** (개발도 같은 함수를 쓴다 — `VITE_AI_BASE`).
+
+  **secret 은 값을 못 읽는다**(대시보드·CLI 모두 해시만 보여준다). 지금 무엇이 열려 있는지는
+  함수에 직접 물어본다 — 허용된 출처면 그 출처가 그대로 돌아온다:
+
+  ```bash
+  curl -s -o /dev/null -D - -X OPTIONS -H "Origin: https://www.olucky.me" \
+    https://<ref>.supabase.co/functions/v1/ai/status | grep -i access-control-allow-origin
+  ```
 
 ### 2-2. SPA 라우팅 — 빠뜨리면 슬러그가 죽는다
 
@@ -248,7 +269,7 @@ Deno 에선 `npm:@anthropic-ai/sdk` 로 같은 SDK 를 쓴다. `cards.json` 은 
 - **슬롯별 예산 상한** → `claim_ai_usage` (0003). 넘으면 402 → 화면은 폴백(카드별 해석). **원자적이어야 한다**: 읽고-검사-쓰기로 하면 새로고침 연타에 여러 요청이 동시에 "아직 남았네"를 보고 전부 통과한다. `update … where reading < cap` 한 문장이라 행 잠금이 순서를 만든다.
 - **레이트리밋** → `bump_ai_rate` (0003). 한도(슬롯당 수천 회)는 **예산**을 지키지 연타를 못 막는다. 리딩 10회/분.
 - **답변 생성 권한** → 그 슬롯 주최자만 (`manages_slot()`). 78장 = 209원짜리 버튼이다. 색 만들기는 최고관리자만.
-- **CORS** → `AI_ALLOWED_ORIGINS` secret. 지금은 `http://localhost:5174` 뿐 — **배포 도메인을 여기 넣어야 한다.**
+- **CORS** → `AI_ALLOWED_ORIGINS` secret. 지금 값: `https://www.olucky.me,https://olucky.me,https://tarot-btjp.vercel.app,http://localhost:5174` (§2-1 에 왜 이 순서인지 적어 뒀다).
 
 **함수 권한의 함정:** `create function` 은 EXECUTE 를 **PUBLIC** 에 준다. `revoke … from anon, authenticated` 로는 안 뺏긴다(둘 다 PUBLIC 을 통해 상속받는다) — 실제로 그렇게 썼다가 anon 키로 `release_ai_usage` 를 불러 사용량을 되돌릴 수 있었다. `from public` 으로 뺏고 `service_role` 에만 도로 준다.
 

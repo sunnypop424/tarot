@@ -2,9 +2,14 @@
  * 배포 검증 — **진짜 주소를 때린다.** 로컬이 통과해도 배포가 깨지는 자리가 따로 있다:
  * SPA 리라이트, 자산 절대경로(base), Edge Function CORS, 배포 빌드의 환경변수.
  *
- *   node scripts/verify-prod.mjs https://tarot-btjp.vercel.app <스크린샷 디렉터리>
+ *   node scripts/verify-prod.mjs https://www.olucky.me <스크린샷 디렉터리>
  *
  * 리딩을 실제로 뽑으므로 **돈이 든다** (약 5원).
+ *
+ * **주소를 새로 붙였으면 그 주소로 돌린다.** 커스텀 도메인을 연결하고 이 검사는 옛
+ * vercel 주소로만 돌린 적이 있는데, Edge Function 의 `AI_ALLOWED_ORIGINS` 는 출처별이라
+ * 옛 주소에서만 통과하고 **새 주소에서는 함수 호출이 전부 막혀 있었다** (AI 도, 주최자
+ * 계정도). 도메인마다 결과가 다른 검사다.
  */
 import puppeteer from 'puppeteer-core'
 import { existsSync } from 'node:fs'
@@ -112,6 +117,21 @@ await wait(2000)
 check('편집기는 로그인 뒤에 있다', page.url().endsWith('/theme-editor/login'), page.url())
 
 await browser.close()
+
+/**
+ * **CORS 로 막힌 호출이 있었나.**
+ *
+ * 위 검사들은 "결과가 안 나왔다" 까지만 말한다 — 왜 안 나왔는지는 콘솔에만 남는다.
+ * 커스텀 도메인을 붙였을 때 실제로 이걸 못 읽고 화면만 봤다(AI 는 막히면 조용히 폴백해서
+ * 카드별 해석이 나오는 바람에 멀쩡해 보였다). 원인을 이름으로 말해 주는 검사를 따로 둔다.
+ */
+const corsErrors = errors.filter((e) => /CORS|Access-Control-Allow-Origin/i.test(e))
+check(
+  'CORS 로 막힌 호출이 없다',
+  corsErrors.length === 0,
+  corsErrors.length ? `${corsErrors.length}건 — AI_ALLOWED_ORIGINS 에 ${SITE} 가 있나?` : ''
+)
+
 const real = errors.filter((e) => !/favicon|404/i.test(e))
 if (real.length) {
   console.error('\n콘솔 에러:')
