@@ -11,6 +11,19 @@ interface Props {
 }
 
 /**
+ * 손을 뗀 뒤 나머지가 **쓸려 나가는 시간** (ms).
+ *
+ * 예전엔 시간이 아니라 **프레임 수**로 셌다(반지름을 26번에 나눠 키웠다). 그러면 화면
+ * 주사율에 따라 속도가 달라진다 — 60Hz 폰에서 0.43초짜리가 **120Hz 아이패드에서는
+ * 0.21초**로 후딱 지나간다. 부스 기기가 대개 아이패드라, "긁는 맛" 이 제일 필요한
+ * 자리에서 제일 빨리 끝나고 있었다.
+ *
+ * 지금은 흐른 시간으로 센다 — 어느 기기에서도 같은 속도다.
+ * `ResultReveal` 이 커버를 걷어내는 시점도 이 값에서 파생한다(따로 적으면 어긋난다).
+ */
+export const SCRATCH_SWEEP_MS = 900
+
+/**
  * 스크래치 커버 — 문지르면 지워지고, **누르면(탭) 나머지가 부드럽게 쓸려** 열린다.
  *
  * 색은 슬롯 테마를 그대로 입는다: 커버 배경은 `--color-wash`(편집기 '커버 배경'), 문자는
@@ -100,21 +113,26 @@ export function ScratchCover({ mark, onReveal }: Props) {
           Math.hypot(cx, h - cy),
           Math.hypot(w - cx, h - cy)
         ) + 6
-      let r = 12
-      // 천천히 — 반지름을 조금씩만 키운다 (긁히는 결이 눈에 보이게)
-      const grow = maxR / 26
-      const step = () => {
+      /**
+       * **시간으로 센다** (프레임 수가 아니라 — `SCRATCH_SWEEP_MS` 머리말 참고).
+       *
+       * 반지름은 시작 12px 에서 `maxR` 까지 정해진 시간 동안 자란다. 프레임이 몇 번
+       * 돌든 걸리는 시간은 같다 — 120Hz 기기에서 절반으로 짧아지던 게 이 계산으로 사라진다.
+       */
+      const start = performance.now()
+      const from = 12
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / SCRATCH_SWEEP_MS)
         ctx.beginPath()
-        ctx.arc(cx, cy, r, 0, Math.PI * 2)
+        ctx.arc(cx, cy, from + (maxR - from) * t, 0, Math.PI * 2)
         ctx.fill()
-        r += grow
-        if (r >= maxR) {
+        if (t >= 1) {
           finish()
           return
         }
         rafRef.current = requestAnimationFrame(step)
       }
-      step()
+      rafRef.current = requestAnimationFrame(step)
     }
     const down = (e: PointerEvent) => {
       painting = true

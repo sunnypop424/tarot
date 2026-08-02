@@ -4,13 +4,19 @@ import { Info, Truck } from 'lucide-react'
 import type { LuckydrawDisplay } from '@/data/luckydraw'
 import type { DrawResult, DrawnPrize, LuckydrawSettings } from '@/lib/repo'
 import { Confetti } from './Confetti'
-import { ScratchCover } from './ScratchCover'
+import { ScratchCover, SCRATCH_SWEEP_MS } from './ScratchCover'
 import { ShippingForm } from './ShippingForm'
 import styles from './Luckydraw.module.css'
 import { useT } from '@/i18n'
 
 /** 긁히는 데 걸리는 시간 — CSS 의 transition 과 같아야 한다 */
-const SCRATCH_MS = 700
+/**
+ * 커버를 **걷어내는 시점** — 쓸려 나가는 시간(`SCRATCH_SWEEP_MS`)에 여유를 더한다.
+ *
+ * 따로 적으면 어긋난다: 이 값이 더 짧으면 다 쓸리기 전에 커버가 사라져 **뚝 끊겨 보이고**,
+ * 너무 길면 이미 빈 커버가 남아 다음 칸을 긁는 걸 막는다. 한쪽에서 파생시킨다.
+ */
+const SCRATCH_MS = SCRATCH_SWEEP_MS + 250
 
 interface Props {
   result: DrawResult
