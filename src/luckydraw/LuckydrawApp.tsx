@@ -462,6 +462,7 @@ export default function LuckydrawApp() {
           prizes={[...prizes].sort((a, b) => a.rank - b.rank)}
           showCount={showCount}
           highlightRanks={display.highlightRanks}
+          hideRank={settings?.displayMode === 'prize'}
           onClose={() => setPrizeOpen(false)}
         />
       )}

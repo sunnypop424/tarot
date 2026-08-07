@@ -138,6 +138,46 @@ for (const c of CASES) {
     shipLines.join(' | ') || '(줄 없음)'
   )
   await box.screenshot({ path: join(DIR, `mode-${c.mode}-shipping.png`) })
+
+  /*
+   * 경품 미리보기 — **뽑기 전** 목록이다. 여기 등수가 남아 있으면 뽑기도 전에 등수 체계를
+   * 다 보게 된다. 뽑기 화면으로 돌아가 '경품 미리보기' 를 연다 (여기 상품은 샘플이 아니라
+   * 슬롯에 실제로 들어 있는 것이라, 이름에 "등" 이 안 붙어 있을 수도 있다 — 그래서 배지는
+   * 클래스로 센다).
+   */
+  const drawPill = await page.$('[data-preview-screen="draw"]')
+  if (!drawPill) {
+    check(`${c.slug} 뽑기 미리보기`, false, '화면 pill 을 못 찾았어요')
+    continue
+  }
+  await drawPill.click()
+  await wait(1800)
+
+  const drawFrame = await previewFrame()
+  const opened = await drawFrame.evaluate(() => {
+    const btn = [...document.querySelectorAll('button')].find((e) =>
+      (e.textContent ?? '').includes('경품 미리보기')
+    )
+    btn?.click()
+    return Boolean(btn)
+  })
+  if (!opened) {
+    check(`${c.slug} 경품 미리보기 버튼`, false, '버튼이 없어요 (주최자가 껐거나 상품이 없음)')
+    continue
+  }
+  await wait(900)
+
+  const prizeRows = await drawFrame.$$eval('[class*="prizeRow"]', (els) => els.length)
+  check(`${c.slug} 경품 미리보기가 열림`, prizeRows > 0, `${prizeRows}줄`)
+  const prizeBadges = await drawFrame.$$eval('[class*="prizeBadge"]', (els) =>
+    els.map((e) => e.textContent)
+  )
+  check(
+    `${c.slug}(${c.mode}) 경품 미리보기 등수 배지 ${c.rank ? '있음' : '없음'}`,
+    prizeRows > 0 && (c.rank ? prizeBadges.length > 0 : prizeBadges.length === 0),
+    prizeBadges.join(' ') || '(없음)'
+  )
+  await box.screenshot({ path: join(DIR, `mode-${c.mode}-prizes.png`) })
 }
 
 await browser.close()
