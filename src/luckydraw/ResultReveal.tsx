@@ -113,11 +113,16 @@ export function ResultReveal({
               className={styles.summaryRow}
               data-high={isHigh(p) || undefined}
             >
-              <span className={styles.summaryBadge} data-high={isHigh(p) || undefined}>
-                {t('{n}등', { n: p.rank })}
-              </span>
-              {/* 전체 결과는 방문자 연출이 아니라 스태프 핸드오프 목록이다 —
-                  displayMode(등수만/상품명만) 와 무관하게 늘 상품명을 보여준다.
+              {/* **'상품명만' 이면 여기서도 등수를 감춘다.**
+                  전체 결과는 스태프 핸드오프 목록이라 등수를 붙여 두는 게 원래 편했는데,
+                  등수를 숨기기로 한 행사에서 **당첨 화면엔 없던 "1등" 이 이 목록에서 튀어나왔다** —
+                  방문자가 같이 보는 화면이라 숨긴 게 숨겨지지 않는다. 주최자가 고른 대로 따른다. */}
+              {displayMode !== 'prize' && (
+                <span className={styles.summaryBadge} data-high={isHigh(p) || undefined}>
+                  {t('{n}등', { n: p.rank })}
+                </span>
+              )}
+              {/* 상품명은 displayMode('등수만') 와 무관하게 늘 보여준다 —
                   스태프가 뭘 줘야 하는지 여기서 한눈에 봐야 하기 때문. */}
               <span className={styles.summaryName}>{p.name}</span>
               {p.requiresShipping && (
@@ -155,6 +160,7 @@ export function ResultReveal({
             prizes={grouped
               .filter((p) => p.requiresShipping)
               .map((p) => ({ rank: p.rank, name: p.name, count: p.count }))}
+            hideRank={displayMode === 'prize'}
             onClose={() => setShipping(false)}
           />
         )}

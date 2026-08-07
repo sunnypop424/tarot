@@ -8,6 +8,14 @@ import { useT } from '@/i18n'
 interface Props {
   slug: string
   prizes: { rank: number; name: string; count: number }[]
+  /**
+   * '상품명만' 슬롯 — **보여줄 때만** 등수를 뺀다.
+   *
+   * 이 창은 전체 결과에서 한 번 눌러 들어오는 자리라, 목록에서 감춘 등수가 여기서
+   * 그대로 튀어나오면 감춘 의미가 없다. **보내는 값에는 rank 가 그대로 들어간다** —
+   * 주최자·스태프는 어느 등수 상품을 보내야 하는지 알아야 한다.
+   */
+  hideRank?: boolean
   onClose: () => void
 }
 
@@ -18,7 +26,7 @@ interface Props {
  * 과해 보이지만, 읽기를 열면 그 슬롯 당첨자 전원의 이름·연락처·주소가 anon 키로 긁힌다 —
  * 그 위험에 비하면 "제출 후 수정 불가" 는 싸다 (틀리면 스태프에게 말하면 된다).
  */
-export function ShippingForm({ slug, prizes, onClose }: Props) {
+export function ShippingForm({ slug, prizes, hideRank = false, onClose }: Props) {
   const t = useT()
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -80,7 +88,9 @@ export function ShippingForm({ slug, prizes, onClose }: Props) {
                     {prizes.map((p) => (
                       <li key={`${p.rank}-${p.name}`} className={styles.shipItem}>
                         {/* 경품 이름은 주최자가 쓴 말 — 언어별로 적었으면 그걸 (0046) */}
-                        <span>{t('{n}등 · {name}', { n: p.rank, name: p.name })}</span>
+                        <span>
+                          {hideRank ? p.name : t('{n}등 · {name}', { n: p.rank, name: p.name })}
+                        </span>
                         <b className={styles.shipCount}>{t('{n}개', { n: p.count })}</b>
                       </li>
                     ))}
