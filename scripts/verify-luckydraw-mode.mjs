@@ -28,7 +28,8 @@ const env = Object.fromEntries(
     .map((l) => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()])
 )
 const PW = env.SEED_PASSWORD ?? 'tarot1234'
-const BASE = 'http://localhost:5174'
+/** 기본은 개발 서버. 배포된 걸 그대로 찔러보려면 `BASE=https://www.olucky.me` */
+const BASE = process.env.BASE ?? 'http://localhost:5174'
 const DIR = process.argv[2] ?? '.'
 
 /** 어떤 슬롯을 어떤 기대로 볼지 — display_mode 는 DB 에 이미 그렇게 저장돼 있다 */
