@@ -37,6 +37,20 @@
   --ds-band-line: none;
   --ds-pv-border: none;
   --ds-pv-hover: var(--color-surface);
+  /**
+   * **포인트 글자·아이콘** — '경품 미리보기' 글자, 안내 배너 아이콘, 배송 칩.
+   *
+   * 기본은 `--color-primary` 다. 그런데 럭드 편집기에서 primary 의 이름은 '버튼 **배경색**'
+   * 이고 짝은 onPrimary 다 — 밝은 슬롯은 여기에 크림색을 넣는다. 그 값이 흰 박스 위 글자로
+   * 나가면 안 보인다 (실제로 그런 슬롯이 있었다).
+   *
+   * **테마에서 파생하지 않고 칸을 연 이유:** accent 로 파생해 봤더니 accent 를 흰색으로 둔
+   * 슬롯이 4개였다 — 흰색은 흰 박스 위에서 못 읽혀 파생이 회색으로 끌어내리고, 지금 잘 나오는
+   * 파랑·분홍이 통째로 회색이 된다. 이 자리는 슬롯마다 답이 달라서 **고르게 하는 게 맞다.**
+   * 비우면 `--ld-point` 가 없으니 지금까지처럼 primary 로 떨어진다 (`data/luckydraw.ts` pointColor).
+   */
+  --ds-pv-fg: var(--ld-point, var(--color-primary));
+  --ds-note-icon: var(--ld-point, var(--color-primary));
 }
 
 .panel {
@@ -533,7 +547,8 @@
   gap: 4px;
   padding: 3px 8px;
   border-radius: var(--radius-full);
-  color: var(--color-primary);
+  /* 밴드 글자·리허설 아이콘과 같은 포인트색 (`.stage` 의 `--ds-pv-fg` 머리말) */
+  color: var(--ld-point, var(--color-primary));
   /* 배경은 글자색을 따라 옅게 (currentColor) */
   background: color-mix(in srgb, currentColor 14%, transparent);
   font-size: 11px;

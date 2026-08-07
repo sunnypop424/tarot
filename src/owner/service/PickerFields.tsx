@@ -1,5 +1,55 @@
+import { useEffect, useState } from 'react'
+
 import type { CountPickerStyle } from '@/data/countPicker'
 import { CSS, Divided, Field, SwatchColor } from '../editorUi'
+
+/** "5, 10, 15" → [5,10,15]. 정리(중복·정렬·기본값)는 화면 쪽 `countPresets` 가 한다 */
+const parsePresets = (text: string): number[] =>
+  text
+    .split(',')
+    .map((s) => Math.floor(Number(s.trim())))
+    .filter((n) => Number.isFinite(n) && n >= 1)
+
+/**
+ * 빠른선택 숫자 — **타이핑 중인 글자를 상태로 들고 있는다.**
+ *
+ * 숫자 배열을 그대로 되돌려 그리면 `"5, 10,"` 의 마지막 쉼표가 매 글자마다 지워져
+ * 다음 숫자를 이어 칠 수가 없다. 그래서 칸은 문자열을 보이고, 부모에는 숫자만 올린다.
+ * 밖에서 값이 바뀐 때(슬롯 전환·초안 되돌리기)만 다시 맞춘다 — 내가 친 글자가 같은
+ * 숫자로 읽히면 건드리지 않는다.
+ */
+function PresetsField({
+  value,
+  onChange,
+}: {
+  value: number[] | undefined
+  onChange: (nums: number[]) => void
+}) {
+  const incoming = (value ?? []).join(', ')
+  const [text, setText] = useState(incoming)
+
+  useEffect(() => {
+    setText((cur) => (parsePresets(cur).join(', ') === incoming ? cur : incoming))
+  }, [incoming])
+
+  return (
+    <Field label="빠른선택 숫자" hint="쉼표로 구분해요. 비우면 1, 5, 10.">
+      <input
+        type="text"
+        inputMode="numeric"
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value)
+          onChange(parsePresets(e.target.value))
+        }}
+        placeholder="1, 5, 10"
+        style={CSS.input}
+        aria-label="빠른선택 숫자"
+        data-picker-presets
+      />
+    </Field>
+  )
+}
 
 /**
  * 수량 고르기 설정 — **럭키드로우와 포토카드가 같이 쓴다.**
@@ -71,6 +121,15 @@ export function PickerFields({
             <option value="3">굵게 (3px)</option>
           </select>
         </Field>
+        <PresetsField
+          value={value.presets}
+          onChange={(nums) => {
+            const next = { ...value }
+            if (nums.length) next.presets = nums
+            else delete next.presets
+            onChange(next)
+          }}
+        />
       </div>
 
       <Divided min={230} gap={12}>

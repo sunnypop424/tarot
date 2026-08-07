@@ -134,6 +134,11 @@ export default function LuckydrawApp() {
     set('--ld-sub-bg', display.subBtnBg)
     set('--ld-sub-fg', display.subBtnFg)
     /*
+     * 포인트 글자·아이콘('경품 미리보기'·안내 배너 아이콘·배송 칩). 비우면 변수를 지워
+     * CSS 가 primary 로 폴백한다 — 안 고른 슬롯의 화면은 지금과 똑같다.
+     */
+    set('--ld-point', display.pointColor)
+    /*
      * 수량 고르기는 공용 컴포넌트라 `--cp-*` 로 넘긴다. 안 고른 색은 **슬롯 테마와 옛
      * counter* 값에서** 물려받는다 — 이미 도는 럭드 슬롯의 화면이 달라지면 안 된다.
      */
@@ -384,6 +389,8 @@ export default function LuckydrawApp() {
                   <CountPicker
                     count={count}
                     max={MAX_DRAW}
+                    /* 빠른선택 숫자 — 색과 달리 CSS 로 못 보내서 값으로 넘긴다 (비우면 기본 1·5·10) */
+                    presets={display.picker.presets}
                     onCount={setCount}
                     onGo={draw}
                     label={t('몇 개를 뽑을까요?')}

@@ -107,7 +107,12 @@
   border: var(--ds-pv-border, 1px solid var(--color-border-hover));
   border-radius: var(--radius-md);
   background: var(--color-surface);
-  color: var(--color-primary);
+  /**
+   * 글자색도 열어 둔다 — `--color-primary` 는 **바탕색 토큰**이라 글자로 쓰면 슬롯에 따라
+   * 사라진다. 실제로 primary 를 크림색(#fdf9e3)으로 둔 슬롯에서 흰 표면 위 크림 글자가 됐다
+   * (그 슬롯의 읽히는 포인트색은 accent 쪽에 있었다). 럭드는 `--ds-pv-fg` 로 갈아 끼운다.
+   */
+  color: var(--ds-pv-fg, var(--color-primary));
   font-size: var(--text-xxs);
   font-weight: var(--weight-bold);
   cursor: pointer;
@@ -273,7 +278,8 @@
 .infoBanner svg {
   flex-shrink: 0;
   margin-top: 1px;
-  color: var(--color-primary);
+  /* 아이콘 색도 같은 이유로 연다 (`.previewBtn` 의 `--ds-pv-fg` 머리말) */
+  color: var(--ds-note-icon, var(--color-primary));
 }
 .infoBanner b {
   color: var(--color-fg-1);

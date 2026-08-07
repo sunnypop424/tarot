@@ -151,6 +151,17 @@ export interface LuckydrawDisplay {
   subBtnFg: string
 
   /**
+   * **포인트 글자·아이콘 색** — '경품 미리보기' 글자, 안내 배너 아이콘, 배송 칩.
+   * 비우면 지금까지처럼 `primary`(버튼 배경색)를 글자로 쓴다.
+   *
+   * 칸을 연 이유: primary 는 편집기에서 '버튼 **배경색**' 이라 밝은 색이 들어온다. 크림색
+   * primary 를 쓴 슬롯에서 이 세 자리가 흰 박스 위 크림 글자로 나가 안 보였다.
+   * 테마에서 파생(accent)하는 길도 있었지만 accent 를 흰색으로 둔 슬롯이 4개라, 파생하면
+   * 그 슬롯들의 파랑·분홍이 회색으로 끌려간다 — 슬롯마다 답이 달라 고르게 하는 게 맞다.
+   */
+  pointColor: string
+
+  /**
    * 등수 배지 스타일 (전체 결과·경품 목록의 "1등" 알약).
    *
    * - `soft`: 배경이 **글자색을 따라 옅게** 깔린다 (글자에 색, 배경은 그 색의 투명 톤). 시안 기본.
@@ -208,7 +219,7 @@ export const LUCKYDRAW_GROUPS: {
   extras?: (
     | 'boxRadius' | 'boxPadding' | 'boxTopMargin' | 'buttonRadius' | 'subBtn'
     | 'font' | 'background' | 'texts' | 'cover' | 'badge' | 'footer' | 'shadow' | 'modal'
-    | 'noBorder' | 'highNoBorder' | 'counter' | 'badgeStyle' | 'boxBorder'
+    | 'noBorder' | 'highNoBorder' | 'counter' | 'badgeStyle' | 'boxBorder' | 'point'
   )[]
 }[] = [
   // ── 박스 (사진 위에 뜨는 상자) — 배경·테두리·둥글기·여백·그림자 한자리에 ──
@@ -272,7 +283,7 @@ export const LUCKYDRAW_GROUPS: {
       { key: 'fg1', label: '제목', part: 'title' },
       { key: 'fg3', label: '안내 문구', part: 'note' },
     ],
-    extras: ['font', 'badge', 'footer'],
+    extras: ['font', 'badge', 'footer', 'point'],
   },
   // ── 배송·경품 모달 ──
   {
@@ -349,6 +360,8 @@ export const DEFAULT_DISPLAY: LuckydrawDisplay = {
   // 비우면 지금까지처럼 파생색 (칩 바탕 + 그 위에서 읽히는 글자)
   subBtnBg: '',
   subBtnFg: '',
+  // 비우면 primary 로 폴백 (지금까지의 화면 그대로)
+  pointColor: '',
   // 시안 기본 — 옅은 배경 + 글자색
   badgeStyle: 'soft',
   picker: {},
@@ -403,6 +416,7 @@ export function luckydrawDisplay(slot: Slot): LuckydrawDisplay {
     counterShadow: saved.counterShadow ?? DEFAULT_DISPLAY.counterShadow,
     subBtnBg: saved.subBtnBg ?? DEFAULT_DISPLAY.subBtnBg,
     subBtnFg: saved.subBtnFg ?? DEFAULT_DISPLAY.subBtnFg,
+    pointColor: saved.pointColor ?? DEFAULT_DISPLAY.pointColor,
     // 'solid' 만 유효값으로 받고 나머지는 기본 soft
     badgeStyle: saved.badgeStyle === 'solid' ? 'solid' : 'soft',
     /*

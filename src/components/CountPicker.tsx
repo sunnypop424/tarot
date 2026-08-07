@@ -1,6 +1,6 @@
 import { Minus, Plus } from 'lucide-react'
 
-import { COUNT_PRESETS } from '@/data/countPicker'
+import { countPresets } from '@/data/countPicker'
 import styles from './CountPicker.module.css'
 import { useT } from '@/i18n'
 
@@ -24,10 +24,13 @@ export function CountPicker({
   busy,
   disabled,
   className,
+  presets: rawPresets,
 }: {
   count: number
   /** 상한 — 서비스가 정한다 (럭드 100, 포토카드 슬롯 설정) */
   max: number
+  /** 빠른선택 숫자 — 슬롯이 고른 값. 비우면 기본 1·5·10 */
+  presets?: number[]
   onCount: (n: number) => void
   onGo: () => void
   /** 스테퍼 위 한 줄. 비우면 안 그린다 */
@@ -40,7 +43,7 @@ export function CountPicker({
 }) {
   const t = useT()
   const clamp = (n: number) => Math.max(1, Math.min(max, n))
-  const presets = COUNT_PRESETS.filter((n) => n <= max)
+  const presets = countPresets(rawPresets).filter((n) => n <= max)
 
   return (
     <div className={`${styles.root}${className ? ` ${className}` : ''}`} data-count-picker>
@@ -78,8 +81,15 @@ export function CountPicker({
         </button>
       </div>
 
-      {/* 프리셋이 하나뿐이면(상한 1) 안 그린다 — 누를 게 없는 줄이 남는다 */}
-      {presets.length > 1 && (
+      {/**
+       * 누를 게 없으면 안 그린다 — 빈 줄이 남는다.
+       *
+       * 예전 조건은 `길이 > 1` 이었다. 기본값(1·5·10)에선 "상한이 낮아 1 만 남았다" 를
+       * 걸러내는 같은 뜻이지만, 슬롯이 프리셋을 고르게 된 뒤로는 **하나만 고른 슬롯
+       * (예: 10개 하나)의 줄까지 지운다.** 지우고 싶은 건 스테퍼가 이미 열어 둔 값(1)뿐인
+       * 경우다 — 그걸 그대로 적는다. 상한 3 인 포토카드 슬롯은 예전처럼 안 그려진다.
+       */}
+      {presets.some((n) => n > 1) && (
         <div className={styles.quick}>
           {presets.map((n) => (
             <button

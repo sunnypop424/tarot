@@ -378,6 +378,8 @@ function Staff({ slot }: { slot: Slot }) {
                 <CountPicker
                   count={count}
                   max={max}
+                  /* 빠른선택 숫자 — 색과 달리 CSS 로 못 보내서 값으로 넘긴다 (비우면 기본 1·5·10) */
+                  presets={display.picker.presets}
                   onCount={setCount}
                   onGo={() => void go()}
                   label={t('몇 장을 뽑을까요?')}

@@ -315,6 +315,19 @@ export function LuckydrawExtra({
           />
         </>
       )
+    /**
+     * 포인트 글자·아이콘 — **비우면 primary** 라 지금까지의 화면과 같다.
+     * 칸을 연 이유는 `data/luckydraw.ts` 의 `pointColor` 머리말에 적어 뒀다.
+     */
+    case 'point':
+      return (
+        <AlphaColor
+          label="포인트 글자·아이콘"
+          value={d.pointColor || draft.theme.colors.primary}
+          onChange={(v) => patchLd({ pointColor: v })}
+          hint="'경품 미리보기' 글자 · 안내 배너 아이콘 · 배송 칩이에요"
+        />
+      )
     case 'counter': {
       /**
        * 수량 고르기 — **포토카드와 같은 컴포넌트**를 쓴다 (`components/CountPicker.tsx`).

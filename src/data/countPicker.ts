@@ -10,6 +10,14 @@
  * 있고 자기 팔레트를 쓰는 서비스도 있어서다.
  */
 export interface CountPickerStyle {
+  /**
+   * 빠른선택 숫자 — 비우면 기본 `COUNT_PRESETS`(1·5·10).
+   *
+   * 색이 아니라 **내용**이지만 여기 두는 이유: 이 묶음을 슬롯 단위로 다루는 자리가 여기
+   * 하나뿐이고, 럭드·포토카드가 같은 컴포넌트를 쓰므로 한쪽만 열면 또 갈라진다.
+   * 상한(`max`)을 넘는 값은 화면이 뺀다.
+   */
+  presets?: number[]
   /** 모서리 둥글기 (px) — 스테퍼·프리셋·실행 버튼에 비례해 들어간다 */
   radius: number
   /** 테두리 굵기 (px). 0 이면 테두리가 없다 */
@@ -65,6 +73,11 @@ export function countPicker(
   const pick = <K extends keyof CountPickerStyle>(k: K): CountPickerStyle[K] =>
     (s[k] ?? base[k] ?? DEFAULT_COUNT_PICKER[k]) as CountPickerStyle[K]
   return {
+    /**
+     * 프리셋은 **빈 배열도 "안 골랐다"** 로 본다 — `countPresets` 가 기본값으로 되돌린다.
+     * 빠른선택 줄을 통째로 없애는 건 프리셋을 비우는 게 아니라 상한을 1 로 두는 쪽이다.
+     */
+    presets: s.presets?.length ? s.presets : base.presets,
     // 숫자는 0 이 유효한 값이라 `??` 로 (0 을 "없음" 으로 보면 테두리를 못 끈다)
     radius: s.radius ?? base.radius ?? DEFAULT_COUNT_PICKER.radius,
     borderWidth: s.borderWidth ?? base.borderWidth ?? DEFAULT_COUNT_PICKER.borderWidth,
@@ -101,9 +114,18 @@ export function pickerVars(s: CountPickerStyle): Record<string, string> {
 }
 
 /**
- * 프리셋 — **1·5·10 으로 통일한다.**
+ * 프리셋 **기본값** — 1·5·10 으로 통일한다.
  *
  * 럭드는 1·5·10, 포토카드는 1·3·5·10 이었다. 같은 화면인데 숫자가 다르면 그건 그냥
  * 갈라진 것이고, 방문자가 두 이벤트를 오가면 손이 헷갈린다. 상한(`max`)을 넘는 건 뺀다.
+ *
+ * 슬롯이 `presets` 를 채우면 그 값이 이긴다 — 행사마다 "한 번에 몇 개" 의 단위가 다르다
+ * (10장 세트를 파는 부스에서 1·5·10 은 아무도 안 누른다). 기본은 그대로 둔다.
  */
 export const COUNT_PRESETS = [1, 5, 10] as const
+
+/** 슬롯이 고른 프리셋을 정리한다 — 정수·1 이상·중복 제거·오름차순. 비면 기본값 */
+export function countPresets(presets: number[] | undefined): number[] {
+  const clean = [...new Set((presets ?? []).map((n) => Math.floor(Number(n))).filter((n) => n >= 1))]
+  return clean.length ? clean.sort((a, b) => a - b) : [...COUNT_PRESETS]
+}
